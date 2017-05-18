@@ -1,0 +1,17 @@
+@page {
+    bleed: 1cm;
+    marks: cross;
+    size: A4 portrait;
+}
+
+@page :first {
+    content: 'first!';
+}
+
+@page :left {
+    content: 'Recto';
+}
+
+@page :right {
+    content: 'Verso';
+}

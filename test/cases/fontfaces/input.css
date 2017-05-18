@@ -1,0 +1,13 @@
+.rule {
+    color: red
+}
+
+@font-face {
+    /* empty */
+}
+
+@font-face {
+    font-family: monospace;
+    font-variant: normal;
+    font-weight: normal;
+}

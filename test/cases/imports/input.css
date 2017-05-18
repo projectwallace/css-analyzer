@@ -1,0 +1,10 @@
+@import 'https://example.com/without-url';
+@import url('https://example.com/with-url');
+
+.rule {
+    color: red;
+}
+
+@import url('https://example.com/with-media-query') screen and (min-width: 33em);
+
+@import url('https://example.com/with-multiple-media-queries') screen, projection;

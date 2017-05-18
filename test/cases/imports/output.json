@@ -1,0 +1,10 @@
+{
+  "total": 4,
+  "totalUnique": 4,
+  "unique": [
+    "'https://example.com/without-url'",
+    "url('https://example.com/with-media-query') screen and (min-width: 33em)",
+    "url('https://example.com/with-multiple-media-queries') screen, projection",
+    "url('https://example.com/with-url')"
+  ]
+}

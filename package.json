@@ -1,0 +1,35 @@
+{
+  "name": "css-analyzer",
+  "version": "1.0.0",
+  "author": {
+    "name": "Bart Veneman",
+    "email": "bart@bveneman.nl",
+    "website": "bveneman.nl"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=7.0"
+  },
+  "scripts": {
+    "test": "xo && nyc ava"
+  },
+  "xo": {
+    "space": true,
+    "semicolon": false
+  },
+  "dependencies": {
+    "colors-regex": "^1.0.0",
+    "css": "^2.2.1",
+    "css-collection": "projectwallace/css-collection",
+    "css-color-names": "^0.0.4",
+    "css-shorthand-expand": "^1.1.0",
+    "css-unit-sort": "^1.1.1",
+    "path": "^0.12.7",
+    "specificity": "^0.3.0"
+  },
+  "devDependencies": {
+    "ava": "^0.19.1",
+    "nyc": "^10.3.2",
+    "xo": "^0.18.1"
+  }
+}

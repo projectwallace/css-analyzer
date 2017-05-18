@@ -1,0 +1,92 @@
+{
+  "total": 51,
+  "totalUnique": 50,
+  "js": {
+    "total": 6,
+    "totalUnique": 6,
+    "unique": [
+      "#jsSelector",
+      ".JSFOO",
+      ".adjecent.js-selector",
+      ".js-toggle-item",
+      "[class*=\"js-selector\"]",
+      "[id='js-selector']"
+    ]
+  },
+  "id": {
+    "total": 4,
+    "totalUnique": 4,
+    "unique": [
+      "#foo",
+      "#jsSelector",
+      "#multipe #ids #counted #as #one",
+      ".Foo > .Bar ~ .Baz [type=\"text\"] + span:before #bazz #fizz #buzz #drank #drugs"
+    ]
+  },
+  "universal": {
+    "total": 12,
+    "totalUnique": 11,
+    "unique": [
+      "*",
+      "* + html .selector",
+      "* html .selector",
+      "*+html .selector",
+      "*:first-child + html .selector",
+      "*:first-child+html .selector",
+      "*|html[xmlns*=\"\"] .selector",
+      ".foo *",
+      ".foo * .bar",
+      ".selector:not(*:root)",
+      "body*.selector"
+    ]
+  },
+  "specificity": {
+    "top": [
+      {
+        "selector": ".Foo > .Bar ~ .Baz [type=\"text\"] + span:before #bazz #fizz #buzz #drank #drugs",
+        "specificity": {
+          "a": 0,
+          "b": 5,
+          "c": 4,
+          "d": 2
+        }
+      },
+      {
+        "selector": "#multipe #ids #counted #as #one",
+        "specificity": {
+          "a": 0,
+          "b": 5,
+          "c": 0,
+          "d": 0
+        }
+      },
+      {
+        "selector": "#foo",
+        "specificity": {
+          "a": 0,
+          "b": 1,
+          "c": 0,
+          "d": 0
+        }
+      },
+      {
+        "selector": "#jsSelector",
+        "specificity": {
+          "a": 0,
+          "b": 1,
+          "c": 0,
+          "d": 0
+        }
+      },
+      {
+        "selector": ".a .b .c .d .e .f .g .h .i .j .k .l .m .n .o .p .q .r .s .t .u .v .w .x .y .z",
+        "specificity": {
+          "a": 0,
+          "b": 0,
+          "c": 26,
+          "d": 0
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "total": 63,
+  "fontfamilies": {
+    "total": 18,
+    "totalUnique": 12,
+    "unique": [
+      "\"-apple-system\", \"BlinkMacSystemFont\", \"Segoe UI\", \"Roboto\", \"Helvetica\", \"Arial\", sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+      "\"Arial Black\", \"Arial Bold\", Gadget, sans-serif",
+      "\"Brush Script MT\", cursive",
+      "\"Consolas\", \"Liberation Mono\", \"Menlo\", \"Courier\", monospace",
+      "\"Droid Sans\", serif",
+      "\"Noto Sans\"",
+      "\"Source Sans Pro\", serif",
+      "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+      "Consolas, \"Liberation Mono\", Menlo, Courier, monospace",
+      "monospace",
+      "sans-serif",
+      "serif"
+    ]
+  },
+  "fontsizes": {
+    "total": 15,
+    "totalUnique": 10,
+    "unique": [
+      "calc(3vw + 1em)",
+      "1.3em",
+      "1.2em",
+      "large",
+      "1.1em",
+      "16px",
+      "1em",
+      "medium",
+      "small",
+      "11px"
+    ]
+  },
+  "prefixed": {
+    "total": 4,
+    "totalUnique": 4,
+    "unique": [
+      "-moz-linear-gradient(transparent, transparent)",
+      "-ms-linear-gradient(transparent, transparent)",
+      "-o-linear-gradient(transparent, transparent)",
+      "-webkit-gradient(transparent, transparent)"
+    ],
+    "share": 0.06349206349206349
+  },
+  "colors": {
+    "total": 16,
+    "totalUnique": 13,
+    "unique": [
+      "#0000ff00",
+      "#aaa",
+      "#aff034",
+      "Aqua",
+      "hsl(100, 20%, 30%)",
+      "hsla(100, 20%, 30%, 0.5)",
+      "purple",
+      "red",
+      "rgb(100, 200, 10)",
+      "rgba(100, 200, 10, .5)",
+      "rgba(100, 200, 10, 0.5)",
+      "tomato",
+      "white"
+    ]
+  }
+}

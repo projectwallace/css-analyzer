@@ -1,0 +1,11 @@
+{
+  "total": 7,
+  "totalUnique": 5,
+  "unique": [
+    "(min-width: 20px)",
+    "print",
+    "screen",
+    "screen and (min-width: 33em)",
+    "screen or print"
+  ]
+}

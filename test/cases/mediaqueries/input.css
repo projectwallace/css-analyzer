@@ -1,0 +1,55 @@
+@media screen {
+  .empty-rule { }
+  #look-at-this {
+    color: green;
+  }
+  @import url('some-file-in-mq.css');
+}
+
+@media screen {}
+
+@media screen and (min-width: 33em) {
+  #foo:before {
+    content: 'nothing';
+  }
+}
+
+@media (min-width: 20px) {
+  .level-1 {}
+
+  /** TODO support nested MQs */
+  @media (max-width: 200px) {
+    .nested,
+    .level-2 {}
+  }
+}
+
+@media screen or print {
+  .this-awesome-query {}
+}
+
+@media (min-width: 20px) {
+  .idential-query {}
+}
+
+@media print {
+  .no-query {}
+}
+
+/**
+ * TODO support CSS Hacks
+ *
+@media screen\9{.selector{color:red}}
+@media screen\9{.selector{color:red}}
+@media \0screen\,screen\9{.selector{color:red}}
+@media \0screen{.selector{color:red}}
+@media screen and (min-width: 0\0){.selector{color:red}}
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none){.selector{color:red}}
+@-moz-document url-prefix(){.selector{color:red}}
+@media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) { .selector{color:red}}
+@media \0 all{.selector{color:red}}
+@media screen and (-moz-images-in-menus:0){.selector{color:red}}
+@media screen and (min--moz-device-pixel-ratio:0){.selector{color:red}}
+@media all and (min--moz-device-pixel-ratio:0) and (min-resolution: 3e1dpcm){.selector{color:red}}
+@media (min-resolution: .001dpcm){.selector{color:red}}
+*/

@@ -1,0 +1,9 @@
+{
+  "total": 4,
+  "totalUnique": 3,
+  "unique": [
+    "(-webkit-appearance:none)",
+    "(display: table-cell) and (display: list-item)",
+    "(filter: blur(5px))"
+  ]
+}

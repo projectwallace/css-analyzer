@@ -1,0 +1,25 @@
+@-webkit-keyframes NAME-YOUR-ANIMATION {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+@-moz-keyframes NAME-YOUR-ANIMATION {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+@-o-keyframes NAME-YOUR-ANIMATION {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes NAME-YOUR-ANIMATION {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes fontbulger {
+  0%, 100% {
+    font-size: 10px;
+  }
+  50% {
+    font-size: 12px;
+  }
+}

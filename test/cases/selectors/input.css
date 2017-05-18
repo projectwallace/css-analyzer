@@ -1,0 +1,104 @@
+/**
+ * Top specificity selector
+ */
+.Foo > .Bar ~ .Baz [type="text"] + span:before #bazz #fizz #buzz #drank #drugs {
+  margin: 0;
+}
+
+/**
+ * Top identifier selector
+ */
+.a .b .c .d .e .f .g .h .i .j .k .l .m .n .o .p .q .r .s .t .u .v .w .x .y .z {
+  margin: 0;
+}
+
+/**
+ * Js-specific selectors
+ */
+.js-toggle-item,
+.JSFOO,
+.adjecent.js-selector,
+#jsSelector,
+[class*="js-selector"],
+[id='js-selector'] {
+  margin: 0;
+}
+
+/**
+ * Universal selectors
+ * There are more below at the Old IE Hacks
+ */
+*,
+.foo *,
+.foo * .bar,
+[class*='foo'] {
+  content: '*';
+}
+
+/**
+ * ID selectors
+ * There's more above at the JS selectors
+ */
+#foo,
+#multipe #ids #counted #as #one,
+[id='baz'],
+[href='#crux'],
+[href=#foo] {
+  content: '#foo';
+  color: #f00;
+}
+
+/**
+ * CSS Hacks
+ * Contains universal selectors
+ */
+* html .selector {}
+*:first-child + html .selector {}
+*:first-child+html .selector {}
+* + html .selector {}
+*+html .selector {}
+body*.selector {}
+html > body .selector {}
+html>body .selector {}
+.selector\ {}
+:root .selector {}
+body:last-child .selector {}
+body:nth-of-type(1) .selector {}
+body:first-of-type .selector {}
+.selector:not([attr*='']) {}
+.selector:not([attr*=""]) {}
+.selector:not(*:root) {}
+body:empty .selector {}
+x:-moz-any-link {}
+body:not(:-moz-handler-blocked) .selector {}
+_::-moz-progress-bar {}
+_::-moz-range-track {}
+_:-moz-tree-row(hover) {}
+_::selection {}
+x:-IE7 {}
+_:-ms-fullscreen {}
+_:-ms-input-placeholder {}
+html:first-child .selector {}
+_:-o-prefocus {}
+*|html[xmlns*=""] .selector {}
+html[xmlns*=""] body:last-child .selector {}
+html[xmlns*=""]:root .selector  {}
+_::-moz-svg-foreign-content {}
+
+/* Don't report these ones (Issue #88) */
+tbody:first-child {}
+
+/* Don't report duplicates (Issue 161) */
+* html .selector {}
+
+/**
+ * Keyframes (are not selectors) (Issue #107)
+ */
+@keyframes iAmNotSelector {
+  from {
+    margin: 0;
+  }
+  to {
+    margin: auto;
+  }
+}

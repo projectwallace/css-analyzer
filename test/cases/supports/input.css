@@ -1,0 +1,34 @@
+@supports (filter: blur(5px)) {
+  .foo {
+    filter: blur(5px);
+    color: green;
+  }
+}
+
+@supports (display: table-cell) and (display: list-item) {
+  .foo {
+    color: green;
+  }
+}
+
+@supports(-webkit-appearance:none){.foo{color:green;}}
+@supports(-webkit-appearance:none){.foo{color:green;}}
+
+/**
+  * Not supports rules
+  */
+.foo {
+  color: red;
+}
+
+@media screen {
+  .foo {
+    color: red;
+  }
+}
+
+@keyframes test {
+  from {
+    color: red;
+  }
+}
