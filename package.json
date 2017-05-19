@@ -8,7 +8,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=7.0"
+    "node": ">=4.0"
   },
   "scripts": {
     "test": "xo && nyc ava"
@@ -29,7 +29,14 @@
   },
   "devDependencies": {
     "ava": "^0.19.1",
+    "coveralls": "^2.13.1",
     "nyc": "^10.3.2",
     "xo": "^0.18.1"
+  },
+  "nyc": {
+    "reporter": [
+      "lcov",
+      "text"
+    ]
   }
 }
