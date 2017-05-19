@@ -9,13 +9,13 @@ like the amount of rules, the amount of `!important`s, unique colors, and so on.
 ## Install
 
 ```
-$ npm install --save css-analyzer
+$ npm install --save projectwallace/css-analyzer
 ```
 
 or
 
 ```
-$ yarn install css-analyzer
+$ yarn install projectwallace/css-analyzer
 ```
 
 
