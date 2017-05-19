@@ -22,16 +22,153 @@ $ yarn install projectwallace/css-analyzer
 ## Usage
 
 ```js
-const cssAnalyzer = require('css-analyzer');
+const analyze = require('css-analyzer');
 
-cssAnalyzer('body { color: red !important; }');
-//=> {"stylesheet": { "size": 1234, "cohesion": 0.12 }, "selectors": { "total": 123, "totalUnique": 112 }, "etc..."}
+console.log(
+  analyze('body{color:red}')
+);
+
+//=>
+// {
+//   "stylesheets": {
+//     "size": 15,
+//     "simplicity": 1,
+//     "cohesion": {
+//       "average": 1
+//     }
+//   },
+//   "charsets": {
+//     "total": 0,
+//     "unique": [],
+//     "totalUnique": 0
+//   },
+//   "documents": {
+//     "total": 0,
+//     "unique": [],
+//     "totalUnique": 0
+//   },
+//   "fontfaces": {
+//     "total": 0
+//   },
+//   "imports": {
+//     "total": 0,
+//     "unique": [],
+//     "totalUnique": 0
+//   },
+//   "keyframes": {
+//     "total": 0,
+//     "unique": [],
+//     "totalUnique": 0
+//   },
+//   "mediaqueries": {
+//     "total": 0,
+//     "unique": [],
+//     "totalUnique": 0
+//   },
+//   "namespaces": {
+//     "total": 0,
+//     "unique": [],
+//     "totalUnique": 0
+//   },
+//   "pages": {
+//     "total": 0,
+//     "unique": [],
+//     "totalUnique": 0
+//   },
+//   "supports": {
+//     "total": 0,
+//     "unique": [],
+//     "totalUnique": 0
+//   },
+//   "rules": {
+//     "total": 1
+//   },
+//   "selectors": {
+//     "total": 1,
+//     "totalUnique": 1,
+//     "js": {
+//       "total": 0,
+//       "unique": [],
+//       "totalUnique": 0
+//     },
+//     "id": {
+//       "total": 0,
+//       "unique": [],
+//       "totalUnique": 0
+//     },
+//     "universal": {
+//       "total": 0,
+//       "unique": [],
+//       "totalUnique": 0
+//     },
+//     "specificity": {
+//       "top": [
+//         {
+//           "selector": "body",
+//           "specificity": {
+//             "a": 0,
+//             "b": 0,
+//             "c": 0,
+//             "d": 1
+//           }
+//         }
+//       ]
+//     }
+//   },
+//   "declarations": {
+//     "total": 1,
+//     "totalUnique": 1,
+//     "importants": {
+//       "total": 0,
+//       "share": 0
+//     }
+//   },
+//   "properties": {
+//     "total": 1,
+//     "unique": [
+//       "color"
+//     ],
+//     "totalUnique": 1,
+//     "prefixed": {
+//       "total": 0,
+//       "unique": [],
+//       "totalUnique": 0,
+//       "share": 0
+//     }
+//   },
+//   "values": {
+//     "total": 1,
+//     "prefixed": {
+//       "total": 0,
+//       "unique": [],
+//       "totalUnique": 0,
+//       "share": 0
+//     },
+//     "fontsizes": {
+//       "total": 0,
+//       "unique": [],
+//       "totalUnique": 0
+//     },
+//     "fontfamilies": {
+//       "total": 0,
+//       "unique": [],
+//       "totalUnique": 0
+//     },
+//     "colors": {
+//       "total": 1,
+//       "unique": [
+//         "red"
+//       ],
+//       "totalUnique": 1
+//     }
+//   }
+// }
 ```
 
 
 ## API
 
-### cssAnalyzer(input)
+### analyze(input)
 
 #### input
 
