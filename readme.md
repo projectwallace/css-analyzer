@@ -1,4 +1,4 @@
-# css-analyzer
+# css-analyzer [![Build Status](https://travis-ci.org/projectwallace/css-analyzer.svg?branch=master)](https://travis-ci.org/projectwallace/css-analyzer)
 
 > Analyze your CSS completely
 
