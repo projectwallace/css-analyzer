@@ -26,6 +26,8 @@
 .color9 { outline-color: whitesmoke; }
 .color12and12again { background: linear-gradient(90deg, purple 0, purple 100%) }
 .color13 { color: #0000ff00; }
+.color14 { background: rgba(2,2,2,.2) }
+.color15 { background: hsl(100, 10%, 20%) }
 .color-false { background-image: url('icon-blue.png'), url('blue-icon.png'), url('blue_icon.png'), url('icon_blue.png'); }
 .color-false { white-space: nowrap; }
 .color-false { color: inherit; color: initial; color: auto; background: none; color: currentColor; color: transparent; }

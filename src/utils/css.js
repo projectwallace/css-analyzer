@@ -6,7 +6,9 @@ module.exports.KEYWORDS = [
   'auto',
   'inherit',
   'initial',
-  'none'
+  'none',
+  'revert',
+  'unset'
 ]
 
 module.exports.color = {
