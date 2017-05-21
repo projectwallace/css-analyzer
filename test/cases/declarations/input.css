@@ -66,6 +66,8 @@
   }
 }
 
+@keyframes empty {}
+
 /**
  * @font-face can have declarations too
  */
@@ -81,6 +83,9 @@
   margin: 0;
 }
 
+/**
+ * @document can have declarations to0
+ */
 @document url('https://example.com') {
     .rule {
         color: red

@@ -11,10 +11,8 @@ module.exports = rules => {
 
     rules.forEach(rule => {
       const selectors = rule.selectors
-      if (selectors) {
-        while (selectors.length) {
-          collection.push(selectors.shift())
-        }
+      while (selectors.length) {
+        collection.push(selectors.shift())
       }
     })
 
