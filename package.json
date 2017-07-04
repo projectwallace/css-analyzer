@@ -11,7 +11,7 @@
     "node": ">=4.0"
   },
   "scripts": {
-    "test": "xo && nyc ava"
+    "test": "xo && nyc ava test/analyzer test/parser"
   },
   "xo": {
     "space": true,
