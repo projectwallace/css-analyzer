@@ -1,19 +1,15 @@
 const Collection = require('css-collection')
 
-module.exports = stylesheet => {
-  const all = new Collection(stylesheet.rules)
+module.exports = atRules => {
+  const all = new Collection(atRules)
     .filter(rule => rule.type === 'page')
+    .map(rule => rule.params)
 
-  const unique = all
-    .map(rule => `${rule.selectors.join(', ')}`)
-    .unique()
+  const unique = all.unique()
 
   return {
-    all: all.toArray(),
-    stats: {
-      total: all.size(),
-      unique: unique.toArray(),
-      totalUnique: unique.size()
-    }
+    total: all.size(),
+    unique: unique.toArray(),
+    totalUnique: unique.size()
   }
 }

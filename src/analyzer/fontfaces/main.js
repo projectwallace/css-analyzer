@@ -1,13 +1,11 @@
 const Collection = require('css-collection')
 
-module.exports = stylesheet => {
-  const all = new Collection(stylesheet.rules)
+module.exports = atRules => {
+  const all = new Collection(atRules)
     .filter(rule => rule.type === 'font-face')
+    .map(rule => rule.params)
 
   return {
-    all: all.toArray(),
-    stats: {
-      total: all.size()
-    }
+    total: all.size()
   }
 }

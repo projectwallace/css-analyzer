@@ -1,7 +1,6 @@
 {
   "total": 12,
   "unique": [
-    "*zoom",
     "-moz-border-radius",
     "-o-border-radius",
     "-webkit-border-radius",
@@ -9,7 +8,8 @@
     "border-radius",
     "margin",
     "opacity",
-    "property"
+    "property",
+    "zoom"
   ],
   "totalUnique": 9,
   "prefixed": {

@@ -17,7 +17,6 @@
 @media (min-width: 20px) {
   .level-1 {}
 
-  /** TODO support nested MQs */
   @media (max-width: 200px) {
     .nested,
     .level-2 {}

@@ -1,17 +1,23 @@
 const Collection = require('css-collection')
 
-module.exports = stylesheet => {
-  const all = new Collection(stylesheet.rules)
-    .filter(rule => rule.type === 'keyframes')
+module.exports = atRules => {
+  const all = new Collection(atRules)
+    .filter(rule => {
+      return [
+        'keyframes',
+        '-moz-keyframes',
+        '-webkit-keyframes',
+        '-ms-keyframes',
+        '-o-keyframes'
+      ].includes(rule.type)
+    })
+    .map(rule => rule.params)
 
-  const unique = all.uniqueOn('name')
+  const unique = all.unique()
 
   return {
-    all: all.toArray(),
-    stats: {
-      total: all.size(),
-      unique: unique.toArray(),
-      totalUnique: unique.size()
-    }
+    total: all.size(),
+    unique: unique.toArray(),
+    totalUnique: unique.size()
   }
 }

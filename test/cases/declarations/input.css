@@ -86,7 +86,7 @@
 /**
  * @document can have declarations to0
  */
-@document url('https://example.com') {
+@document url('https://no-declarations.com') {
     .rule {
         color: red
     }

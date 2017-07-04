@@ -2,7 +2,6 @@ const expand = require('css-shorthand-expand')
 const Collection = require('css-collection')
 const utils = require('../../utils/css')
 
-const stripImportant = utils.stripImportant
 const cssKeywords = utils.KEYWORDS
 
 module.exports = declarations => {
@@ -27,7 +26,6 @@ module.exports = declarations => {
   })()
 
   const all = new Collection(_all)
-    .map(stripImportant)
     .filter(v => !cssKeywords.includes(v))
 
   const unique = all.unique()
