@@ -1,0 +1,12 @@
+{
+  "total": 8,
+  "totalUnique": 6,
+  "unique": [
+    "(max-width: 200px)",
+    "(min-width: 20px)",
+    "print",
+    "screen",
+    "screen and (min-width: 33em)",
+    "screen or print"
+  ]
+}

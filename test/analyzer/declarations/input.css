@@ -1,0 +1,93 @@
+.foo {
+  margin: 1px;
+  padding: 1em;
+}
+
+/**
+ * In media query
+ */
+@media print {
+  .bar {
+    outline: none;
+  }
+
+  @supports (display: grid) {
+    #baz {
+      margin: 0;
+    }
+  }
+}
+
+/**
+ * Prefixed
+ */
+.baz {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(red), to(blue));
+}
+
+/**
+ * Important !important
+ */
+.imp {
+  border-width: 1px!important;
+}
+
+.imp:before {
+  content: '!important' !important;
+}
+
+.imp-font-size {
+  font-size: 16px !important;
+}
+
+/**
+ * CSS Hacks
+ */
+.selector { _property: value; }
+.selector { property: value !ie; }
+.selector { property: value\9; }
+.selector { opacity: .9; }
+.selector { *zoom: 1 }
+.selector { *zoom: 1 }
+
+/**
+ * @keyframes can have declarations too
+ */
+@keyframes countMeToo {
+  0% {
+    margin: 0;
+  }
+  to {
+    margin: auto;
+  }
+}
+
+@keyframes empty {}
+
+/**
+ * @font-face can have declarations too
+ */
+@font-face {
+  font-family: 'foo';
+  font-weight: normal;
+}
+
+/**
+ * @page can have declarations too
+ */
+@page {
+  margin: 0;
+}
+
+/**
+ * @document can have declarations to0
+ */
+@document url('https://no-declarations.com') {
+    .rule {
+        color: red
+    }
+}

@@ -2,7 +2,6 @@ const expand = require('css-shorthand-expand')
 const Collection = require('css-collection')
 const utils = require('../../utils/css')
 
-const stripImportant = utils.stripImportant
 const cssColorKeywords = utils.COLOR_KEYWORDS
 
 const BACKGROUND_COLOR_PROP = 'background-color'
@@ -13,7 +12,7 @@ module.exports = declarations => {
   const all = new Collection(declarations)
     .filter(d => BACKGROUND_PROPS.includes(d.property))
     .map(d => {
-      const value = stripImportant(d.value)
+      const value = d.value
 
       if (d.property === BACKGROUND_COLOR_PROP) {
         return value

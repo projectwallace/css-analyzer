@@ -1,7 +1,6 @@
 module.exports = declarations => {
   const all = declarations
-    .map(declaration => declaration.value)
-    .filter(value => value.endsWith('!important'))
+    .filter(value => value.important)
 
   const share = (() => {
     // Catch divide by zero exception

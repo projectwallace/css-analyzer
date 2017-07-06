@@ -8,10 +8,10 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=4.0"
+    "node": ">=7.0"
   },
   "scripts": {
-    "test": "xo && nyc ava"
+    "test": "xo && nyc ava test/analyzer test/parser"
   },
   "xo": {
     "space": true,
@@ -19,12 +19,12 @@
   },
   "dependencies": {
     "colors-regex": "^1.0.0",
-    "css": "^2.2.1",
     "css-collection": "projectwallace/css-collection",
     "css-color-names": "^0.0.4",
     "css-shorthand-expand": "^1.1.0",
     "css-unit-sort": "^1.1.1",
     "path": "^0.12.7",
+    "postcss": "^6.0.3",
     "specificity": "^0.3.0"
   },
   "devDependencies": {

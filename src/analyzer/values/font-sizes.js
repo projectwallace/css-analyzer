@@ -3,7 +3,6 @@ const unitSort = require('css-unit-sort')
 const Collection = require('css-collection')
 const utils = require('../../utils/css')
 
-const stripImportant = utils.stripImportant
 const keywords = utils.KEYWORDS
 
 module.exports = declarations => {
@@ -28,7 +27,6 @@ module.exports = declarations => {
   })()
 
   const all = new Collection(_all)
-    .map(stripImportant)
     .filter(v => !keywords.includes(v))
   const unique = all.unique().sort(unitSort)
 

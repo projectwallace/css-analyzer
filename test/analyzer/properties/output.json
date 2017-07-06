@@ -1,0 +1,25 @@
+{
+  "total": 12,
+  "unique": [
+    "-moz-border-radius",
+    "-o-border-radius",
+    "-webkit-border-radius",
+    "background-image",
+    "border-radius",
+    "margin",
+    "opacity",
+    "property",
+    "zoom"
+  ],
+  "totalUnique": 9,
+  "prefixed": {
+    "total": 3,
+    "unique": [
+      "-moz-border-radius",
+      "-o-border-radius",
+      "-webkit-border-radius"
+    ],
+    "totalUnique": 3,
+    "share": 0.25
+  }
+}

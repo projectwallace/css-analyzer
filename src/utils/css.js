@@ -35,10 +35,3 @@ module.exports.color = {
     hsl: /hsl\(\s*(\d+)\s*,\s*(\d*(?:\.\d+)?%)\s*,\s*(\d*(?:\.\d+)?%)\)|hsla\((\d+),\s*([\d.]+)%,\s*([\d.]+)%,\s*(\d*(?:\.\d+)?)\)/gi
   }
 }
-
-module.exports.stripImportant = value => {
-  return value
-    .toString()
-    .replace('!important', '')
-    .trim()
-}

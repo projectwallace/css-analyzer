@@ -3,13 +3,12 @@ const utils = require('../../utils/css')
 
 const cssKeywords = utils.color.keywords
 const colorProperties = utils.color.properties
-const stripImportant = utils.stripImportant
 
 module.exports = declarations => {
   const _all = []
 
   declarations.forEach(declaration => {
-    const value = stripImportant(declaration.value)
+    const value = declaration.value
 
     // Try to get a direct color
     if (colorProperties.includes(declaration.property)) {

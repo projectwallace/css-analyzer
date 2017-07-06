@@ -1,39 +1,43 @@
-const parser = require('css')
+const parser = require('../parser')
 
 module.exports = input => {
-  const stylesheet = parser.parse(input).stylesheet
+  return new Promise((resolve, reject) => {
+    parser(input).then(css => {
+      const charsets = require('./charsets/main')(css.atRules)
+      const documents = require('./documents/main')(css.atRules)
+      const fontfaces = require('./fontfaces/main')(css.atRules)
+      const imports = require('./imports/main')(css.atRules)
+      const keyframes = require('./keyframes/main')(css.atRules)
+      const mediaqueries = require('./mediaqueries/main')(css.atRules)
+      const namespaces = require('./namespaces/main')(css.atRules)
+      const pages = require('./pages/main')(css.atRules)
+      const supports = require('./supports/main')(css.atRules)
+      const rules = require('./rules/main')(css.rules)
+      const selectors = require('./selectors/main')(css.selectors)
+      const declarations = require('./declarations/main')(css.declarations)
+      const properties = require('./properties/main')(css.declarations)
+      const values = require('./values/main')(css.declarations)
+      const stylesheets = require('./stylesheets/main')(input, rules, selectors, declarations)
 
-  const charsets = require('./charsets/main')(stylesheet)
-  const documents = require('./documents/main')(stylesheet)
-  const fontfaces = require('./fontfaces/main')(stylesheet)
-  const imports = require('./imports/main')(stylesheet)
-  const keyframes = require('./keyframes/main')(stylesheet)
-  const mediaqueries = require('./mediaqueries/main')(stylesheet)
-  const namespaces = require('./namespaces/main')(stylesheet)
-  const pages = require('./pages/main')(stylesheet)
-  const supports = require('./supports/main')(stylesheet)
-  const rules = require('./rules/main')(stylesheet)
-  const selectors = require('./selectors/main')(rules.all)
-  const declarations = require('./declarations/main')(rules.all, fontfaces.all, keyframes.all, pages.all)
-  const properties = require('./properties/main')(declarations.all)
-  const values = require('./values/main')(declarations.all)
-  const stylesheets = require('./stylesheets/main')(input, rules.stats, selectors.stats, declarations.stats)
-
-  return {
-    stylesheets,
-    charsets,
-    documents,
-    fontfaces: fontfaces.stats,
-    imports,
-    keyframes: keyframes.stats,
-    mediaqueries,
-    namespaces,
-    pages: pages.stats,
-    supports,
-    rules: rules.stats,
-    selectors: selectors.stats,
-    declarations: declarations.stats,
-    properties,
-    values
-  }
+      resolve({
+        stylesheets,
+        charsets,
+        documents,
+        fontfaces,
+        imports,
+        keyframes,
+        mediaqueries,
+        namespaces,
+        pages,
+        supports,
+        rules,
+        selectors,
+        declarations,
+        properties,
+        values
+      })
+    }).catch(err => {
+      reject(err)
+    })
+  })
 }

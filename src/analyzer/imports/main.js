@@ -1,10 +1,11 @@
 const Collection = require('css-collection')
 
-module.exports = stylesheet => {
-  const all = new Collection(stylesheet.rules)
+module.exports = atRules => {
+  const all = new Collection(atRules)
     .filter(rule => rule.type === 'import')
+    .map(rule => rule.params)
 
-  const unique = all.uniqueOn('import')
+  const unique = all.unique()
 
   return {
     total: all.size(),
