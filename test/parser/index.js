@@ -7,20 +7,20 @@ test('parser returns a Promise', t => {
 
 test('parser returns a list of @rules', async t => {
   const actual = await parser('')
-  t.truthy(actual.atRules)
+  t.true(Array.isArray(actual.atRules))
 })
 
 test('parser returns a list of rules', async t => {
   const actual = await parser('')
-  t.truthy(actual.rules)
+  t.true(Array.isArray(actual.rules))
 })
 
 test('parser returns a list of selectors', async t => {
   const actual = await parser('')
-  t.truthy(actual.selectors)
+  t.true(Array.isArray(actual.selectors))
 })
 
 test('parser returns a list of declarations', async t => {
   const actual = await parser('')
-  t.truthy(actual.declarations)
+  t.true(Array.isArray(actual.declarations))
 })

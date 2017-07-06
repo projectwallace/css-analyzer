@@ -19,8 +19,11 @@ module.exports = async scope => {
   const inputFile = path.join(dir, 'input.css')
   const outputFile = path.join(dir, 'output.json')
 
+  const actual = await analyzer(readFile(inputFile))
+  const expected = JSON.parse(readFile(outputFile))
+
   return {
-    actual: await analyzer(readFile(inputFile)),
-    expected: JSON.parse(readFile(outputFile))
+    actual,
+    expected
   }
 }
