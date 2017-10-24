@@ -1,4 +1,4 @@
-# css-analyzer [![Build Status](https://travis-ci.org/projectwallace/css-analyzer.svg?branch=master)](https://travis-ci.org/projectwallace/css-analyzer) [![Known Vulnerabilities](https://snyk.io/test/github/projectwallace/css-analyzer/badge.svg)](https://snyk.io/test/github/projectwallace/css-analyzer)
+# css-analyzer [![Build Status](https://travis-ci.org/projectwallace/css-analyzer.svg?branch=master)](https://travis-ci.org/projectwallace/css-analyzer) [![Known Vulnerabilities](https://snyk.io/test/github/projectwallace/css-analyzer/badge.svg)](https://snyk.io/test/github/projectwallace/css-analyzer) [![Coverage Status](https://coveralls.io/repos/github/projectwallace/css-analyzer/badge.svg?branch=master)](https://coveralls.io/github/projectwallace/css-analyzer?branch=master)
 
 > Analyze your CSS completely
 
@@ -24,9 +24,10 @@ $ yarn install projectwallace/css-analyzer
 ```js
 const analyze = require('css-analyzer');
 
-console.log(
-  analyze('body{color:red}')
-);
+analyze('body{color:red}')
+  .then(result => {
+    console.log(result)
+  })
 
 //=>
 // {
@@ -164,18 +165,6 @@ console.log(
 //   }
 // }
 ```
-
-
-## API
-
-### analyze(input)
-
-#### input
-
-Type: `string`
-
-The CSS (minified or not) that you want to know statistics about
-
 
 ## License
 
