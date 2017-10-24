@@ -1,5 +1,5 @@
 const expand = require('css-shorthand-expand')
-const Collection = require('css-collection')
+const arrayUniq = require('array-uniq')
 const utils = require('../../utils/css')
 
 const cssColorKeywords = utils.COLOR_KEYWORDS
@@ -9,7 +9,7 @@ const BACKGROUND_SHORTHAND_PROP = 'background'
 const BACKGROUND_PROPS = [BACKGROUND_COLOR_PROP, BACKGROUND_SHORTHAND_PROP]
 
 module.exports = declarations => {
-  const all = new Collection(declarations)
+  const all = declarations
     .filter(d => BACKGROUND_PROPS.includes(d.property))
     .map(d => {
       const value = d.value
@@ -34,11 +34,11 @@ module.exports = declarations => {
     // Filter out null values and css keywords
     .filter(v => Boolean(v) && !cssColorKeywords.includes(v))
 
-  const unique = all.unique()
+  const unique = arrayUniq(all).sort()
 
   return {
-    total: all.size(),
-    unique: unique.toArray(),
-    totalUnique: unique.size()
+    total: all.length,
+    unique,
+    totalUnique: unique.length
   }
 }

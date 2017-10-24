@@ -1,21 +1,23 @@
+const arrayUniq = require('array-uniq')
+
 const PREFIX_RE = /^-(?:webkit|moz|ms|o)-/
 
 module.exports = properties => {
   const all = properties.filter(property => property.match(PREFIX_RE))
-  const unique = all.unique()
+  const unique = arrayUniq(all).sort()
 
   const share = (() => {
-    if (properties.size() === 0) {
+    if (properties.length === 0) {
       return 0
     }
 
-    return all.size() / properties.size()
+    return all.length / properties.length
   })()
 
   return {
-    total: all.size(),
-    unique: unique.toArray(),
-    totalUnique: unique.size(),
+    total: all.length,
+    unique,
+    totalUnique: unique.length,
     share
   }
 }

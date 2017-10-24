@@ -1,9 +1,9 @@
 const specificity = require('specificity')
+const arrayUniq = require('array-uniq')
 
 module.exports = selectors => {
-  const all = selectors
-    .unique()
-    .toArray()
+  const all = arrayUniq(selectors)
+    .sort()
     .sort(specificity.compare)
     .reverse()
 
@@ -11,7 +11,10 @@ module.exports = selectors => {
     return [...all]
       .slice(0, count)
       .map(selector => {
-        const spec = specificity.calculate(selector).shift().specificityArray
+        const spec = specificity
+          .calculate(selector)
+          .shift()
+          .specificityArray
 
         return {
           selector,

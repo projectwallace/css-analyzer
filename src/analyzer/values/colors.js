@@ -1,4 +1,4 @@
-const Collection = require('css-collection')
+const arrayUniq = require('array-uniq')
 const utils = require('../../utils/css')
 
 const cssKeywords = utils.color.keywords
@@ -49,14 +49,14 @@ module.exports = declarations => {
     }
   })
 
-  const all = new Collection(_all)
+  const all = _all
     .filter(v => Boolean(v) && !cssKeywords.includes(v))
 
-  const unique = all.unique()
+  const unique = arrayUniq(all).sort()
 
   return {
-    total: all.size(),
-    unique: unique.toArray(),
-    totalUnique: unique.size()
+    total: all.length,
+    unique,
+    totalUnique: unique.length
   }
 }
