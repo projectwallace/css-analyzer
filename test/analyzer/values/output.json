@@ -1,5 +1,5 @@
 {
-  "total": 65,
+  "total": 66,
   "fontfamilies": {
     "total": 18,
     "totalUnique": 12,
@@ -43,27 +43,31 @@
       "-o-linear-gradient(transparent, transparent)",
       "-webkit-gradient(transparent, transparent)"
     ],
-    "share": 0.06153846153846154
+    "share": 0.06060606060606061
   },
   "colors": {
-    "total": 18,
-    "totalUnique": 15,
+    "total": 22,
+    "totalUnique": 19,
     "unique": [
       "#0000ff00",
       "#aaa",
       "#aff034",
+      "#fff",
       "Aqua",
       "hsl(100, 10%, 20%)",
       "hsl(100, 20%, 30%)",
+      "hsl(360, 100%, 100%)",
       "hsla(100, 20%, 30%, 0.5)",
       "purple",
       "red",
       "rgb(100, 200, 10)",
+      "rgb(255, 255, 255)",
       "rgba(100, 200, 10, .5)",
       "rgba(100, 200, 10, 0.5)",
       "rgba(2,2,2,.2)",
       "tomato",
-      "white"
+      "white",
+      "whitesmoke"
     ]
   }
 }
