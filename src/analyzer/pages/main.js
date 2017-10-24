@@ -1,15 +1,15 @@
-const Collection = require('css-collection')
+const arrayUniq = require('array-uniq')
 
 module.exports = atRules => {
-  const all = new Collection(atRules)
+  const all = atRules
     .filter(rule => rule.type === 'page')
     .map(rule => rule.params)
 
-  const unique = all.unique()
+  const unique = arrayUniq(all).sort()
 
   return {
-    total: all.size(),
-    unique: unique.toArray(),
-    totalUnique: unique.size()
+    total: all.length,
+    unique,
+    totalUnique: unique.length
   }
 }

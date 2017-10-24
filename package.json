@@ -18,8 +18,8 @@
     "semicolon": false
   },
   "dependencies": {
+    "array-uniq": "^1.0.3",
     "colors-regex": "^1.0.0",
-    "css-collection": "projectwallace/css-collection",
     "css-color-names": "^0.0.4",
     "css-shorthand-expand": "^1.1.0",
     "css-unit-sort": "^1.1.1",

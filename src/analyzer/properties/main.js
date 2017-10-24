@@ -1,16 +1,16 @@
-const Collection = require('css-collection')
+const arrayUniq = require('array-uniq')
 
 module.exports = declarations => {
-  const all = new Collection(declarations)
+  const all = declarations
     .map(declaration => declaration.property)
 
-  const unique = all.unique()
+  const unique = arrayUniq(all).sort()
   const prefixed = require('./prefixed')(all)
 
   return {
-    total: all.size(),
-    unique: unique.toArray(),
-    totalUnique: unique.size(),
+    total: all.length,
+    unique,
+    totalUnique: unique.length,
     prefixed
   }
 }

@@ -1,15 +1,17 @@
-const Collection = require('css-collection')
+const arrayUniq = require('array-uniq')
 
 module.exports = declarations => {
-  const all = new Collection(declarations)
+  const all = declarations
   const importants = require('./importants')(all)
-  const unique = all.map(declaration => {
-    return `${declaration.property} : ${declaration.value}`
-  }).unique()
+  const unique = arrayUniq(
+    all.map(declaration => {
+      return `${declaration.property} : ${declaration.value}`
+    })
+  ).sort()
 
   return {
-    total: all.size(),
-    totalUnique: unique.size(),
+    total: all.length,
+    totalUnique: unique.length,
     importants
   }
 }

@@ -1,12 +1,14 @@
+const arrayUniq = require('array-uniq')
+
 const ID_RE = /(?![^[]*])#/
 
 module.exports = selectors => {
   const all = selectors.filter(selector => selector.match(ID_RE))
-  const unique = all.unique()
+  const unique = arrayUniq(all).sort()
 
   return {
-    total: all.size(),
-    unique: unique.toArray(),
-    totalUnique: unique.size()
+    total: all.length,
+    unique,
+    totalUnique: unique.length
   }
 }

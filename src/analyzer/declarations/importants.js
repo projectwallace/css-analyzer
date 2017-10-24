@@ -4,15 +4,15 @@ module.exports = declarations => {
 
   const share = (() => {
     // Catch divide by zero exception
-    if (declarations.size() === 0) {
+    if (declarations.length === 0) {
       return 0
     }
 
-    return all.size() / declarations.size()
+    return all.length / declarations.length
   })()
 
   return {
-    total: all.size(),
+    total: all.length,
     share
   }
 }

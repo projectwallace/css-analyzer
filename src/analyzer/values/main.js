@@ -1,7 +1,5 @@
-const Collection = require('css-collection')
-
 module.exports = declarations => {
-  const all = new Collection(declarations)
+  const all = declarations
     .map(declaration => declaration.value)
 
   const prefixed = require('./prefixed')(all)
@@ -10,7 +8,7 @@ module.exports = declarations => {
   const colors = require('./colors')(declarations)
 
   return {
-    total: all.size(),
+    total: all.length,
     prefixed,
     fontsizes,
     fontfamilies,
