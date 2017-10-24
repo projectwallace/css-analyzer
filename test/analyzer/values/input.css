@@ -28,6 +28,7 @@
 .color13 { color: #0000ff00; }
 .color14 { background: rgba(2,2,2,.2) }
 .color15 { background: hsl(100, 10%, 20%) }
+.color16 { background: linear-gradient(to right, hsl(360, 100%, 100%), rgb(255, 255, 255), #fff, white) }
 .color-false { background-image: url('icon-blue.png'), url('blue-icon.png'), url('blue_icon.png'), url('icon_blue.png'); }
 .color-false { white-space: nowrap; }
 .color-false { color: inherit; color: initial; color: auto; background: none; color: currentColor; color: transparent; }

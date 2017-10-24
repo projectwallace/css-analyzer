@@ -16,37 +16,16 @@ module.exports = declarations => {
       return
     }
 
-    // COLOR NAMES
-    const nameRegex = utils.color.regex.name
-    let keywordMatches = nameRegex.exec(value)
-    while (keywordMatches) {
-      _all.push(keywordMatches[0])
-      keywordMatches = nameRegex.exec(value)
-    }
+    // Try all regexes for hsl(a), rgb(a) and hex(a)
+    Object.keys(utils.color.regex).forEach(reg => {
+      const regex = utils.color.regex[reg]
+      let matches = regex.exec(value)
 
-    // HEX(A)
-    const hexRegex = utils.color.regex.hex
-    let hexMatches = hexRegex.exec(value)
-    while (hexMatches) {
-      _all.push(hexMatches[0])
-      hexMatches = hexRegex.exec(value)
-    }
-
-    // RGB(A)
-    const rgbRegex = utils.color.regex.rgb
-    let rgbMatches = rgbRegex.exec(value)
-    while (rgbMatches) {
-      _all.push(rgbMatches[0])
-      rgbMatches = rgbRegex.exec(value)
-    }
-
-    // HSL(A)
-    const hslRegex = utils.color.regex.hsl
-    let hslMatches = hslRegex.exec(value)
-    while (hslMatches) {
-      _all.push(hslMatches[0])
-      hslMatches = hslRegex.exec(value)
-    }
+      while (matches) {
+        _all.push(matches[0])
+        matches = regex.exec(value)
+      }
+    })
   })
 
   const all = _all
