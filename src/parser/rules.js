@@ -7,7 +7,9 @@ module.exports = tree => {
     rule.walkDecls(() => {
       declarationsCount += 1
     })
-    rules.push({declarationsCount})
+    rules.push({
+      declarationsCount
+    })
   })
 
   return rules

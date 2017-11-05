@@ -1,8 +1,10 @@
 const parser = require('../parser')
 
 module.exports = input => {
-  return new Promise((resolve, reject) => {
-    parser(input).then(css => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const css = await parser(input)
+
       const charsets = require('./charsets/main')(css.atRules)
       const documents = require('./documents/main')(css.atRules)
       const fontfaces = require('./fontfaces/main')(css.atRules)
@@ -17,7 +19,12 @@ module.exports = input => {
       const declarations = require('./declarations/main')(css.declarations)
       const properties = require('./properties/main')(css.declarations)
       const values = require('./values/main')(css.declarations)
-      const stylesheets = require('./stylesheets/main')(input, rules, selectors, declarations)
+      const stylesheets = require('./stylesheets/main')(
+        input,
+        rules,
+        selectors,
+        declarations
+      )
 
       resolve({
         stylesheets,
@@ -36,8 +43,8 @@ module.exports = input => {
         properties,
         values
       })
-    }).catch(err => {
+    } catch (err) {
       reject(err)
-    })
+    }
   })
 }
