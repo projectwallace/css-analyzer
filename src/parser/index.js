@@ -14,14 +14,12 @@ function processNodes(tree) {
 }
 
 module.exports = css => {
-  return new Promise((resolve, reject) => {
-    postcss()
-      .process(css)
-      .then(result => {
-        resolve(processNodes(result.root))
-      })
-      .catch(err => {
-        reject(err)
-      })
+  return new Promise(async (resolve, reject) => {
+    try {
+      const result = await postcss().process(css)
+      resolve(processNodes(result.root))
+    } catch (err) {
+      reject(err)
+    }
   })
 }
