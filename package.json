@@ -24,11 +24,11 @@
     "css-shorthand-expand": "^1.1.0",
     "css-unit-sort": "^1.1.1",
     "path": "^0.12.7",
-    "postcss": "^6.0.3",
-    "specificity": "^0.3.0"
+    "postcss": "^6.0.14",
+    "specificity": "^0.3.2"
   },
   "devDependencies": {
-    "ava": "^0.19.1",
+    "ava": "^0.24.0",
     "coveralls": "^2.13.1",
     "nyc": "^10.3.2",
     "xo": "^0.18.1"
