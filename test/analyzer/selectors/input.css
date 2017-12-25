@@ -88,7 +88,7 @@ _::-moz-svg-foreign-content {}
 /* Don't report these ones (Issue #88) */
 tbody:first-child {}
 
-/* Don't report duplicates (Issue 161) */
+/* Don't report duplicates (Issue #161) */
 * html .selector {}
 
 /**

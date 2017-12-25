@@ -7,6 +7,7 @@ module.exports = selectors => {
   const id = require('./id')(all)
   const universal = require('./universal')(all)
   const specificity = require('./specificity')(all)
+  const identifiers = require('./identifiers')(all)
 
   return {
     total: all.length,
@@ -14,6 +15,7 @@ module.exports = selectors => {
     js,
     id,
     universal,
-    specificity
+    specificity,
+    identifiers
   }
 }
