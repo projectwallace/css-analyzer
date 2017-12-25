@@ -88,5 +88,22 @@
         }
       }
     ]
+  },
+  "identifiers": {
+    "average": 2.7450980392156863,
+    "top": [
+    {
+      "identifiers": 26,
+      "selector": ".a .b .c .d .e .f .g .h .i .j .k .l .m .n .o .p .q .r .s .t .u .v .w .x .y .z"
+     },
+     {
+       "identifiers": 11,
+       "selector": ".Foo > .Bar ~ .Baz [type=\"text\"] + span:before #bazz #fizz #buzz #drank #drugs"
+     },
+     {
+       "identifiers": 5,
+       "selector": "html[xmlns*=\"\"] body:last-child .selector"
+     }
+   ]
   }
 }
