@@ -12,7 +12,7 @@ module.exports = selectors => {
     })
 
   const totalIdentifiers = identifiersPerSelector
-    .map(slctr => slctr.identifiers)
+    .map(selector => selector.identifiers)
     .reduce((prev, curr) => prev + curr, 0)
   const average = totalIdentifiers / totalSelectors
 
