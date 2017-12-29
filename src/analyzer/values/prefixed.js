@@ -1,10 +1,9 @@
 const arrayUniq = require('array-uniq')
 
-const PREFIX_RE = /-(?:webkit|moz|ms|o)-/i
+const PREFIX_RE = /^-(?:webkit|moz|ms|o)-/i
 
 module.exports = values => {
-  const all = values
-    .filter(property => property.match(PREFIX_RE))
+  const all = values.filter(property => PREFIX_RE.test(property))
   const unique = arrayUniq(all).sort()
 
   const share = (() => {

@@ -1,8 +1,9 @@
 const arrayUniq = require('array-uniq')
 const utils = require('../../utils/css')
 
-const cssKeywords = utils.color.keywords
-const colorProperties = utils.color.properties
+const colorUtils = utils.color
+const cssKeywords = colorUtils.keywords
+const colorProperties = colorUtils.properties
 
 module.exports = declarations => {
   const _all = []
@@ -16,9 +17,8 @@ module.exports = declarations => {
       return
     }
 
-    // Try all regexes for hsl(a), rgb(a) and hex(a)
-    Object.keys(utils.color.regex).forEach(reg => {
-      const regex = utils.color.regex[reg]
+    // Try all regexes for keywords, hsl(a), rgb(a) and hex(a)
+    Object.values(colorUtils.regex).forEach(regex => {
       let matches = regex.exec(value)
 
       while (matches) {
@@ -28,9 +28,7 @@ module.exports = declarations => {
     })
   })
 
-  const all = _all
-    .filter(v => Boolean(v) && !cssKeywords.includes(v))
-
+  const all = _all.filter(v => Boolean(v) && !cssKeywords.includes(v))
   const unique = arrayUniq(all).sort()
 
   return {

@@ -2,7 +2,7 @@ const arrayUniq = require('array-uniq')
 
 module.exports = selectors => {
   const all = selectors
-  const unique = arrayUniq(all).sort()
+  const unique = arrayUniq(all)
   const js = require('./js')(all)
   const id = require('./id')(all)
   const universal = require('./universal')(all)

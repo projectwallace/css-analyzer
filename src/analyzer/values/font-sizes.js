@@ -26,8 +26,7 @@ module.exports = declarations => {
     return tmp
   })()
 
-  const all = _all
-    .filter(v => !keywords.includes(v))
+  const all = _all.filter(v => !keywords.includes(v))
   const unique = arrayUniq(unitSort(all))
 
   return {

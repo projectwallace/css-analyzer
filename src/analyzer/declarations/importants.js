@@ -1,6 +1,5 @@
 module.exports = declarations => {
-  const all = declarations
-    .filter(value => value.important)
+  const all = declarations.filter(value => value.important)
 
   const share = (() => {
     // Catch divide by zero exception

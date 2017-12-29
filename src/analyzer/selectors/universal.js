@@ -1,10 +1,9 @@
 const arrayUniq = require('array-uniq')
 
-const UNIVERSAL_RE = /(?![^[]*])\*/
+const UNIVERSAL_REGEX = /(?![^[]*])\*/
 
 module.exports = selectors => {
-  const all = selectors
-    .filter(selector => selector.match(UNIVERSAL_RE))
+  const all = selectors.filter(selector => UNIVERSAL_REGEX.test(selector))
   const unique = arrayUniq(all).sort()
 
   return {
