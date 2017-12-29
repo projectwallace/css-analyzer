@@ -25,9 +25,7 @@ module.exports = declarations => {
     return all
   })()
 
-  const all = _all
-    .filter(v => !cssKeywords.includes(v))
-
+  const all = _all.filter(v => !cssKeywords.includes(v))
   const unique = arrayUniq(all).sort()
 
   return {
