@@ -5,9 +5,7 @@
 A module that goes through your CSS to find all kinds of relevant statistics,
 like the amount of rules, the amount of `!important`s, unique colors, and so on.
 
-<a target='_blank' rel='nofollow' href='https://app.codesponsor.io/link/cYZvdCsHXAu8TdZM9qjjz3MH/projectwallace/css-analyzer'>
-  <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/cYZvdCsHXAu8TdZM9qjjz3MH/projectwallace/css-analyzer.svg' />
-</a>
+
 
 
 ## Install
