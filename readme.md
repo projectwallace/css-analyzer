@@ -5,10 +5,6 @@
 A module that goes through your CSS to find all kinds of relevant statistics,
 like the amount of rules, the amount of `!important`s, unique colors, and so on.
 
-<a target='_blank' rel='nofollow' href='https://app.codesponsor.io/link/cYZvdCsHXAu8TdZM9qjjz3MH/projectwallace/css-analyzer'>
-  <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/cYZvdCsHXAu8TdZM9qjjz3MH/projectwallace/css-analyzer.svg' />
-</a>
-
 
 ## Install
 
@@ -19,7 +15,7 @@ $ npm install --save projectwallace/css-analyzer
 or
 
 ```
-$ yarn install projectwallace/css-analyzer
+$ yarn add projectwallace/css-analyzer
 ```
 
 
@@ -28,145 +24,152 @@ $ yarn install projectwallace/css-analyzer
 ```js
 const analyze = require('css-analyzer');
 
-analyze('body{color:red}')
-  .then(result => {
-    console.log(result)
-  })
+async function (css) {
+  const result = await analyze('foo {}')
+  console.log(result)
+}
 
 //=>
 // {
-//   "stylesheets": {
-//     "size": 15,
-//     "simplicity": 1,
-//     "cohesion": {
-//       "average": 1
-//     }
-//   },
-//   "charsets": {
-//     "total": 0,
-//     "unique": [],
-//     "totalUnique": 0
-//   },
-//   "documents": {
-//     "total": 0,
-//     "unique": [],
-//     "totalUnique": 0
-//   },
-//   "fontfaces": {
-//     "total": 0
-//   },
-//   "imports": {
-//     "total": 0,
-//     "unique": [],
-//     "totalUnique": 0
-//   },
-//   "keyframes": {
-//     "total": 0,
-//     "unique": [],
-//     "totalUnique": 0
-//   },
-//   "mediaqueries": {
-//     "total": 0,
-//     "unique": [],
-//     "totalUnique": 0
-//   },
-//   "namespaces": {
-//     "total": 0,
-//     "unique": [],
-//     "totalUnique": 0
-//   },
-//   "pages": {
-//     "total": 0,
-//     "unique": [],
-//     "totalUnique": 0
-//   },
-//   "supports": {
-//     "total": 0,
-//     "unique": [],
-//     "totalUnique": 0
-//   },
-//   "rules": {
-//     "total": 1
-//   },
-//   "selectors": {
-//     "total": 1,
-//     "totalUnique": 1,
-//     "js": {
-//       "total": 0,
-//       "unique": [],
-//       "totalUnique": 0
-//     },
-//     "id": {
-//       "total": 0,
-//       "unique": [],
-//       "totalUnique": 0
-//     },
-//     "universal": {
-//       "total": 0,
-//       "unique": [],
-//       "totalUnique": 0
-//     },
-//     "specificity": {
-//       "top": [
-//         {
-//           "selector": "body",
-//           "specificity": {
-//             "a": 0,
-//             "b": 0,
-//             "c": 0,
-//             "d": 1
-//           }
-//         }
-//       ]
-//     }
-//   },
-//   "declarations": {
-//     "total": 1,
-//     "totalUnique": 1,
-//     "importants": {
-//       "total": 0,
-//       "share": 0
-//     }
-//   },
-//   "properties": {
-//     "total": 1,
-//     "unique": [
-//       "color"
-//     ],
-//     "totalUnique": 1,
-//     "prefixed": {
-//       "total": 0,
-//       "unique": [],
-//       "totalUnique": 0,
-//       "share": 0
-//     }
-//   },
-//   "values": {
-//     "total": 1,
-//     "prefixed": {
-//       "total": 0,
-//       "unique": [],
-//       "totalUnique": 0,
-//       "share": 0
-//     },
-//     "fontsizes": {
-//       "total": 0,
-//       "unique": [],
-//       "totalUnique": 0
-//     },
-//     "fontfamilies": {
-//       "total": 0,
-//       "unique": [],
-//       "totalUnique": 0
-//     },
-//     "colors": {
-//       "total": 1,
-//       "unique": [
-//         "red"
-//       ],
-//       "totalUnique": 1
-//     }
-//   }
+//  atrules: {
+//    charsets: {
+//      total: 0,
+//      totalUnique: 0,
+//      unique: []
+//    },
+//    documents: {
+//      total: 0,
+//      totalUnique: 0,
+//      unique: []
+//    },
+//    fontfaces: {
+//      total: 0
+//    },
+//    imports: {
+//      total: 0,
+//      totalUnique: 0,
+//      unique: []
+//    },
+//    keyframes: {
+//      total: 0,
+//      totalUnique: 0,
+//      unique: []
+//    },
+//    mediaqueries: {
+//      total: 0,
+//      totalUnique: 0,
+//      unique: []
+//    },
+//    namespaces: {
+//      total: 0,
+//      totalUnique: 0,
+//      unique: []
+//    },
+//    pages: {
+//      total: 0,
+//      totalUnique: 0,
+//      unique: []
+//    },
+//    supports: {
+//      total: 0,
+//      totalUnique: 0,
+//      unique: []
+//    }
+//  },
+//  declarations: {
+//    importants: {
+//      share: 0,
+//      total: 0
+//    },
+//    total: 0,
+//    totalUnique: 0
+//  },
+//  properties: {
+//    prefixed: {
+//      share: 0,
+//      total: 0,
+//      totalUnique: 0,
+//      unique: []
+//    },
+//    total: 0,
+//    totalUnique: 0,
+//    unique: []
+//  },
+//  rules: {
+//    total: 1
+//  },
+//  selectors: {
+//    id: {
+//      total: 0,
+//      totalUnique: 0,
+//      unique: []
+//    },
+//    identifiers: {
+//      average: 1,
+//      top: [
+//        {
+//          identifiers: 1,
+//          selector: 'foo'
+//        }
+//      ]
+//    },
+//    js: {
+//      total: 0,
+//      totalUnique: 0,
+//      unique: []
+//    },
+//    specificity: {
+//      top: [
+//        {
+//          selector: 'foo',
+//          specificity: {
+//            a: 0,
+//            b: 0,
+//            c: 0,
+//            d: 1
+//          }
+//        }
+//      ]
+//    },
+//    total: 1,
+//    totalUnique: 1,
+//    universal: {
+//      total: 0,
+//      totalUnique: 0,
+//      unique: []
+//    }
+//  },
+//  stylesheets: {
+//    cohesion: {
+//      average: 0
+//    },
+//    simplicity: 1,
+//    size: 5
+//  },
+//  values: {
+//    colors: {
+//      total: 0,
+//      totalUnique: 0,
+//      unique: []
+//    },
+//    fontfamilies: {
+//      total: 0,
+//      totalUnique: 0,
+//      unique: []
+//    },
+//    fontsizes: {
+//      total: 0,
+//      totalUnique: 0,
+//      unique: []
+//    },
+//    prefixed: {
+//      share: 0,
+//      total: 0,
+//      totalUnique: 0,
+//      unique: []
+//    },
+//    total: 0
+//  }
 // }
 ```
 

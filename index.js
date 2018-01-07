@@ -1,4 +1,4 @@
-const analyzer = require('./src/analyzer/main.js')
+const analyzer = require('./src/analyzer')
 
 module.exports = input => {
   return analyzer(input)
