@@ -16,7 +16,7 @@ function processNodes(tree) {
 module.exports = css => {
   return new Promise(async (resolve, reject) => {
     try {
-      const result = await postcss().process(css)
+      const result = await postcss().process(css, {from: undefined})
       resolve(processNodes(result.root))
     } catch (err) {
       reject(err)
