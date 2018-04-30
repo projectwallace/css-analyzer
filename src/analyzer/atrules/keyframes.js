@@ -1,4 +1,4 @@
-const arrayUniq = require('array-uniq')
+const uniquer = require('../../utils/uniquer')
 
 module.exports = atRules => {
   const all = atRules
@@ -13,11 +13,8 @@ module.exports = atRules => {
     })
     .map(rule => rule.params)
 
-  const unique = arrayUniq(all).sort()
-
   return {
     total: all.length,
-    unique,
-    totalUnique: unique.length
+    ...uniquer(all)
   }
 }

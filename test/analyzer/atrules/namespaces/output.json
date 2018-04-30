@@ -4,5 +4,15 @@
   "unique": [
     "svg url(http://www.w3.org/2000/svg)",
     "url(http://www.w3.org/1999/xhtml)"
+  ],
+  "uniqueWithCount": [
+    {
+      "value": "svg url(http://www.w3.org/2000/svg)",
+      "count": 1
+    },
+    {
+      "value": "url(http://www.w3.org/1999/xhtml)",
+      "count": 1
+    }
   ]
 }

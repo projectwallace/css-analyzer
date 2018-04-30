@@ -2,7 +2,17 @@
   "total": 5,
   "totalUnique": 2,
   "unique": [
-    "NAME-YOUR-ANIMATION",
-    "fontbulger"
+    "fontbulger",
+    "NAME-YOUR-ANIMATION"
+  ],
+  "uniqueWithCount": [
+    {
+      "value": "fontbulger",
+      "count": 1
+    },
+    {
+      "value": "NAME-YOUR-ANIMATION",
+      "count": 4
+    }
   ]
 }

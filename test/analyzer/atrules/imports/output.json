@@ -6,5 +6,23 @@
     "url('https://example.com/with-media-query') screen and (min-width: 33em)",
     "url('https://example.com/with-multiple-media-queries') screen, projection",
     "url('https://example.com/with-url')"
+  ],
+  "uniqueWithCount": [
+    {
+      "value": "'https://example.com/without-url'",
+      "count": 1
+    },
+    {
+      "value": "url('https://example.com/with-media-query') screen and (min-width: 33em)",
+      "count": 1
+    },
+    {
+      "value": "url('https://example.com/with-multiple-media-queries') screen, projection",
+      "count": 1
+    },
+    {
+      "value": "url('https://example.com/with-url')",
+      "count": 1
+    }
   ]
 }

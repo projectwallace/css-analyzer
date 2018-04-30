@@ -5,5 +5,19 @@
     "(-webkit-appearance:none)",
     "(display: table-cell) and (display: list-item)",
     "(filter: blur(5px))"
+  ],
+  "uniqueWithCount": [
+    {
+      "value": "(-webkit-appearance:none)",
+      "count": 2
+    },
+    {
+      "value": "(display: table-cell) and (display: list-item)",
+      "count": 1
+    },
+    {
+      "value": "(filter: blur(5px))",
+      "count": 1
+    }
   ]
 }
