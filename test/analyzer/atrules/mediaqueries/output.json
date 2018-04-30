@@ -8,5 +8,31 @@
     "screen",
     "screen and (min-width: 33em)",
     "screen or print"
+  ],
+  "uniqueWithCount": [
+    {
+      "value": "(max-width: 200px)",
+      "count": 1
+    },
+    {
+      "value": "(min-width: 20px)",
+      "count": 2
+    },
+    {
+      "value": "print",
+      "count": 1
+    },
+    {
+      "value": "screen",
+      "count": 2
+    },
+    {
+      "value": "screen and (min-width: 33em)",
+      "count": 1
+    },
+    {
+      "value": "screen or print",
+      "count": 1
+    }
   ]
 }

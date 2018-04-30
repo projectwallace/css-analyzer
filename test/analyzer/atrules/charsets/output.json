@@ -1,5 +1,9 @@
 {
   "total": 1,
   "unique": ["'UTF-8'"],
-  "totalUnique": 1
+  "totalUnique": 1,
+  "uniqueWithCount": [{
+    "value": "'UTF-8'",
+    "count": 1
+  }]
 }
