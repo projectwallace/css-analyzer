@@ -1,10 +1,10 @@
-const arrayUniq = require('array-uniq')
+const uniquer = require('../../utils/uniquer')
 
 const PREFIXED_REGEX = /^-(?:webkit|moz|ms|o)-/
 
 module.exports = properties => {
-  const all = properties.filter(property => PREFIXED_REGEX.test(property))
-  const unique = arrayUniq(all).sort()
+  const all = properties
+    .filter(property => PREFIXED_REGEX.test(property))
 
   const share = (() => {
     if (properties.length === 0) {
@@ -16,8 +16,7 @@ module.exports = properties => {
 
   return {
     total: all.length,
-    unique,
-    totalUnique: unique.length,
+    ...uniquer(all),
     share
   }
 }

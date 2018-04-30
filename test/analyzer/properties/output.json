@@ -11,6 +11,44 @@
     "property",
     "zoom"
   ],
+  "uniqueWithCount": [
+    {
+      "value": "-moz-border-radius",
+      "count": 1
+    },
+    {
+      "value": "-o-border-radius",
+      "count": 1
+    },
+    {
+      "value": "-webkit-border-radius",
+      "count": 1
+    },
+    {
+      "value": "background-image",
+      "count": 1
+    },
+    {
+      "value": "border-radius",
+      "count": 1
+    },
+    {
+      "value": "margin",
+      "count": 2
+    },
+    {
+      "value": "opacity",
+      "count": 1
+    },
+    {
+      "value": "property",
+      "count": 2
+    },
+    {
+      "value": "zoom",
+      "count": 2
+    }
+  ],
   "totalUnique": 9,
   "prefixed": {
     "total": 3,
@@ -18,6 +56,20 @@
       "-moz-border-radius",
       "-o-border-radius",
       "-webkit-border-radius"
+    ],
+    "uniqueWithCount": [
+      {
+        "value": "-moz-border-radius",
+        "count": 1
+      },
+      {
+        "value": "-o-border-radius",
+        "count": 1
+      },
+      {
+        "value": "-webkit-border-radius",
+        "count": 1
+      }
     ],
     "totalUnique": 3,
     "share": 0.25
