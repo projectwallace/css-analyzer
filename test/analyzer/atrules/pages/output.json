@@ -6,5 +6,23 @@
     ":first",
     ":left",
     ":right"
+  ],
+  "uniqueWithCount": [
+    {
+      "value": "",
+      "count": 1
+    },
+    {
+      "value": ":first",
+      "count": 1
+    },
+    {
+      "value": ":left",
+      "count": 1
+    },
+    {
+      "value": ":right",
+      "count": 1
+    }
   ]
 }

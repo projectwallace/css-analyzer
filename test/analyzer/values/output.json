@@ -4,6 +4,7 @@
     "total": 18,
     "totalUnique": 12,
     "unique": [
+      "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
       "\"-apple-system\", \"BlinkMacSystemFont\", \"Segoe UI\", \"Roboto\", \"Helvetica\", \"Arial\", sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
       "\"Arial Black\", \"Arial Bold\", Gadget, sans-serif",
       "\"Brush Script MT\", cursive",
@@ -11,11 +12,60 @@
       "\"Droid Sans\", serif",
       "\"Noto Sans\"",
       "\"Source Sans Pro\", serif",
-      "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
       "Consolas, \"Liberation Mono\", Menlo, Courier, monospace",
       "monospace",
       "sans-serif",
       "serif"
+    ],
+    "uniqueWithCount": [
+      {
+        "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "count": 1
+      },
+      {
+        "value": "\"-apple-system\", \"BlinkMacSystemFont\", \"Segoe UI\", \"Roboto\", \"Helvetica\", \"Arial\", sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "count": 1
+      },
+      {
+        "value": "\"Arial Black\", \"Arial Bold\", Gadget, sans-serif",
+        "count": 1
+      },
+      {
+        "value": "\"Brush Script MT\", cursive",
+        "count": 1
+      },
+      {
+        "value": "\"Consolas\", \"Liberation Mono\", \"Menlo\", \"Courier\", monospace",
+        "count": 1
+      },
+      {
+        "value": "\"Droid Sans\", serif",
+        "count": 1
+      },
+      {
+        "value": "\"Noto Sans\"",
+        "count": 1
+      },
+      {
+        "value": "\"Source Sans Pro\", serif",
+        "count": 1
+      },
+      {
+        "value": "Consolas, \"Liberation Mono\", Menlo, Courier, monospace",
+        "count": 1
+      },
+      {
+        "value": "monospace",
+        "count": 1
+      },
+      {
+        "value": "sans-serif",
+        "count": 1
+      },
+      {
+        "value": "serif",
+        "count": 7
+      }
     ]
   },
   "fontsizes": {
@@ -27,11 +77,53 @@
       "1.2em",
       "large",
       "1.1em",
-      "medium",
       "16px",
       "1em",
+      "medium",
       "small",
       "11px"
+    ],
+    "uniqueWithCount": [
+      {
+        "value": "calc(3vw + 1em)",
+        "count": 1
+      },
+      {
+        "value": "1.3em",
+        "count": 1
+      },
+      {
+        "value": "1.2em",
+        "count": 1
+      },
+      {
+        "value": "large",
+        "count": 1
+      },
+      {
+        "value": "1.1em",
+        "count": 1
+      },
+      {
+        "value": "16px",
+        "count": 1
+      },
+      {
+        "value": "1em",
+        "count": 5
+      },
+      {
+        "value": "medium",
+        "count": 1
+      },
+      {
+        "value": "small",
+        "count": 1
+      },
+      {
+        "value": "11px",
+        "count": 2
+      }
     ]
   },
   "prefixed": {
@@ -42,6 +134,24 @@
       "-ms-linear-gradient(transparent, transparent)",
       "-o-linear-gradient(transparent, transparent)",
       "-webkit-gradient(transparent, transparent)"
+    ],
+    "uniqueWithCount": [
+      {
+        "value": "-moz-linear-gradient(transparent, transparent)",
+        "count": 1
+      },
+      {
+        "value": "-ms-linear-gradient(transparent, transparent)",
+        "count": 1
+      },
+      {
+        "value": "-o-linear-gradient(transparent, transparent)",
+        "count": 1
+      },
+      {
+        "value": "-webkit-gradient(transparent, transparent)",
+        "count": 1
+      }
     ],
     "share": 0.06060606060606061
   },
@@ -68,6 +178,84 @@
       "tomato",
       "white",
       "whitesmoke"
+    ],
+    "uniqueWithCount": [
+      {
+        "value": "#0000ff00",
+        "count": 1
+      },
+      {
+        "value": "#aaa",
+        "count": 1
+      },
+      {
+        "value": "#aff034",
+        "count": 1
+      },
+      {
+        "value": "#fff",
+        "count": 1
+      },
+      {
+        "value": "Aqua",
+        "count": 1
+      },
+      {
+        "value": "hsl(100, 10%, 20%)",
+        "count": 1
+      },
+      {
+        "value": "hsl(100, 20%, 30%)",
+        "count": 1
+      },
+      {
+        "value": "hsl(360, 100%, 100%)",
+        "count": 1
+      },
+      {
+        "value": "hsla(100, 20%, 30%, 0.5)",
+        "count": 1
+      },
+      {
+        "value": "purple",
+        "count": 2
+      },
+      {
+        "value": "red",
+        "count": 3
+      },
+      {
+        "value": "rgb(100, 200, 10)",
+        "count": 1
+      },
+      {
+        "value": "rgb(255, 255, 255)",
+        "count": 1
+      },
+      {
+        "value": "rgba(100, 200, 10, .5)",
+        "count": 1
+      },
+      {
+        "value": "rgba(100, 200, 10, 0.5)",
+        "count": 1
+      },
+      {
+        "value": "rgba(2,2,2,.2)",
+        "count": 1
+      },
+      {
+        "value": "tomato",
+        "count": 1
+      },
+      {
+        "value": "white",
+        "count": 1
+      },
+      {
+        "value": "whitesmoke",
+        "count": 1
+      }
     ]
   }
 }

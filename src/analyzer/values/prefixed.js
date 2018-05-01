@@ -1,10 +1,9 @@
-const arrayUniq = require('array-uniq')
+const uniquer = require('../../utils/uniquer')
 
 const PREFIX_RE = /^-(?:webkit|moz|ms|o)-/i
 
 module.exports = values => {
   const all = values.filter(property => PREFIX_RE.test(property))
-  const unique = arrayUniq(all).sort()
 
   const share = (() => {
     if (values.length === 0) {
@@ -16,8 +15,7 @@ module.exports = values => {
 
   return {
     total: all.length,
-    unique,
-    totalUnique: unique.length,
+    ...uniquer(all),
     share
   }
 }

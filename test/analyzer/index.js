@@ -16,12 +16,14 @@ test('Returns the correct analysis object structure', async t => {
       charsets: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       },
       documents: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       },
       fontfaces: {
         total: 0
@@ -29,32 +31,38 @@ test('Returns the correct analysis object structure', async t => {
       imports: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       },
       keyframes: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       },
       mediaqueries: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       },
       namespaces: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       },
       pages: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       },
       supports: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       }
     },
     declarations: {
@@ -70,11 +78,13 @@ test('Returns the correct analysis object structure', async t => {
         share: 0,
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       },
       total: 0,
       totalUnique: 0,
-      unique: []
+      unique: [],
+      uniqueWithCount: []
     },
     rules: {
       total: 1
@@ -83,7 +93,8 @@ test('Returns the correct analysis object structure', async t => {
       id: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       },
       identifiers: {
         average: 1,
@@ -97,7 +108,8 @@ test('Returns the correct analysis object structure', async t => {
       js: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       },
       specificity: {
         top: [
@@ -117,7 +129,8 @@ test('Returns the correct analysis object structure', async t => {
       universal: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       }
     },
     stylesheets: {
@@ -131,23 +144,27 @@ test('Returns the correct analysis object structure', async t => {
       colors: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       },
       fontfamilies: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       },
       fontsizes: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       },
       prefixed: {
         share: 0,
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       },
       total: 0
     }

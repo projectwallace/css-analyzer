@@ -18,18 +18,16 @@ module.exports = selectors => {
 
   const top = function (count) {
     const sorter = function (a, b) {
-      if (a.identifiers === b.identifiers) {
-        return 0
-      }
-
       return a.identifiers > b.identifiers ? -1 : 1
     }
 
-    return identifiersPerSelector.sort(sorter).slice(0, count)
+    return identifiersPerSelector
+      .sort(sorter)
+      .slice(0, count)
   }
 
   return {
     average,
-    top: top(3)
+    top: top(5)
   }
 }
