@@ -93,7 +93,8 @@ test('Returns the correct analysis object structure', async t => {
       id: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       },
       identifiers: {
         average: 1,
@@ -107,7 +108,8 @@ test('Returns the correct analysis object structure', async t => {
       js: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       },
       specificity: {
         top: [
@@ -127,7 +129,8 @@ test('Returns the correct analysis object structure', async t => {
       universal: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        uniqueWithCount: []
       }
     },
     stylesheets: {

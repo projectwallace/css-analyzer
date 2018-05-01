@@ -1,14 +1,13 @@
-const arrayUniq = require('array-uniq')
+const uniquer = require('../../utils/uniquer')
 
 const UNIVERSAL_REGEX = /(?![^[]*])\*/
 
 module.exports = selectors => {
-  const all = selectors.filter(selector => UNIVERSAL_REGEX.test(selector))
-  const unique = arrayUniq(all).sort()
+  const all = selectors
+    .filter(selector => UNIVERSAL_REGEX.test(selector))
 
   return {
     total: all.length,
-    unique,
-    totalUnique: unique.length
+    ...uniquer(all)
   }
 }
