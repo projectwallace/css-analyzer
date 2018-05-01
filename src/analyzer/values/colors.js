@@ -1,4 +1,4 @@
-const arrayUniq = require('array-uniq')
+const uniquer = require('../../utils/uniquer')
 const utils = require('../../utils/css')
 
 const colorUtils = utils.color
@@ -29,11 +29,9 @@ module.exports = declarations => {
   })
 
   const all = _all.filter(v => Boolean(v) && !cssKeywords.includes(v))
-  const unique = arrayUniq(all).sort()
 
   return {
     total: all.length,
-    unique,
-    totalUnique: unique.length
+    ...uniquer(all)
   }
 }

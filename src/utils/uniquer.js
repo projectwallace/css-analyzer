@@ -1,10 +1,10 @@
 module.exports = (values, sortFn) => {
   if (!sortFn) {
     sortFn = (a, b) => {
-      return a.value
+      return a
         .toLowerCase()
         .localeCompare(
-          b.value.toLowerCase()
+          b.toLowerCase()
         )
     }
   }
@@ -21,11 +21,20 @@ module.exports = (values, sortFn) => {
       value: value[0],
       count: value[1]
     }
-  }).sort(sortFn)
+  })
+
+  const sorted = reduced
+    .map(el => el.value)
+    .sort(sortFn)
+
+  const final = sorted
+    .map(el => {
+      return reduced.find(r => r.value === el)
+    })
 
   return {
-    unique: reduced.map(v => v.value),
-    totalUnique: reduced.length,
-    uniqueWithCount: reduced
+    unique: final.map(v => v.value),
+    totalUnique: final.length,
+    uniqueWithCount: final
   }
 }

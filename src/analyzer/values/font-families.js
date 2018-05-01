@@ -1,5 +1,5 @@
 const expand = require('css-shorthand-expand')
-const arrayUniq = require('array-uniq')
+const uniquer = require('../../utils/uniquer')
 const utils = require('../../utils/css')
 
 const cssKeywords = utils.KEYWORDS
@@ -26,11 +26,9 @@ module.exports = declarations => {
   })()
 
   const all = _all.filter(v => !cssKeywords.includes(v))
-  const unique = arrayUniq(all).sort()
 
   return {
     total: all.length,
-    unique,
-    totalUnique: unique.length
+    ...uniquer(all)
   }
 }
