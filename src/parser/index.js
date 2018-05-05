@@ -19,7 +19,10 @@ module.exports = css => {
       const result = await postcss().process(css, {from: undefined})
       resolve(processNodes(result.root))
     } catch (err) {
-      reject(err)
+      const {source, line, column, reason} = err
+      reject(new SyntaxError(
+        `${reason} at line ${line}, column ${column}. Source: ${source}`
+      ))
     }
   })
 }
