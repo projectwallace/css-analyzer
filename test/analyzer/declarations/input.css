@@ -69,9 +69,12 @@
 @keyframes empty {}
 
 /**
- * @font-face can have declarations too
+ * @font-faces don't have declarations, they have
+ * font descriptors, so these should be ignored
+ * https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face#Descriptors
  */
 @font-face {
+  src: url('foo.com/font.woff');
   font-family: 'foo';
   font-weight: normal;
 }
