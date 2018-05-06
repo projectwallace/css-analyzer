@@ -26,7 +26,10 @@ test('Returns the correct analysis object structure', async t => {
         uniqueWithCount: []
       },
       fontfaces: {
-        total: 0
+        total: 0,
+        totalUnique: 0,
+        unique: [],
+        uniqueWithCount: []
       },
       imports: {
         total: 0,
