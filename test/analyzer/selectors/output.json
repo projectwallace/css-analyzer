@@ -5,14 +5,6 @@
     "total": 6,
     "totalUnique": 6,
     "unique": [
-      ".adjecent.js-selector",
-      ".js-toggle-item",
-      ".JSFOO",
-      "[class*=\"js-selector\"]",
-      "[id='js-selector']",
-      "#jsSelector"
-    ],
-    "uniqueWithCount": [
       {
         "value": ".adjecent.js-selector",
         "count": 1
@@ -43,12 +35,6 @@
     "total": 4,
     "totalUnique": 4,
     "unique": [
-      ".Foo > .Bar ~ .Baz [type=\"text\"] + span:before #bazz #fizz #buzz #drank #drugs",
-      "#foo",
-      "#jsSelector",
-      "#multipe #ids #counted #as #one"
-    ],
-    "uniqueWithCount": [
       {
         "value": ".Foo > .Bar ~ .Baz [type=\"text\"] + span:before #bazz #fizz #buzz #drank #drugs",
         "count": 1
@@ -71,19 +57,6 @@
     "total": 12,
     "totalUnique": 11,
     "unique": [
-      ".foo *",
-      ".foo * .bar",
-      ".selector:not(*:root)",
-      "*",
-      "* + html .selector",
-      "* html .selector",
-      "*:first-child + html .selector",
-      "*:first-child+html .selector",
-      "*+html .selector",
-      "*|html[xmlns*=\"\"] .selector",
-      "body*.selector"
-    ],
-    "uniqueWithCount": [
       {
         "value": ".foo *",
         "count": 1
