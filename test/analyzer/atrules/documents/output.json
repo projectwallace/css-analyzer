@@ -1,10 +1,7 @@
 {
   "total": 1,
-  "unique": [
-    "url('https://example.com')"
-  ],
   "totalUnique": 1,
-  "uniqueWithCount": [
+  "unique": [
     {
       "value": "url('https://example.com')",
       "count": 1

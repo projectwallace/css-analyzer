@@ -1,17 +1,6 @@
 {
   "total": 12,
   "unique": [
-    "-moz-border-radius",
-    "-o-border-radius",
-    "-webkit-border-radius",
-    "background-image",
-    "border-radius",
-    "margin",
-    "opacity",
-    "property",
-    "zoom"
-  ],
-  "uniqueWithCount": [
     {
       "value": "-moz-border-radius",
       "count": 1
@@ -53,11 +42,6 @@
   "prefixed": {
     "total": 3,
     "unique": [
-      "-moz-border-radius",
-      "-o-border-radius",
-      "-webkit-border-radius"
-    ],
-    "uniqueWithCount": [
       {
         "value": "-moz-border-radius",
         "count": 1

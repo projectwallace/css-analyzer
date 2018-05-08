@@ -2,10 +2,6 @@
   "total": 5,
   "totalUnique": 2,
   "unique": [
-    "fontbulger",
-    "NAME-YOUR-ANIMATION"
-  ],
-  "uniqueWithCount": [
     {
       "value": "fontbulger",
       "count": 1

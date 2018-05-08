@@ -26,14 +26,11 @@ module.exports = (values, sortFn) => {
     .map(el => el.value)
     .sort(sortFn)
 
-  const final = sorted
-    .map(el => {
-      return reduced.find(r => r.value === el)
-    })
+  const unique = sorted
+    .map(value => reduced.find(r => r.value === value))
 
   return {
-    unique: final.map(v => v.value),
-    totalUnique: final.length,
-    uniqueWithCount: final
+    unique,
+    totalUnique: unique.length
   }
 }
