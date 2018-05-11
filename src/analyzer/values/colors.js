@@ -1,34 +1,58 @@
+const valueParser = require('postcss-values-parser')
+const cssColorNames = require('css-color-names')
+
 const uniquer = require('../../utils/uniquer')
-const utils = require('../../utils/css')
 
-const colorUtils = utils.color
-const cssKeywords = colorUtils.keywords
-const colorProperties = colorUtils.properties
+const CSS_COLOR_KEYWORDS = Object
+  .keys(cssColorNames)
+  .map(color => color.toLowerCase())
+const CSS_COLOR_FUNCTIONS = ['hsl', 'hsla', 'rgb', 'rgba']
 
-module.exports = declarations => {
-  const _all = []
+function prepareValue(value) {
+  return value
+    .toString()
+    .toLowerCase()
+    .trim()
+}
 
-  declarations.forEach(declaration => {
-    const value = declaration.value
+function nodeIsHexColor(node) {
+  return node.isColor
+}
 
-    // Try to get a direct color
-    if (colorProperties.includes(declaration.property)) {
-      _all.push(value)
-      return
+function nodeIsColorFn(node) {
+  return node.type === 'func' &&
+    CSS_COLOR_FUNCTIONS.includes(prepareValue(node.value))
+}
+
+function nodeIsKeyword(node) {
+  return node.type === 'word' &&
+    CSS_COLOR_KEYWORDS.includes(prepareValue(node))
+}
+
+function extractColorsFromDeclaration(declaration) {
+  const colors = []
+
+  valueParser(declaration.value).parse().walk(node => {
+    if (nodeIsHexColor(node) || nodeIsColorFn(node) || nodeIsKeyword(node)) {
+      return colors.push(node)
     }
-
-    // Try all regexes for keywords, hsl(a), rgb(a) and hex(a)
-    Object.values(colorUtils.regex).forEach(regex => {
-      let matches = regex.exec(value)
-
-      while (matches) {
-        _all.push(matches[0])
-        matches = regex.exec(value)
-      }
-    })
   })
 
-  const all = _all.filter(v => Boolean(v) && !cssKeywords.includes(v))
+  if (colors.length > 0) {
+    declaration.colors = colors.map(color => color.toString().trim())
+  }
+
+  return declaration
+}
+
+module.exports = declarations => {
+  const all = declarations
+    .map(extractColorsFromDeclaration)
+    .filter(declaration => declaration.colors && declaration.colors.length > 0)
+    .map(declaration => declaration.colors)
+    .reduce((allColors, declarationColors) => {
+      return [...allColors, ...declarationColors]
+    }, [])
 
   return {
     total: all.length,
