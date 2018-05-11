@@ -14,24 +14,40 @@
   /* comment */
 }
 
-.color0 { color: #aff034; }
-.color1 { color: rgb(100, 200, 10); }
-.color2 { color: rgba(100, 200, 10, 0.5); }
-.color3 { color: rgba(100, 200, 10, .5); }
-.color4 { background-color: hsl(100, 20%, 30%); }
-.color5 { background-color: hsla(100, 20%, 30%, 0.5); }
-.color6 { border: 1px solid #aaa; }
-.color7 { outline: 1px solid tomato; }
-.color8 { border-color: Aqua; }
-.color9 { outline-color: whitesmoke; }
-.color12and12again { background: linear-gradient(90deg, purple 0, purple 100%) }
-.color13 { color: #0000ff00; }
-.color14 { background: rgba(2,2,2,.2) }
-.color15 { background: hsl(100, 10%, 20%) }
-.color16 { background: linear-gradient(to right, hsl(360, 100%, 100%), rgb(255, 255, 255), #fff, white) }
-.color-false { background-image: url('icon-blue.png'), url('blue-icon.png'), url('blue_icon.png'), url('icon_blue.png'); }
-.color-false { white-space: nowrap; }
-.color-false { color: inherit; color: initial; color: auto; background: none; color: currentColor; color: transparent; }
+.color4 { color: #aff034; }
+.color5 { color: rgb(100, 200, 10); }
+.color6 { color: rgba(100, 200, 10, 0.5); }
+.color7 { color: rgba(100, 200, 10, .5); }
+.color8 { background-color: hsl(100, 20%, 30%); }
+.color9 { background-color: hsla(100, 20%, 30%, 0.5); }
+.color10 { border: 1px solid #aaa; }
+.color11 { outline: 1px solid tomato; }
+.color12 { border-color: Aqua; }
+.color13 { outline-color: whitesmoke; }
+.color14and15 { background: linear-gradient(90deg, purple 0, purple 100%) }
+.color16 { color: #0000ff00; }
+.color17 { background: rgba(2,2,2,.2) }
+.color18 { background: hsl(100, 10%, 20%) }
+.color19-20-21-22 { background: linear-gradient(to right, hsl(360, 100%, 100%), rgb(255, 255, 255), #fff, white) }
+.color-false {
+  background-image:
+    url('icon-blue.png'),
+    url('blue-icon.png'),
+    url('blue_icon.png'),
+    url('icon_blue.png'); /* NOT blue */
+  background-image: url(#footer-logo-text-linear-gradient); /* NOT a keyword */
+  white-space: nowrap; /* NOT white */
+  counter-increment: lineNo; /* NOT linen */
+  -moz-osx-font-smoothing: grayscale; /* NOT gray */
+
+  /* Keywords */
+  color: inherit;
+  color: initial;
+  color: auto;
+  background: none;
+  color: currentColor;
+  color: transparent;
+}
 
 .prefixes {
   -webkit-border-radius: 0;

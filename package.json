@@ -25,6 +25,7 @@
     "css-unit-sort": "^1.1.1",
     "path": "^0.12.7",
     "postcss": "^6.0.14",
+    "postcss-values-parser": "^1.5.0",
     "specificity": "^0.3.2"
   },
   "devDependencies": {
