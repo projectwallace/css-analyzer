@@ -14,6 +14,15 @@
   /* comment */
 }
 
+/* Custom properties and calc() and complex values */
+:root {
+  --my-custom-property: 12px;
+  height: var(--my-custom-property);
+  width: calc(100px + 2%);
+  grid-column: 1/-1; /* Used to cause an Error */
+}
+
+/* Colors */
 .color4 { color: #aff034; }
 .color5 { color: rgb(100, 200, 10); }
 .color6 { color: rgba(100, 200, 10, 0.5); }
