@@ -2,7 +2,13 @@ const test = require('ava')
 const parser = require('../../src/parser')
 
 test('basic declarations are parsed', async t => {
-  const fixture = 'html, body {color:red; font-size : 12px; a: whatever;}'
+  const fixture = `
+    html, body {
+      color:red;
+      font-size : 12px;
+      a: whatever;
+    }
+  `
   const actual = await parser(fixture)
   const expected = [{
     property: 'color',
@@ -22,7 +28,12 @@ test('basic declarations are parsed', async t => {
 })
 
 test('!important is parsed', async t => {
-  const fixture = 'html { color: red !important; content: \'!important\'; color: blue; }'
+  const fixture = `html {
+      color: red !important;
+      content: '!important';
+      color: blue;
+    }
+  `
   const actual = await parser(fixture)
   const expected = [{
     property: 'color',
@@ -35,6 +46,48 @@ test('!important is parsed', async t => {
   }, {
     property: 'color',
     value: 'blue',
+    important: false
+  }]
+
+  t.deepEqual(actual.declarations, expected)
+})
+
+test('custom properties are parsed', async t => {
+  const fixture = `
+    :root {
+      --my-custom-property: 12px;
+      width: var(--my-custom-property);
+    }
+  `
+  const actual = await parser(fixture)
+  const expected = [{
+    property: '--my-custom-property',
+    value: '12px',
+    important: false
+  }, {
+    property: 'width',
+    value: 'var(--my-custom-property)',
+    important: false
+  }]
+
+  t.deepEqual(actual.declarations, expected)
+})
+
+test('calc() is parsed', async t => {
+  const fixture = `
+    .el {
+      width: calc(100px + 3%);
+      font-size: calc(3em + 20vmin);
+    }
+  `
+  const actual = await parser(fixture)
+  const expected = [{
+    property: 'width',
+    value: 'calc(100px + 3%)',
+    important: false
+  }, {
+    property: 'font-size',
+    value: 'calc(3em + 20vmin)',
     important: false
   }]
 

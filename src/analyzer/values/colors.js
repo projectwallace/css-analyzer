@@ -32,11 +32,13 @@ function nodeIsKeyword(node) {
 function extractColorsFromDeclaration(declaration) {
   const colors = []
 
-  valueParser(declaration.value).parse().walk(node => {
-    if (nodeIsHexColor(node) || nodeIsColorFn(node) || nodeIsKeyword(node)) {
-      return colors.push(node)
-    }
-  })
+  valueParser(declaration.value, {loose: true})
+    .parse()
+    .walk(node => {
+      if (nodeIsHexColor(node) || nodeIsColorFn(node) || nodeIsKeyword(node)) {
+        return colors.push(node)
+      }
+    })
 
   if (colors.length > 0) {
     declaration.colors = colors.map(color => color.toString().trim())
