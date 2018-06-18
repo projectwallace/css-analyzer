@@ -1,14 +1,14 @@
 .rule1 {
-  color: red;
+  margin: 0;
   /* comment */
 }
 
 @media screen {
   .rule2 {
-    color: red
+    margin: 0;
   }
   .rule3 {
-    color: red !important;
+    margin: 0 !important;
     /* comment */
   }
   /* comment */
@@ -23,21 +23,56 @@
 }
 
 /* Colors */
-.color4 { color: #aff034; }
-.color5 { color: rgb(100, 200, 10); }
-.color6 { color: rgba(100, 200, 10, 0.5); }
-.color7 { color: rgba(100, 200, 10, .5); }
-.color8 { background-color: hsl(100, 20%, 30%); }
-.color9 { background-color: hsla(100, 20%, 30%, 0.5); }
-.color10 { border: 1px solid #aaa; }
-.color11 { outline: 1px solid tomato; }
-.color12 { border-color: Aqua; }
-.color13 { outline-color: whitesmoke; }
-.color14and15 { background: linear-gradient(90deg, purple 0, purple 100%) }
-.color16 { color: #0000ff00; }
-.color17 { background: rgba(2,2,2,.2) }
-.color18 { background: hsl(100, 10%, 20%) }
-.color19-20-21-22 { background: linear-gradient(to right, hsl(360, 100%, 100%), rgb(255, 255, 255), #fff, white) }
+.color-hex {
+  color: #aff034;
+  border: 1px solid #aaa;
+  color: #0000ff00; /* Including opacity */
+}
+.color-rgb {
+  color: rgb(100, 200, 10);
+  color: rgba(100, 200, 10, 0.5);
+  color: rgba(100, 200, 10, .5);
+  background: rgba(2,2,2,.2);
+}
+.color-hsl {
+  color: hsl(100, 20%, 30%);
+  color: hsla(100, 20%, 30%, 0.5);
+  background: hsl(100, 10%, 20%);
+
+  /**
+   * Complex examples from
+   * https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#Examples_2
+   */
+
+  /* These examples all specify the same color: a lavender. */
+  color: hsl(270,60%,70%);
+  color: hsl(270, 60%, 70%);
+  color: hsl(270 60% 70%);
+  color: hsl(270deg, 60%, 70%);
+  color: hsl(4.71239rad, 60%, 70%);
+  color: hsl(.75turn, 60%, 70%);
+
+  /* These examples all specify the same color: a lavender that is 15% opaque. */
+  color: hsl(270, 60%, 50%, .15);
+  color: hsl(270, 60%, 50%, 15%);
+  color: hsl(270 60% 50% / .15);
+  color: hsl(270 60% 50% / 15%);
+}
+.color-keyword {
+  outline: 1px solid tomato;
+  border-color: Aqua;
+  outline-color: whitesmoke;
+  background: linear-gradient(90deg, purple 0, purple 100%);
+}
+.color-mixed {
+  background: linear-gradient(
+    to right,
+    hsl(360, 100%, 100%),
+    rgb(255, 255, 255),
+    #fff,
+    white
+  );
+}
 .color-false {
   background-image:
     url('icon-blue.png'),
@@ -81,8 +116,16 @@
 .font-size5 { font: medium serif; }
 .font-size6 { font: normal normal 1.2em serif; }
 .font-size7 { font: 400 1.3em/1 serif; }
-.font-false { font: inherit; font: initial; font: auto; }
-.font-false { font-size: inherit; font-size: initial; font-size: auto; }
+.font-false {
+  font: inherit;
+  font: initial;
+  font: auto;
+}
+.font-false {
+  font-size: inherit;
+  font-size: initial;
+  font-size: auto;
+}
 
 /**
  * Font-families
@@ -97,7 +140,11 @@
   font: 1em/ 1 serif;
   font: 1em /1 serif;
 }
-.font-family-keywords { font-family: inherit; font-family: initial; font-family: auto; }
+.font-family-keywords {
+  font-family: inherit;
+  font-family: initial;
+  font-family: auto;
+}
 .font-families-github {
   font-family:"Arial Black", "Arial Bold", Gadget, sans-serif;
   font-family:"Brush Script MT", cursive;

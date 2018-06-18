@@ -1,5 +1,5 @@
 {
-  "total": 73,
+  "total": 83,
   "fontfamilies": {
     "total": 18,
     "totalUnique": 12,
@@ -121,11 +121,11 @@
         "count": 1
       }
     ],
-    "share": 0.0547945205479452
+    "share": 0.04819277108433735
   },
   "colors": {
-    "total": 22,
-    "totalUnique": 19,
+    "total": 29,
+    "totalUnique": 28,
     "unique": [
       {
         "value": "#0000ff00",
@@ -148,6 +148,10 @@
         "count": 1
       },
       {
+        "value": "hsl(.75turn, 60%, 70%)",
+        "count": 1
+      },
+      {
         "value": "hsl(100, 10%, 20%)",
         "count": 1
       },
@@ -156,7 +160,42 @@
         "count": 1
       },
       {
+        "value": "hsl(270 60% 50% / .15)",
+        "count": 1
+      },       {
+        "value": "hsl(270 60% 50% / 15%)",
+        "count": 1
+      },
+      {
+        "value": "hsl(270 60% 70%)",
+        "count": 1
+      },
+      {
+        "value": "hsl(270, 60%, 50%, .15)",
+        "count": 1
+      },
+      {
+        "value": "hsl(270, 60%, 50%, 15%)",
+        "count": 1
+      },
+      {
+        "value": "hsl(270, 60%, 70%)",
+        "count": 1
+      },
+      {
+        "value": "hsl(270,60%,70%)",
+        "count": 1
+      },
+      {
+        "value": "hsl(270deg, 60%, 70%)",
+        "count": 1
+      },
+      {
         "value": "hsl(360, 100%, 100%)",
+        "count": 1
+      },
+      {
+        "value": "hsl(4.71239rad, 60%, 70%)",
         "count": 1
       },
       {
@@ -166,10 +205,6 @@
       {
         "value": "purple",
         "count": 2
-      },
-      {
-        "value": "red",
-        "count": 3
       },
       {
         "value": "rgb(100, 200, 10)",
