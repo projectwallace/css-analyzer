@@ -18,21 +18,20 @@
     "semicolon": false
   },
   "dependencies": {
-    "array-uniq": "^1.0.3",
     "colors-regex": "^1.0.0",
     "css-color-names": "^0.0.4",
-    "css-shorthand-expand": "^1.1.0",
+    "css-shorthand-expand": "^1.2.0",
     "css-unit-sort": "^1.1.1",
     "path": "^0.12.7",
-    "postcss": "^6.0.14",
+    "postcss": "^6.0.22",
     "postcss-values-parser": "^1.5.0",
     "specificity": "^0.3.2"
   },
   "devDependencies": {
-    "ava": "^0.24.0",
-    "coveralls": "^3.0.0",
-    "nyc": "^11.4.1",
-    "xo": "^0.18.1"
+    "ava": "^0.25.0",
+    "coveralls": "^3.0.1",
+    "nyc": "^12.0.2",
+    "xo": "^0.21.1"
   },
   "nyc": {
     "reporter": [

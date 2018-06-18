@@ -1,8 +1,7 @@
 const specificity = require('specificity')
-const arrayUniq = require('array-uniq')
 
 module.exports = selectors => {
-  const all = arrayUniq(selectors)
+  const all = [...new Set(selectors)]
     .sort()
     .sort(specificity.compare)
     .reverse()

@@ -9,12 +9,10 @@ function stringCompare(a, b) {
 module.exports = (values, sortFn) => {
   sortFn = sortFn || stringCompare
 
-  const reduced = Array.from(
-    values.reduce((map, value) => {
-      // Create a Map of unique values and their counts
-      return map.set(value, map.get(value) + 1 || 1)
-    }, new Map())
-  ).map(value => {
+  const reduced = [...values.reduce((map, value) => {
+    // Create a Map of unique values and their counts
+    return map.set(value, map.get(value) + 1 || 1)
+  }, new Map())].map(value => {
     // Create an array of [{value, count}]
     return {
       value: value[0],
