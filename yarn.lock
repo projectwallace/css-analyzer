@@ -1073,9 +1073,9 @@ css-color-names@^0.0.4:
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/css-color-names/-/css-color-names-0.0.4.tgz#808adc2e79cf84738069b646cb20ec27beb629e0"
 
-css-shorthand-expand@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/css-shorthand-expand/-/css-shorthand-expand-1.1.0.tgz#102f7286cbd32375430b5849d4e2fea3aa21ea64"
+css-shorthand-expand@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/css-shorthand-expand/-/css-shorthand-expand-1.2.0.tgz#bd6ac8d79f99928581eaca9fe05a03d316d17fe5"
   dependencies:
     css-color-names "0.0.1"
     css-url-regex "0.0.1"
