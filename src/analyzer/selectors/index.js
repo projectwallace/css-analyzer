@@ -4,6 +4,7 @@ module.exports = selectors => {
   const js = require('./js')(all)
   const id = require('./id')(all)
   const universal = require('./universal')(all)
+  const accessibility = require('./accessibility')(all)
   const specificity = require('./specificity')(all)
   const identifiers = require('./identifiers')(all)
 
@@ -13,6 +14,7 @@ module.exports = selectors => {
     js,
     id,
     universal,
+    accessibility,
     specificity,
     identifiers
   }

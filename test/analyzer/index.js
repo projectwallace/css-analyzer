@@ -82,6 +82,11 @@ test('Returns the correct analysis object structure', async t => {
       total: 1
     },
     selectors: {
+      accessibility: {
+        total: 0,
+        totalUnique: 0,
+        unique: []
+      },
       id: {
         total: 0,
         totalUnique: 0,

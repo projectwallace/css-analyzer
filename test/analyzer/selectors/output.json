@@ -1,6 +1,6 @@
 {
-  "total": 51,
-  "totalUnique": 50,
+  "total": 57,
+  "totalUnique": 56,
   "js": {
     "total": 6,
     "totalUnique": 6,
@@ -103,6 +103,36 @@
       }
     ]
   },
+  "accessibility": {
+    "total": 6,
+    "totalUnique": 6,
+    "unique": [
+      {
+        "value": ":checked ~ [role=\"menu\"]",
+        "count": 1
+      },
+      {
+        "value": "[aria-selected]",
+        "count": 1
+      },
+      {
+        "value": "[aria-selected]::after",
+        "count": 1
+      },
+      {
+        "value": "[role=\"menu\"] a",
+        "count": 1
+      },
+      {
+        "value": "[role=\"menuitem\"][aria-checked=\"true\"]::before",
+        "count": 1
+      },
+      {
+        "value": "[role=\"tablist\"]",
+        "count": 1
+      }
+    ]
+  },
   "specificity": {
     "top": [
       {
@@ -153,7 +183,7 @@
     ]
   },
   "identifiers": {
-    "average": 2.7450980392156863,
+    "average": 2.6491228070175437,
     "top": [
     {
       "identifiers": 26,
