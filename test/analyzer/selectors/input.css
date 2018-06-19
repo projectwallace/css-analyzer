@@ -49,6 +49,17 @@
 }
 
 /**
+ * Accessibility-related selectors
+ * Examples from https://inclusive-components.design
+ */
+[role="tablist"],
+[aria-selected],
+[aria-selected]::after,
+[role="menu"] a,
+:checked ~ [role="menu"],
+[role="menuitem"][aria-checked="true"]::before {}
+
+/**
  * CSS Hacks
  * Contains universal selectors
  */
