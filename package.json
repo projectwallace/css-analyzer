@@ -1,10 +1,8 @@
 {
-  "name": "css-analyzer",
+  "name": "@projectwallace/css-analyzer",
   "version": "1.0.0",
   "author": {
-    "name": "Bart Veneman",
-    "email": "bart@bveneman.nl",
-    "website": "bveneman.nl"
+    "name": "Bart Veneman"
   },
   "license": "MIT",
   "engines": {
