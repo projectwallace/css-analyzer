@@ -8,13 +8,13 @@ like the amount of rules, the amount of `!important`s, unique colors, and so on.
 ## Install
 
 ```sh
-npm install --save projectwallace/css-analyzer
+npm install --save @projectwallace/css-analyzer
 ```
 
 or
 
 ```sh
-yarn add projectwallace/css-analyzer
+yarn add @projectwallace/css-analyzer
 ```
 
 ## Usage
