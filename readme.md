@@ -1,23 +1,21 @@
 # css-analyzer [![Build Status](https://travis-ci.org/projectwallace/css-analyzer.svg?branch=master)](https://travis-ci.org/projectwallace/css-analyzer) [![Known Vulnerabilities](https://snyk.io/test/github/projectwallace/css-analyzer/badge.svg)](https://snyk.io/test/github/projectwallace/css-analyzer) [![Coverage Status](https://coveralls.io/repos/github/projectwallace/css-analyzer/badge.svg?branch=master)](https://coveralls.io/github/projectwallace/css-analyzer?branch=master) ![Dependencies Status](https://img.shields.io/david/projectwallace/css-analyzer.svg) ![Dependencies Status](https://img.shields.io/david/dev/projectwallace/css-analyzer.svg)
 
-> Analyze your CSS completely
+> Analyze your CSS
 
 A module that goes through your CSS to find all kinds of relevant statistics,
 like the amount of rules, the amount of `!important`s, unique colors, and so on.
 
-
 ## Install
 
-```
-$ npm install --save projectwallace/css-analyzer
+```sh
+npm install --save projectwallace/css-analyzer
 ```
 
 or
 
+```sh
+yarn add projectwallace/css-analyzer
 ```
-$ yarn add projectwallace/css-analyzer
-```
-
 
 ## Usage
 
@@ -182,4 +180,4 @@ analyze('foo {}')
 
 ## License
 
-MIT © [Bart Veneman](http://projectwallace.herokuapp.com)
+MIT © Bart Veneman
