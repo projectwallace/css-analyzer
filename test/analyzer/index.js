@@ -79,7 +79,10 @@ test('Returns the correct analysis object structure', async t => {
       unique: []
     },
     rules: {
-      total: 1
+      total: 1,
+      empty: {
+        total: 1
+      }
     },
     selectors: {
       accessibility: {
