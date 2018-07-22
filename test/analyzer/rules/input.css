@@ -11,3 +11,17 @@
     }
   }
 }
+
+/**
+ * Empty rule and at-rule
+ */
+.empty {}
+.empty-multiline{
+
+
+}
+@media screen {}
+
+@media (min-width: 1px) {
+  .empty-inside-mq {}
+}
