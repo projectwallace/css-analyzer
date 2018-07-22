@@ -1,9 +1,9 @@
 {
   "name": "@projectwallace/css-analyzer",
   "version": "1.0.0",
-  "author": {
-    "name": "Bart Veneman"
-  },
+  "author": "Bart Veneman",
+  "homepage": "https://github.com/projectwallace/css-analyzer",
+  "issues": "https://github.com/projectwallace/css-analyzer/issues",
   "license": "MIT",
   "engines": {
     "node": ">=8.0"
@@ -16,18 +16,17 @@
     "semicolon": false
   },
   "dependencies": {
-    "colors-regex": "^1.0.0",
     "css-color-names": "^0.0.4",
     "css-shorthand-expand": "^1.2.0",
     "css-unit-sort": "^1.1.1",
     "path": "^0.12.7",
-    "postcss": "^6.0.22",
+    "postcss": "^7.0.1",
     "postcss-values-parser": "^1.5.0",
-    "specificity": "^0.3.2"
+    "specificity": "^0.4.0"
   },
   "devDependencies": {
     "ava": "^0.25.0",
-    "coveralls": "^3.0.1",
+    "coveralls": "^3.0.2",
     "nyc": "^12.0.2",
     "xo": "^0.21.1"
   },
