@@ -8,6 +8,19 @@
   "engines": {
     "node": ">=8.0"
   },
+  "keywords": [
+    "projectwallace",
+    "wallace",
+    "css",
+    "stats",
+    "statistics",
+    "analytics",
+    "cssstats",
+    "parker",
+    "performance",
+    "styleguide",
+    "metrics"
+  ],
   "scripts": {
     "test": "xo && nyc ava test/analyzer test/parser"
   },
