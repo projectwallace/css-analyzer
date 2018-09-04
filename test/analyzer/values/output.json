@@ -1,5 +1,5 @@
 {
-  "total": 91,
+  "total": 93,
   "fontfamilies": {
     "total": 18,
     "totalUnique": 12,
@@ -121,11 +121,11 @@
         "count": 1
       }
     ],
-    "share": 0.04395604395604396
+    "share": 0.043010752688172046
   },
   "colors": {
-    "total": 37,
-    "totalUnique": 35,
+    "total": 39,
+    "totalUnique": 37,
     "unique": [
       {
         "value": "#000",
@@ -145,6 +145,14 @@
       },
       {
         "value": "#aff034",
+        "count": 1
+      },
+      {
+        "value": "#d9d9d9",
+        "count": 1
+      },
+      {
+        "value": "#dadada",
         "count": 1
       },
       {
