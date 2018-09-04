@@ -1,5 +1,5 @@
 {
-  "total": 83,
+  "total": 91,
   "fontfamilies": {
     "total": 18,
     "totalUnique": 12,
@@ -121,12 +121,20 @@
         "count": 1
       }
     ],
-    "share": 0.04819277108433735
+    "share": 0.04395604395604396
   },
   "colors": {
-    "total": 29,
-    "totalUnique": 28,
+    "total": 37,
+    "totalUnique": 35,
     "unique": [
+      {
+        "value": "#000",
+        "count": 1
+      },
+      {
+        "value": "#000000",
+        "count": 1
+      },
       {
         "value": "#0000ff00",
         "count": 1
@@ -148,7 +156,15 @@
         "count": 1
       },
       {
+        "value": "black",
+        "count": 2
+      },
+      {
         "value": "hsl(.75turn, 60%, 70%)",
+        "count": 1
+      },
+      {
+        "value": "hsl(0,0,0)",
         "count": 1
       },
       {
@@ -199,6 +215,10 @@
         "count": 1
       },
       {
+        "value": "hsla(0,0,0,1)",
+        "count": 1
+      },
+      {
         "value": "hsla(100, 20%, 30%, 0.5)",
         "count": 1
       },
@@ -207,11 +227,19 @@
         "count": 2
       },
       {
+        "value": "rgb(0,0,0)",
+        "count": 1
+      },
+      {
         "value": "rgb(100, 200, 10)",
         "count": 1
       },
       {
         "value": "rgb(255, 255, 255)",
+        "count": 1
+      },
+      {
+        "value": "rgba(0,0,0,1)",
         "count": 1
       },
       {
@@ -237,6 +265,118 @@
       {
         "value": "whitesmoke",
         "count": 1
+      }
+    ],
+    "duplicates": [
+      {
+        "count": 8,
+        "value": "#000",
+        "aliases": [
+          {
+            "value": "#000",
+            "count": 1
+          },
+          {
+            "value": "#000000",
+            "count": 1
+          },
+          {
+            "value": "black",
+            "count": 2
+          },
+          {
+            "value": "hsl(0,0,0)",
+            "count": 1
+          },
+          {
+            "value": "hsla(0,0,0,1)",
+            "count": 1
+          },
+          {
+            "value": "rgb(0,0,0)",
+            "count": 1
+          },
+          {
+            "value": "rgba(0,0,0,1)",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "value": "#fff",
+        "count": 4,
+        "aliases": [
+          {
+            "count": 1,
+            "value": "#fff"
+          },
+          {
+            "count": 1,
+            "value": "hsl(360, 100%, 100%)"
+          },
+          {
+            "count": 1,
+            "value": "rgb(255, 255, 255)"
+          },
+          {
+            "count": 1,
+            "value": "white"
+          }
+        ]
+      },
+      {
+        "value": "hsl(270 60% 50% / .15)",
+        "count": 4,
+        "aliases": [
+          {
+            "count": 1,
+            "value": "hsl(270 60% 50% / .15)"
+          },
+          {
+            "count": 1,
+            "value": "hsl(270 60% 50% / 15%)"
+          },
+          {
+            "count": 1,
+            "value": "hsl(270, 60%, 50%, .15)"
+          },
+          {
+            "count": 1,
+            "value": "hsl(270, 60%, 50%, 15%)"
+          }
+        ]
+      },
+      {
+        "value": "hsl(270 60% 70%)",
+        "count": 3,
+        "aliases": [
+          {
+            "count": 1,
+            "value": "hsl(270 60% 70%)"
+          },
+          {
+            "count": 1,
+            "value": "hsl(270, 60%, 70%)"
+          },
+          {
+            "count": 1,
+            "value": "hsl(270,60%,70%)"
+          }
+        ]
+      },
+      {
+        "value": "rgba(100, 200, 10, .5)",
+        "count": 2,
+        "aliases": [
+          {
+            "count": 1,
+            "value": "rgba(100, 200, 10, .5)"
+          },
+          {
+            "count": 1,
+            "value": "rgba(100, 200, 10, 0.5)"
+          }
+        ]
       }
     ]
   }
