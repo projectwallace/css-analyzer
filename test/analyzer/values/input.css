@@ -68,6 +68,10 @@
   color: rgba(0,0,0,1);
   color: hsl(0,0,0);
   color: hsla(0,0,0,1);
+
+  /* Almost duplicates */
+  color: #d9d9d9;
+  color: #dadada;
 }
 .color-keyword {
   outline: 1px solid tomato;
