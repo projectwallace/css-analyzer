@@ -48,6 +48,7 @@
   color: hsl(270,60%,70%);
   color: hsl(270, 60%, 70%);
   color: hsl(270 60% 70%);
+  /** tinycolor doesn't support these color formats, so they won't show up as aliases/duplicates */
   color: hsl(270deg, 60%, 70%);
   color: hsl(4.71239rad, 60%, 70%);
   color: hsl(.75turn, 60%, 70%);
@@ -57,6 +58,16 @@
   color: hsl(270, 60%, 50%, 15%);
   color: hsl(270 60% 50% / .15);
   color: hsl(270 60% 50% / 15%);
+
+  /* Duplicate colors */
+  color: #000;
+  color: #000000;
+  color: black;
+  color: black; /* duplicate */
+  color: rgb(0,0,0);
+  color: rgba(0,0,0,1);
+  color: hsl(0,0,0);
+  color: hsla(0,0,0,1);
 }
 .color-keyword {
   outline: 1px solid tomato;

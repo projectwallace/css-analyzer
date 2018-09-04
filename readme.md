@@ -158,7 +158,8 @@ analyze('foo {}')
 //     colors: {
 //       total: 0,
 //       totalUnique: 0,
-//       unique: []
+//       unique: [],
+//       duplicates: []
 //     },
 //     fontfamilies: {
 //       total: 0,

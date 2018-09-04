@@ -1,5 +1,6 @@
 const valueParser = require('postcss-values-parser')
 const cssColorNames = require('css-color-names')
+const tinycolor = require('tinycolor2')
 
 const uniquer = require('../../utils/uniquer')
 
@@ -47,6 +48,81 @@ function extractColorsFromDeclaration(declaration) {
   return declaration
 }
 
+const addCount = color => {
+  return {
+    ...color,
+    count: color.aliases.reduce((acc, curr) => {
+      return acc + curr.count
+    }, 0)
+  }
+}
+
+const addShortestNotation = color => {
+  return {
+    ...color,
+    value: [...color.aliases].sort((a, b) => {
+      return a.value.length - b.value.length
+    }).shift().value
+  }
+}
+
+const addAliases = (acc, curr) => {
+  if (!acc[curr.key]) {
+    acc[curr.key] = {
+      key: curr.key,
+      aliases: []
+    }
+  }
+
+  acc[curr.key] = {
+    ...acc[curr.key],
+    aliases: [...acc[curr.key].aliases, curr]
+  }
+
+  return acc
+}
+
+const filterDuplicateColors = color => {
+  // Filter out the actual duplicate colors
+  return color.aliases.length > 1
+}
+
+const validateColor = color => {
+  return tinycolor(color.value).isValid()
+}
+
+const normalizeColors = color => {
+  // Add a normalized value
+  return {
+    ...color,
+    key: tinycolor(color.value).toHslString()
+  }
+}
+
+const rmTmpProps = color => {
+  // Remove temporary props that were needed for analysis
+  const {key, ...restColor} = color
+  return {
+    ...restColor,
+    aliases: color.aliases.map(alias => {
+      const {key, ...restAlias} = alias
+      return restAlias
+    })
+  }
+}
+
+const withAliases = colors => Object
+  .values(
+    colors
+      .filter(validateColor)
+      .map(normalizeColors)
+      .reduce(addAliases, {})
+  )
+  .filter(filterDuplicateColors)
+  .map(addCount)
+  .map(addShortestNotation)
+  .map(rmTmpProps)
+
 module.exports = declarations => {
   const all = declarations
     .map(extractColorsFromDeclaration)
@@ -55,9 +131,12 @@ module.exports = declarations => {
     .reduce((allColors, declarationColors) => {
       return [...allColors, ...declarationColors]
     }, [])
+  const {totalUnique, unique} = uniquer(all)
 
   return {
     total: all.length,
-    ...uniquer(all)
+    unique,
+    totalUnique,
+    duplicates: withAliases(unique)
   }
 }

@@ -35,7 +35,8 @@
     "path": "^0.12.7",
     "postcss": "^7.0.1",
     "postcss-values-parser": "^1.5.0",
-    "specificity": "^0.4.0"
+    "specificity": "^0.4.0",
+    "tinycolor2": "^1.4.1"
   },
   "devDependencies": {
     "ava": "^0.25.0",

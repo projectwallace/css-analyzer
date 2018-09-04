@@ -141,7 +141,8 @@ test('Returns the correct analysis object structure', async t => {
       colors: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        duplicates: []
       },
       fontfamilies: {
         total: 0,
