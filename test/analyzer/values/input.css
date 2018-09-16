@@ -48,10 +48,6 @@
   color: hsl(270,60%,70%);
   color: hsl(270, 60%, 70%);
   color: hsl(270 60% 70%);
-  /** tinycolor doesn't support these color formats, so they won't show up as aliases/duplicates */
-  color: hsl(270deg, 60%, 70%);
-  color: hsl(4.71239rad, 60%, 70%);
-  color: hsl(.75turn, 60%, 70%);
 
   /* These examples all specify the same color: a lavender that is 15% opaque. */
   color: hsl(270, 60%, 50%, .15);

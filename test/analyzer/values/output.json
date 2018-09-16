@@ -1,5 +1,5 @@
 {
-  "total": 93,
+  "total": 90,
   "fontfamilies": {
     "total": 18,
     "totalUnique": 12,
@@ -121,26 +121,14 @@
         "count": 1
       }
     ],
-    "share": 0.043010752688172046
+    "share": 0.044444444444444446
   },
   "colors": {
-    "total": 39,
-    "totalUnique": 37,
+    "total": 36,
+    "totalUnique": 34,
     "unique": [
       {
-        "value": "#000",
-        "count": 1
-      },
-      {
-        "value": "#000000",
-        "count": 1
-      },
-      {
-        "value": "#0000ff00",
-        "count": 1
-      },
-      {
-        "value": "#aaa",
+        "value": "tomato",
         "count": 1
       },
       {
@@ -148,31 +136,15 @@
         "count": 1
       },
       {
-        "value": "#d9d9d9",
+        "value": "rgb(100, 200, 10)",
         "count": 1
       },
       {
-        "value": "#dadada",
+        "value": "rgba(100, 200, 10, 0.5)",
         "count": 1
       },
       {
-        "value": "#fff",
-        "count": 1
-      },
-      {
-        "value": "Aqua",
-        "count": 1
-      },
-      {
-        "value": "black",
-        "count": 2
-      },
-      {
-        "value": "hsl(.75turn, 60%, 70%)",
-        "count": 1
-      },
-      {
-        "value": "hsl(0,0,0)",
+        "value": "rgba(100, 200, 10, .5)",
         "count": 1
       },
       {
@@ -184,22 +156,15 @@
         "count": 1
       },
       {
-        "value": "hsl(270 60% 50% / .15)",
-        "count": 1
-      },       {
-        "value": "hsl(270 60% 50% / 15%)",
+        "value": "hsla(100, 20%, 30%, 0.5)",
         "count": 1
       },
       {
-        "value": "hsl(270 60% 70%)",
+        "value": "Aqua",
         "count": 1
       },
       {
-        "value": "hsl(270, 60%, 50%, .15)",
-        "count": 1
-      },
-      {
-        "value": "hsl(270, 60%, 50%, 15%)",
+        "value": "#0000ff00",
         "count": 1
       },
       {
@@ -211,23 +176,23 @@
         "count": 1
       },
       {
-        "value": "hsl(270deg, 60%, 70%)",
+        "value": "hsl(270 60% 70%)",
         "count": 1
       },
       {
-        "value": "hsl(360, 100%, 100%)",
+        "value": "hsl(270 60% 50% / 15%)",
         "count": 1
       },
       {
-        "value": "hsl(4.71239rad, 60%, 70%)",
+        "value": "hsl(270 60% 50% / .15)",
         "count": 1
       },
       {
-        "value": "hsla(0,0,0,1)",
+        "value": "hsl(270, 60%, 50%, .15)",
         "count": 1
       },
       {
-        "value": "hsla(100, 20%, 30%, 0.5)",
+        "value": "hsl(270, 60%, 50%, 15%)",
         "count": 1
       },
       {
@@ -235,11 +200,15 @@
         "count": 2
       },
       {
-        "value": "rgb(0,0,0)",
+        "value": "white",
         "count": 1
       },
       {
-        "value": "rgb(100, 200, 10)",
+        "value": "hsl(360, 100%, 100%)",
+        "count": 1
+      },
+      {
+        "value": "#fff",
         "count": 1
       },
       {
@@ -247,102 +216,98 @@
         "count": 1
       },
       {
+        "value": "whitesmoke",
+        "count": 1
+      },
+      {
+        "value": "#dadada",
+        "count": 1
+      },
+      {
+        "value": "#d9d9d9",
+        "count": 1
+      },
+      {
+        "value": "#aaa",
+        "count": 1
+      },
+      {
         "value": "rgba(0,0,0,1)",
         "count": 1
       },
       {
-        "value": "rgba(100, 200, 10, .5)",
+        "value": "black",
+        "count": 2
+      },
+      {
+        "value": "hsl(0,0,0)",
         "count": 1
       },
       {
-        "value": "rgba(100, 200, 10, 0.5)",
+        "value": "#000",
+        "count": 1
+      },
+      {
+        "value": "rgb(0,0,0)",
+        "count": 1
+      },
+      {
+        "value": "hsla(0,0,0,1)",
+        "count": 1
+      },
+      {
+        "value": "#000000",
         "count": 1
       },
       {
         "value": "rgba(2,2,2,.2)",
         "count": 1
-      },
-      {
-        "value": "tomato",
-        "count": 1
-      },
-      {
-        "value": "white",
-        "count": 1
-      },
-      {
-        "value": "whitesmoke",
-        "count": 1
       }
     ],
     "duplicates": [
       {
-        "count": 8,
-        "value": "#000",
+        "value": "rgba(100, 200, 10, .5)",
+        "count": 2,
         "aliases": [
           {
-            "value": "#000",
-            "count": 1
+            "count": 1,
+            "value": "rgba(100, 200, 10, 0.5)"
           },
           {
-            "value": "#000000",
-            "count": 1
-          },
-          {
-            "value": "black",
-            "count": 2
-          },
-          {
-            "value": "hsl(0,0,0)",
-            "count": 1
-          },
-          {
-            "value": "hsla(0,0,0,1)",
-            "count": 1
-          },
-          {
-            "value": "rgb(0,0,0)",
-            "count": 1
-          },
-          {
-            "value": "rgba(0,0,0,1)",
-            "count": 1
+            "count": 1,
+            "value": "rgba(100, 200, 10, .5)"
           }
         ]
       },
       {
-        "value": "#fff",
-        "count": 4,
+        "value": "hsl(270,60%,70%)",
+        "count": 3,
         "aliases": [
           {
             "count": 1,
-            "value": "#fff"
+            "value": "hsl(270, 60%, 70%)"
           },
           {
             "count": 1,
-            "value": "hsl(360, 100%, 100%)"
+            "value": "hsl(270,60%,70%)"
           },
           {
             "count": 1,
-            "value": "rgb(255, 255, 255)"
-          },
-          {
-            "count": 1,
-            "value": "white"
+            "value": "hsl(270 60% 70%)"
           }
         ]
       },
       {
-        "value": "hsl(270 60% 50% / .15)",
+        "value": "hsl(270 60% 50% / 15%)",
         "count": 4,
         "aliases": [
-          {
-            "count": 1,
-            "value": "hsl(270 60% 50% / .15)"
-          },
           {
             "count": 1,
             "value": "hsl(270 60% 50% / 15%)"
+          },
+          {
+            "count": 1,
+            "value": "hsl(270 60% 50% / .15)"
           },
           {
             "count": 1,
@@ -355,34 +320,58 @@
         ]
       },
       {
-        "value": "hsl(270 60% 70%)",
-        "count": 3,
+        "value": "#fff",
+        "count": 4,
         "aliases": [
           {
             "count": 1,
-            "value": "hsl(270 60% 70%)"
+            "value": "white"
           },
           {
             "count": 1,
-            "value": "hsl(270, 60%, 70%)"
+            "value": "hsl(360, 100%, 100%)"
           },
           {
             "count": 1,
-            "value": "hsl(270,60%,70%)"
+            "value": "#fff"
+          },
+          {
+            "count": 1,
+            "value": "rgb(255, 255, 255)"
           }
         ]
       },
       {
-        "value": "rgba(100, 200, 10, .5)",
-        "count": 2,
+        "count": 8,
+        "value": "#000",
         "aliases": [
           {
-            "count": 1,
-            "value": "rgba(100, 200, 10, .5)"
+            "value": "rgba(0,0,0,1)",
+            "count": 1
           },
           {
-            "count": 1,
-            "value": "rgba(100, 200, 10, 0.5)"
+            "value": "black",
+            "count": 2
+          },
+          {
+            "value": "hsl(0,0,0)",
+            "count": 1
+          },
+          {
+            "value": "#000",
+            "count": 1
+          },
+          {
+            "value": "rgb(0,0,0)",
+            "count": 1
+          },
+          {
+            "value": "hsla(0,0,0,1)",
+            "count": 1
+          },
+          {
+            "value": "#000000",
+            "count": 1
           }
         ]
       }

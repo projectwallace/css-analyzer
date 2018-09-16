@@ -1,6 +1,7 @@
 const valueParser = require('postcss-values-parser')
 const cssColorNames = require('css-color-names')
 const tinycolor = require('tinycolor2')
+const sortColors = require('color-sorter')
 
 const uniquer = require('../../utils/uniquer')
 
@@ -135,10 +136,14 @@ module.exports = declarations => {
     }, [])
   const {totalUnique, unique} = uniquer(all)
 
+  // Uniquer sorts the colors, so sort them here once more
+  const sorted = sortColors(unique.map(c => c.value))
+  const uniqueSorted = sorted.map(c => unique.find(u => u.value === c))
+
   return {
     total: all.length,
-    unique,
+    unique: uniqueSorted,
     totalUnique,
-    duplicates: withAliases(unique)
+    duplicates: withAliases(uniqueSorted)
   }
 }
