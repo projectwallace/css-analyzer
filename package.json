@@ -29,6 +29,7 @@
     "semicolon": false
   },
   "dependencies": {
+    "color-sorter": "^2.0.0",
     "css-color-names": "^0.0.4",
     "css-shorthand-expand": "^1.2.0",
     "css-unit-sort": "^1.1.1",
