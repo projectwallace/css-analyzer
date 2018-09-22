@@ -29,14 +29,14 @@
     "semicolon": false
   },
   "dependencies": {
-    "color-sorter": "^2.0.0",
+    "color-sorter": "2.0.0",
     "css-color-names": "^0.0.4",
     "css-shorthand-expand": "^1.2.0",
     "css-unit-sort": "^1.1.1",
     "path": "^0.12.7",
-    "postcss": "^7.0.1",
+    "postcss": "^7.0.2",
     "postcss-values-parser": "^1.5.0",
-    "specificity": "^0.4.0",
+    "specificity": "^0.4.1",
     "tinycolor2": "^1.4.1"
   },
   "devDependencies": {
