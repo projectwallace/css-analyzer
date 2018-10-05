@@ -1086,9 +1086,9 @@ color-name@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/color-name/-/color-name-1.1.1.tgz#4b1415304cf50028ea81643643bd82ea05803689"
 
-color-sorter@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/color-sorter/-/color-sorter-2.0.0.tgz#b802344624869234838e26b7baf8e13ae916b192"
+color-sorter@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/color-sorter/-/color-sorter-2.2.0.tgz#1301a1b704a70ab4e73d7e516a9227a8ad1a1e35"
   dependencies:
     tinycolor2 "^1.4.1"
 
