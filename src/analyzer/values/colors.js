@@ -68,14 +68,14 @@ const addShortestNotation = color => {
 }
 
 const addAliases = (acc, curr) => {
-  if (!acc[curr.key]) {
-    acc[curr.key] = {
+  if (!acc[curr.normalized]) {
+    acc[curr.normalized] = {
       aliases: []
     }
   }
 
-  acc[curr.key] = {
-    aliases: [...acc[curr.key].aliases, curr]
+  acc[curr.normalized] = {
+    aliases: [...acc[curr.normalized].aliases, curr]
   }
 
   return acc
@@ -96,10 +96,11 @@ const normalizeColors = color => {
   // Avoid using TinyColor's toHslString() because it rounds
   // the numbers and incorrectly reports aliases
   const {h, s, l, a} = tinycolor(color.value).toHsl()
+  const normalized = a === 0 ? 0 : `h${h}s${s}l${l}a${a}`
 
   return {
     ...color,
-    key: `h${h}s${s}l${l}a${a}`
+    normalized
   }
 }
 
@@ -108,7 +109,7 @@ const rmTmpProps = color => {
   return {
     ...color,
     aliases: color.aliases.map(alias => {
-      const {key, ...restAlias} = alias
+      const {normalized, ...restAlias} = alias
       return restAlias
     })
   }
