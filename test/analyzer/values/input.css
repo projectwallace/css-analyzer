@@ -26,7 +26,7 @@
 .color-hex {
   color: #aff034;
   border: 1px solid #aaa;
-  color: #0000ff00; /* Including opacity */
+  color: #0000ffaa; /* Including opacity */
 }
 .color-rgb {
   color: rgb(100, 200, 10);
@@ -59,11 +59,15 @@
   color: #000;
   color: #000000;
   color: black;
-  color: black; /* duplicate */
+  color: black;
   color: rgb(0,0,0);
   color: rgba(0,0,0,1);
   color: hsl(0,0,0);
   color: hsla(0,0,0,1);
+
+  /* Fully transparent aliases */
+  color: rgba(0,0,0,0);
+  color: hsla(0,0%,0%,0);
 
   /* Almost duplicates */
   color: #d9d9d9;
