@@ -16,9 +16,13 @@ module.exports = selectors => {
     .reduce((prev, curr) => prev + curr, 0)
   const average = totalIdentifiers / totalSelectors
 
-  const top = function (count) {
-    const sorter = function (a, b) {
-      return a.identifiers > b.identifiers ? -1 : 1
+  const top = (count) => {
+    const sorter = (a, b) => {
+      if (a.identifiers === b.identifiers) {
+        return a.selector.localeCompare(b.selector)
+      }
+
+      return b.identifiers - a.identifiers
     }
 
     return identifiersPerSelector
