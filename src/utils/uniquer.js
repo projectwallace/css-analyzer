@@ -1,13 +1,7 @@
-function stringCompare(a, b) {
-  return a
-    .toLowerCase()
-    .localeCompare(
-      b.toLowerCase()
-    )
-}
+const stringSortFn = require('string-natural-compare')
 
 module.exports = (values, sortFn) => {
-  sortFn = sortFn || stringCompare
+  sortFn = sortFn || stringSortFn.caseInsensitive
 
   const reduced = [...values.reduce((map, value) => {
     // Create a Map of unique values and their counts

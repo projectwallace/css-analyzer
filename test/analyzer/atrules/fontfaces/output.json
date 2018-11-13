@@ -5,6 +5,14 @@
     {
       "count": 1,
       "value": {
+        "font-family": "MyHelvetica",
+        "src": "local(\"Helvetica Neue Bold\"), local(\"HelveticaNeue-Bold\"), url(MgOpenModernaBold.ttf)",
+        "font-weight": "bold"
+      }
+    },
+    {
+      "count": 1,
+      "value": {
         "font-display": "swap",
         "font-family": "monospace",
         "font-stretch": "condensed",
@@ -20,21 +28,6 @@
     {
       "count": 1,
       "value": {
-        "font-family": "MyHelvetica",
-        "src": "local(\"Helvetica Neue Bold\"), local(\"HelveticaNeue-Bold\"), url(MgOpenModernaBold.ttf)",
-        "font-weight": "bold"
-      }
-    },
-    {
-      "count": 2,
-      "value": {
-        "src": "url('https://example.com')",
-        "font-family": "'Example Duplicate'"
-      }
-    },
-    {
-      "count": 1,
-      "value": {
         "font-family": "\"Open Sans\"",
         "src": "url(\"/fonts/OpenSans-Regular-webfont.woff2\") format(\"woff2\"), url(\"/fonts/OpenSans-Regular-webfont.woff\") format(\"woff\")"
       }
@@ -44,6 +37,13 @@
       "value": {
         "font-family": "\"Bitstream Vera Serif Bold\"",
         "src": "url(\"https://mdn.mozillademos.org/files/2468/VeraSeBd.ttf\")"
+      }
+    },
+    {
+      "count": 2,
+      "value": {
+        "src": "url('https://example.com')",
+        "font-family": "'Example Duplicate'"
       }
     }
   ]

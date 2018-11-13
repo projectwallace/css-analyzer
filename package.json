@@ -37,6 +37,7 @@
     "postcss": "^7.0.2",
     "postcss-values-parser": "^2.0.0",
     "specificity": "^0.4.1",
+    "string-natural-compare": "^2.0.3",
     "tinycolor2": "^1.4.1"
   },
   "devDependencies": {

@@ -6,6 +6,10 @@
     "totalUnique": 6,
     "unique": [
       {
+        "value": "#jsSelector",
+        "count": 1
+      },
+      {
         "value": ".adjecent.js-selector",
         "count": 1
       },
@@ -24,10 +28,6 @@
       {
         "value": "[id='js-selector']",
         "count": 1
-      },
-      {
-        "value": "#jsSelector",
-        "count": 1
       }
     ]
   },
@@ -35,10 +35,6 @@
     "total": 4,
     "totalUnique": 4,
     "unique": [
-      {
-        "value": ".Foo > .Bar ~ .Baz [type=\"text\"] + span:before #bazz #fizz #buzz #drank #drugs",
-        "count": 1
-      },
       {
         "value": "#foo",
         "count": 1
@@ -50,6 +46,10 @@
       {
         "value": "#multipe #ids #counted #as #one",
         "count": 1
+      },
+      {
+        "value": ".Foo > .Bar ~ .Baz [type=\"text\"] + span:before #bazz #fizz #buzz #drank #drugs",
+        "count": 1
       }
     ]
   },
@@ -57,18 +57,6 @@
     "total": 12,
     "totalUnique": 11,
     "unique": [
-      {
-        "value": ".foo *",
-        "count": 1
-      },
-      {
-        "value": ".foo * .bar",
-        "count": 1
-      },
-      {
-        "value": ".selector:not(*:root)",
-        "count": 1
-      },
       {
         "value": "*",
         "count": 1
@@ -82,6 +70,10 @@
         "count": 2
       },
       {
+        "value": "*+html .selector",
+        "count": 1
+      },
+      {
         "value": "*:first-child + html .selector",
         "count": 1
       },
@@ -90,11 +82,19 @@
         "count": 1
       },
       {
-        "value": "*+html .selector",
+        "value": "*|html[xmlns*=\"\"] .selector",
         "count": 1
       },
       {
-        "value": "*|html[xmlns*=\"\"] .selector",
+        "value": ".foo *",
+        "count": 1
+      },
+      {
+        "value": ".foo * .bar",
+        "count": 1
+      },
+      {
+        "value": ".selector:not(*:root)",
         "count": 1
       },
       {
