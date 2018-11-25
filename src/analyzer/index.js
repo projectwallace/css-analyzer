@@ -16,6 +16,7 @@ module.exports = input => {
         rules,
         selectors,
         declarations,
+        properties,
         values
       )
 

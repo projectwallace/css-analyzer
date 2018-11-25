@@ -10,19 +10,23 @@ test('basic declarations are parsed', async t => {
     }
   `
   const actual = await parser(fixture)
-  const expected = [{
-    property: 'color',
-    value: 'red',
-    important: false
-  }, {
-    property: 'font-size',
-    value: '12px',
-    important: false
-  }, {
-    property: 'a',
-    value: 'whatever',
-    important: false
-  }]
+  const expected = [
+    {
+      property: 'color',
+      value: 'red',
+      important: false
+    },
+    {
+      property: 'font-size',
+      value: '12px',
+      important: false
+    },
+    {
+      property: 'a',
+      value: 'whatever',
+      important: false
+    }
+  ]
 
   t.deepEqual(actual.declarations, expected)
 })
@@ -35,19 +39,23 @@ test('!important is parsed', async t => {
     }
   `
   const actual = await parser(fixture)
-  const expected = [{
-    property: 'color',
-    value: 'red',
-    important: true
-  }, {
-    property: 'content',
-    value: '\'!important\'',
-    important: false
-  }, {
-    property: 'color',
-    value: 'blue',
-    important: false
-  }]
+  const expected = [
+    {
+      property: 'color',
+      value: 'red',
+      important: true
+    },
+    {
+      property: 'content',
+      value: "'!important'", // eslint-disable-line quotes
+      important: false
+    },
+    {
+      property: 'color',
+      value: 'blue',
+      important: false
+    }
+  ]
 
   t.deepEqual(actual.declarations, expected)
 })
@@ -60,15 +68,18 @@ test('custom properties are parsed', async t => {
     }
   `
   const actual = await parser(fixture)
-  const expected = [{
-    property: '--my-custom-property',
-    value: '12px',
-    important: false
-  }, {
-    property: 'width',
-    value: 'var(--my-custom-property)',
-    important: false
-  }]
+  const expected = [
+    {
+      property: '--my-custom-property',
+      value: '12px',
+      important: false
+    },
+    {
+      property: 'width',
+      value: 'var(--my-custom-property)',
+      important: false
+    }
+  ]
 
   t.deepEqual(actual.declarations, expected)
 })
@@ -81,15 +92,42 @@ test('calc() is parsed', async t => {
     }
   `
   const actual = await parser(fixture)
-  const expected = [{
-    property: 'width',
-    value: 'calc(100px + 3%)',
-    important: false
-  }, {
-    property: 'font-size',
-    value: 'calc(3em + 20vmin)',
-    important: false
-  }]
+  const expected = [
+    {
+      property: 'width',
+      value: 'calc(100px + 3%)',
+      important: false
+    },
+    {
+      property: 'font-size',
+      value: 'calc(3em + 20vmin)',
+      important: false
+    }
+  ]
+
+  t.deepEqual(actual.declarations, expected)
+})
+
+test('browser hacks prefixes are not trimmed', async t => {
+  const fixture = `
+    .el {
+      _color: blue;
+      *zoom: 1;
+    }
+  `
+  const actual = await parser(fixture)
+  const expected = [
+    {
+      property: '_color',
+      value: 'blue',
+      important: false
+    },
+    {
+      property: '*zoom',
+      value: '1',
+      important: false
+    }
+  ]
 
   t.deepEqual(actual.declarations, expected)
 })

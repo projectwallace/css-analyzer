@@ -1,6 +1,10 @@
 {
-  "total": 12,
+  "total": 13,
   "unique": [
+    {
+      "value": "*zoom",
+      "count": 2
+    },
     {
       "value": "-moz-border-radius",
       "count": 1
@@ -11,6 +15,10 @@
     },
     {
       "value": "-webkit-border-radius",
+      "count": 1
+    },
+    {
+      "value": "_color",
       "count": 1
     },
     {
@@ -32,13 +40,9 @@
     {
       "value": "property",
       "count": 2
-    },
-    {
-      "value": "zoom",
-      "count": 2
     }
   ],
-  "totalUnique": 9,
+  "totalUnique": 10,
   "prefixed": {
     "total": 3,
     "unique": [
@@ -56,6 +60,20 @@
       }
     ],
     "totalUnique": 3,
-    "share": 0.25
+    "share": 0.23076923076923078
+  },
+  "browserhacks": {
+    "total": 3,
+    "unique": [
+      {
+        "value": "*zoom",
+        "count": 2
+      },
+      {
+        "value": "_color",
+        "count": 1
+      }
+    ],
+    "totalUnique": 2
   }
 }
