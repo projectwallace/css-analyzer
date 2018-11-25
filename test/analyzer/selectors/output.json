@@ -1,6 +1,6 @@
 {
-  "total": 57,
-  "totalUnique": 56,
+  "total": 26,
+  "totalUnique": 25,
   "js": {
     "total": 6,
     "totalUnique": 6,
@@ -54,15 +54,11 @@
     ]
   },
   "universal": {
-    "total": 12,
-    "totalUnique": 11,
+    "total": 5,
+    "totalUnique": 4,
     "unique": [
       {
         "value": "*",
-        "count": 1
-      },
-      {
-        "value": "* + html .selector",
         "count": 1
       },
       {
@@ -70,35 +66,11 @@
         "count": 2
       },
       {
-        "value": "*+html .selector",
-        "count": 1
-      },
-      {
-        "value": "*:first-child + html .selector",
-        "count": 1
-      },
-      {
-        "value": "*:first-child+html .selector",
-        "count": 1
-      },
-      {
-        "value": "*|html[xmlns*=\"\"] .selector",
-        "count": 1
-      },
-      {
         "value": ".foo *",
         "count": 1
       },
       {
         "value": ".foo * .bar",
-        "count": 1
-      },
-      {
-        "value": ".selector:not(*:root)",
-        "count": 1
-      },
-      {
-        "value": "body*.selector",
         "count": 1
       }
     ]
@@ -183,28 +155,38 @@
     ]
   },
   "identifiers": {
-    "average": 2.6491228070175437,
+    "average": 2.8461538461538463,
     "top": [
-    {
-      "identifiers": 26,
-      "selector": ".a .b .c .d .e .f .g .h .i .j .k .l .m .n .o .p .q .r .s .t .u .v .w .x .y .z"
-     },
-     {
-       "identifiers": 11,
-       "selector": ".Foo > .Bar ~ .Baz [type=\"text\"] + span:before #bazz #fizz #buzz #drank #drugs"
-     },
-     {
-       "identifiers": 5,
-       "selector": "#multipe #ids #counted #as #one"
-     },
-     {
-       "identifiers": 5,
-       "selector": "html[xmlns*=\"\"] body:last-child .selector"
-     },
-     {
-       "identifiers": 4,
-       "selector": "html[xmlns*=\"\"]:root .selector"
-     }
-   ]
+      {
+        "identifiers": 26,
+        "selector": ".a .b .c .d .e .f .g .h .i .j .k .l .m .n .o .p .q .r .s .t .u .v .w .x .y .z"
+      },
+      {
+        "identifiers": 11,
+        "selector": ".Foo > .Bar ~ .Baz [type=\"text\"] + span:before #bazz #fizz #buzz #drank #drugs"
+      },
+      {
+        "identifiers": 5,
+        "selector": "#multipe #ids #counted #as #one"
+      },
+      {
+        "identifiers": 3,
+        "selector": "[role=\"menuitem\"][aria-checked=\"true\"]::before"
+      },
+      {
+        "identifiers": 2,
+        "selector": "* html .selector"
+      }
+    ]
+  },
+  "browserhacks": {
+    "total": 2,
+    "unique": [
+      {
+        "value": "* html .selector",
+        "count": 2
+      }
+    ],
+    "totalUnique": 1
   }
 }

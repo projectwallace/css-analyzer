@@ -46,6 +46,7 @@
     "css-color-names": "^1.0.0",
     "css-media-query-browser-h4cks-analyzer": "^1.0.0",
     "css-property-browser-h4cks-analyzer": "^1.0.1",
+    "css-selector-browser-h4cks-analyzer": "^1.0.1",
     "css-shorthand-expand": "^1.2.0",
     "css-unit-sort": "^1.1.1",
     "css-value-browser-h4cks-analyzer": "^1.0.1",

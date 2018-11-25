@@ -1,4 +1,5 @@
 const specificity = require('specificity')
+const {caseInsensitive: stringCompare} = require('string-natural-compare')
 
 module.exports = selectors => {
   const totalSelectors = selectors.length
@@ -17,17 +18,16 @@ module.exports = selectors => {
   const average = totalIdentifiers / totalSelectors
 
   const top = count => {
+    // Sort by identifiers count, then by alphabet
     const sorter = (a, b) => {
       if (a.identifiers === b.identifiers) {
-        return a.selector.localeCompare(b.selector)
+        return stringCompare(a, b)
       }
 
       return b.identifiers - a.identifiers
     }
 
-    return identifiersPerSelector
-      .sort(sorter)
-      .slice(0, count)
+    return identifiersPerSelector.sort(sorter).slice(0, count)
   }
 
   return {
