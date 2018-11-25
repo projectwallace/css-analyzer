@@ -41,7 +41,12 @@ test('Returns the correct analysis object structure', async t => {
       mediaqueries: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        browserhacks: {
+          total: 0,
+          unique: [],
+          totalUnique: 0
+        }
       },
       namespaces: {
         total: 0,

@@ -21,10 +21,12 @@ test('It recognizes browser hacks correctly', t => {
   ])
   const expected = {
     total: 1,
-    unique: [{
-      value: 'blue\\9',
-      count: 1
-    }],
+    unique: [
+      {
+        value: 'blue\\9',
+        count: 1
+      }
+    ],
     totalUnique: 1
   }
 
@@ -38,10 +40,12 @@ test('It does not report values that are no browser hacks', t => {
     totalUnique: 0
   }
 
-  const actual = analyze([{
-    property: 'color',
-    value: 'blue'
-  }])
+  const actual = analyze([
+    {
+      property: 'color',
+      value: 'blue'
+    }
+  ])
 
   t.deepEqual(actual, expected)
 })
