@@ -74,6 +74,11 @@ test('Returns the correct analysis object structure', async t => {
         totalUnique: 0,
         unique: []
       },
+      browserhacks: {
+        total: 0,
+        unique: [],
+        totalUnique: 0
+      },
       total: 0,
       totalUnique: 0,
       unique: []
@@ -135,9 +140,18 @@ test('Returns the correct analysis object structure', async t => {
         average: 0
       },
       simplicity: 1,
-      size: 5
+      size: 5,
+      browserhacks: {
+        total: 0,
+        totalUnique: 0
+      }
     },
     values: {
+      browserhacks: {
+        total: 0,
+        unique: [],
+        totalUnique: 0
+      },
       colors: {
         total: 0,
         totalUnique: 0,

@@ -28,11 +28,26 @@
     "space": true,
     "semicolon": false
   },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "bracketSpacing": false,
+    "overrides": [
+      {
+        "files": "*.json",
+        "options": {
+          "useTabs": false
+        }
+      }
+    ]
+  },
   "dependencies": {
     "color-sorter": "^2.2.0",
     "css-color-names": "^1.0.0",
+    "css-property-browser-h4cks-analyzer": "^1.0.1",
     "css-shorthand-expand": "^1.2.0",
     "css-unit-sort": "^1.1.1",
+    "css-value-browser-h4cks-analyzer": "^1.0.1",
     "path": "^0.12.7",
     "postcss": "^7.0.2",
     "postcss-values-parser": "^2.0.0",

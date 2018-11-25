@@ -15,7 +15,9 @@ module.exports = input => {
         input,
         rules,
         selectors,
-        declarations
+        declarations,
+        properties,
+        values
       )
 
       resolve({
@@ -27,8 +29,8 @@ module.exports = input => {
         properties,
         values
       })
-    } catch (err) {
-      reject(err)
+    } catch (error) {
+      reject(error)
     }
   })
 }

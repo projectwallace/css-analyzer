@@ -1,9 +1,6 @@
-/* TODO .selector { _property: value; }*/
 .selector { property: value !ie; }
 .selector { property: value\9; }
 .selector { opacity: .9; }
-.selector { *zoom: 1 }
-.selector { *zoom: 1 }
 
 /**
  * @keyframes have declarations too
@@ -27,3 +24,10 @@
   border-radius: 0;
   background-image: -webkit-gradient(linear, left top, left bottom, from(red), to(blue));
 }
+
+/**
+ * Browserhacks
+ */
+.h4ck { _color: blue; }
+.h4ck { *zoom: 1 }
+.h4ck { *zoom: 1 }

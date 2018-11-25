@@ -1,5 +1,5 @@
 {
-  "total": 92,
+  "total": 93,
   "fontfamilies": {
     "total": 18,
     "totalUnique": 12,
@@ -121,7 +121,7 @@
         "count": 1
       }
     ],
-    "share": 0.043478260869565216
+    "share": 0.043010752688172046
   },
   "colors": {
     "total": 38,
@@ -398,5 +398,15 @@
         ]
       }
     ]
+  },
+  "browserhacks": {
+    "total": 1,
+    "unique": [
+      {
+        "value": "blue\\9",
+        "count": 1
+      }
+    ],
+    "totalUnique": 1
   }
 }
