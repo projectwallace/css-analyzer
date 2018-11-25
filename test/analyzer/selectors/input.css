@@ -64,37 +64,6 @@
  * Contains universal selectors
  */
 * html .selector {}
-*:first-child + html .selector {}
-*:first-child+html .selector {}
-* + html .selector {}
-*+html .selector {}
-body*.selector {}
-html > body .selector {}
-html>body .selector {}
-.selector\ {}
-:root .selector {}
-body:last-child .selector {}
-body:nth-of-type(1) .selector {}
-body:first-of-type .selector {}
-.selector:not([attr*='']) {}
-.selector:not([attr*=""]) {}
-.selector:not(*:root) {}
-body:empty .selector {}
-x:-moz-any-link {}
-body:not(:-moz-handler-blocked) .selector {}
-_::-moz-progress-bar {}
-_::-moz-range-track {}
-_:-moz-tree-row(hover) {}
-_::selection {}
-x:-IE7 {}
-_:-ms-fullscreen {}
-_:-ms-input-placeholder {}
-html:first-child .selector {}
-_:-o-prefocus {}
-*|html[xmlns*=""] .selector {}
-html[xmlns*=""] body:last-child .selector {}
-html[xmlns*=""]:root .selector  {}
-_::-moz-svg-foreign-content {}
 
 /* Don't report these ones (Issue #88) */
 tbody:first-child {}

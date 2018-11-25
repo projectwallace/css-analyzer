@@ -138,6 +138,11 @@ test('Returns the correct analysis object structure', async t => {
         total: 0,
         totalUnique: 0,
         unique: []
+      },
+      browserhacks: {
+        total: 0,
+        unique: [],
+        totalUnique: 0
       }
     },
     stylesheets: {
