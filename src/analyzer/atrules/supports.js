@@ -1,3 +1,4 @@
+const isBrowserHack = require('css-at-supports-browser-h4cks-analyzer')
 const uniquer = require('../../utils/uniquer')
 
 module.exports = atRules => {
@@ -5,8 +6,14 @@ module.exports = atRules => {
     .filter(rule => rule.type === 'supports')
     .map(rule => rule.params)
 
+  const browserhacks = all.filter(isBrowserHack)
+
   return {
     total: all.length,
-    ...uniquer(all)
+    ...uniquer(all),
+    browserhacks: {
+      total: browserhacks.length,
+      ...uniquer(browserhacks)
+    }
   }
 }
