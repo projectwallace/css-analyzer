@@ -58,7 +58,12 @@ analyze('foo {}')
 //     mediaqueries: {
 //       total: 0,
 //       totalUnique: 0,
-//       unique: []
+//       unique: [],
+//       browserhacks: {
+//         total: 0,
+//         unique: [],
+//         totalUnique: 0
+//       }
 //     },
 //     namespaces: {
 //       total: 0,
@@ -73,7 +78,12 @@ analyze('foo {}')
 //     supports: {
 //       total: 0,
 //       totalUnique: 0,
-//       unique: []
+//       unique: [],
+//       browserhacks: {
+//         total: 0,
+//         unique: [],
+//         totalUnique: 0
+//       }
 //     }
 //   },
 //   declarations: {
@@ -93,7 +103,12 @@ analyze('foo {}')
 //     },
 //     total: 0,
 //     totalUnique: 0,
-//     unique: []
+//     unique: [],
+//     browserhacks: {
+//       total: 0,
+//       unique: [],
+//       totalUnique: 0
+//     }
 //   },
 //   rules: {
 //     total: 1,
@@ -145,6 +160,11 @@ analyze('foo {}')
 //       total: 0,
 //       totalUnique: 0,
 //       unique: []
+//     },
+//     browserhacks: {
+//       total: 0,
+//       unique: [],
+//       totalUnique: 0
 //     }
 //   },
 //   stylesheets: {
@@ -152,7 +172,11 @@ analyze('foo {}')
 //       average: 0
 //     },
 //     simplicity: 1,
-//     size: 5
+//     size: 5,
+//     browserhacks: {
+//       total: 0,
+//       totalUnique: 0
+//     }
 //   },
 //   values: {
 //     colors: {
@@ -176,6 +200,11 @@ analyze('foo {}')
 //       total: 0,
 //       totalUnique: 0,
 //       unique: []
+//     },
+//     browserhacks: {
+//       total: 0,
+//       unique: [],
+//       totalUnique: 0
 //     },
 //     total: 0
 //   }
