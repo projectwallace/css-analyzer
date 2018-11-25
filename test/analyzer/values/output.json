@@ -398,5 +398,10 @@
         ]
       }
     ]
+  },
+  "browserhacks": {
+    "total": 0,
+    "unique": [],
+    "totalUnique": 0
   }
 }
