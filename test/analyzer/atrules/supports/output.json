@@ -14,5 +14,15 @@
       "value": "(filter: blur(5px))",
       "count": 1
     }
-  ]
+  ],
+  "browserhacks": {
+    "total": 2,
+    "unique": [
+      {
+        "value": "(-webkit-appearance:none)",
+        "count": 2
+      }
+    ],
+    "totalUnique": 1
+  }
 }

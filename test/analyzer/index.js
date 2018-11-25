@@ -61,7 +61,12 @@ test('Returns the correct analysis object structure', async t => {
       supports: {
         total: 0,
         totalUnique: 0,
-        unique: []
+        unique: [],
+        browserhacks: {
+          total: 0,
+          unique: [],
+          totalUnique: 0
+        }
       }
     },
     declarations: {
