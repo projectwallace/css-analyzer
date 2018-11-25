@@ -1,5 +1,5 @@
-module.exports = (properties, values) => {
-  const {total, totalUnique} = [properties, values]
+module.exports = (atrules, properties, values) => {
+  const {total, totalUnique} = [atrules.mediaqueries, properties, values]
     .map(metric => metric.browserhacks)
     .reduce(
       (totals, current) => {

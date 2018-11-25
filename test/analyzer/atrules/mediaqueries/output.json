@@ -1,14 +1,18 @@
 {
-  "total": 8,
-  "totalUnique": 6,
+  "total": 9,
+  "totalUnique": 7,
   "unique": [
     {
-      "value": "(max-width: 200px)",
-      "count": 1
+      "count": 1,
+      "value": "(max-width: 200px)"
     },
     {
       "value": "(min-width: 20px)",
       "count": 2
+    },
+    {
+      "count": 1,
+      "value": "\\0 all"
     },
     {
       "value": "print",
@@ -26,5 +30,15 @@
       "value": "screen or print",
       "count": 1
     }
-  ]
+  ],
+  "browserhacks": {
+    "total": 1,
+    "unique": [
+      {
+        "count": 1,
+        "value": "\\0 all"
+      }
+    ],
+    "totalUnique": 1
+  }
 }

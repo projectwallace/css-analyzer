@@ -13,6 +13,7 @@ module.exports = input => {
       const values = require('./values')(css.declarations)
       const stylesheets = require('./stylesheets')(
         input,
+        atrules,
         rules,
         selectors,
         declarations,

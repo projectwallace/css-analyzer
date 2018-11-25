@@ -36,19 +36,6 @@
 }
 
 /**
- * TODO support CSS Hacks
- *
-@media screen\9{.selector{color:red}}
-@media screen\9{.selector{color:red}}
-@media \0screen\,screen\9{.selector{color:red}}
-@media \0screen{.selector{color:red}}
-@media screen and (min-width: 0\0){.selector{color:red}}
-@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none){.selector{color:red}}
-@-moz-document url-prefix(){.selector{color:red}}
-@media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) { .selector{color:red}}
+ * browser hacks
+ */
 @media \0 all{.selector{color:red}}
-@media screen and (-moz-images-in-menus:0){.selector{color:red}}
-@media screen and (min--moz-device-pixel-ratio:0){.selector{color:red}}
-@media all and (min--moz-device-pixel-ratio:0) and (min-resolution: 3e1dpcm){.selector{color:red}}
-@media (min-resolution: .001dpcm){.selector{color:red}}
-*/
