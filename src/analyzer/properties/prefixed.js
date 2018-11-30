@@ -1,10 +1,8 @@
+const isVendorPrefixed = require('is-vendor-prefixed')
 const uniquer = require('../../utils/uniquer')
 
-const PREFIXED_REGEX = /^-(?:webkit|moz|ms|o)-/
-
 module.exports = properties => {
-  const all = properties
-    .filter(property => PREFIXED_REGEX.test(property))
+  const all = properties.filter(isVendorPrefixed)
 
   const share = (() => {
     if (properties.length === 0) {

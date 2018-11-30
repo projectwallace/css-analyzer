@@ -1,9 +1,10 @@
+const vendorPrefixes = require('vendor-prefixes')()
 const uniquer = require('../../utils/uniquer')
 
-const PREFIX_RE = /^-(?:webkit|moz|ms|o)-/i
+const PREFIX_REGEX = new RegExp(`^${vendorPrefixes.join('|')}`)
 
 module.exports = values => {
-  const all = values.filter(property => PREFIX_RE.test(property))
+  const all = values.filter(property => PREFIX_REGEX.test(property))
 
   const share = (() => {
     if (values.length === 0) {
