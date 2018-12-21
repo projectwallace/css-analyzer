@@ -42,7 +42,7 @@
     ]
   },
   "dependencies": {
-    "color-sorter": "^2.2.0",
+    "color-sorter": "^3.0.0",
     "css-at-supports-browser-h4cks-analyzer": "^1.0.0",
     "css-color-names": "^1.0.0",
     "css-media-query-browser-h4cks-analyzer": "^1.0.0",

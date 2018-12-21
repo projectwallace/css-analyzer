@@ -1,13 +1,13 @@
 const valueParser = require('postcss-values-parser')
 const cssColorNames = require('css-color-names')
 const tinycolor = require('tinycolor2')
-const sortColors = require('color-sorter')
+const colorSorter = require('color-sorter')
 
 const uniquer = require('../../utils/uniquer')
 
-const CSS_COLOR_KEYWORDS = Object
-  .keys(cssColorNames)
-  .map(color => color.toLowerCase())
+const CSS_COLOR_KEYWORDS = Object.keys(cssColorNames).map(color =>
+  color.toLowerCase()
+)
 const CSS_COLOR_FUNCTIONS = ['hsl', 'hsla', 'rgb', 'rgba']
 
 function prepareValue(value) {
@@ -22,13 +22,14 @@ function nodeIsHexColor(node) {
 }
 
 function nodeIsColorFn(node) {
-  return node.type === 'func' &&
+  return (
+    node.type === 'func' &&
     CSS_COLOR_FUNCTIONS.includes(prepareValue(node.value))
+  )
 }
 
 function nodeIsKeyword(node) {
-  return node.type === 'word' &&
-    CSS_COLOR_KEYWORDS.includes(prepareValue(node))
+  return node.type === 'word' && CSS_COLOR_KEYWORDS.includes(prepareValue(node))
 }
 
 function extractColorsFromDeclaration(declaration) {
@@ -61,9 +62,11 @@ const addCount = color => {
 const addShortestNotation = color => {
   return {
     ...color,
-    value: [...color.aliases].sort((a, b) => {
-      return a.value.length - b.value.length
-    }).shift().value
+    value: [...color.aliases]
+      .sort((a, b) => {
+        return a.value.length - b.value.length
+      })
+      .shift().value
   }
 }
 
@@ -115,17 +118,17 @@ const rmTmpProps = color => {
   }
 }
 
-const withAliases = colors => Object
-  .values(
+const withAliases = colors =>
+  Object.values(
     colors
       .filter(validateColor)
       .map(normalizeColors)
       .reduce(addAliases, {})
   )
-  .filter(filterDuplicateColors)
-  .map(addCount)
-  .map(addShortestNotation)
-  .map(rmTmpProps)
+    .filter(filterDuplicateColors)
+    .map(addCount)
+    .map(addShortestNotation) // @TODO: use most often appearing color here
+    .map(rmTmpProps)
 
 module.exports = declarations => {
   const all = declarations
@@ -135,16 +138,12 @@ module.exports = declarations => {
     .reduce((allColors, declarationColors) => {
       return [...allColors, ...declarationColors]
     }, [])
-  const {totalUnique, unique} = uniquer(all)
-
-  // Uniquer sorts the colors, so sort them here once more
-  const sorted = sortColors(unique.map(c => c.value))
-  const uniqueSorted = sorted.map(c => unique.find(u => u.value === c))
+  const {totalUnique, unique} = uniquer(all, colorSorter.sortFn)
 
   return {
     total: all.length,
-    unique: uniqueSorted,
+    unique,
     totalUnique,
-    duplicates: withAliases(uniqueSorted)
+    duplicates: withAliases(unique)
   }
 }
