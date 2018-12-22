@@ -9,13 +9,6 @@ module.exports = async rawCss => {
   try {
     const css = await parser(rawCss)
 
-    // CSS undefined means that PostCSS encountered an error
-    if (typeof css === 'undefined') {
-      return Promise.reject(
-        new SyntaxError('Invalid CSS found, cannot analyze invalid CSS')
-      )
-    }
-
     const atrules = require('./atrules')(css.atRules)
     const rules = require('./rules')(css.rules)
     const selectors = require('./selectors')(css.selectors)
