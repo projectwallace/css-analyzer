@@ -171,7 +171,11 @@ test('Returns the correct analysis object structure', async t => {
         total: 0,
         totalUnique: 0,
         unique: [],
-        duplicates: []
+        duplicates: {
+          total: 0,
+          totalUnique: 0,
+          unique: []
+        }
       },
       fontfamilies: {
         total: 0,
