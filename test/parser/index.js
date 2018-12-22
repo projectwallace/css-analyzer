@@ -27,9 +27,10 @@ test('parser returns a list of declarations', async t => {
 
 test('parser throws a useful error on invalid CSS', async t => {
   const cssWithSyntaxError = 'a { color red }'
-  const error = await t.throws(
-    parser(cssWithSyntaxError)
-  )
+  const error = await t.throwsAsync(parser(cssWithSyntaxError))
 
-  t.is(error.message, 'Unknown word at line 1, column 5. Source: a { color red }')
+  t.is(
+    error.message,
+    'Unknown word at line 1, column 5. Source: a { color red }'
+  )
 })
