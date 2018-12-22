@@ -12,189 +12,102 @@ test('Passes with valid CSS', async t => {
 test('Returns the correct analysis object structure', async t => {
   const actual = await analyzer('foo{}')
   const expected = {
-    atrules: {
-      charsets: {
-        total: 0,
-        totalUnique: 0,
-        unique: []
-      },
-      documents: {
-        total: 0,
-        totalUnique: 0,
-        unique: []
-      },
-      fontfaces: {
-        total: 0,
-        totalUnique: 0,
-        unique: []
-      },
-      imports: {
-        total: 0,
-        totalUnique: 0,
-        unique: []
-      },
-      keyframes: {
-        total: 0,
-        totalUnique: 0,
-        unique: []
-      },
-      mediaqueries: {
-        total: 0,
-        totalUnique: 0,
-        unique: [],
-        browserhacks: {
-          total: 0,
-          unique: [],
-          totalUnique: 0
-        }
-      },
-      namespaces: {
-        total: 0,
-        totalUnique: 0,
-        unique: []
-      },
-      pages: {
-        total: 0,
-        totalUnique: 0,
-        unique: []
-      },
-      supports: {
-        total: 0,
-        totalUnique: 0,
-        unique: [],
-        browserhacks: {
-          total: 0,
-          unique: [],
-          totalUnique: 0
-        }
-      }
-    },
-    declarations: {
-      importants: {
-        share: 0,
-        total: 0
-      },
-      total: 0,
-      totalUnique: 0
-    },
-    properties: {
-      prefixed: {
-        share: 0,
-        total: 0,
-        totalUnique: 0,
-        unique: []
-      },
-      browserhacks: {
-        total: 0,
-        unique: [],
-        totalUnique: 0
-      },
-      total: 0,
-      totalUnique: 0,
-      unique: []
-    },
-    rules: {
-      total: 1,
-      empty: {
-        total: 1
-      }
-    },
-    selectors: {
-      accessibility: {
-        total: 0,
-        totalUnique: 0,
-        unique: []
-      },
-      id: {
-        total: 0,
-        totalUnique: 0,
-        unique: []
-      },
-      identifiers: {
-        average: 1,
-        top: [
-          {
-            identifiers: 1,
-            selector: 'foo'
-          }
-        ]
-      },
-      js: {
-        total: 0,
-        totalUnique: 0,
-        unique: []
-      },
-      specificity: {
-        top: [
-          {
-            selector: 'foo',
-            specificity: {
-              a: 0,
-              b: 0,
-              c: 0,
-              d: 1
-            }
-          }
-        ]
-      },
-      total: 1,
-      totalUnique: 1,
-      universal: {
-        total: 0,
-        totalUnique: 0,
-        unique: []
-      },
-      browserhacks: {
-        total: 0,
-        unique: [],
-        totalUnique: 0
-      }
-    },
-    stylesheets: {
-      cohesion: {
-        average: 0
-      },
-      simplicity: 1,
-      size: 5,
-      browserhacks: {
-        total: 0,
-        totalUnique: 0
-      }
-    },
-    values: {
-      browserhacks: {
-        total: 0,
-        unique: [],
-        totalUnique: 0
-      },
-      colors: {
-        total: 0,
-        totalUnique: 0,
-        unique: [],
-        duplicates: {
-          total: 0,
-          totalUnique: 0,
-          unique: []
-        }
-      },
-      fontfamilies: {
-        total: 0,
-        totalUnique: 0,
-        unique: []
-      },
-      fontsizes: {
-        total: 0,
-        totalUnique: 0,
-        unique: []
-      },
-      prefixed: {
-        share: 0,
-        total: 0,
-        totalUnique: 0,
-        unique: []
-      },
-      total: 0
-    }
+    'atrules.charsets.total': 0,
+    'atrules.charsets.totalUnique': 0,
+    'atrules.charsets.unique': [],
+    'atrules.documents.total': 0,
+    'atrules.documents.totalUnique': 0,
+    'atrules.documents.unique': [],
+    'atrules.fontfaces.total': 0,
+    'atrules.fontfaces.totalUnique': 0,
+    'atrules.fontfaces.unique': [],
+    'atrules.imports.total': 0,
+    'atrules.imports.totalUnique': 0,
+    'atrules.imports.unique': [],
+    'atrules.keyframes.total': 0,
+    'atrules.keyframes.totalUnique': 0,
+    'atrules.keyframes.unique': [],
+    'atrules.mediaqueries.total': 0,
+    'atrules.mediaqueries.totalUnique': 0,
+    'atrules.mediaqueries.unique': [],
+    'atrules.mediaqueries.browserhacks.total': 0,
+    'atrules.mediaqueries.browserhacks.unique': [],
+    'atrules.mediaqueries.browserhacks.totalUnique': 0,
+    'atrules.namespaces.total': 0,
+    'atrules.namespaces.totalUnique': 0,
+    'atrules.namespaces.unique': [],
+    'atrules.pages.total': 0,
+    'atrules.pages.totalUnique': 0,
+    'atrules.pages.unique': [],
+    'atrules.supports.total': 0,
+    'atrules.supports.totalUnique': 0,
+    'atrules.supports.unique': [],
+    'atrules.supports.browserhacks.total': 0,
+    'atrules.supports.browserhacks.unique': [],
+    'atrules.supports.browserhacks.totalUnique': 0,
+    'declarations.importants.share': 0,
+    'declarations.importants.total': 0,
+    'declarations.total': 0,
+    'declarations.totalUnique': 0,
+    'properties.prefixed.share': 0,
+    'properties.prefixed.total': 0,
+    'properties.prefixed.totalUnique': 0,
+    'properties.prefixed.unique': [],
+    'properties.browserhacks.total': 0,
+    'properties.browserhacks.unique': [],
+    'properties.browserhacks.totalUnique': 0,
+    'properties.total': 0,
+    'properties.totalUnique': 0,
+    'properties.unique': [],
+    'rules.total': 1,
+    'rules.empty.total': 1,
+    'selectors.accessibility.total': 0,
+    'selectors.accessibility.totalUnique': 0,
+    'selectors.accessibility.unique': [],
+    'selectors.id.total': 0,
+    'selectors.id.totalUnique': 0,
+    'selectors.id.unique': [],
+    'selectors.identifiers.average': 1,
+    'selectors.identifiers.top': [{identifiers: 1, selector: 'foo'}],
+    'selectors.js.total': 0,
+    'selectors.js.totalUnique': 0,
+    'selectors.js.unique': [],
+    'selectors.specificity.top': [
+      {selector: 'foo', specificity: {a: 0, b: 0, c: 0, d: 1}}
+    ],
+    'selectors.total': 1,
+    'selectors.totalUnique': 1,
+    'selectors.universal.total': 0,
+    'selectors.universal.totalUnique': 0,
+    'selectors.universal.unique': [],
+    'selectors.browserhacks.total': 0,
+    'selectors.browserhacks.unique': [],
+    'selectors.browserhacks.totalUnique': 0,
+    'stylesheets.cohesion.average': 0,
+    'stylesheets.simplicity': 1,
+    'stylesheets.size': 5,
+    'stylesheets.browserhacks.total': 0,
+    'stylesheets.browserhacks.totalUnique': 0,
+    'values.browserhacks.total': 0,
+    'values.browserhacks.unique': [],
+    'values.browserhacks.totalUnique': 0,
+    'values.colors.total': 0,
+    'values.colors.totalUnique': 0,
+    'values.colors.unique': [],
+    'values.colors.duplicates.total': 0,
+    'values.colors.duplicates.totalUnique': 0,
+    'values.colors.duplicates.unique': [],
+    'values.fontfamilies.total': 0,
+    'values.fontfamilies.totalUnique': 0,
+    'values.fontfamilies.unique': [],
+    'values.fontsizes.total': 0,
+    'values.fontsizes.totalUnique': 0,
+    'values.fontsizes.unique': [],
+    'values.prefixed.share': 0,
+    'values.prefixed.total': 0,
+    'values.prefixed.totalUnique': 0,
+    'values.prefixed.unique': [],
+    'values.total': 0
   }
 
   t.deepEqual(actual, expected)
