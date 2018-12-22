@@ -1,6 +1,11 @@
 const path = require('path')
 const fs = require('fs')
+const flat = require('flat')
 const analyzer = require('../..')
+
+function unFlattenObject(obj) {
+  return flat.unflatten(obj, {safe: true})
+}
 
 function readFile(file) {
   let src = fs.readFileSync(file, 'utf8')
@@ -23,7 +28,7 @@ module.exports = async scope => {
   const expected = JSON.parse(readFile(outputFile))
 
   return {
-    actual,
+    actual: unFlattenObject(actual),
     expected
   }
 }
