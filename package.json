@@ -26,7 +26,11 @@
   },
   "xo": {
     "space": true,
-    "semicolon": false
+    "semicolon": false,
+    "rules": {
+      "ava/no-import-test-files": "off",
+      "no-async-promise-executor": "warn"
+    }
   },
   "prettier": {
     "semi": false,
@@ -62,10 +66,10 @@
     "vendor-prefixes": "^1.0.0"
   },
   "devDependencies": {
-    "ava": "^0.25.0",
+    "ava": "^1.0.1",
     "coveralls": "^3.0.2",
     "nyc": "^13.1.0",
-    "xo": "^0.21.1"
+    "xo": "^0.23.0"
   },
   "nyc": {
     "reporter": [

@@ -2,11 +2,11 @@ const test = require('ava')
 const analyzer = require('../..')
 
 test('Breaks with invalid CSS', async t => {
-  await t.throws(analyzer('INVALID CSS'))
+  await t.throwsAsync(analyzer('INVALID CSS'))
 })
 
 test('Passes with valid CSS', async t => {
-  await t.notThrows(analyzer('body {}'))
+  await t.notThrowsAsync(analyzer('body {}'))
 })
 
 test('Returns the correct analysis object structure', async t => {
