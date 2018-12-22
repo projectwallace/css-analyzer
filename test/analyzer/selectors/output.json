@@ -108,7 +108,7 @@
   "specificity": {
     "top": [
       {
-        "selector": ".Foo > .Bar ~ .Baz [type=\"text\"] + span:before #bazz #fizz #buzz #drank #drugs",
+        "value": ".Foo > .Bar ~ .Baz [type=\"text\"] + span:before #bazz #fizz #buzz #drank #drugs",
         "specificity": {
           "a": 0,
           "b": 5,
@@ -117,7 +117,7 @@
         }
       },
       {
-        "selector": "#multipe #ids #counted #as #one",
+        "value": "#multipe #ids #counted #as #one",
         "specificity": {
           "a": 0,
           "b": 5,
@@ -126,7 +126,7 @@
         }
       },
       {
-        "selector": "#foo",
+        "value": "#foo",
         "specificity": {
           "a": 0,
           "b": 1,
@@ -135,7 +135,7 @@
         }
       },
       {
-        "selector": "#jsSelector",
+        "value": "#jsSelector",
         "specificity": {
           "a": 0,
           "b": 1,
@@ -144,7 +144,7 @@
         }
       },
       {
-        "selector": ".a .b .c .d .e .f .g .h .i .j .k .l .m .n .o .p .q .r .s .t .u .v .w .x .y .z",
+        "value": ".a .b .c .d .e .f .g .h .i .j .k .l .m .n .o .p .q .r .s .t .u .v .w .x .y .z",
         "specificity": {
           "a": 0,
           "b": 0,
@@ -156,26 +156,30 @@
   },
   "identifiers": {
     "average": 2.8461538461538463,
+    "max": {
+      "count": 26,
+      "value": ".a .b .c .d .e .f .g .h .i .j .k .l .m .n .o .p .q .r .s .t .u .v .w .x .y .z"
+    },
     "top": [
       {
-        "identifiers": 26,
-        "selector": ".a .b .c .d .e .f .g .h .i .j .k .l .m .n .o .p .q .r .s .t .u .v .w .x .y .z"
+        "count": 26,
+        "value": ".a .b .c .d .e .f .g .h .i .j .k .l .m .n .o .p .q .r .s .t .u .v .w .x .y .z"
       },
       {
-        "identifiers": 11,
-        "selector": ".Foo > .Bar ~ .Baz [type=\"text\"] + span:before #bazz #fizz #buzz #drank #drugs"
+        "count": 11,
+        "value": ".Foo > .Bar ~ .Baz [type=\"text\"] + span:before #bazz #fizz #buzz #drank #drugs"
       },
       {
-        "identifiers": 5,
-        "selector": "#multipe #ids #counted #as #one"
+        "count": 5,
+        "value": "#multipe #ids #counted #as #one"
       },
       {
-        "identifiers": 3,
-        "selector": "[role=\"menuitem\"][aria-checked=\"true\"]::before"
+        "count": 3,
+        "value": "[role=\"menuitem\"][aria-checked=\"true\"]::before"
       },
       {
-        "identifiers": 2,
-        "selector": "* html .selector"
+        "count": 2,
+        "value": "* html .selector"
       }
     ]
   },

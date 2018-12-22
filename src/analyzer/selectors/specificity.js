@@ -7,24 +7,21 @@ module.exports = selectors => {
     .reverse()
 
   const top = count => {
-    return [...all]
-      .slice(0, count)
-      .map(selector => {
-        const spec = specificity
-          .calculate(selector)
-          .shift()
-          .specificityArray
+    return [...all].slice(0, count).map(selector => {
+      const [a, b, c, d] = specificity
+        .calculate(selector)
+        .shift().specificityArray
 
-        return {
-          selector,
-          specificity: {
-            a: spec[0],
-            b: spec[1],
-            c: spec[2],
-            d: spec[3]
-          }
+      return {
+        value: selector,
+        specificity: {
+          a,
+          b,
+          c,
+          d
         }
-      })
+      }
+    })
   }
 
   return {
