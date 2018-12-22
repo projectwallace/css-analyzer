@@ -64,7 +64,11 @@ const addShortestNotation = color => {
     ...color,
     value: [...color.aliases]
       .sort((a, b) => {
-        return a.value.length - b.value.length
+        if (a.count === b.count) {
+          return a.value.length - b.value.length
+        }
+
+        return b.count - a.count
       })
       .shift().value
   }

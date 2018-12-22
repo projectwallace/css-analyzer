@@ -365,7 +365,7 @@
       },
       {
         "count": 8,
-        "value": "#000",
+        "value": "black",
         "aliases": [
           {
             "value": "hsl(0,0,0)",
