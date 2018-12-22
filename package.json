@@ -28,8 +28,7 @@
     "space": true,
     "semicolon": false,
     "rules": {
-      "ava/no-import-test-files": "off",
-      "no-async-promise-executor": "warn"
+      "ava/no-import-test-files": "off"
     }
   },
   "prettier": {

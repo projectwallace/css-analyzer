@@ -5,13 +5,15 @@ function flattenObject(obj) {
   return flat(obj, {safe: true})
 }
 
-module.exports = rawCss => {
-  return new Promise(async (resolve, reject) => {
-    const css = await parser(rawCss).catch(error => reject(error))
+module.exports = async rawCss => {
+  try {
+    const css = await parser(rawCss)
 
     // CSS undefined means that PostCSS encountered an error
     if (typeof css === 'undefined') {
-      return reject(new Error('Invalid CSS found, cannot analyze invalid CSS'))
+      return Promise.reject(
+        new SyntaxError('Invalid CSS found, cannot analyze invalid CSS')
+      )
     }
 
     const atrules = require('./atrules')(css.atRules)
@@ -30,7 +32,7 @@ module.exports = rawCss => {
       values
     })
 
-    return resolve(
+    return Promise.resolve(
       flattenObject({
         stylesheets,
         atrules,
@@ -41,5 +43,7 @@ module.exports = rawCss => {
         values
       })
     )
-  })
+  } catch (error) {
+    return Promise.reject(error)
+  }
 }
