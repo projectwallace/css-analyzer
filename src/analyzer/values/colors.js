@@ -144,11 +144,16 @@ module.exports = declarations => {
       return [...allColors, ...declarationColors]
     }, [])
   const {totalUnique, unique} = uniquer(all, colorSorter.sortFn)
+  const duplicates = withDuplicateNotations(unique)
 
   return {
     total: all.length,
     unique,
     totalUnique,
-    duplicates: withDuplicateNotations(unique)
+    duplicates: {
+      unique: duplicates,
+      totalUnique: duplicates.length,
+      total: duplicates.length
+    }
   }
 }
