@@ -276,7 +276,7 @@
       {
         "count": 2,
         "value": "rgba(0,0,0,0)",
-        "aliases": [
+        "notations": [
           {
             "value": "hsla(0,0%,0%,0)",
             "count": 1
@@ -290,7 +290,7 @@
       {
         "value": "rgba(100, 200, 10, .5)",
         "count": 2,
-        "aliases": [
+        "notations": [
           {
             "count": 1,
             "value": "rgba(100, 200, 10, .5)"
@@ -304,7 +304,7 @@
       {
         "value": "hsl(270,60%,70%)",
         "count": 3,
-        "aliases": [
+        "notations": [
           {
             "count": 1,
             "value": "hsl(270,60%,70%)"
@@ -322,7 +322,7 @@
       {
         "value": "hsl(270 60% 50% / .15)",
         "count": 4,
-        "aliases": [
+        "notations": [
           {
             "count": 1,
             "value": "hsl(270, 60%, 50%, 15%)"
@@ -344,7 +344,7 @@
       {
         "value": "#fff",
         "count": 4,
-        "aliases": [
+        "notations": [
           {
             "count": 1,
             "value": "hsl(360, 100%, 100%)"
@@ -366,7 +366,7 @@
       {
         "count": 8,
         "value": "black",
-        "aliases": [
+        "notations": [
           {
             "value": "hsl(0,0,0)",
             "count": 1

@@ -53,17 +53,18 @@ function extractColorsFromDeclaration(declaration) {
 const addCount = color => {
   return {
     ...color,
-    count: color.aliases.reduce((acc, curr) => {
-      return acc + curr.count
+    count: color.notations.reduce((total, {count}) => {
+      return total + count
     }, 0)
   }
 }
 
-const addShortestNotation = color => {
+const addMostCommonNotation = color => {
   return {
     ...color,
-    value: [...color.aliases]
+    value: [...color.notations]
       .sort((a, b) => {
+        // If counts are the same, get the shortest notation
         if (a.count === b.count) {
           return a.value.length - b.value.length
         }
@@ -74,15 +75,15 @@ const addShortestNotation = color => {
   }
 }
 
-const addAliases = (acc, curr) => {
+const addNotations = (acc, curr) => {
   if (!acc[curr.normalized]) {
     acc[curr.normalized] = {
-      aliases: []
+      notations: []
     }
   }
 
   acc[curr.normalized] = {
-    aliases: [...acc[curr.normalized].aliases, curr]
+    notations: [...acc[curr.normalized].notations, curr]
   }
 
   return acc
@@ -90,7 +91,7 @@ const addAliases = (acc, curr) => {
 
 const filterDuplicateColors = color => {
   // Filter out the actual duplicate colors
-  return color.aliases.length > 1
+  return color.notations.length > 1
 }
 
 const validateColor = color => {
@@ -101,7 +102,7 @@ const normalizeColors = color => {
   // Add a normalized value
 
   // Avoid using TinyColor's toHslString() because it rounds
-  // the numbers and incorrectly reports aliases
+  // the numbers and incorrectly reports duplicates
   const {h, s, l, a} = tinycolor(color.value).toHsl()
   const normalized = a === 0 ? 0 : `h${h}s${s}l${l}a${a}`
 
@@ -115,23 +116,23 @@ const rmTmpProps = color => {
   // Remove temporary props that were needed for analysis
   return {
     ...color,
-    aliases: color.aliases.map(alias => {
-      const {normalized, ...restAlias} = alias
-      return restAlias
+    notations: color.notations.map(notation => {
+      const {normalized, ...colorProps} = notation
+      return colorProps
     })
   }
 }
 
-const withAliases = colors =>
+const withDuplicateNotations = colors =>
   Object.values(
     colors
       .filter(validateColor)
       .map(normalizeColors)
-      .reduce(addAliases, {})
+      .reduce(addNotations, {})
   )
     .filter(filterDuplicateColors)
     .map(addCount)
-    .map(addShortestNotation) // @TODO: use most often appearing color here
+    .map(addMostCommonNotation)
     .map(rmTmpProps)
 
 module.exports = declarations => {
@@ -148,6 +149,6 @@ module.exports = declarations => {
     total: all.length,
     unique,
     totalUnique,
-    duplicates: withAliases(unique)
+    duplicates: withDuplicateNotations(unique)
   }
 }
