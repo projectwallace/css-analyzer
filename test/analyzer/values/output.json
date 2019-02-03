@@ -412,5 +412,10 @@
       }
     ],
     "totalUnique": 1
+  },
+  "boxshadows": {
+    "total": 0,
+    "unique": [],
+    "totalUnique": 0
   }
 }

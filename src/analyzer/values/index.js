@@ -1,12 +1,12 @@
 module.exports = declarations => {
-  const all = declarations
-    .map(declaration => declaration.value)
+  const all = declarations.map(declaration => declaration.value)
 
   const prefixed = require('./prefixed.js')(all)
   const fontsizes = require('./font-sizes.js')(declarations)
   const fontfamilies = require('./font-families.js')(declarations)
   const colors = require('./colors.js')(declarations)
   const browserhacks = require('./browserhacks.js')(declarations)
+  const boxshadows = require('./box-shadows.js')(declarations)
 
   return {
     total: all.length,
@@ -14,6 +14,7 @@ module.exports = declarations => {
     fontsizes,
     fontfamilies,
     colors,
-    browserhacks
+    browserhacks,
+    boxshadows
   }
 }
