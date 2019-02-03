@@ -57,18 +57,18 @@
     "flat": "^4.1.0",
     "is-vendor-prefixed": "^1.0.0",
     "path": "^0.12.7",
-    "postcss": "^7.0.2",
-    "postcss-values-parser": "^2.0.0",
+    "postcss": "^7.0.14",
+    "postcss-values-parser": "^2.0.1",
     "specificity": "^0.4.1",
     "string-natural-compare": "^2.0.3",
     "tinycolor2": "^1.4.1",
     "vendor-prefixes": "^1.0.0"
   },
   "devDependencies": {
-    "ava": "^1.0.1",
+    "ava": "^1.2.0",
     "coveralls": "^3.0.2",
     "nyc": "^13.1.0",
-    "xo": "^0.23.0"
+    "xo": "^0.24.0"
   },
   "nyc": {
     "reporter": [
