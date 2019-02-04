@@ -47,6 +47,14 @@ test('It ignores keywords, and global values', t => {
     {
       property: 'z-index',
       value: 'unset'
+    },
+    {
+      property: 'z-index',
+      value: 'initial'
+    },
+    {
+      property: 'z-index',
+      value: 'inherit'
     }
   ])
 

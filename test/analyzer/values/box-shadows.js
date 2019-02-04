@@ -80,3 +80,31 @@ test('It recognizes an advanced box-shadow with multiple shadows', t => {
 
   t.deepEqual(actual, expected)
 })
+
+test('It ignores CSS keywords', t => {
+  const expected = {
+    total: 0,
+    totalUnique: 0,
+    unique: []
+  }
+  const actual = analyze([
+    {
+      property: 'box-shadow',
+      value: 'none'
+    },
+    {
+      property: 'box-shadow',
+      value: 'inherit'
+    },
+    {
+      property: 'box-shadow',
+      value: 'initial'
+    },
+    {
+      property: 'box-shadow',
+      value: 'unset'
+    }
+  ])
+
+  t.deepEqual(actual, expected)
+})
