@@ -63,8 +63,12 @@ test('It ignores keywords, and global values', t => {
 
 test('It sorts multiple z-indexes correctly, from small to large', t => {
   const expected = {
-    total: 4,
+    total: 5,
     unique: [
+      {
+        value: -100,
+        count: 1
+      },
       {
         value: -1,
         count: 1
@@ -82,7 +86,7 @@ test('It sorts multiple z-indexes correctly, from small to large', t => {
         count: 1
       }
     ],
-    totalUnique: 4
+    totalUnique: 5
   }
   const actual = analyze([
     {
@@ -100,6 +104,10 @@ test('It sorts multiple z-indexes correctly, from small to large', t => {
     {
       property: 'z-index',
       value: '-1'
+    },
+    {
+      property: 'z-index',
+      value: '-100'
     }
   ])
 
