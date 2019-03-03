@@ -1,32 +1,25 @@
 const expand = require('css-shorthand-expand')
 const unitSort = require('css-unit-sort')
 const uniquer = require('../../utils/uniquer')
-const utils = require('../../utils/css')
-
-const keywords = utils.KEYWORDS
+const {KEYWORDS} = require('../../utils/css')
 
 module.exports = declarations => {
-  const _all = (() => {
-    const tmp = []
+  const all = declarations.reduce((prev, {property, value}) => {
+    if (KEYWORDS.includes(value)) {
+      return prev
+    }
 
-    declarations.forEach(declaration => {
-      if (declaration.property === 'font-size') {
-        return tmp.push(declaration.value)
-      }
+    if (property === 'font-size') {
+      prev = [...prev, value]
+    }
 
-      if (declaration.property === 'font') {
-        const font = expand('font', declaration.value)
+    if (property === 'font') {
+      const {'font-size': size} = expand('font', value)
+      prev = [...prev, size]
+    }
 
-        if (font && font['font-size']) {
-          return tmp.push(font['font-size'])
-        }
-      }
-    })
-
-    return tmp
-  })()
-
-  const all = _all.filter(v => !keywords.includes(v))
+    return prev
+  }, [])
 
   return {
     total: all.length,
