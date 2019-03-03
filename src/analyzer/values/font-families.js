@@ -5,27 +5,23 @@ const utils = require('../../utils/css')
 const cssKeywords = utils.KEYWORDS
 
 module.exports = declarations => {
-  const _all = (() => {
-    const all = []
-
-    declarations.forEach(declaration => {
-      if (declaration.property === 'font-family') {
-        return all.push(declaration.value)
+  const all = declarations
+    .reduce((prev, {property, value}) => {
+      if (property === 'font-family') {
+        prev = [...prev, value]
       }
 
-      if (declaration.property === 'font') {
-        const font = expand('font', declaration.value)
+      if (property === 'font') {
+        const expanded = expand('font', value)
 
-        if (font && font['font-family']) {
-          return all.push(font['font-family'])
+        if (expanded && expanded['font-family']) {
+          prev = [...prev, expanded['font-family']]
         }
       }
-    })
 
-    return all
-  })()
-
-  const all = _all.filter(v => !cssKeywords.includes(v))
+      return prev
+    }, [])
+    .filter(value => !cssKeywords.includes(value))
 
   return {
     total: all.length,

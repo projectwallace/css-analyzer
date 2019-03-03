@@ -1,104 +1,14 @@
 {
-  "total": 48,
+  "total": 17,
   "fontfamilies": {
-    "total": 18,
-    "totalUnique": 12,
-    "unique": [
-      {
-        "value": "\"-apple-system\", \"BlinkMacSystemFont\", \"Segoe UI\", \"Roboto\", \"Helvetica\", \"Arial\", sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
-        "count": 1
-      },
-      {
-        "value": "\"Arial Black\", \"Arial Bold\", Gadget, sans-serif",
-        "count": 1
-      },
-      {
-        "value": "\"Brush Script MT\", cursive",
-        "count": 1
-      },
-      {
-        "value": "\"Consolas\", \"Liberation Mono\", \"Menlo\", \"Courier\", monospace",
-        "count": 1
-      },
-      {
-        "value": "\"Droid Sans\", serif",
-        "count": 1
-      },
-      {
-        "value": "\"Noto Sans\"",
-        "count": 1
-      },
-      {
-        "value": "\"Source Sans Pro\", serif",
-        "count": 1
-      },
-      {
-        "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
-        "count": 1
-      },
-      {
-        "value": "Consolas, \"Liberation Mono\", Menlo, Courier, monospace",
-        "count": 1
-      },
-      {
-        "value": "monospace",
-        "count": 1
-      },
-      {
-        "value": "sans-serif",
-        "count": 1
-      },
-      {
-        "value": "serif",
-        "count": 7
-      }
-    ]
+    "total": 0,
+    "totalUnique": 0,
+    "unique": []
   },
   "fontsizes": {
-    "total": 15,
-    "totalUnique": 10,
-    "unique": [
-      {
-        "value": "calc(3vw + 1em)",
-        "count": 1
-      },
-      {
-        "value": "1.3em",
-        "count": 1
-      },
-      {
-        "value": "1.2em",
-        "count": 1
-      },
-      {
-        "value": "large",
-        "count": 1
-      },
-      {
-        "value": "1.1em",
-        "count": 1
-      },
-      {
-        "value": "16px",
-        "count": 1
-      },
-      {
-        "value": "1em",
-        "count": 5
-      },
-      {
-        "value": "medium",
-        "count": 1
-      },
-      {
-        "value": "small",
-        "count": 1
-      },
-      {
-        "value": "11px",
-        "count": 2
-      }
-    ]
+    "total": 0,
+    "totalUnique": 0,
+    "unique": []
   },
   "prefixed": {
     "total": 4,
@@ -121,7 +31,7 @@
         "count": 1
       }
     ],
-    "share": 0.08333333333333333
+    "share": 0.23529411764705882
   },
   "colors": {
     "total": 0,
