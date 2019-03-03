@@ -1,5 +1,5 @@
 {
-  "total": 17,
+  "total": 8,
   "fontfamilies": {
     "total": 0,
     "totalUnique": 0,
@@ -11,27 +11,10 @@
     "unique": []
   },
   "prefixed": {
-    "total": 4,
-    "totalUnique": 4,
-    "unique": [
-      {
-        "value": "-moz-linear-gradient(transparent, transparent)",
-        "count": 1
-      },
-      {
-        "value": "-ms-linear-gradient(transparent, transparent)",
-        "count": 1
-      },
-      {
-        "value": "-o-linear-gradient(transparent, transparent)",
-        "count": 1
-      },
-      {
-        "value": "-webkit-gradient(transparent, transparent)",
-        "count": 1
-      }
-    ],
-    "share": 0.23529411764705882
+    "total": 0,
+    "totalUnique": 0,
+    "unique": [],
+    "share": 0
   },
   "colors": {
     "total": 0,
