@@ -1,5 +1,5 @@
 module.exports = declarations => {
-  const all = declarations.map(declaration => declaration.value)
+  const all = declarations.map(({value}) => value)
 
   const prefixed = require('./prefixed.js')(all)
   const fontsizes = require('./font-sizes.js')(declarations)
