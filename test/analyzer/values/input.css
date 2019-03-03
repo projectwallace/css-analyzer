@@ -22,18 +22,6 @@
   grid-column: 1/-1; /* Used to cause an Error */
 }
 
-.prefixes {
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -o-border-radius: 0;
-  border-radius: 0;
-  background: -webkit-gradient(transparent, transparent);
-  background: -moz-linear-gradient(transparent, transparent);
-  background: -ms-linear-gradient(transparent, transparent);
-  background: -o-linear-gradient(transparent, transparent);
-  background: linear-gradient(transparent, transparent);
-}
-
 /**
  * Browser hacks
  */
