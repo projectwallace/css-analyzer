@@ -1,8 +1,6 @@
 const expand = require('css-shorthand-expand')
 const uniquer = require('../../utils/uniquer')
-const utils = require('../../utils/css')
-
-const cssKeywords = utils.KEYWORDS
+const {KEYWORDS} = require('../../utils/css')
 
 module.exports = declarations => {
   const all = declarations
@@ -21,7 +19,7 @@ module.exports = declarations => {
 
       return prev
     }, [])
-    .filter(value => !cssKeywords.includes(value))
+    .filter(value => !KEYWORDS.includes(value))
 
   return {
     total: all.length,
