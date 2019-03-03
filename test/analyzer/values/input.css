@@ -35,57 +35,6 @@
 }
 
 /**
- * Font-sizes
- */
-.font-size0 { font-size: 16px; }
-.font-size1 { font-size: small; }
-.font-size2 { font-size: 1em; }
-.font-size3 { font-size: calc(3vw + 1em); }
-.font-size4 { font: 1.1em serif; }
-.font-size5 { font: medium serif; }
-.font-size6 { font: normal normal 1.2em serif; }
-.font-size7 { font: 400 1.3em/1 serif; }
-.font-false {
-  font: inherit;
-  font: initial;
-  font: auto;
-}
-.font-false {
-  font-size: inherit;
-  font-size: initial;
-  font-size: auto;
-}
-
-/**
- * Font-families
- * Note: there's a couple serif keywords above;
- */
-.font-family0 { font-family: "Droid Sans", serif; }
-.font-family1 { font-family: sans-serif; }
-.font-family2 { font: large 'Noto Sans'; }
-.font-family3 { font: normal normal 1em/1 'Source Sans Pro', serif; }
-.font-family-spaces {
-  font: 1em / 1 serif;
-  font: 1em/ 1 serif;
-  font: 1em /1 serif;
-}
-.font-family-keywords {
-  font-family: inherit;
-  font-family: initial;
-  font-family: auto;
-}
-.font-families-github {
-  font-family:"Arial Black", "Arial Bold", Gadget, sans-serif;
-  font-family:"Brush Script MT", cursive;
-  font-family:monospace;
-  font-family:Consolas, "Liberation Mono", Menlo, Courier, monospace;
-  /* Some real life examples that caused bugs in the past: */
-  font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  font:11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
-  font:normal normal 11px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-}
-
-/**
  * Browser hacks
  */
  .h4ck {

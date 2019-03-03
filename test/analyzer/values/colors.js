@@ -124,7 +124,11 @@ test('It does not report false positives for color keywords', t => {
     },
     {
       property: '-moz-osx-font-smoothing',
-      value: 'grayscale'
+      value: 'grayscale' // Not gray keyword
+    },
+    {
+      property: 'font-family',
+      value: '"Arial Black", "Arial Bold", Gadget, sans-serif' // Not Black keyword
     }
   ]
   const actual = analyze(falsePositives)
