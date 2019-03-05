@@ -31,6 +31,6 @@ test('parser throws a useful error on invalid CSS', async t => {
 
   t.is(
     error.message,
-    'Unknown word at line 1, column 5. Source: a { color red }'
+    'Unknown word at line 1, column 5:\n\n> 1 | a { color red }\n    |     ^'
   )
 })
