@@ -1,4 +1,4 @@
-const postcss = require('postcss')
+const {parse} = require('postcss')
 const atRules = require('./atrules')
 const rules = require('./rules')
 const selectors = require('./selectors')
@@ -15,16 +15,18 @@ function processNodes(tree) {
 
 module.exports = async css => {
   try {
-    const result = await postcss.parse(css)
+    const result = await parse(css)
     const rootNode = result.toResult().root
 
     return Promise.resolve(processNodes(rootNode))
   } catch (error) {
-    const {source, line, column, reason} = error
+    const {line, column, reason} = error
 
     return Promise.reject(
       new SyntaxError(
-        `${reason} at line ${line}, column ${column}. Source: ${source}`
+        `${reason} at line ${line}, column ${column}:\n\n${error.showSourceCode(
+          false
+        )}`
       )
     )
   }
