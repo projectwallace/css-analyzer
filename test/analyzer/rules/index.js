@@ -1,5 +1,5 @@
 const test = require('ava')
-const analyze = require('../../../src/analyzer/rules/index')
+const analyze = require('../../../src/analyzer/rules')
 
 test('it responds with the correct structure', t => {
   const actual = analyze([])
