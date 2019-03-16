@@ -3,6 +3,6 @@ const analyze = require('../../../src/analyzer/selectors')
 
 test.todo('it responds with the correct structure')
 
-test.todo('it counts the total of all selectors')
-
-test.todo('it counts the total of all unique selectors')
+test.todo(
+  'it finds the top 5 specificity selectors and sorts them by specificity'
+)

@@ -1,5 +1,5 @@
 const test = require('ava')
-const analyze = require('../../../src/analyzer/selectors/browserhacks.js')
+const analyze = require('../../../src/analyzer/selectors/browserhacks')
 
 test('It responds with the correct structure', t => {
   const actual = analyze([])
