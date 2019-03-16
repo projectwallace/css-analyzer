@@ -1,7 +1,7 @@
 const uniquer = require('../../utils/uniquer.js')
 
 module.exports = declarations => {
-  const all = declarations.map(declaration => declaration.property)
+  const all = declarations.map(({property}) => property)
 
   const prefixed = require('./prefixed.js')(all)
   const browserhacks = require('./browserhacks.js')(all)

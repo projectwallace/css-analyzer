@@ -13,29 +13,33 @@ test('It responds with the correct structure', t => {
 })
 
 test('It recognizes browser hacks correctly', t => {
-  const actual = analyze(['_color'])
+  const actual = analyze(['_color', '*zoom'])
   const expected = {
-    total: 1,
+    total: 2,
     unique: [
+      {
+        value: '*zoom',
+        count: 1
+      },
+
       {
         value: '_color',
         count: 1
       }
     ],
-    totalUnique: 1
+    totalUnique: 2
   }
 
   t.deepEqual(actual, expected)
 })
 
 test('It does not report values that are no browser hacks', t => {
+  const actual = analyze(['color'])
   const expected = {
     total: 0,
     unique: [],
     totalUnique: 0
   }
-
-  const actual = analyze(['color'])
 
   t.deepEqual(actual, expected)
 })
