@@ -1,13 +1,13 @@
 module.exports = declarations => {
   const all = declarations
+  const totalUnique = new Set(
+    all.map(({property, value}) => `${property} : ${value}`)
+  ).size
   const importants = require('./importants')(all)
-  const unique = [...new Set(all.map(declaration => {
-    return `${declaration.property} : ${declaration.value}`
-  }))].sort()
 
   return {
     total: all.length,
-    totalUnique: unique.length,
+    totalUnique,
     importants
   }
 }

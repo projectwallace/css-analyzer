@@ -1,9 +1,64 @@
 const test = require('ava')
-const testScope = require('../../utils/scope-tester.js')
+const analyze = require('../../../src/analyzer/declarations')
 
-const SCOPE = 'declarations'
+test('it responds with the correct structure', t => {
+  const actual = analyze([])
+  const expected = {
+    total: 0,
+    totalUnique: 0,
+    importants: {
+      total: 0,
+      share: 0
+    }
+  }
 
-test(SCOPE, async t => {
-  const {actual, expected} = await testScope(SCOPE)
-  t.deepEqual(actual[SCOPE], expected)
+  t.deepEqual(actual, expected)
+})
+
+test('it counts declarations', t => {
+  const fixture = [
+    {
+      property: 'color',
+      value: 'red',
+      important: false
+    },
+    {
+      property: 'border',
+      value: '1px solid blue',
+      important: false
+    },
+    {
+      property: 'font-size',
+      value: '16px',
+      important: false
+    },
+    {
+      // Duplicate
+      property: 'font-size',
+      value: '16px',
+      important: false
+    }
+  ]
+  const {total, totalUnique} = analyze(fixture)
+
+  t.is(total, 4)
+  t.is(totalUnique, 3)
+})
+
+test('it ignores !importants when looking for unique declarations', t => {
+  const fixture = [
+    {
+      property: 'font-size',
+      value: '16px',
+      important: false
+    },
+    {
+      property: 'font-size',
+      value: '16px',
+      important: true
+    }
+  ]
+  const {totalUnique: actual} = analyze(fixture)
+
+  t.deepEqual(actual, 1)
 })
