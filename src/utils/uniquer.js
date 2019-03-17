@@ -10,12 +10,10 @@ module.exports = (values, sortFn) => {
     }, new Map())
   ]
     // Create an array of [{value, count}]
-    .map(value => {
-      return {
-        value: value[0],
-        count: value[1]
-      }
-    })
+    .map(value => ({
+      value: value[0],
+      count: value[1]
+    }))
 
   const sorted = reduced.map(el => el.value).sort(sortFn)
   const unique = sorted.map(value => reduced.find(r => r.value === value))

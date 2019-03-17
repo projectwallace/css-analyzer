@@ -1,8 +1,9 @@
 const specificity = require('specificity')
 
 module.exports = selectors => {
-  const all = [...new Set(selectors)]
+  const all = [...selectors]
     .sort()
+    .reverse()
     .sort(specificity.compare)
     .reverse()
 
@@ -14,12 +15,7 @@ module.exports = selectors => {
 
       return {
         value: selector,
-        specificity: {
-          a,
-          b,
-          c,
-          d
-        }
+        specificity: {a, b, c, d}
       }
     })
   }

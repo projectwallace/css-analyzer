@@ -1,10 +1,10 @@
 const specificity = require('specificity')
 const {caseInsensitive: stringCompare} = require('string-natural-compare')
 
-// Sort by identifiers count, then by alphabet
+// Sort by identifiers count (high to low), then by alphabet (A-Z)
 function sortByIdentifiersCount(a, b) {
   if (a.count === b.count) {
-    return stringCompare(a, b)
+    return stringCompare(a.value, b.value)
   }
 
   return b.count - a.count
@@ -15,27 +15,33 @@ function getSelectorSpecificity(selector) {
 }
 
 module.exports = selectors => {
+  if (selectors.length === 0) {
+    return {
+      average: 0,
+      top: [],
+      max: {
+        value: null,
+        count: null
+      }
+    }
+  }
+
   const identifiersPerSelector = selectors
     .map(getSelectorSpecificity)
-    .map(specificity => {
-      return {
-        value: specificity.selector,
-        count: specificity.parts.length
-      }
-    })
+    .map(specificity => ({
+      value: specificity.selector,
+      count: specificity.parts.length
+    }))
 
   const totalIdentifiers = identifiersPerSelector
-    .map(selector => selector.count)
+    .map(({count}) => count)
     .reduce((prev, curr) => prev + curr, 0)
-
-  const totalSelectors = selectors.length
-  const average = totalIdentifiers / totalSelectors
 
   const sorted = identifiersPerSelector.sort(sortByIdentifiersCount)
   const [max] = sorted
 
   return {
-    average,
+    average: totalIdentifiers / selectors.length,
     max,
     top: sorted.slice(0, 5)
   }
