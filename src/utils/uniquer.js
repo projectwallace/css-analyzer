@@ -8,12 +8,7 @@ module.exports = (values, sortFn) => {
     ...values.reduce((map, value) => {
       return map.set(value, map.get(value) + 1 || 1)
     }, new Map())
-  ]
-    // Create an array of [{value, count}]
-    .map(value => ({
-      value: value[0],
-      count: value[1]
-    }))
+  ].map(([value, count]) => ({value, count}))
 
   const sorted = reduced.map(el => el.value).sort(sortFn)
   const unique = sorted.map(value => reduced.find(r => r.value === value))
