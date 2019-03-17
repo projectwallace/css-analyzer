@@ -21,15 +21,16 @@
     "styleguide",
     "metrics"
   ],
+  "main": "src/analyzer/index.js",
+  "files": [
+    "src"
+  ],
   "scripts": {
     "test": "xo && nyc ava test/analyzer test/parser"
   },
   "xo": {
     "space": true,
-    "semicolon": false,
-    "rules": {
-      "ava/no-import-test-files": "off"
-    }
+    "semicolon": false
   },
   "prettier": {
     "semi": false,

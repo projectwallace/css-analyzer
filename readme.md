@@ -33,7 +33,7 @@ const analyze = require('css-analyzer');
 
 analyze('foo{}')
   .then(result => console.log(result))
-  .catch(err => console.error(err))
+  .catch(error => console.error(error))
 }
 
 //=>
