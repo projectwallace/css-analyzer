@@ -2,7 +2,13 @@ const test = require('ava')
 const analyzer = require('../..')
 
 test('Breaks with invalid CSS', async t => {
-  await t.throwsAsync(analyzer('INVALID CSS'))
+  const cssWithSyntaxError = 'a { color red }'
+  const error = await t.throwsAsync(analyzer(cssWithSyntaxError))
+
+  t.is(
+    error.message,
+    'Unknown word at line 1, column 5:\n\n> 1 | a { color red }\n    |     ^'
+  )
 })
 
 test('Passes with valid CSS', async t => {
