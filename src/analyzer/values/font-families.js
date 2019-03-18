@@ -13,8 +13,11 @@ module.exports = declarations => {
     }
 
     if (property === 'font') {
-      const {'font-family': family} = expand('font', value)
-      prev = [...prev, family]
+      const expanded = expand('font', value)
+
+      if (expanded) {
+        prev = [...prev, expanded['font-family']]
+      }
     }
 
     return prev

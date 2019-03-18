@@ -77,6 +77,20 @@ test('It extracts a font-family correctly from the `font` shorthand', t => {
   })
 })
 
+test('it ignores the ultra shorthand `0/0 a`', t => {
+  t.notThrows(() => {
+    analyze([{property: 'font', value: '0/0 a'}])
+  })
+
+  const {total, totalUnique, unique} = analyze([
+    {property: 'font', value: '0/0 a'}
+  ])
+
+  t.is(total, 0)
+  t.is(totalUnique, 0)
+  t.deepEqual(unique, [])
+})
+
 test('It ignores keywords, and global values', t => {
   const fixtures = ['inherit', 'initial', 'auto', 'unset']
 

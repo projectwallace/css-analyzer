@@ -14,8 +14,11 @@ module.exports = declarations => {
     }
 
     if (property === 'font') {
-      const {'font-size': size} = expand('font', value)
-      prev = [...prev, size]
+      const expanded = expand('font', value)
+
+      if (expanded) {
+        prev = [...prev, expanded['font-size']]
+      }
     }
 
     return prev
