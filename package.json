@@ -26,7 +26,7 @@
     "src"
   ],
   "scripts": {
-    "test": "xo && nyc ava test/analyzer test/parser"
+    "test": "xo && nyc ava test"
   },
   "xo": {
     "space": true,
@@ -48,7 +48,6 @@
   "dependencies": {
     "color-sorter": "^3.0.0",
     "css-at-supports-browser-h4cks-analyzer": "^1.0.0",
-    "css-color-names": "^1.0.0",
     "css-media-query-browser-h4cks-analyzer": "^1.0.0",
     "css-property-browser-h4cks-analyzer": "^1.1.0",
     "css-selector-browser-h4cks-analyzer": "^1.1.0",
@@ -59,7 +58,7 @@
     "is-vendor-prefixed": "^1.0.0",
     "path": "^0.12.7",
     "postcss": "^7.0.14",
-    "postcss-values-parser": "^2.0.1",
+    "postcss-values-parser": "^3.0.2",
     "specificity": "^0.4.1",
     "string-natural-compare": "^2.0.3",
     "tinycolor2": "^1.4.1",
