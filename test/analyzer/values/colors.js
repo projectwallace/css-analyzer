@@ -169,7 +169,7 @@ test('It finds RGB(A) colors', t => {
     [
       'rgb(100, 200, 10)',
       'rgba(100, 200, 10, 0.5)',
-      'rgba(100, 200, 11, .5)',
+      'RGBA(100, 200, 11, .5)',
       'rgba(2,2,2,.2)'
     ].map(value => ({
       property: 'color',
@@ -181,7 +181,7 @@ test('It finds RGB(A) colors', t => {
     unique: [
       {count: 1, value: 'rgb(100, 200, 10)'},
       {count: 1, value: 'rgba(100, 200, 10, 0.5)'},
-      {count: 1, value: 'rgba(100, 200, 11, .5)'},
+      {count: 1, value: 'RGBA(100, 200, 11, .5)'},
       {count: 1, value: 'rgba(2,2,2,.2)'}
     ],
     totalUnique: 4,
@@ -197,7 +197,7 @@ test('It finds RGB(A) colors', t => {
 
 test('It finds HSL(A) colors', t => {
   const actual = analyze(
-    ['hsl(100, 20%, 30%)', 'hsla(100, 20%, 30%, 0.5)'].map(value => ({
+    ['hsl(100, 20%, 30%)', 'Hsla(100, 20%, 30%, 0.5)'].map(value => ({
       property: 'color',
       value
     }))
@@ -206,7 +206,7 @@ test('It finds HSL(A) colors', t => {
     total: 2,
     unique: [
       {count: 1, value: 'hsl(100, 20%, 30%)'},
-      {count: 1, value: 'hsla(100, 20%, 30%, 0.5)'}
+      {count: 1, value: 'Hsla(100, 20%, 30%, 0.5)'}
     ],
     totalUnique: 2,
     duplicates: {
