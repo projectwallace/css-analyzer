@@ -14,7 +14,7 @@ function extractColorsFromDeclaration(declaration) {
         return colors.push(node)
       }
     })
-  } catch (e) {}
+  } catch (error) {}
 
   if (colors.length > 0) {
     declaration.colors = colors.map(color => color.toString().trim())
