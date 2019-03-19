@@ -7,11 +7,14 @@ const uniquer = require('../../utils/uniquer')
 function extractColorsFromDeclaration(declaration) {
   const colors = []
 
-  parse(declaration.value, {loose: true}).walk(node => {
-    if (node.isColor) {
-      return colors.push(node)
-    }
-  })
+  // Temporary try-catch until https://github.com/shellscape/postcss-values-parser/issues/76 is fixed
+  try {
+    parse(declaration.value, {loose: true}).walk(node => {
+      if (node.isColor) {
+        return colors.push(node)
+      }
+    })
+  } catch (error) {}
 
   if (colors.length > 0) {
     declaration.colors = colors.map(color => color.toString().trim())
