@@ -25,10 +25,16 @@ module.exports = tree => {
       params: rule.params.trim()
     }
 
-    return atrules.push(
-      addDescriptorsToAtRuleFromTree(atRule, rule)
-    )
+    return atrules.push(addDescriptorsToAtRuleFromTree(atRule, rule))
   })
 
   return atrules
+}
+
+module.exports.isKeyframes = rule => {
+  return (
+    rule.parent &&
+    rule.parent.type === 'atrule' &&
+    rule.parent.name === 'keyframes'
+  )
 }

@@ -4,7 +4,10 @@ const parser = require('../../src/parser')
 test('basic rules are parsed', async t => {
   const fixture = 'html {color:red} @media screen { html {} }'
   const actual = await parser(fixture)
-  const expected = [{declarationsCount: 1}, {declarationsCount: 0}]
+  const expected = [
+    {declarationsCount: 1, selectorsCount: 1},
+    {declarationsCount: 0, selectorsCount: 1}
+  ]
 
   t.deepEqual(actual.rules, expected)
 })
@@ -12,7 +15,10 @@ test('basic rules are parsed', async t => {
 test('declarations per rule are counted', async t => {
   const fixture = 'html, body {color:red; font-size : 12px} .foo {color: red;}'
   const actual = await parser(fixture)
-  const expected = [2, 1].map(num => ({declarationsCount: num}))
+  const expected = [
+    {declarationsCount: 2, selectorsCount: 2},
+    {declarationsCount: 1, selectorsCount: 1}
+  ]
   t.deepEqual(actual.rules, expected)
 })
 
@@ -29,6 +35,6 @@ test('heavily nested rules are parsed', async t => {
     }
   `
   const actual = await parser(fixture)
-  const expected = [{declarationsCount: 1}]
+  const expected = [{declarationsCount: 1, selectorsCount: 1}]
   t.deepEqual(actual.rules, expected)
 })

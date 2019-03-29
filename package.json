@@ -30,7 +30,10 @@
   },
   "xo": {
     "space": true,
-    "semicolon": false
+    "semicolon": false,
+    "rules": {
+      "operator-linebreak": "off"
+    }
   },
   "prettier": {
     "semi": false,
