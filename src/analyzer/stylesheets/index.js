@@ -7,7 +7,7 @@ module.exports = ({
   properties,
   values
 }) => {
-  const size = Buffer.byteLength(rawCss, 'utf8')
+  const filesize = require('./size.js')(rawCss)
   const simplicity = require('./simplicity.js')(rules, selectors)
   const cohesion = require('./cohesion.js')(rules, declarations)
   const browserhacks = require('./browserhacks.js')(
@@ -18,7 +18,8 @@ module.exports = ({
   )
 
   return {
-    size,
+    size: filesize.uncompressed.totalBytes,
+    filesize,
     simplicity,
     cohesion,
     browserhacks
