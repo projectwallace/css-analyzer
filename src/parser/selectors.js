@@ -10,8 +10,14 @@ module.exports = tree => {
     }
 
     // Get selectors: flatten the list, split each by ',' and trim the results
-    selectors.push(...rule.selector.split(',').map(s => s.trim()))
+    selectors.push(...getSelectorsFromRule(rule))
   })
 
   return selectors
 }
+
+const getSelectorsFromRule = rule => {
+  return rule.selector.split(',').map(s => s.trim())
+}
+
+module.exports.getSelectorsFromRule = getSelectorsFromRule
