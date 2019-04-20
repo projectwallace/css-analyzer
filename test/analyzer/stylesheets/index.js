@@ -19,6 +19,21 @@ const FIXTURE = {
 test('it responds with the correct structure', t => {
   t.deepEqual(analyze(FIXTURE), {
     size: 0,
+    filesize: {
+      uncompressed: {
+        totalBytes: 0
+      },
+      compressed: {
+        gzip: {
+          totalBytes: 20,
+          compressionRatio: 0
+        },
+        brotli: {
+          totalBytes: 1,
+          compressionRatio: 0
+        }
+      }
+    },
     simplicity: 0,
     cohesion: {
       average: 0
@@ -28,9 +43,4 @@ test('it responds with the correct structure', t => {
       totalUnique: 0
     }
   })
-})
-
-test('it reports the filesize correctly', t => {
-  const {size: actual} = analyze({...FIXTURE, rawCss: 'html {}'})
-  t.is(actual, 7)
 })

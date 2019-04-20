@@ -49,6 +49,7 @@
     ]
   },
   "dependencies": {
+    "brotli-size": "0.0.3",
     "color-sorter": "^3.0.0",
     "css-at-supports-browser-h4cks-analyzer": "^1.0.0",
     "css-media-query-browser-h4cks-analyzer": "^1.0.0",
@@ -58,6 +59,7 @@
     "css-unit-sort": "^1.1.1",
     "css-value-browser-h4cks-analyzer": "^1.0.1",
     "flat": "^4.1.0",
+    "gzip-size": "^5.1.0",
     "is-vendor-prefixed": "^1.0.0",
     "path": "^0.12.7",
     "postcss": "^7.0.14",
