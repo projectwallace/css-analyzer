@@ -36,7 +36,8 @@ test('it responds with the correct structure', t => [
     prefixed: {
       total: 0,
       totalUnique: 0,
-      unique: []
+      unique: [],
+      share: 0
     }
   })
 ])
@@ -85,6 +86,7 @@ test('it finds all vendor prefixed keyframes', t => {
 
   t.is(actual.total, 4)
   t.is(actual.totalUnique, 4)
+  t.is(actual.share, 1)
   t.deepEqual(actual.unique, [
     {
       count: 1,
@@ -120,7 +122,8 @@ test('it does not report non-vendor prefixed keyframes as prefixed', t => {
 
   t.is(actual.total, 0)
   t.is(actual.totalUnique, 0)
-  t.is(actual.unique, [])
+  t.is(actual.share, 0)
+  t.deepEqual(actual.unique, [])
 })
 
 test('it does not report non-@keyframes atrules as @keyframes', t => {
@@ -135,9 +138,7 @@ test('it does not report non-@keyframes atrules as @keyframes', t => {
     }
   ])
 
-  t.deepEqual(actual, {
-    total: 0,
-    totalUnique: 0,
-    unique: []
-  })
+  t.is(actual.total, 0)
+  t.is(actual.totalUnique, 0)
+  t.deepEqual(actual.unique, [])
 })
