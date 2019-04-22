@@ -123,6 +123,8 @@ analyze('foo{}')
 //   'selectors.browserhacks.unique': [],
 //   'selectors.browserhacks.totalUnique': 0,
 //   'stylesheets.cohesion.average': 0,
+//   'stylesheets.cohesion.min.count': 0,
+//   'stylesheets.cohesion.min.value': null,
 //   'stylesheets.filesize.compressed.brotli.compressionRatio': -0.8,
 //   'stylesheets.filesize.compressed.brotli.totalBytes': 9,
 //   'stylesheets.filesize.compressed.gzip.compressionRatio': -4,
