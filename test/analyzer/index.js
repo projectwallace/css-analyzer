@@ -1,7 +1,7 @@
 const test = require('ava')
 const analyzer = require('../..')
 
-test('Breaks with invalid CSS', async t => {
+test('it breaks with invalid CSS', async t => {
   const cssWithSyntaxError = 'a { color red }'
   const error = await t.throwsAsync(analyzer(cssWithSyntaxError))
 
@@ -11,11 +11,11 @@ test('Breaks with invalid CSS', async t => {
   )
 })
 
-test('Passes with valid CSS', async t => {
+test('it passes with valid CSS', async t => {
   await t.notThrowsAsync(analyzer('body {}'))
 })
 
-test('Returns the correct analysis object structure', async t => {
+test('it returns the correct analysis object structure', async t => {
   const actual = await analyzer('foo{}')
   const expected = {
     'atrules.charsets.total': 0,
@@ -103,6 +103,8 @@ test('Returns the correct analysis object structure', async t => {
     'selectors.browserhacks.unique': [],
     'selectors.browserhacks.totalUnique': 0,
     'stylesheets.cohesion.average': 0,
+    'stylesheets.cohesion.min.count': 0,
+    'stylesheets.cohesion.min.value': null,
     'stylesheets.filesize.compressed.brotli.compressionRatio': -0.8,
     'stylesheets.filesize.compressed.brotli.totalBytes': 9,
     'stylesheets.filesize.compressed.gzip.compressionRatio': -4,

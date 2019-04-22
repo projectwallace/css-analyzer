@@ -1,15 +1,7 @@
-module.exports = ({
-  rawCss,
-  atrules,
-  rules,
-  selectors,
-  declarations,
-  properties,
-  values
-}) => {
+module.exports = ({rawCss, atrules, rules, selectors, properties, values}) => {
   const filesize = require('./size.js')(rawCss)
   const simplicity = require('./simplicity.js')(rules, selectors)
-  const cohesion = require('./cohesion.js')(rules, declarations)
+  const cohesion = require('./cohesion.js')(rules)
   const browserhacks = require('./browserhacks.js')(
     atrules,
     selectors,

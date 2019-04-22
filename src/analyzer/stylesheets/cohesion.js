@@ -1,13 +1,30 @@
-module.exports = (rules, declarations) => {
-  const average = ((rules, declarations) => {
-    if (declarations.total === 0) {
-      return 0
-    }
+module.exports = rules => {
+  const totalRules = rules.length
+  const totalDeclarations =
+    totalRules === 0
+      ? 0
+      : rules.reduce((acc, curr) => acc + curr.declarations.length, 0)
+  const rulesSortedByDeclarationCount = rules.sort(
+    (a, b) => b.declarations.length - a.declarations.length
+  )
 
-    return declarations.total / rules.total
-  })(rules, declarations)
+  if (totalRules === 0 || totalDeclarations === 0) {
+    return {
+      average: 0,
+      min: {
+        count: 0,
+        value: null
+      }
+    }
+  }
+
+  const [ruleWithMostDeclarations] = rulesSortedByDeclarationCount
 
   return {
-    average
+    average: totalDeclarations / totalRules,
+    min: {
+      count: ruleWithMostDeclarations.declarations.length,
+      value: ruleWithMostDeclarations
+    }
   }
 }
