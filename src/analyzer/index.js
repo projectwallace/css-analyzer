@@ -17,9 +17,8 @@ module.exports = async rawCss => {
   const stylesheets = require('./stylesheets')({
     rawCss,
     atrules,
-    rules,
+    rules: css.rules,
     selectors,
-    declarations,
     properties,
     values
   })

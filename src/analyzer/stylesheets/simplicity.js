@@ -3,5 +3,5 @@ module.exports = (rules, selectors) => {
     return 0
   }
 
-  return rules.total / selectors.total
+  return rules.length / selectors.total
 }
