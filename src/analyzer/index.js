@@ -16,11 +16,13 @@ module.exports = async rawCss => {
   const values = require('./values')(css.declarations)
   const stylesheets = require('./stylesheets')({
     rawCss,
+    css,
     atrules,
     rules: css.rules,
     selectors,
     properties,
-    values
+    values,
+    declarations
   })
 
   return Promise.resolve(
