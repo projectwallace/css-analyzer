@@ -2,6 +2,10 @@
   "name": "@projectwallace/css-analyzer",
   "version": "2.4.0",
   "author": "Bart Veneman",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/projectwallace/css-analyzer"
+  },
   "homepage": "https://www.projectwallace.com/oss",
   "issues": "https://github.com/projectwallace/css-analyzer/issues",
   "license": "MIT",
@@ -65,6 +69,7 @@
     "postcss": "^7.0.14",
     "postcss-values-parser": "^3.0.2",
     "specificity": "^0.4.1",
+    "split-lines": "^2.0.0",
     "string-natural-compare": "^2.0.3",
     "tinycolor2": "^1.4.1",
     "vendor-prefixes": "^1.0.0"

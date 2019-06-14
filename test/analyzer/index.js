@@ -110,6 +110,8 @@ test('it returns the correct analysis object structure', async t => {
     'stylesheets.filesize.compressed.gzip.compressionRatio': -4,
     'stylesheets.filesize.compressed.gzip.totalBytes': 25,
     'stylesheets.filesize.uncompressed.totalBytes': 5,
+    'stylesheets.linesOfCode.sourceLinesOfCode.total': 1,
+    'stylesheets.linesOfCode.total': 1,
     'stylesheets.simplicity': 1,
     'stylesheets.size': 5,
     'stylesheets.browserhacks.total': 0,

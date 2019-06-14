@@ -13,7 +13,12 @@ const FIXTURE = {
     supports: {browserhacks: {total: 0, totalUnique: 0}}
   },
   properties: {browserhacks: {total: 0, totalUnique: 0}},
-  values: {browserhacks: {total: 0, totalUnique: 0}}
+  values: {browserhacks: {total: 0, totalUnique: 0}},
+  css: {
+    atRules: [],
+    selectors: [],
+    declarations: []
+  }
 }
 
 test('it responds with the correct structure', t => {
@@ -45,6 +50,7 @@ test('it responds with the correct structure', t => {
     browserhacks: {
       total: 0,
       totalUnique: 0
-    }
+    },
+    linesOfCode: {total: 1, sourceLinesOfCode: {total: 0}}
   })
 })
