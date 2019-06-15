@@ -20,6 +20,11 @@ test('"selectors" in @keyframes are not passed as actual selectors', async t => 
       no-selector-1 { opacity: 1 }
       no-selector-2 { opacity: 0 }
     }
+
+    @-webkit-keyframes {
+      0% { opacity: 0 }
+      100% { opacity: 1 }
+    }
   `
 
   const {selectors: actual} = await parser(fixture)
