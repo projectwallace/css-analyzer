@@ -13,7 +13,7 @@ test('it analyzes large CSS files without errors - css-tricks', async t => {
   await t.notThrowsAsync(analyze(css))
 })
 
-test.only('it analyzes large CSS files without errors - smashing magazine', async t => {
+test('it analyzes large CSS files without errors - smashing magazine', async t => {
   const css = readFileSync(
     join(__dirname, '/smashing-magazine-20190319.css'),
     'utf8'

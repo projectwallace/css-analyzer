@@ -103,7 +103,6 @@ test('it returns the correct analysis object structure', async t => {
     'selectors.browserhacks.unique': [],
     'selectors.browserhacks.totalUnique': 0,
     'selectors.complexity.average': 1,
-    'selectors.complexity.max.count': 1,
     'selectors.complexity.max.value': 1,
     'selectors.complexity.max.selectors': [{value: 'foo', count: 1}],
     'selectors.complexity.max.count': 1,
