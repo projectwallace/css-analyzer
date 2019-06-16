@@ -35,6 +35,6 @@ module.exports.isKeyframes = rule => {
   return (
     rule.parent &&
     rule.parent.type === 'atrule' &&
-    rule.parent.name === 'keyframes'
+    rule.parent.name.includes('keyframes')
   )
 }
