@@ -53,13 +53,13 @@
     ]
   },
   "dependencies": {
-    "brotli-size": "0.0.3",
+    "brotli-size": "^0.1.0",
     "color-sorter": "^3.0.0",
     "css-at-supports-browser-h4cks-analyzer": "^1.0.0",
     "css-media-query-browser-h4cks-analyzer": "^1.0.0",
     "css-property-browser-h4cks-analyzer": "^1.1.0",
     "css-selector-browser-h4cks-analyzer": "^1.1.0",
-    "css-selector-complexity": "^0.1.1",
+    "css-selector-complexity": "^0.1.2",
     "css-shorthand-expand": "^1.2.0",
     "css-unit-sort": "^3.3.0",
     "css-value-browser-h4cks-analyzer": "^1.0.1",

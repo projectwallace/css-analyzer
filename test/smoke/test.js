@@ -1,22 +1,23 @@
-const {readFileSync} = require('fs')
+const {readFile} = require('fs')
+const {promisify} = require('util')
 const {join} = require('path')
 const test = require('ava')
 const analyze = require('../../src/analyzer')
 
-test('it analyzes large CSS files without errors - facebook', async t => {
-  const css = readFileSync(join(__dirname, '/facebook-20190319.css'), 'utf8')
-  await t.notThrowsAsync(analyze(css))
-})
+const readFileAsync = promisify(readFile)
 
-test('it analyzes large CSS files without errors - css-tricks', async t => {
-  const css = readFileSync(join(__dirname, '/css-tricks-20190319.css'), 'utf8')
-  await t.notThrowsAsync(analyze(css))
-})
+const fileNames = [
+  'facebook-20190319',
+  'css-tricks-20190319',
+  'smashing-magazine-20190319',
+  'trello-20190617',
+  'bol-com-20190617',
+  'lego-20190617'
+]
 
-test('it analyzes large CSS files without errors - smashing magazine', async t => {
-  const css = readFileSync(
-    join(__dirname, '/smashing-magazine-20190319.css'),
-    'utf8'
-  )
-  await t.notThrowsAsync(analyze(css))
+fileNames.forEach(fileName => {
+  test(`It doesn't fail on real-life CSS - ${fileName}`, async t => {
+    const css = await readFileAsync(join(__dirname, `${fileName}.css`), 'utf8')
+    await t.notThrowsAsync(() => analyze(css))
+  })
 })

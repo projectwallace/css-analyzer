@@ -3,9 +3,15 @@ const uniquer = require('../../utils/uniquer')
 
 module.exports = selectors => {
   const all = selectors.map(selector => {
+    let complexity = 0
+
+    try {
+      complexity = selectorComplexity(selector)
+    } catch {}
+
     return {
       selector,
-      complexity: selectorComplexity(selector)
+      complexity
     }
   })
   const allComplexities = all.map(selector => selector.complexity)
