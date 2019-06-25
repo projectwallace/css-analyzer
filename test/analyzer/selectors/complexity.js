@@ -85,3 +85,35 @@ test('it calculates the average complexity per selector', t => {
 
   t.is(actual, 26 / 6)
 })
+
+test('it reports a default complexity of 1 in case of an invalid selector', t => {
+  const provider = ['+.box-group', '.w-(20: 20%']
+  const expected = {
+    max: {
+      value: 0,
+      count: 2,
+      selectors: [
+        {
+          value: '+.box-group',
+          count: 1
+        },
+        {
+          value: '.w-(20: 20%',
+          count: 1
+        }
+      ]
+    },
+    average: 0,
+    sum: 0,
+    unique: [
+      {
+        value: 0,
+        count: 2
+      }
+    ],
+    totalUnique: 1
+  }
+  const actual = analyze(provider)
+
+  t.deepEqual(actual, expected)
+})
