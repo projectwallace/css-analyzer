@@ -2,7 +2,7 @@ const {readFile} = require('fs')
 const {promisify} = require('util')
 const {join} = require('path')
 const test = require('ava')
-const analyze = require('../../src/analyzer')
+const analyze = require('../..')
 
 const readFileAsync = promisify(readFile)
 
