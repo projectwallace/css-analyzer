@@ -7,7 +7,12 @@ const uniquer = require('../../utils/uniquer')
 function extractColorsFromDeclaration(declaration) {
   const colors = []
 
-  // Temporary try-catch until https://github.com/shellscape/postcss-values-parser/issues/76 is fixed
+  // Try-catch to ignore values that cannot be parsed with postcss-values-parser
+  // Examples:
+  // - Base64-encoded images
+  // - startColorstr=\'#5243AA\', endColorstr=\'#0079bf\', GradientType=1
+  // - opacity=50
+  // - 1.5deg
   try {
     parse(declaration.value, {loose: true}).walk(node => {
       if (node.isColor) {
