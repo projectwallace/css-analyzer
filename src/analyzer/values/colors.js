@@ -19,13 +19,7 @@ function extractColorsFromDeclaration(declaration) {
         return colors.push(node)
       }
     })
-  } catch (error) {
-    console.error(
-      `Ignoring this value: ${error.input.source} because: *${
-        error.input.reason
-      }*`
-    )
-  }
+  } catch (error) {}
 
   if (colors.length > 0) {
     declaration.colors = colors.map(color => color.toString().trim())
