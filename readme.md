@@ -177,7 +177,6 @@ analyze('foo{}')
 
 - [Wallace CLI](https://github.com/bartveneman/wallace-cli) - CLI tool for
   @projectwallace/css-analyzer
-- [Gromit CLI](https://github.com/bartveneman/gromit-cli) - A test framework to assert
-  that CSS doesn't exceeds certain thresholds
+- [Constyble](https://github.com/bartveneman/constyble) - CSS Complexity linter
 - [Color Sorter](https://github.com/bartveneman/color-sorter) - Sort CSS colors
   by hue, saturation, lightness and opacity
