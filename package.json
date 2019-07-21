@@ -76,8 +76,8 @@
     "vendor-prefixes": "^1.0.0"
   },
   "devDependencies": {
-    "ava": "^2.1.0",
-    "coveralls": "^3.0.4",
+    "ava": "^2.2.0",
+    "coveralls": "^3.0.5",
     "nyc": "^14.1.1",
     "xo": "^0.24.0"
   },
