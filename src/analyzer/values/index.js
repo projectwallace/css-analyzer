@@ -7,6 +7,7 @@ module.exports = declarations => {
   const colors = require('./colors.js')(declarations)
   const browserhacks = require('./browserhacks.js')(declarations)
   const boxshadows = require('./box-shadows.js')(declarations)
+  const textshadows = require('./text-shadows.js')(declarations)
   const zindexes = require('./z-indexes.js')(declarations)
 
   return {
@@ -17,6 +18,7 @@ module.exports = declarations => {
     colors,
     browserhacks,
     boxshadows,
+    textshadows,
     zindexes
   }
 }
