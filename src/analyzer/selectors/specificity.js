@@ -1,26 +1,42 @@
-const specificity = require('specificity')
+const {compare, calculate} = require('specificity')
+const uniquer = require('../../utils/uniquer')
 
 module.exports = selectors => {
-  const all = [...selectors]
-    .sort()
-    .reverse()
-    .sort(specificity.compare)
-    .reverse()
+  if (selectors.length === 0) {
+    return {
+      max: {
+        count: 0,
+        selectors: [],
+        value: null
+      },
+      top: []
+    }
+  }
 
-  const top = count => {
-    return [...all].slice(0, count).map(selector => {
-      const [a, b, c, d] = specificity
-        .calculate(selector)
-        .shift().specificityArray
+  const all = uniquer(selectors)
+    .unique.map(({value, count}) => {
+      const [a, b, c, d] = calculate(value).shift().specificityArray
 
       return {
-        value: selector,
+        count,
+        value,
         specificity: {a, b, c, d}
       }
     })
-  }
+    .sort((a, b) => compare(b.value, a.value))
+
+  const [maxSpecificitySelector] = all
+  const maxSpecificity = maxSpecificitySelector.specificity
+  const maxSpecificitySelectors = all.filter(
+    selector => compare(selector.value, maxSpecificitySelector.value) === 0
+  )
 
   return {
-    top: top(5)
+    top: [...all].slice(0, 5),
+    max: {
+      value: maxSpecificity,
+      count: maxSpecificitySelectors.length,
+      selectors: maxSpecificitySelectors
+    }
   }
 }
