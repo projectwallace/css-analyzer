@@ -91,8 +91,16 @@ test('it returns the correct analysis object structure', async t => {
     'selectors.js.total': 0,
     'selectors.js.totalUnique': 0,
     'selectors.js.unique': [],
+    'selectors.specificity.max.count': 1,
+    'selectors.specificity.max.selectors': [
+      {value: 'foo', specificity: {a: 0, b: 0, c: 0, d: 1}, count: 1}
+    ],
+    'selectors.specificity.max.value.a': 0,
+    'selectors.specificity.max.value.b': 0,
+    'selectors.specificity.max.value.c': 0,
+    'selectors.specificity.max.value.d': 1,
     'selectors.specificity.top': [
-      {value: 'foo', specificity: {a: 0, b: 0, c: 0, d: 1}}
+      {value: 'foo', specificity: {a: 0, b: 0, c: 0, d: 1}, count: 1}
     ],
     'selectors.total': 1,
     'selectors.totalUnique': 1,
