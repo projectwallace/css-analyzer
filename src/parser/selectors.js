@@ -17,7 +17,7 @@ module.exports = tree => {
 }
 
 const getSelectorsFromRule = rule => {
-  return rule.selector.split(',').map(s => s.trim())
+  return rule.selector.split(',').map(s => s.trim()).filter(selector => selector)
 }
 
 module.exports.getSelectorsFromRule = getSelectorsFromRule

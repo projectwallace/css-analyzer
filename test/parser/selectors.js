@@ -14,6 +14,32 @@ test('basic selectors are parsed', async t => {
   t.deepEqual(actual, expected)
 })
 
+test('basic selectors example 2 are parsed', async t => {
+  const fixture = `
+    .a,
+    {}
+  `
+  const {selectors: actual} = await parser(fixture)
+  const expected = ['.a']
+
+  t.deepEqual(actual, expected)
+})
+
+test('basic selectors example 3 are parsed', async t => {
+  const fixture = `
+    .a,
+    .b,
+    .c,
+    .d,
+    .e,
+    {}
+  `
+  const {selectors: actual} = await parser(fixture)
+  const expected = ['.a', '.b', '.c', '.d', '.e']
+
+  t.deepEqual(actual, expected)
+})
+
 test('"selectors" in @keyframes are not passed as actual selectors', async t => {
   const fixture = `
     @keyframes no-selector {
