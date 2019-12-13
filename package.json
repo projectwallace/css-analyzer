@@ -70,6 +70,7 @@
     "postcss": "^7.0.17",
     "postcss-values-parser": "^3.0.5",
     "specificity": "^0.4.1",
+    "split-css-value": "^0.1.1",
     "split-lines": "^2.0.0",
     "string-natural-compare": "^2.0.3",
     "tinycolor2": "^1.4.1",

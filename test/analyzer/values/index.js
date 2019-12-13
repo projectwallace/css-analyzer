@@ -10,7 +10,8 @@ test('It responds with the correct structure', t => {
     fontfamilies,
     fontsizes,
     prefixed,
-    zindexes
+    zindexes,
+    animations
   } = analyze([{property: 'a', value: '0'}])
 
   t.is(total, 1)
@@ -21,6 +22,7 @@ test('It responds with the correct structure', t => {
   t.truthy(fontsizes)
   t.truthy(prefixed)
   t.truthy(zindexes)
+  t.truthy(animations)
 })
 
 test('It analyzes values with comments', t => {
