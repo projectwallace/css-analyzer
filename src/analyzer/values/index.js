@@ -9,6 +9,7 @@ module.exports = declarations => {
   const boxshadows = require('./box-shadows.js')(declarations)
   const textshadows = require('./text-shadows.js')(declarations)
   const zindexes = require('./z-indexes.js')(declarations)
+  const animations = require('./animations.js')(declarations)
 
   return {
     total: all.length,
@@ -19,6 +20,7 @@ module.exports = declarations => {
     browserhacks,
     boxshadows,
     textshadows,
-    zindexes
+    zindexes,
+    animations
   }
 }
