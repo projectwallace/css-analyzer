@@ -1,8 +1,8 @@
 const {parse} = require('postcss-values-parser')
 const splitValue = require('split-css-value')
+const {sortFn: timeSortFn} = require('css-time-sort')
 const uniquer = require('../../utils/uniquer')
 const {KEYWORDS} = require('../../utils/css')
-const durationSort = require('../../utils/duration-sort')
 
 function getSingleDuration(animation) {
   let duration
@@ -84,7 +84,7 @@ module.exports = declarations => {
 
   const {unique: uniqueDurations, totalUnique: totalUniqueDurations} = uniquer(
     durations,
-    durationSort
+    timeSortFn
   )
 
   const timingFunctions = all
