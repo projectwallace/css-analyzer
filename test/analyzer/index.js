@@ -120,8 +120,6 @@ test('it returns the correct analysis object structure', async t => {
     'stylesheets.cohesion.average': 0,
     'stylesheets.cohesion.min.count': 0,
     'stylesheets.cohesion.min.value': null,
-    'stylesheets.filesize.compressed.brotli.compressionRatio': -0.8,
-    'stylesheets.filesize.compressed.brotli.totalBytes': 9,
     'stylesheets.filesize.compressed.gzip.compressionRatio': -4,
     'stylesheets.filesize.compressed.gzip.totalBytes': 25,
     'stylesheets.filesize.uncompressed.totalBytes': 5,

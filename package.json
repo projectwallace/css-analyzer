@@ -1,6 +1,6 @@
 {
   "name": "@projectwallace/css-analyzer",
-  "version": "2.7.1",
+  "version": "3.0.0",
   "author": "Bart Veneman",
   "repository": {
     "type": "git",
@@ -10,7 +10,7 @@
   "issues": "https://github.com/projectwallace/css-analyzer/issues",
   "license": "MIT",
   "engines": {
-    "node": ">=8.0"
+    "node": ">=10.0"
   },
   "keywords": [
     "projectwallace",
@@ -53,7 +53,6 @@
     ]
   },
   "dependencies": {
-    "brotli-size": "^0.1.0",
     "color-sorter": "^4.0.0",
     "css-at-supports-browser-h4cks-analyzer": "^2.0.0",
     "css-media-query-browser-h4cks-analyzer": "^2.0.0",

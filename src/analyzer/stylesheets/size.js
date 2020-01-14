@@ -1,5 +1,4 @@
 const gzipSize = require('gzip-size')
-const brotliSize = require('brotli-size')
 
 function getCompressionRatio(rawSize, compressedSize) {
   if (rawSize === 0 || compressedSize === 0) {
@@ -13,7 +12,6 @@ function getCompressionRatio(rawSize, compressedSize) {
 module.exports = rawCss => {
   const rawBytes = Buffer.byteLength(rawCss, 'utf8')
   const gzipBytes = gzipSize.sync(rawCss)
-  const brotliBytes = brotliSize.sync(rawCss)
 
   return {
     uncompressed: {
@@ -23,10 +21,6 @@ module.exports = rawCss => {
       gzip: {
         totalBytes: gzipBytes,
         compressionRatio: getCompressionRatio(rawBytes, gzipBytes)
-      },
-      brotli: {
-        totalBytes: brotliBytes,
-        compressionRatio: getCompressionRatio(rawBytes, brotliBytes)
       }
     }
   }
