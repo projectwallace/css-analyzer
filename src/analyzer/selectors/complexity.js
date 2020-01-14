@@ -7,7 +7,7 @@ module.exports = selectors => {
 
     try {
       complexity = selectorComplexity(selector)
-    } catch (error) {
+    } catch (_) {
       // Fail silently, ignoring the error
     }
 
