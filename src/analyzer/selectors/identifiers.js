@@ -1,10 +1,10 @@
 const specificity = require('specificity')
-const {caseInsensitive: stringCompare} = require('string-natural-compare')
+const stringCompare = require('string-natural-compare')
 
 // Sort by identifiers count (high to low), then by alphabet (A-Z)
 function sortByIdentifiersCount(a, b) {
   if (a.count === b.count) {
-    return stringCompare(a.value, b.value)
+    return stringCompare(a.value, b.value, {caseInsensitive: true})
   }
 
   return b.count - a.count

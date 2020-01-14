@@ -60,5 +60,5 @@ test('it ignores !importants when looking for unique declarations', t => {
   ]
   const {totalUnique: actual} = analyze(fixture)
 
-  t.deepEqual(actual, 1)
+  t.is(actual, 1)
 })

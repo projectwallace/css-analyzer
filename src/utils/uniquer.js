@@ -1,7 +1,11 @@
 const stringSortFn = require('string-natural-compare')
 
 module.exports = (values, sortFn) => {
-  sortFn = sortFn || stringSortFn.caseInsensitive
+  sortFn =
+    sortFn ||
+    function(a, b) {
+      return stringSortFn(String(a), String(b), {caseInsensitive: true})
+    }
 
   // Create a Map of unique values and their counts
   const reduced = [

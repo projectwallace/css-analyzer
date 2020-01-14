@@ -36,7 +36,8 @@
     "space": true,
     "semicolon": false,
     "rules": {
-      "operator-linebreak": "off"
+      "operator-linebreak": "off",
+      "space-before-function-paren": "off"
     }
   },
   "prettier": {
@@ -63,24 +64,24 @@
     "css-time-sort": "^1.0.0",
     "css-unit-sort": "^3.3.1",
     "css-value-browser-h4cks-analyzer": "^2.0.0",
-    "flat": "^4.1.0",
+    "flat": "^5.0.0",
     "gzip-size": "^5.1.1",
     "is-vendor-prefixed": "^3.3.1",
     "path": "^0.12.7",
-    "postcss": "^7.0.17",
+    "postcss": "^7.0.26",
     "postcss-values-parser": "^3.0.5",
     "specificity": "^0.4.1",
     "split-css-value": "^0.1.1",
     "split-lines": "^2.0.0",
-    "string-natural-compare": "^2.0.3",
+    "string-natural-compare": "^3.0.0",
     "tinycolor2": "^1.4.1",
     "vendor-prefixes": "^1.0.0"
   },
   "devDependencies": {
-    "ava": "^2.3.0",
-    "coveralls": "^3.0.6",
-    "nyc": "^14.1.1",
-    "xo": "^0.24.0"
+    "ava": "^2.4.0",
+    "coveralls": "^3.0.9",
+    "nyc": "^15.0.0",
+    "xo": "^0.25.3"
   },
   "nyc": {
     "reporter": [
