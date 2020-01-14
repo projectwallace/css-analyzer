@@ -32,10 +32,6 @@ test('it responds with the correct structure', t => {
         gzip: {
           totalBytes: 20,
           compressionRatio: 0
-        },
-        brotli: {
-          totalBytes: 1,
-          compressionRatio: 0
         }
       }
     },

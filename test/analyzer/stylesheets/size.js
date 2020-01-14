@@ -36,11 +36,3 @@ test('it calculates compressed size with gzip', t => {
 test('it calculates the compression ratio of gzip', t => {
   t.is(actual.compressed.gzip.compressionRatio, 0.17730496453900713)
 })
-
-test('it calculates compressed size with brotli', t => {
-  t.is(actual.compressed.brotli.totalBytes, 80)
-})
-
-test('it calculates the compression ratio of brotli', t => {
-  t.is(actual.compressed.brotli.compressionRatio, 0.43262411347517726)
-})
