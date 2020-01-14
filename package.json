@@ -36,7 +36,8 @@
     "space": true,
     "semicolon": false,
     "rules": {
-      "operator-linebreak": "off"
+      "operator-linebreak": "off",
+      "space-before-function-paren": "off"
     }
   },
   "prettier": {
