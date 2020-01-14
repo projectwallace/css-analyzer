@@ -17,10 +17,9 @@ module.exports = rules => {
     .filter(({selectors}) => selectors.length > 0)
     .sort((a, b) => {
       if (a.selectors.length === b.selectors.length) {
-        return compareStrings.caseInsensitive(
-          a.selectors.join(''),
-          b.selectors.join('')
-        )
+        return compareStrings(a.selectors.join(''), b.selectors.join(''), {
+          caseInsensitive: true
+        })
       }
 
       return a.selectors.length - b.selectors.length
