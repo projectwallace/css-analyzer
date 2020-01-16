@@ -7,7 +7,7 @@ module.exports = ({
   properties,
   values
 }) => {
-  const filesize = require('./size.js')(rawCss)
+  const size = require('./size.js')(rawCss)
   const simplicity = require('./simplicity.js')(rules, selectors)
   const cohesion = require('./cohesion.js')(rules)
   const browserhacks = require('./browserhacks.js')(
@@ -24,8 +24,7 @@ module.exports = ({
   })
 
   return {
-    size: filesize.uncompressed.totalBytes,
-    filesize,
+    size,
     simplicity,
     cohesion,
     browserhacks,

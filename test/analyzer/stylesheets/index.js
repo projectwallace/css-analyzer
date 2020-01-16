@@ -23,8 +23,7 @@ const FIXTURE = {
 
 test('it responds with the correct structure', t => {
   t.deepEqual(analyze(FIXTURE), {
-    size: 0,
-    filesize: {
+    size: {
       uncompressed: {
         totalBytes: 0
       },
