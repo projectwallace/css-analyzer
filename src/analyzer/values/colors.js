@@ -90,7 +90,7 @@ const normalizeColors = color => {
   }
 }
 
-const rmTmpProps = color => {
+const removeTemporaryProperties = color => {
   // Remove temporary props that were needed for analysis
   return {
     ...color,
@@ -111,7 +111,7 @@ const withDuplicateNotations = colors =>
     .filter(filterDuplicateColors)
     .map(addCount)
     .map(addMostCommonNotation)
-    .map(rmTmpProps)
+    .map(removeTemporaryProperties)
 
 module.exports = declarations => {
   const all = declarations

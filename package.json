@@ -78,10 +78,10 @@
     "vendor-prefixes": "^1.0.0"
   },
   "devDependencies": {
-    "ava": "^2.4.0",
+    "ava": "^3.5.0",
     "coveralls": "^3.0.9",
     "nyc": "^15.0.0",
-    "xo": "^0.25.3"
+    "xo": "^0.28.0"
   },
   "nyc": {
     "reporter": [

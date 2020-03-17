@@ -32,6 +32,7 @@ test('basic declarations are parsed', async t => {
 })
 
 test('!important is parsed', async t => {
+  // eslint-disable-next-line unicorn/string-content
   const fixture = `html {
       color: red !important;
       content: '!important';
@@ -48,7 +49,8 @@ test('!important is parsed', async t => {
     },
     {
       property: 'content',
-      value: "'!important'", // eslint-disable-line quotes
+      // eslint-disable-next-line quotes
+      value: `'!important'`, // eslint-disable-line unicorn/string-content
       important: false
     },
     {

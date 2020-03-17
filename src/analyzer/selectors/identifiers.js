@@ -35,7 +35,7 @@ module.exports = selectors => {
 
   const totalIdentifiers = identifiersPerSelector
     .map(({count}) => count)
-    .reduce((prev, curr) => prev + curr, 0)
+    .reduce((total, current) => total + current, 0)
 
   const sorted = identifiersPerSelector.sort(sortByIdentifiersCount)
   const [max] = sorted

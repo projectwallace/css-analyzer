@@ -16,6 +16,7 @@ const fileNames = [
 ]
 
 fileNames.forEach(fileName => {
+  // eslint-disable-next-line unicorn/string-content
   test(`It doesn't fail on real-life CSS - ${fileName}`, async t => {
     const css = await readFileAsync(join(__dirname, `${fileName}.css`), 'utf8')
     await t.notThrowsAsync(() => analyze(css))

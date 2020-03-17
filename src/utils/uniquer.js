@@ -14,7 +14,7 @@ module.exports = (values, sortFn) => {
     }, new Map())
   ].map(([value, count]) => ({value, count}))
 
-  const sorted = reduced.map(el => el.value).sort(sortFn)
+  const sorted = reduced.map(element => element.value).sort(sortFn)
   const unique = sorted.map(value => reduced.find(r => r.value === value))
 
   return {
