@@ -54,7 +54,7 @@
     ]
   },
   "dependencies": {
-    "color-sorter": "^4.0.0",
+    "color-sorter": "^4.0.1",
     "css-at-supports-browser-h4cks-analyzer": "^2.0.0",
     "css-media-query-browser-h4cks-analyzer": "^2.0.0",
     "css-property-browser-h4cks-analyzer": "^2.0.0",
@@ -68,20 +68,20 @@
     "gzip-size": "^5.1.1",
     "is-vendor-prefixed": "^3.3.1",
     "path": "^0.12.7",
-    "postcss": "^7.0.26",
-    "postcss-values-parser": "^3.0.5",
+    "postcss": "^7.0.27",
+    "postcss-values-parser": "^3.1.1",
     "specificity": "^0.4.1",
     "split-css-value": "^0.1.1",
     "split-lines": "^2.0.0",
-    "string-natural-compare": "^3.0.0",
+    "string-natural-compare": "^3.0.1",
     "tinycolor2": "^1.4.1",
     "vendor-prefixes": "^1.0.0"
   },
   "devDependencies": {
-    "ava": "^2.4.0",
+    "ava": "^3.5.0",
     "coveralls": "^3.0.9",
     "nyc": "^15.0.0",
-    "xo": "^0.25.3"
+    "xo": "^0.28.0"
   },
   "nyc": {
     "reporter": [

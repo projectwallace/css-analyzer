@@ -3,24 +3,24 @@ const uniquer = require('../../utils/uniquer')
 const {KEYWORDS} = require('../../utils/css')
 
 module.exports = declarations => {
-  const all = declarations.reduce((prev, {property, value}) => {
+  const all = declarations.reduce((previous, {property, value}) => {
     if (KEYWORDS.includes(value)) {
-      return prev
+      return previous
     }
 
     if (property === 'font-family') {
-      prev = [...prev, value]
+      previous = [...previous, value]
     }
 
     if (property === 'font') {
       const expanded = expand('font', value)
 
       if (expanded) {
-        prev = [...prev, expanded['font-family']]
+        previous = [...previous, expanded['font-family']]
       }
     }
 
-    return prev
+    return previous
   }, [])
 
   return {

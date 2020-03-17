@@ -1,8 +1,8 @@
 const flat = require('flat')
 const parser = require('../parser')
 
-function flattenObject(obj) {
-  return flat(obj, {safe: true})
+function flattenObject(object) {
+  return flat(object, {safe: true})
 }
 
 module.exports = async rawCss => {
