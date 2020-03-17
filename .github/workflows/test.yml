@@ -27,4 +27,3 @@ jobs:
       - run: npm test
         env:
           CI: true
-      - run: cat coverage/lcov.info | ./node_modules/.bin/coveralls
