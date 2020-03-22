@@ -6,7 +6,6 @@ module.exports = selectors => {
   const universal = require('./universal.js')(all)
   const accessibility = require('./accessibility.js')(all)
   const specificity = require('./specificity.js')(all)
-  const identifiers = require('./identifiers.js')(all)
   const complexity = require('./complexity.js')(all)
   const browserhacks = require('./browserhacks.js')(all)
 
@@ -18,7 +17,6 @@ module.exports = selectors => {
     universal,
     accessibility,
     specificity,
-    identifiers,
     complexity,
     browserhacks
   }

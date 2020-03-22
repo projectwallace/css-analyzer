@@ -10,7 +10,6 @@ test('it responds with the correct structure', t => {
 
   t.is(typeof actual.accessibility, 'object')
   t.is(typeof actual.specificity, 'object')
-  t.is(typeof actual.identifiers, 'object')
   t.is(typeof actual.js, 'object')
   t.is(typeof actual.id, 'object')
   t.is(typeof actual.universal, 'object')
