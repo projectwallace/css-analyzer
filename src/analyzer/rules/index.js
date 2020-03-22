@@ -39,10 +39,6 @@ module.exports = rules => {
       total: empty.length
     },
     selectors: {
-      /** @deprecated */
-      min: total === 0 ? 0 : ruleWithLeastSelectors.selectors.length,
-      /** @deprecated */
-      max: total === 0 ? 0 : ruleWithMostSelectors.selectors.length,
       average: averageSelectorsPerRule,
       minimum: {
         count: total === 0 ? 0 : ruleWithLeastSelectors.selectors.length,

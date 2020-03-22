@@ -112,8 +112,6 @@ analyze(`
   "atrules.supports.browserhacks.totalUnique": 0,
   "rules.total": 2,
   "rules.empty.total": 0,
-  "rules.selectors.min": 1,
-  "rules.selectors.max": 1,
   "rules.selectors.average": 1,
   "rules.selectors.minimum.count": 1,
   "rules.selectors.minimum.value": [
