@@ -176,19 +176,6 @@ analyze(`
       }
     }
   ],
-  "selectors.identifiers.average": 1.5,
-  "selectors.identifiers.max.value": ".component[data-state=\"loading\"]",
-  "selectors.identifiers.max.count": 2,
-  "selectors.identifiers.top": [
-    {
-      "value": ".component[data-state=\"loading\"]",
-      "count": 2
-    },
-    {
-      "value": "p",
-      "count": 1
-    }
-  ],
   "selectors.complexity.max.value": 3,
   "selectors.complexity.max.selectors": [
     {
