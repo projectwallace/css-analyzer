@@ -71,8 +71,6 @@ test('it returns the correct analysis object structure', async t => {
     'properties.unique': [],
     'rules.total': 1,
     'rules.empty.total': 1,
-    'rules.selectors.max': 1,
-    'rules.selectors.min': 1,
     'rules.selectors.average': 1,
     'rules.selectors.maximum.count': 1,
     'rules.selectors.maximum.value': ['foo'],

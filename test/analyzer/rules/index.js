@@ -10,12 +10,10 @@ test('it responds with the correct structure', t => {
       total: 0
     },
     selectors: {
-      min: 0 /** @deprecated */,
       minimum: {
         count: 0,
         value: []
       },
-      max: 0 /** @deprecated */,
       maximum: {
         count: 0,
         value: []
@@ -85,30 +83,4 @@ test('it sorts the minimum selectors per rule by string length and alphabeticall
 
   t.is(actual.selectors.minimum.count, 1)
   t.deepEqual(actual.selectors.minimum.value, ['A'])
-})
-
-/**
- * @deprecated in v3.0.0
- */
-test('it counts the min selectors per rule', t => {
-  const actual = analyze([
-    {selectors: ['a', 'b', 'c', 'd'], declarations: []},
-    {selectors: ['a'], declarations: []}
-  ])
-  const expected = 1
-
-  t.is(actual.selectors.min, expected)
-})
-
-/**
- * @deprecated v3.0.0
- */
-test('it counts the max selectors per rule', t => {
-  const actual = analyze([
-    {selectors: ['a', 'b', 'c', 'd'], declarations: []},
-    {selectors: ['a'], declarations: []}
-  ])
-  const expected = 4
-
-  t.is(actual.selectors.max, expected)
 })
