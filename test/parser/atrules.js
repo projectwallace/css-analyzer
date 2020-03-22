@@ -42,13 +42,14 @@ test('atRules are found correctly', async t => {
 })
 
 test('@font-face atRules have declarations', async t => {
-  const {atRules: actual} = await parser(`
+  const fixture = `
     @font-face {
       src: url(MOCK_URL);
-      font-family: 'MOCK';
+      font-family: "MOCK";
       font-weight: normal;
     }
-  `)
+  `
+  const {atRules: actual} = await parser(fixture)
 
   const expected = [
     {
@@ -56,7 +57,7 @@ test('@font-face atRules have declarations', async t => {
       params: '',
       declarations: [
         {property: 'src', value: 'url(MOCK_URL)', important: false},
-        {property: 'font-family', value: "'MOCK'", important: false},
+        {property: 'font-family', value: '"MOCK"', important: false},
         {property: 'font-weight', value: 'normal', important: false}
       ]
     }
