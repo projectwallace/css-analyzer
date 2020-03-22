@@ -1,0 +1,47 @@
+[
+  {
+    "name": "🐛 defect",
+    "color": "b62020",
+    "description": "Something isn't working as expected"
+  },
+  {
+    "name": "🚨 breaking change",
+    "color": "b62020",
+    "description": "changes that require a major version bump"
+  },
+  {
+    "name": "📚 dependencies",
+    "color": "0854c4",
+    "description": "pull requests that update a dependency file"
+  },
+  {
+    "name": "👯‍♂️ duplicate",
+    "color": "9eacb3",
+    "description": "this issue or pull request already exists"
+  },
+  {
+    "name": "✨ enhancement",
+    "color": "29c87d",
+    "description": "New feature or request"
+  },
+  {
+    "name": "🚸 help wanted",
+    "color": "0854c4",
+    "description": "issue needs help"
+  },
+  {
+    "name": "🗣 feedback wanted",
+    "color": "0854c4",
+    "description": "community feedback wanted"
+  },
+  {
+    "name": "⚠️ tests",
+    "color": "f10e69",
+    "description": "issues regarding test suite"
+  },
+  {
+    "name": "🛑 wontfix",
+    "color": "f8f8f8",
+    "description": "not in scope of this package or can be achieved otherwise"
+  }
+]
