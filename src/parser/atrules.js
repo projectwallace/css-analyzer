@@ -1,23 +1,20 @@
-const AT_RULES_WITH_DESCRIPTORS = ['font-face']
+const declarations = require('./declarations')
 
-function addDescriptorsToAtRuleFromTree(atRule, tree) {
-  if (!AT_RULES_WITH_DESCRIPTORS.includes(atRule.type)) {
+const AT_RULES_WITH_DECLARATIONS = ['font-face']
+
+function addDeclarations(atRule, tree) {
+  if (!AT_RULES_WITH_DECLARATIONS.includes(atRule.type)) {
     return atRule
   }
 
-  const descriptors = {}
-  tree.walkDecls(declaration => {
-    descriptors[declaration.prop] = declaration.value
-  })
-
   return {
     ...atRule,
-    descriptors
+    declarations: declarations(tree)
   }
 }
 
 module.exports = tree => {
-  const atrules = []
+  const atRules = []
 
   tree.walkAtRules(rule => {
     const atRule = {
@@ -25,10 +22,10 @@ module.exports = tree => {
       params: rule.params.trim()
     }
 
-    return atrules.push(addDescriptorsToAtRuleFromTree(atRule, rule))
+    return atRules.push(addDeclarations(atRule, rule))
   })
 
-  return atrules
+  return atRules
 }
 
 module.exports.isKeyframes = rule => {

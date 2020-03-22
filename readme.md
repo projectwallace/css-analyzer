@@ -28,156 +28,269 @@ yarn add @projectwallace/css-analyzer
 
 ## Usage
 
-```js
+````js
 const analyze = require('@projectwallace/css-analyzer');
 
-analyze('foo{}')
+analyze(`
+	p {
+		color: blue;
+		font-size: 100%;
+	}
+
+	.component[data-state="loading"] {
+		background-color: whitesmoke;
+	}
+`)
   .then(result => console.log(result))
   .catch(error => console.error(error))
 }
-
-//=>
-// {
-//   'atrules.charsets.total': 0,
-//   'atrules.charsets.totalUnique': 0,
-//   'atrules.charsets.unique': [],
-//   'atrules.documents.total': 0,
-//   'atrules.documents.totalUnique': 0,
-//   'atrules.documents.unique': [],
-//   'atrules.fontfaces.total': 0,
-//   'atrules.fontfaces.totalUnique': 0,
-//   'atrules.fontfaces.unique': [],
-//   'atrules.imports.total': 0,
-//   'atrules.imports.totalUnique': 0,
-//   'atrules.imports.unique': [],
-//   'atrules.keyframes.total': 0,
-//   'atrules.keyframes.totalUnique': 0,
-//   'atrules.keyframes.unique': [],
-//   'atrules.keyframes.prefixed.total': 0,
-//   'atrules.keyframes.prefixed.totalUnique': 0,
-//   'atrules.keyframes.prefixed.unique': [],
-//   'atrules.keyframes.prefixed.share': 0,
-//   'atrules.mediaqueries.total': 0,
-//   'atrules.mediaqueries.totalUnique': 0,
-//   'atrules.mediaqueries.unique': [],
-//   'atrules.mediaqueries.browserhacks.total': 0,
-//   'atrules.mediaqueries.browserhacks.unique': [],
-//   'atrules.mediaqueries.browserhacks.totalUnique': 0,
-//   'atrules.namespaces.total': 0,
-//   'atrules.namespaces.totalUnique': 0,
-//   'atrules.namespaces.unique': [],
-//   'atrules.pages.total': 0,
-//   'atrules.pages.totalUnique': 0,
-//   'atrules.pages.unique': [],
-//   'atrules.supports.total': 0,
-//   'atrules.supports.totalUnique': 0,
-//   'atrules.supports.unique': [],
-//   'atrules.supports.browserhacks.total': 0,
-//   'atrules.supports.browserhacks.unique': [],
-//   'atrules.supports.browserhacks.totalUnique': 0,
-//   'declarations.importants.share': 0,
-//   'declarations.importants.total': 0,
-//   'declarations.total': 0,
-//   'declarations.totalUnique': 0,
-//   'properties.prefixed.share': 0,
-//   'properties.prefixed.total': 0,
-//   'properties.prefixed.totalUnique': 0,
-//   'properties.prefixed.unique': [],
-//   'properties.browserhacks.total': 0,
-//   'properties.browserhacks.unique': [],
-//   'properties.browserhacks.totalUnique': 0,
-//   'properties.total': 0,
-//   'properties.totalUnique': 0,
-//   'properties.unique': [],
-//   'rules.total': 1,
-//   'rules.empty.total': 1,
-//   'rules.selectors.max': 1,
-//   'rules.selectors.min': 1,
-//   'rules.selectors.minimum.count': 1,
-//   'rules.selectors.minimum.value': ['foo'],
-//   'rules.selectors.maximum.count': 1,
-//   'rules.selectors.maximum.value': ['foo'],
-//   'rules.selectors.average': 1,
-//   'selectors.accessibility.total': 0,
-//   'selectors.accessibility.totalUnique': 0,
-//   'selectors.accessibility.unique': [],
-//   'selectors.id.total': 0,
-//   'selectors.id.totalUnique': 0,
-//   'selectors.id.unique': [],
-//   'selectors.identifiers.average': 1,
-//   'selectors.identifiers.top': [{count: 1, value: 'foo'}],
-//   'selectors.identifiers.max.count': 1,
-//   'selectors.identifiers.max.value': 'foo',
-//   'selectors.js.total': 0,
-//   'selectors.js.totalUnique': 0,
-//   'selectors.js.unique': [],
-//   'selectors.specificity.top': [
-//     {value: 'foo', specificity: {a: 0, b: 0, c: 0, d: 1}}
-//   ],
-//   'selectors.total': 1,
-//   'selectors.totalUnique': 1,
-//   'selectors.universal.total': 0,
-//   'selectors.universal.totalUnique': 0,
-//   'selectors.universal.unique': [],
-//   'selectors.browserhacks.total': 0,
-//   'selectors.browserhacks.unique': [],
-//   'selectors.browserhacks.totalUnique': 0,
-//   'selectors.complexity.average': 1,
-//   'selectors.complexity.max.count': 1,
-//   'selectors.complexity.max.value': 1,
-//   'selectors.complexity.max.selectors': [{value: 'foo', count: 1}],
-//   'selectors.complexity.max.count': 1,
-//   'selectors.complexity.sum': 1,
-//   'selectors.complexity.unique': [{value: 1, count: 1}],
-//   'selectors.complexity.totalUnique': 1,
-//   'stylesheets.cohesion.average': 0,
-//   'stylesheets.cohesion.min.count': 0,
-//   'stylesheets.cohesion.min.value': null,
-//   'stylesheets.filesize.compressed.brotli.compressionRatio': -0.8,
-//   'stylesheets.filesize.compressed.brotli.totalBytes': 9,
-//   'stylesheets.filesize.compressed.gzip.compressionRatio': -4,
-//   'stylesheets.filesize.compressed.gzip.totalBytes': 25,
-//   'stylesheets.filesize.uncompressed.totalBytes': 5,
-//   'stylesheets.linesOfCode.sourceLinesOfCode.total': 1,
-//   'stylesheets.linesOfCode.total': 1,
-//   'stylesheets.simplicity': 1,
-//   'stylesheets.size': 5,
-//   'stylesheets.browserhacks.total': 0,
-//   'stylesheets.browserhacks.totalUnique': 0,
-//   'values.animations.durations.total': 0,
-//   'values.animations.durations.totalUnique': 0,
-//   'values.animations.durations.unique': [],
-//   'values.animations.timingFunctions.total': 0,
-//   'values.animations.timingFunctions.totalUnique': 0,
-//   'values.animations.timingFunctions.unique': [],
-//   'values.boxshadows.total': 0,
-//   'values.boxshadows.unique': [],
-//   'values.boxshadows.totalUnique': 0,
-//   'values.browserhacks.total': 0,
-//   'values.browserhacks.unique': [],
-//   'values.browserhacks.totalUnique': 0,
-//   'values.colors.total': 0,
-//   'values.colors.totalUnique': 0,
-//   'values.colors.unique': [],
-//   'values.colors.duplicates.total': 0,
-//   'values.colors.duplicates.totalUnique': 0,
-//   'values.colors.duplicates.unique': [],
-//   'values.fontfamilies.total': 0,
-//   'values.fontfamilies.totalUnique': 0,
-//   'values.fontfamilies.unique': [],
-//   'values.fontsizes.total': 0,
-//   'values.fontsizes.totalUnique': 0,
-//   'values.fontsizes.unique': [],
-//   'values.zindexes.total': 0,
-//   'values.zindexes.unique': [],
-//   'values.zindexes.totalUnique': 0,
-//   'values.prefixed.share': 0,
-//   'values.prefixed.total': 0,
-//   'values.prefixed.totalUnique': 0,
-//   'values.prefixed.unique': [],
-//   'values.total': 0
-// }
 ```
+
+```json
+{
+  "stylesheets.size.uncompressed.totalBytes": 115,
+  "stylesheets.size.compressed.gzip.totalBytes": 121,
+  "stylesheets.size.compressed.gzip.compressionRatio": -0.05217391304347818,
+  "stylesheets.simplicity": 1,
+  "stylesheets.cohesion.average": 1.5,
+  "stylesheets.cohesion.min.count": 2,
+  "stylesheets.cohesion.min.value.declarations": [
+    {
+      "property": "color",
+      "value": "blue",
+      "important": false
+    },
+    {
+      "property": "font-size",
+      "value": "100%",
+      "important": false
+    }
+  ],
+  "stylesheets.cohesion.min.value.selectors": [
+    "p"
+  ],
+  "stylesheets.browserhacks.total": 0,
+  "stylesheets.browserhacks.totalUnique": 0,
+  "stylesheets.linesOfCode.total": 10,
+  "stylesheets.linesOfCode.sourceLinesOfCode.total": 5,
+  "atrules.charsets.total": 0,
+  "atrules.charsets.unique": [],
+  "atrules.charsets.totalUnique": 0,
+  "atrules.documents.total": 0,
+  "atrules.documents.unique": [],
+  "atrules.documents.totalUnique": 0,
+  "atrules.fontfaces.total": 0,
+  "atrules.fontfaces.unique": [],
+  "atrules.fontfaces.totalUnique": 0,
+  "atrules.imports.total": 0,
+  "atrules.imports.unique": [],
+  "atrules.imports.totalUnique": 0,
+  "atrules.keyframes.total": 0,
+  "atrules.keyframes.unique": [],
+  "atrules.keyframes.totalUnique": 0,
+  "atrules.keyframes.prefixed.total": 0,
+  "atrules.keyframes.prefixed.unique": [],
+  "atrules.keyframes.prefixed.totalUnique": 0,
+  "atrules.keyframes.prefixed.share": 0,
+  "atrules.mediaqueries.total": 0,
+  "atrules.mediaqueries.unique": [],
+  "atrules.mediaqueries.totalUnique": 0,
+  "atrules.mediaqueries.browserhacks.total": 0,
+  "atrules.mediaqueries.browserhacks.unique": [],
+  "atrules.mediaqueries.browserhacks.totalUnique": 0,
+  "atrules.namespaces.total": 0,
+  "atrules.namespaces.unique": [],
+  "atrules.namespaces.totalUnique": 0,
+  "atrules.pages.total": 0,
+  "atrules.pages.unique": [],
+  "atrules.pages.totalUnique": 0,
+  "atrules.supports.total": 0,
+  "atrules.supports.unique": [],
+  "atrules.supports.totalUnique": 0,
+  "atrules.supports.browserhacks.total": 0,
+  "atrules.supports.browserhacks.unique": [],
+  "atrules.supports.browserhacks.totalUnique": 0,
+  "rules.total": 2,
+  "rules.empty.total": 0,
+  "rules.selectors.min": 1,
+  "rules.selectors.max": 1,
+  "rules.selectors.average": 1,
+  "rules.selectors.minimum.count": 1,
+  "rules.selectors.minimum.value": [
+    ".component[data-state=\"loading\"]"
+  ],
+  "rules.selectors.maximum.count": 1,
+  "rules.selectors.maximum.value": [
+    "p"
+  ],
+  "selectors.total": 2,
+  "selectors.totalUnique": 2,
+  "selectors.js.total": 0,
+  "selectors.js.unique": [],
+  "selectors.js.totalUnique": 0,
+  "selectors.id.total": 0,
+  "selectors.id.unique": [],
+  "selectors.id.totalUnique": 0,
+  "selectors.universal.total": 0,
+  "selectors.universal.unique": [],
+  "selectors.universal.totalUnique": 0,
+  "selectors.accessibility.total": 0,
+  "selectors.accessibility.unique": [],
+  "selectors.accessibility.totalUnique": 0,
+  "selectors.specificity.top": [
+    {
+      "count": 1,
+      "value": ".component[data-state=\"loading\"]",
+      "specificity": {
+        "a": 0,
+        "b": 0,
+        "c": 2,
+        "d": 0
+      }
+    },
+    {
+      "count": 1,
+      "value": "p",
+      "specificity": {
+        "a": 0,
+        "b": 0,
+        "c": 0,
+        "d": 1
+      }
+    }
+  ],
+  "selectors.specificity.max.value.a": 0,
+  "selectors.specificity.max.value.b": 0,
+  "selectors.specificity.max.value.c": 2,
+  "selectors.specificity.max.value.d": 0,
+  "selectors.specificity.max.count": 1,
+  "selectors.specificity.max.selectors": [
+    {
+      "count": 1,
+      "value": ".component[data-state=\"loading\"]",
+      "specificity": {
+        "a": 0,
+        "b": 0,
+        "c": 2,
+        "d": 0
+      }
+    }
+  ],
+  "selectors.identifiers.average": 1.5,
+  "selectors.identifiers.max.value": ".component[data-state=\"loading\"]",
+  "selectors.identifiers.max.count": 2,
+  "selectors.identifiers.top": [
+    {
+      "value": ".component[data-state=\"loading\"]",
+      "count": 2
+    },
+    {
+      "value": "p",
+      "count": 1
+    }
+  ],
+  "selectors.complexity.max.value": 3,
+  "selectors.complexity.max.selectors": [
+    {
+      "value": ".component[data-state=\"loading\"]",
+      "count": 1
+    }
+  ],
+  "selectors.complexity.max.count": 1,
+  "selectors.complexity.average": 2,
+  "selectors.complexity.sum": 4,
+  "selectors.complexity.unique": [
+    {
+      "value": 1,
+      "count": 1
+    },
+    {
+      "value": 3,
+      "count": 1
+    }
+  ],
+  "selectors.complexity.totalUnique": 2,
+  "selectors.browserhacks.total": 0,
+  "selectors.browserhacks.unique": [],
+  "selectors.browserhacks.totalUnique": 0,
+  "declarations.total": 3,
+  "declarations.totalUnique": 3,
+  "declarations.importants.total": 0,
+  "declarations.importants.share": 0,
+  "properties.total": 3,
+  "properties.unique": [
+    {
+      "value": "background-color",
+      "count": 1
+    },
+    {
+      "value": "color",
+      "count": 1
+    },
+    {
+      "value": "font-size",
+      "count": 1
+    }
+  ],
+  "properties.totalUnique": 3,
+  "properties.prefixed.total": 0,
+  "properties.prefixed.unique": [],
+  "properties.prefixed.totalUnique": 0,
+  "properties.prefixed.share": 0,
+  "properties.browserhacks.total": 0,
+  "properties.browserhacks.unique": [],
+  "properties.browserhacks.totalUnique": 0,
+  "values.total": 3,
+  "values.prefixed.total": 0,
+  "values.prefixed.unique": [],
+  "values.prefixed.totalUnique": 0,
+  "values.prefixed.share": 0,
+  "values.fontsizes.total": 1,
+  "values.fontsizes.unique": [
+    {
+      "value": "100%",
+      "count": 1
+    }
+  ],
+  "values.fontsizes.totalUnique": 1,
+  "values.fontfamilies.total": 0,
+  "values.fontfamilies.unique": [],
+  "values.fontfamilies.totalUnique": 0,
+  "values.colors.total": 2,
+  "values.colors.unique": [
+    {
+      "value": "blue",
+      "count": 1
+    },
+    {
+      "value": "whitesmoke",
+      "count": 1
+    }
+  ],
+  "values.colors.totalUnique": 2,
+  "values.colors.duplicates.unique": [],
+  "values.colors.duplicates.totalUnique": 0,
+  "values.colors.duplicates.total": 0,
+  "values.browserhacks.total": 0,
+  "values.browserhacks.unique": [],
+  "values.browserhacks.totalUnique": 0,
+  "values.boxshadows.total": 0,
+  "values.boxshadows.unique": [],
+  "values.boxshadows.totalUnique": 0,
+  "values.textshadows.total": 0,
+  "values.textshadows.unique": [],
+  "values.textshadows.totalUnique": 0,
+  "values.zindexes.total": 0,
+  "values.zindexes.unique": [],
+  "values.zindexes.totalUnique": 0,
+  "values.animations.durations.total": 0,
+  "values.animations.durations.unique": [],
+  "values.animations.durations.totalUnique": 0,
+  "values.animations.timingFunctions.total": 0,
+  "values.animations.timingFunctions.unique": [],
+  "values.animations.timingFunctions.totalUnique": 0
+}
+````
 
 ## Related projects
 
