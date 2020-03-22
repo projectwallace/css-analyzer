@@ -41,21 +41,27 @@ test('atRules are found correctly', async t => {
   t.deepEqual(actual, expected)
 })
 
-test('descriptors in @font-face are parsed to descriptors and not declarations', async t => {
+test('@font-face atRules have declarations', async t => {
   const fixture = `
     @font-face {
-      src: url("http://example.com");
-      font-family: MyFont;
+      src: url(MOCK_URL);
+      font-family: "MOCK";
+      font-weight: normal;
     }
   `
-  const {
-    atRules: [fontface]
-  } = await parser(fixture)
-  const expected = {
-    src: 'url("http://example.com")',
-    'font-family': 'MyFont'
-  }
+  const {atRules: actual} = await parser(fixture)
 
-  t.deepEqual(fontface.descriptors, expected)
-  t.is(typeof fontface.declarations, 'undefined')
+  const expected = [
+    {
+      type: 'font-face',
+      params: '',
+      declarations: [
+        {property: 'src', value: 'url(MOCK_URL)', important: false},
+        {property: 'font-family', value: '"MOCK"', important: false},
+        {property: 'font-weight', value: 'normal', important: false}
+      ]
+    }
+  ]
+
+  t.deepEqual(actual, expected)
 })
