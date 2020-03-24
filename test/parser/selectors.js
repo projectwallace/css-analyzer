@@ -32,3 +32,17 @@ test('"selectors" in @keyframes are not passed as actual selectors', async t => 
 
   t.deepEqual(actual, expected)
 })
+
+test('it ignores trailing commas in selectorLists', async t => {
+  const fixture = `
+    html,
+    body, {
+      color: red;
+    }
+  `
+
+  const {selectors: actual} = await parser(fixture)
+  const expected = ['html', 'body']
+
+  t.deepEqual(actual, expected)
+})
