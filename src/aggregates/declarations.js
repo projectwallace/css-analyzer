@@ -1,27 +1,12 @@
-const FORMATS = {
-	STRING: 'string',
-	RATIO: 'ratio',
-	FILESIZE: 'filesize',
-	COUNT: 'integer',
-}
+const { FORMATS, AGGREGATES } = require('./_types')
 
-const AGGREGATES = {
-	SUM: 'sum',
-	AVERAGE: 'average',
-	MAX: 'max',
-	MIN: 'min',
-	LIST: 'list',
-}
-
-module.exports = ({ atrules, rules }) => {
+module.exports = ({ rules }) => {
 	const declarations = rules
 		.map((rule) => rule.declarations)
 		.reduce((all, current) => all.concat(current), [])
 
-	const unique = new Set(declarations.map((declaration) => declaration.key))
-	const importants = declarations.filter(
-		(declaration) => declaration.isImportant
-	)
+	const unique = new Set(declarations.map((d) => d.key))
+	const importants = declarations.filter((d) => d.isImportant)
 
 	return [
 		{
@@ -51,9 +36,8 @@ module.exports = ({ atrules, rules }) => {
 		{
 			id: 'declarations.important.ratio',
 			value: importants.length / declarations.length,
+			format: FORMATS.RATIO,
+			aggregate: AGGREGATES.AVERAGE,
 		},
-	].reduce((list, metric) => {
-		list[metric.id] = metric
-		return list
-	}, {})
+	]
 }

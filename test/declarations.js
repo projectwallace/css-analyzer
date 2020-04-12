@@ -81,12 +81,14 @@ test('it counts the total importants', (t) => {
 		one {
 			color: red;
 			color: red !important;
+			color: red     !important;
 			color:red;
 			color:red!important;
+			content: '!important';
 		}
 	`)
 
-	t.is(actual['declarations.important.total'].value, 2)
+	t.is(actual['declarations.important.total'].value, 3)
 })
 
 test('it calculates the ratio of importants', (t) => {
