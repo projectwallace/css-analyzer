@@ -1,4 +1,5 @@
 const csstree = require('css-tree')
+const isPropertyBrowserhack = require('is-property-browserhack')
 
 function withSelectorAnalysis(selector) {
 	return {
@@ -35,14 +36,15 @@ function stripSelector(selector) {
 }
 
 function withPropertyAnalysis(property) {
-	const prop = csstree.property(property.name)
+	const { custom, hack, vendor } = csstree.property(property.name)
 
 	return {
 		...property,
-		isBrowserHack: Boolean(prop.hack),
-		isVendorPrefixed: Boolean(prop.vendor),
-		isCustom: prop.custom,
+		isBrowserHack: hack || isPropertyBrowserhack(property.name),
+		isVendorPrefixed: Boolean(vendor),
+		isCustom: Boolean(custom),
 		complexity: -1,
+		key: property.name,
 	}
 }
 
@@ -52,6 +54,7 @@ function stripProperty(property) {
 		isVendorPrefixed,
 		isCustom,
 		complexity,
+		key,
 		...rest
 	} = property
 	return rest
@@ -135,6 +138,6 @@ module.exports = ({ atrules, rules }) => {
 module.exports.stripAtrule = stripAtrule
 module.exports.stripRule = stripRule
 module.exports.stripSelector = stripSelector
-module.exports.stripDeclaration = this.stripDeclaration
-module.exports.stripProperty = this.stripProperty
-module.exports.stripValue = this.stripValue
+module.exports.stripDeclaration = stripDeclaration
+module.exports.stripProperty = stripProperty
+module.exports.stripValue = stripValue
