@@ -19,6 +19,21 @@ function withSelectorAnalysis(selector) {
 	}
 }
 
+function stripSelector(selector) {
+	const {
+		specificity,
+		isBrowserHack,
+		isId,
+		isAccessibility,
+		isAttribute,
+		isUniversal,
+		isJavaScript,
+		complexity,
+		...rest
+	} = selector
+	return rest
+}
+
 function withPropertyAnalysis(property) {
 	const prop = csstree.property(property.name)
 
@@ -31,7 +46,22 @@ function withPropertyAnalysis(property) {
 	}
 }
 
+function stripProperty(property) {
+	const {
+		isBrowserHack,
+		isVendorPrefixed,
+		isCustom,
+		complexity,
+		...rest
+	} = property
+	return rest
+}
+
 function withValueAnalysis(value) {
+	return value
+}
+
+function stripValue(value) {
 	return value
 }
 
@@ -51,6 +81,15 @@ function withDeclarationAnalysis(declaration) {
 	}
 }
 
+function stripDeclaration(declaration) {
+	const { complexity, key, ...rest } = declaration
+	return {
+		...rest,
+		property: stripProperty(rest.property),
+		value: stripValue(rest.value),
+	}
+}
+
 function withAtruleAnalysis(atrule) {
 	return {
 		...atrule,
@@ -60,11 +99,29 @@ function withAtruleAnalysis(atrule) {
 	}
 }
 
+function stripAtrule(atrule) {
+	const { isVendorPrefixed, isBrowserHack, ...rest } = atrule
+	return {
+		...rest,
+		declarations: rest.declarations.map(stripDeclaration),
+	}
+}
+
 function withRuleAnalysis(rule) {
 	return {
 		...rule,
 		declarations: rule.declarations.map(withDeclarationAnalysis),
 		selectors: rule.selectors.map(withSelectorAnalysis),
+		isEmpty: rule.declarations.length === 0,
+	}
+}
+
+function stripRule(rule) {
+	const { isEmpty, ...rest } = rule
+	return {
+		...rest,
+		selectors: rest.selectors.map(stripSelector),
+		declarations: rest.declarations.map(stripDeclaration),
 	}
 }
 
@@ -74,3 +131,10 @@ module.exports = ({ atrules, rules }) => {
 		rules: rules.map(withRuleAnalysis),
 	}
 }
+
+module.exports.stripAtrule = stripAtrule
+module.exports.stripRule = stripRule
+module.exports.stripSelector = stripSelector
+module.exports.stripDeclaration = this.stripDeclaration
+module.exports.stripProperty = this.stripProperty
+module.exports.stripValue = this.stripValue

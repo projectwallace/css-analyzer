@@ -12,11 +12,17 @@ function property(str) {
 	}
 }
 
+function value(val) {
+	return {
+		value: val,
+	}
+}
+
 function declaration(decl) {
 	return {
 		isImportant: Boolean(decl.important),
 		property: property(decl.property),
-		value: decl.value.value,
+		value: value(decl.value.value),
 	}
 }
 

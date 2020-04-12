@@ -3,6 +3,12 @@ exports.FORMATS = {
 	RATIO: 'ratio',
 	FILESIZE: 'filesize',
 	COUNT: 'integer',
+	SELECTOR: 'selector',
+	DECLARATION: 'declaration',
+	PROPERTY: 'property',
+	VALUE: 'value',
+	RULE: 'rule',
+	ATRULE: 'atrule',
 }
 
 exports.AGGREGATES = {
