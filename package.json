@@ -25,25 +25,17 @@
     "styleguide",
     "metrics"
   ],
-  "main": "src/analyzer/index.js",
+  "main": "src/index.js",
   "files": [
     "src"
   ],
   "scripts": {
-    "test": "xo && nyc ava"
-  },
-  "xo": {
-    "space": true,
-    "semicolon": false,
-    "rules": {
-      "operator-linebreak": "off",
-      "space-before-function-paren": "off"
-    }
+    "test": "nyc ava"
   },
   "prettier": {
+    "useTabs": true,
     "semi": false,
     "singleQuote": true,
-    "bracketSpacing": false,
     "overrides": [
       {
         "files": "*.json",
@@ -55,23 +47,13 @@
   },
   "dependencies": {
     "color-sorter": "^4.0.1",
-    "css-at-supports-browser-h4cks-analyzer": "^2.0.0",
-    "css-media-query-browser-h4cks-analyzer": "^2.0.0",
-    "css-property-browser-h4cks-analyzer": "^2.0.0",
-    "css-selector-browser-h4cks-analyzer": "^2.0.0",
-    "css-selector-complexity": "^0.1.2",
     "css-shorthand-expand": "^1.2.0",
-    "css-time-sort": "^1.0.0",
+    "css-tree": "^1.0.0-alpha.39",
     "css-unit-sort": "^3.3.1",
-    "css-value-browser-h4cks-analyzer": "^2.0.0",
-    "flat": "^5.0.0",
     "gzip-size": "^5.1.1",
     "is-vendor-prefixed": "^3.3.1",
-    "path": "^0.12.7",
-    "postcss": "^7.0.27",
     "postcss-values-parser": "^3.1.1",
     "specificity": "^0.4.1",
-    "split-css-value": "^0.1.1",
     "split-lines": "^2.0.0",
     "string-natural-compare": "^3.0.1",
     "tinycolor2": "^1.4.1",
@@ -81,7 +63,7 @@
     "ava": "^3.5.0",
     "coveralls": "^3.0.9",
     "nyc": "^15.0.0",
-    "xo": "^0.28.0"
+    "prettier": "^2.0.4"
   },
   "nyc": {
     "reporter": [
