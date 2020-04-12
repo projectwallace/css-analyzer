@@ -1,5 +1,5 @@
 const test = require('ava')
-const analyze = require('../')
+const analyze = require('../../')
 
 test('uncompressed filesize', (t) => {
 	const actual = analyze(`a{}`)

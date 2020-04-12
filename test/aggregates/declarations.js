@@ -1,5 +1,5 @@
 const test = require('ava')
-const analyze = require('../')
+const analyze = require('../../')
 
 test('it does not throw an error when there are no declarations', (t) => {
 	t.notThrows(() => analyze(`a {}`))

@@ -34,7 +34,7 @@ function atrule(atr, { key, declarations }) {
 	}
 }
 
-module.exports = (css, options = {}) => {
+module.exports = (css, options) => {
 	let rules = []
 	let atrules = []
 

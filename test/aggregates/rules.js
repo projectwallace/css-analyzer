@@ -1,5 +1,5 @@
 const test = require('ava')
-const analyze = require('../')
+const analyze = require('../../')
 
 const fixture = `
 	rule1,
