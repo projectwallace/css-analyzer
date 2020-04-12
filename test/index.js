@@ -39,7 +39,7 @@ test('multiple selectors', (t) => {
 	`)
 
 	t.deepEqual(
-		actual.selectors.map((s) => s.value),
+		actual.rules.map((rule) => rule.selectors.map((s) => s.value)).flat(),
 		['.h1', 'h2']
 	)
 })
@@ -53,7 +53,7 @@ test('selector list with comments', (t) => {
 		}
 	`)
 	t.deepEqual(
-		actual.selectors.map((s) => s.value),
+		actual.rules.map((rule) => rule.selectors.map((s) => s.value)).flat(),
 		[
 			'#a',
 			`/* COMMENT */
@@ -69,7 +69,7 @@ test('selector with trailing comma', (t) => {
 		}
 	`)
 	t.deepEqual(
-		actual.selectors.map((s) => s.value),
+		actual.rules.map((rule) => rule.selectors.map((s) => s.value)).flat(),
 		['h1']
 	)
 })
@@ -86,7 +86,10 @@ test('declaration - importants', (t) => {
 		}
 
 		b{color:red!important}
-	`).declarations.map((d) => d.isImportant)
+	`)
+		.rules.map((r) => r.declarations)
+		.flat()
+		.map((d) => d.isImportant)
 
 	const expected = [false, true, true, true, true, false, true]
 	t.deepEqual(actual, expected)
@@ -100,7 +103,10 @@ test('properties', (t) => {
 			_background: green;
 			*zoom: 1;
 		}
-	`).declarations.map(({ property }) => property.name)
+	`)
+		.rules.map((r) => r.declarations)
+		.flat()
+		.map(({ property }) => property.name)
 
 	t.deepEqual(actual, ['color', '-webkit-box-shadow', '_background', '*zoom'])
 })
@@ -112,9 +118,11 @@ test('custom properties', (t) => {
 			font-size: var(--root);
 		}
 	`)
+		.rules.map((r) => r.declarations)
+		.flat()
 
-	t.true(actual.declarations[0].property.isCustom)
-	t.false(actual.declarations[1].property.isCustom)
+	t.true(actual[0].property.isCustom)
+	t.false(actual[1].property.isCustom)
 })
 
 test('rules - empty', (t) => {
