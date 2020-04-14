@@ -1,22 +1,25 @@
 const csstree = require('css-tree')
 const isPropertyBrowserhack = require('is-property-browserhack')
+const isSelectorBrowserHack = require('is-selector-browserhack')
 
 function withSelectorAnalysis(selector) {
+	const { value } = selector
+
 	return {
 		...selector,
 		stats: {
+			key: selector.value,
 			specificity: {
 				a: -1,
 				b: -1,
 				c: -1,
 				d: -1,
 			},
-			isBrowserHack: false,
-			isId: false,
-			isAttribute: false,
-			isUniversal: false,
-			isJavaScript: false,
-			isAccessibility: false,
+			isBrowserhack: isSelectorBrowserHack(value),
+			isId: /(?![^[]*])#/.test(value),
+			isUniversal: /(?![^[]*])\*/.test(value),
+			isJavaScript: /[.|#(?:=")]js/i.test(value),
+			isAccessibility: value.includes('[aria-') || value.includes('[role='),
 			complexity: -1,
 		},
 	}

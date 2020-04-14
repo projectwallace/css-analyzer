@@ -53,6 +53,7 @@
   },
   "dependencies": {
     "color-sorter": "^4.0.1",
+    "css-selector-parser": "^1.4.1",
     "css-shorthand-expand": "^1.2.0",
     "css-tree": "^1.0.0-alpha.39",
     "css-unit-sort": "^3.3.1",

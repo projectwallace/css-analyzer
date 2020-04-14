@@ -53,7 +53,7 @@ module.exports = (css, options) => {
 	csstree.walk(ast, {
 		visit: 'Rule',
 		enter(node, item, list) {
-			// SELECTORS
+			// SELECTORS IN RULESET
 			const _selectors = node.prelude.value
 				.split(',')
 				.filter(Boolean)
