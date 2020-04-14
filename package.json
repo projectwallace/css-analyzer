@@ -30,7 +30,7 @@
     "src"
   ],
   "scripts": {
-    "test": "nyc ava"
+    "test": "nyc ava -v"
   },
   "prettier": {
     "useTabs": true,
@@ -69,6 +69,13 @@
     "reporter": [
       "lcov",
       "text"
+    ]
+  },
+  "ava": {
+    "files": [
+      "test/**/*.js",
+      "src/node_modules/**/test.js",
+      "src/node_modules/**/test/*.js"
     ]
   }
 }
