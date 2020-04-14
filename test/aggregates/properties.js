@@ -59,7 +59,30 @@ test('it finds the unique properties', (t) => {
 	])
 })
 
-test('it finds vendor prefixed properties', (t) => {})
+test('it finds vendor prefixed properties', (t) => {
+	const actual = analyze(`
+		prefixes {
+			-webkit-color: 1;
+			-moz-box-shadow: 1;
+			-khtml-background: 1;
+		}
+
+		notPrefix {
+			color: 1;
+			--custom: 1;
+			-opacity: 1;
+		}
+	`)
+
+	t.is(actual['properties.prefixed.total'].value, 3)
+	t.is(actual['properties.prefixed.ratio'].value, 3 / 6)
+	t.is(actual['properties.prefixed.unique.total'].value, 3)
+	t.deepEqual(actual['properties.prefixed.unique'].value, [
+		{ count: 1, value: { name: '-webkit-color' } },
+		{ count: 1, value: { name: '-moz-box-shadow' } },
+		{ count: 1, value: { name: '-khtml-background' } },
+	])
+})
 
 test('it finds properties with browser hacks', (t) => {
 	const actual = analyze(`

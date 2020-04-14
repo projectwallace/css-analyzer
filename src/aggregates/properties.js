@@ -1,25 +1,11 @@
 const { FORMATS, AGGREGATES } = require('./_types')
-const { stripProperty } = require('../analyze')
-
-function uniqueWithCount(items) {
-	return [
-		...items.reduce((map, item) => {
-			const existingItem = map.get(item.key)
-			return map.set(item.key, {
-				count: (existingItem && existingItem.count + 1) || 1,
-				...item,
-			})
-		}, new Map()),
-	].map(([key, item]) => {
-		const { count, ...value } = item
-		return { count, value }
-	})
-}
+const { stripPropertyAnalysis } = require('../analyze')
+const uniqueWithCount = require('array-unique-with-count')
 
 function stripUnique(item) {
 	return {
 		...item,
-		value: stripProperty(item.value),
+		value: stripPropertyAnalysis(item.value),
 	}
 }
 
@@ -31,8 +17,13 @@ module.exports = ({ atrules, rules }) => {
 
 	const unique = uniqueWithCount(properties).map(stripUnique)
 
-	const browserhacks = properties.filter((p) => p.isBrowserHack)
+	// Browserhacks
+	const browserhacks = properties.filter((p) => p.stats.isBrowserHack)
 	const uniqueBrowserhacks = uniqueWithCount(browserhacks).map(stripUnique)
+
+	// Vendor prefixes
+	const vendorPrefixes = properties.filter((p) => p.stats.isVendorPrefixed)
+	const uniqueVendorPrefixes = uniqueWithCount(vendorPrefixes).map(stripUnique)
 
 	return [
 		{
@@ -61,19 +52,25 @@ module.exports = ({ atrules, rules }) => {
 		},
 		{
 			id: 'properties.prefixed.total',
-			value: void 0,
+			value: vendorPrefixes.length,
 			format: FORMATS.COUNT,
 			aggregate: AGGREGATES.SUM,
 		},
 		{
 			id: 'properties.prefixed.unique',
-			value: void 0,
+			value: uniqueVendorPrefixes,
 			format: FORMATS.PROPERTY,
 			aggregate: AGGREGATES.LIST,
 		},
 		{
+			id: 'properties.prefixed.unique.total',
+			value: uniqueVendorPrefixes.length,
+			format: FORMATS.COUNT,
+			aggregate: AGGREGATES.SUM,
+		},
+		{
 			id: 'properties.prefixed.ratio',
-			value: void 0,
+			value: vendorPrefixes.length / properties.length,
 			format: FORMATS.PROPERTY,
 			aggregate: AGGREGATES.LIST,
 		},

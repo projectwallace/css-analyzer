@@ -1,8 +1,8 @@
 const { FORMATS, AGGREGATES } = require('./_types')
-const { stripRule } = require('../analyze')
+const { stripRuleAnalysis } = require('../analyze')
 
 module.exports = ({ rules }) => {
-	const empty = rules.filter((r) => r.isEmpty)
+	const empty = rules.filter((r) => r.stats.isEmpty)
 	const declarations = rules
 		.map((rule) => rule.declarations)
 		.reduce((all, current) => all.concat(current), [])
@@ -75,7 +75,7 @@ module.exports = ({ rules }) => {
 		},
 		{
 			id: 'rules.selectors.maximum.selectors',
-			value: rulesWithMostSelectors.map(stripRule),
+			value: rulesWithMostSelectors.map(stripRuleAnalysis),
 			format: FORMATS.SELECTOR,
 			aggregate: AGGREGATES.LIST,
 		},
@@ -93,7 +93,7 @@ module.exports = ({ rules }) => {
 		},
 		{
 			id: 'rules.declarations.maximum.declarations',
-			value: rulesWithMostDeclarations.map(stripRule),
+			value: rulesWithMostDeclarations.map(stripRuleAnalysis),
 			format: FORMATS.DECLARATION,
 			aggregate: AGGREGATES.LIST,
 		},

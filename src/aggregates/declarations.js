@@ -5,7 +5,7 @@ module.exports = ({ rules }) => {
 		.map((rule) => rule.declarations)
 		.reduce((all, current) => all.concat(current), [])
 
-	const unique = new Set(declarations.map((d) => d.key))
+	const unique = new Set(declarations.map((d) => d.stats.key))
 	const importants = declarations.filter((d) => d.isImportant)
 
 	return [

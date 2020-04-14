@@ -4,34 +4,26 @@ const isPropertyBrowserhack = require('is-property-browserhack')
 function withSelectorAnalysis(selector) {
 	return {
 		...selector,
-		specificity: {
-			a: -1,
-			b: -1,
-			c: -1,
-			d: -1,
+		stats: {
+			specificity: {
+				a: -1,
+				b: -1,
+				c: -1,
+				d: -1,
+			},
+			isBrowserHack: false,
+			isId: false,
+			isAttribute: false,
+			isUniversal: false,
+			isJavaScript: false,
+			isAccessibility: false,
+			complexity: -1,
 		},
-		isBrowserHack: false,
-		isId: false,
-		isAttribute: false,
-		isUniversal: false,
-		isJavaScript: false,
-		isAccessibility: false,
-		complexity: -1,
 	}
 }
 
-function stripSelector(selector) {
-	const {
-		specificity,
-		isBrowserHack,
-		isId,
-		isAccessibility,
-		isAttribute,
-		isUniversal,
-		isJavaScript,
-		complexity,
-		...rest
-	} = selector
+function stripSelectorAnalysis(selector) {
+	const { stats, ...rest } = selector
 	return rest
 }
 
@@ -40,32 +32,31 @@ function withPropertyAnalysis(property) {
 
 	return {
 		...property,
-		isBrowserHack: hack || isPropertyBrowserhack(property.name),
-		isVendorPrefixed: Boolean(vendor),
-		isCustom: Boolean(custom),
-		complexity: -1,
-		key: property.name,
+		stats: {
+			isBrowserHack: hack || isPropertyBrowserhack(property.name),
+			isVendorPrefixed: Boolean(vendor),
+			isCustom: Boolean(custom),
+			complexity: -1,
+			key: property.name,
+		},
 	}
 }
 
-function stripProperty(property) {
-	const {
-		isBrowserHack,
-		isVendorPrefixed,
-		isCustom,
-		complexity,
-		key,
-		...rest
-	} = property
+function stripPropertyAnalysis(property) {
+	const { stats, ...rest } = property
 	return rest
 }
 
 function withValueAnalysis(value) {
-	return value
+	return {
+		...value,
+		stats: {},
+	}
 }
 
-function stripValue(value) {
-	return value
+function stripValueAnalysis(value) {
+	const { stats, ...rest } = value
+	return rest
 }
 
 function withDeclarationAnalysis(declaration) {
@@ -79,34 +70,38 @@ function withDeclarationAnalysis(declaration) {
 			...declaration.value,
 			...withValueAnalysis(declaration.value),
 		},
-		complexity: -1,
-		key: `${declaration.property.name}:${declaration.value}!${declaration.isImportant}`,
+		stats: {
+			complexity: -1,
+			key: `${declaration.property.name}:${declaration.value}!${declaration.isImportant}`,
+		},
 	}
 }
 
-function stripDeclaration(declaration) {
-	const { complexity, key, ...rest } = declaration
+function stripDeclarationAnalysis(declaration) {
+	const { stats, ...rest } = declaration
 	return {
 		...rest,
-		property: stripProperty(rest.property),
-		value: stripValue(rest.value),
+		property: stripPropertyAnalysis(rest.property),
+		value: stripValueAnalysis(rest.value),
 	}
 }
 
 function withAtruleAnalysis(atrule) {
 	return {
 		...atrule,
-		isVendorPrefixed: false,
-		isBrowserHack: false,
 		declarations: atrule.declarations.map(withDeclarationAnalysis),
+		stats: {
+			isVendorPrefixed: false,
+			isBrowserHack: false,
+		},
 	}
 }
 
-function stripAtrule(atrule) {
-	const { isVendorPrefixed, isBrowserHack, ...rest } = atrule
+function stripAtruleAnalysis(atrule) {
+	const { stats, ...rest } = atrule
 	return {
 		...rest,
-		declarations: rest.declarations.map(stripDeclaration),
+		declarations: rest.declarations.map(stripDeclarationAnalysis),
 	}
 }
 
@@ -115,16 +110,18 @@ function withRuleAnalysis(rule) {
 		...rule,
 		declarations: rule.declarations.map(withDeclarationAnalysis),
 		selectors: rule.selectors.map(withSelectorAnalysis),
-		isEmpty: rule.declarations.length === 0,
+		stats: {
+			isEmpty: rule.declarations.length === 0,
+		},
 	}
 }
 
-function stripRule(rule) {
-	const { isEmpty, ...rest } = rule
+function stripRuleAnalysis(rule) {
+	const { stats, ...rest } = rule
 	return {
 		...rest,
-		selectors: rest.selectors.map(stripSelector),
-		declarations: rest.declarations.map(stripDeclaration),
+		selectors: rest.selectors.map(stripSelectorAnalysis),
+		declarations: rest.declarations.map(stripDeclarationAnalysis),
 	}
 }
 
@@ -135,9 +132,9 @@ module.exports = ({ atrules, rules }) => {
 	}
 }
 
-module.exports.stripAtrule = stripAtrule
-module.exports.stripRule = stripRule
-module.exports.stripSelector = stripSelector
-module.exports.stripDeclaration = stripDeclaration
-module.exports.stripProperty = stripProperty
-module.exports.stripValue = stripValue
+module.exports.stripAtruleAnalysis = stripAtruleAnalysis
+module.exports.stripRuleAnalysis = stripRuleAnalysis
+module.exports.stripSelectorAnalysis = stripSelectorAnalysis
+module.exports.stripDeclarationAnalysis = stripDeclarationAnalysis
+module.exports.stripPropertyAnalysis = stripPropertyAnalysis
+module.exports.stripValueAnalysis = stripValueAnalysis
