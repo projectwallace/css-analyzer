@@ -23,7 +23,13 @@
     "parker",
     "performance",
     "styleguide",
-    "metrics"
+    "metrics",
+    "selector",
+    "value",
+    "declaration",
+    "property",
+    "rule",
+    "atrule"
   ],
   "main": "src/index.js",
   "files": [
