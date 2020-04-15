@@ -2,6 +2,7 @@ const csstree = require('css-tree')
 const isPropertyBrowserhack = require('is-property-browserhack')
 const isSelectorBrowserHack = require('is-selector-browserhack')
 const selectorComplexity = require('selector-complexity')
+const specificity = require('specificity')
 
 function withSelectorAnalysis(selector) {
 	const { value } = selector
@@ -17,12 +18,7 @@ function withSelectorAnalysis(selector) {
 		...selector,
 		stats: {
 			key: value,
-			specificity: {
-				a: -1,
-				b: -1,
-				c: -1,
-				d: -1,
-			},
+			specificity: specificity.calculate(value).shift().specificityArray,
 			isBrowserhack: isSelectorBrowserHack(value),
 			isId: /(?![^[]*])#/.test(value),
 			isUniversal: /(?![^[]*])\*/.test(value),

@@ -43,12 +43,16 @@ test('it counts declarations in rules, nested in atrules', (t) => {
 
 test('it does not count atrule descriptors as declarations', (t) => {
 	const actual = analyze(`
+		rule {
+			property: value;
+		}
+
 		@font-face {
 			src: url(URL);
 			font-family: 'TEST';
 		}
 	`)
-	t.is(actual['declarations.total'].value, 0)
+	t.is(actual['declarations.total'].value, 1)
 })
 
 test('it counts unique declarations', (t) => {

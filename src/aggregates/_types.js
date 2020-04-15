@@ -9,6 +9,7 @@ exports.FORMATS = {
 	VALUE: 'value',
 	RULE: 'rule',
 	ATRULE: 'atrule',
+	SPECIFICITY: 'specificity',
 }
 
 exports.AGGREGATES = {

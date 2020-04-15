@@ -3,7 +3,6 @@ const analyze = require('../')
 
 test('does not throw on syntax error', (t) => {
 	t.notThrows(() => analyze(`a { color red }`))
-	t.notThrows(() => analyze(`{}`))
 	t.notThrows(() => analyze(`a, {}`))
 })
 

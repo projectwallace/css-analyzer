@@ -1,6 +1,7 @@
 const { FORMATS, AGGREGATES } = require('./_types')
 const uniqueWithCount = require('array-unique-with-count')
 const { stripSelectorAnalysis } = require('../analyze')
+const specificity = require('specificity')
 
 function stripUnique(item) {
 	return {
@@ -52,6 +53,45 @@ module.exports = ({ atrules, rules }) => {
 	const complexitySum = selectors
 		.map((s) => s.stats.complexity)
 		.reduce((total, complexity) => (total += complexity), 0)
+
+	// Specificity
+	const specificitiesUnique = uniqueWithCount(
+		selectors.map((s) => ({
+			...s,
+			stats: {
+				...s.stats,
+				key: s.stats.specificity.join(','),
+			},
+		}))
+	).map(({ count, value }) => ({ count, value: value.stats.specificity }))
+
+	const [maxSpecificitySelector] = selectors.sort((a, b) =>
+		specificity.compare(b.value, a.value)
+	)
+	const maxSpecificity = maxSpecificitySelector.stats.specificity
+	const maxSpecificitySelectors = uniqueWithCount(
+		selectors.filter(
+			(s) => specificity.compare(s.stats.specificity, maxSpecificity) === 0
+		)
+	).map(stripUnique)
+	const totalSpecificity = selectors
+		.map((s) => s.stats.specificity)
+		.reduce(
+			(total, specificity) => {
+				total[0] += specificity[0]
+				total[1] += specificity[1]
+				total[2] += specificity[2]
+				total[3] += specificity[3]
+				return total
+			},
+			[0, 0, 0, 0]
+		)
+	const averageSpecificity = [
+		totalSpecificity[0] / selectors.length,
+		totalSpecificity[1] / selectors.length,
+		totalSpecificity[2] / selectors.length,
+		totalSpecificity[3] / selectors.length,
+	]
 
 	return [
 		{
@@ -233,6 +273,48 @@ module.exports = ({ atrules, rules }) => {
 			value: complexitiesUnique,
 			format: FORMATS.COUNT,
 			aggregate: AGGREGATES.LIST,
+		},
+		{
+			id: 'selectors.specificity.maximum.value',
+			value: maxSpecificity,
+			format: FORMATS.SPECIFICITY,
+			aggregate: AGGREGATES.MAX,
+		},
+		{
+			id: 'selectors.specificity.maximum.count',
+			value: maxSpecificitySelectors.length,
+			format: FORMATS.COUNT,
+			aggregate: AGGREGATES.SUM,
+		},
+		{
+			id: 'selectors.specificity.maximum.selectors',
+			value: maxSpecificitySelectors,
+			format: FORMATS.SELECTOR,
+			aggregate: AGGREGATES.LIST,
+		},
+		{
+			id: 'selectors.specificity.unique',
+			value: specificitiesUnique,
+			format: FORMATS.SPECIFICITY,
+			aggregate: AGGREGATES.LIST,
+		},
+		{
+			id: 'selectors.specificity.total_unique',
+			value: specificitiesUnique.length,
+			format: FORMATS.COUNT,
+			aggregate: AGGREGATES.SUM,
+		},
+		{
+			id: 'selectors.specificity.total',
+			value: totalSpecificity,
+			format: FORMATS.SPECIFICITY,
+			aggregate: AGGREGATES.SUM,
+		},
+		{
+			id: 'selectors.specificity.average',
+			value: averageSpecificity,
+			format: FORMATS.SPECIFICITY,
+			aggregate: AGGREGATES.AVERAGE,
 		},
 	]
 }

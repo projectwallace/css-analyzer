@@ -192,4 +192,43 @@ test('it reports complexity=1 for broken selectors', (t) => {
 	t.is(actual['selectors.complexity.total_unique'].value, 1)
 })
 
-test.todo('it reports selector specificity')
+test('it reports selector specificity', (t) => {
+	const actual = analyze(`
+		a,
+		a b,
+		a b c,
+		#a .b c,
+		a .b #c,
+		a #b .c
+		{}
+	`)
+
+	// Maximum
+	t.deepEqual(actual['selectors.specificity.maximum.value'].value, [0, 1, 1, 1])
+	t.deepEqual(actual['selectors.specificity.maximum.selectors'].value, [
+		{ value: '#a .b c', count: 1 },
+		{ value: 'a .b #c', count: 1 },
+		{ value: 'a #b .c', count: 1 },
+	])
+	t.is(actual['selectors.specificity.maximum.count'].value, 3)
+
+	// Uniques
+	t.deepEqual(actual['selectors.specificity.unique'].value, [
+		{ value: [0, 0, 0, 1], count: 1 },
+		{ value: [0, 0, 0, 2], count: 1 },
+		{ value: [0, 0, 0, 3], count: 1 },
+		{ value: [0, 1, 1, 1], count: 3 },
+	])
+	t.is(actual['selectors.specificity.total_unique'].value, 4)
+
+	// Average
+	t.deepEqual(actual['selectors.specificity.average'].value, [
+		0 / 6,
+		3 / 6,
+		3 / 6,
+		9 / 6,
+	])
+
+	// Total
+	t.deepEqual(actual['selectors.specificity.total'].value, [0, 3, 3, 9])
+})
