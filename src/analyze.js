@@ -1,14 +1,22 @@
 const csstree = require('css-tree')
 const isPropertyBrowserhack = require('is-property-browserhack')
 const isSelectorBrowserHack = require('is-selector-browserhack')
+const selectorComplexity = require('selector-complexity')
 
 function withSelectorAnalysis(selector) {
 	const { value } = selector
+	let complexity
+
+	try {
+		complexity = selectorComplexity(value)
+	} catch (error) {
+		complexity = 1
+	}
 
 	return {
 		...selector,
 		stats: {
-			key: selector.value,
+			key: value,
 			specificity: {
 				a: -1,
 				b: -1,
@@ -20,7 +28,7 @@ function withSelectorAnalysis(selector) {
 			isUniversal: /(?![^[]*])\*/.test(value),
 			isJavaScript: /[.|#(?:=")]js/i.test(value),
 			isAccessibility: value.includes('[aria-') || value.includes('[role='),
-			complexity: -1,
+			complexity,
 		},
 	}
 }

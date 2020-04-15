@@ -5,7 +5,7 @@ const { stripSelectorAnalysis } = require('../analyze')
 function stripUnique(item) {
 	return {
 		...item,
-		value: stripSelectorAnalysis(item.value),
+		value: stripSelectorAnalysis(item.value).value,
 	}
 }
 
@@ -34,6 +34,24 @@ module.exports = ({ atrules, rules }) => {
 	// Browser Hacks
 	const browserhacks = selectors.filter((s) => s.stats.isBrowserhack)
 	const browserhacksUnique = uniqueWithCount(browserhacks).map(stripUnique)
+
+	// Complexities
+	const complexities = selectors.map((s) => {
+		return {
+			value: s.stats.complexity,
+			stats: {
+				key: s.stats.complexity,
+			},
+		}
+	})
+	const complexitiesUnique = uniqueWithCount(complexities).map(stripUnique)
+	const maxComplexity = Math.max(...complexities.map((c) => c.value))
+	const maxComplexitySelectors = uniqueWithCount(
+		selectors.filter((s) => s.stats.complexity === maxComplexity)
+	).map(stripUnique)
+	const complexitySum = selectors
+		.map((s) => s.stats.complexity)
+		.reduce((total, complexity) => (total += complexity), 0)
 
 	return [
 		{
@@ -173,6 +191,48 @@ module.exports = ({ atrules, rules }) => {
 			value: browserhacks.length / selectors.length,
 			format: FORMATS.RATIO,
 			aggregate: AGGREGATES.RATIO,
+		},
+		{
+			id: 'selectors.complexity.maximum.value',
+			value: maxComplexity,
+			format: FORMATS.COUNT,
+			aggregate: AGGREGATES.SUM,
+		},
+		{
+			id: 'selectors.complexity.maximum.selectors',
+			value: maxComplexitySelectors,
+			format: FORMATS.SELECTOR,
+			aggregate: AGGREGATES.LIST,
+		},
+		{
+			id: 'selectors.complexity.maximum.count',
+			value: maxComplexitySelectors.length,
+			format: FORMATS.COUNT,
+			aggregate: AGGREGATES.SUM,
+		},
+		{
+			id: 'selectors.complexity.average',
+			value: complexitySum / selectors.length,
+			format: FORMATS.RATIO,
+			aggregate: AGGREGATES.AVERAGE,
+		},
+		{
+			id: 'selectors.complexity.total',
+			value: complexitySum,
+			format: FORMATS.COUNT,
+			aggregate: AGGREGATES.SUM,
+		},
+		{
+			id: 'selectors.complexity.total_unique',
+			value: complexitiesUnique.length,
+			format: FORMATS.COUNT,
+			aggregate: AGGREGATES.SUM,
+		},
+		{
+			id: 'selectors.complexity.unique',
+			value: complexitiesUnique,
+			format: FORMATS.COUNT,
+			aggregate: AGGREGATES.LIST,
 		},
 	]
 }
