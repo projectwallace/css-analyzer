@@ -28,7 +28,7 @@ yarn add @projectwallace/css-analyzer
 
 ## Usage
 
-````js
+```js
 const analyze = require('@projectwallace/css-analyzer');
 
 analyze(`
