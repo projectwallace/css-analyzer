@@ -31,6 +31,7 @@ test('it counts the total properties', (t) => {
 
 		@font-face {
 			notAProperty: -1;
+			src: fake;
 		}
 	`)
 
