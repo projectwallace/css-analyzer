@@ -44,9 +44,7 @@ module.exports = (css, options) => {
 		parseAtrulePrelude: false,
 		onParseError: function (error, fallbackNode) {
 			// optionally store the fallbackNode for reporting
-			if (options.throwOnSyntaxError) {
-				throw error
-			}
+			if (options.throwOnSyntaxError) throw error
 		},
 	})
 
@@ -81,6 +79,12 @@ module.exports = (css, options) => {
 	csstree.walk(ast, {
 		visit: 'Atrule',
 		enter(node) {
+			// Some Atrules don't have a body,
+			// don't try to get declarations from those
+			//
+			// Example: `@charset 'UTF-8';`
+			if (node.block === null) return
+
 			const declarations = csstree
 				.toPlainObject(node.block)
 				.children.filter((child) => child.type === 'Declaration')
