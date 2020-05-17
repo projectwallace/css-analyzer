@@ -23,7 +23,7 @@ test('it reports all selectors', (t) => {
 	`)
 
 	t.is(actual['selectors.total'].value, 5)
-	t.is(actual['selectors.total_unique'].value, 5)
+	t.is(actual['selectors.totalUnique'].value, 5)
 	t.deepEqual(actual['selectors.unique'].value, [
 		{ value: 'selector1', count: 1 },
 		{ value: 'selector2', count: 1 },
@@ -48,7 +48,7 @@ test('it reports JS selectors', (t) => {
 	`)
 
 	t.is(actual['selectors.js.total'].value, 3)
-	t.is(actual['selectors.js.total_unique'].value, 3)
+	t.is(actual['selectors.js.totalUnique'].value, 3)
 	t.is(actual['selectors.js.ratio'].value, 3 / 5)
 	t.deepEqual(actual['selectors.js.unique'].value, [
 		{ count: 1, value: '.js-test' },
@@ -73,7 +73,7 @@ test('it reports ID selectors', (t) => {
 	`)
 
 	t.is(actual['selectors.id.total'].value, 3)
-	t.is(actual['selectors.id.total_unique'].value, 3)
+	t.is(actual['selectors.id.totalUnique'].value, 3)
 	t.is(actual['selectors.id.ratio'].value, 3 / 6)
 	t.deepEqual(actual['selectors.id.unique'].value, [
 		{ count: 1, value: '#WITH_ID' },
@@ -96,7 +96,7 @@ test('it reports A11Y selectors', (t) => {
 	`)
 
 	t.is(actual['selectors.accessibility.total'].value, 2)
-	t.is(actual['selectors.accessibility.total_unique'].value, 2)
+	t.is(actual['selectors.accessibility.totalUnique'].value, 2)
 	t.is(actual['selectors.accessibility.ratio'].value, 2 / 4)
 	t.deepEqual(actual['selectors.accessibility.unique'].value, [
 		{ count: 1, value: '[aria-hidden]' },
@@ -120,7 +120,7 @@ test('it reports universal selectors', (t) => {
 	`)
 
 	t.is(actual['selectors.universal.total'].value, 5)
-	t.is(actual['selectors.universal.total_unique'].value, 5)
+	t.is(actual['selectors.universal.totalUnique'].value, 5)
 	t.is(actual['selectors.universal.ratio'].value, 5 / 6)
 	t.deepEqual(actual['selectors.universal.unique'].value, [
 		{ count: 1, value: '*' },
@@ -144,7 +144,7 @@ test('it reports selectors with Browserhacks', (t) => {
 	`)
 
 	t.is(actual['selectors.browserhacks.total'].value, 2)
-	t.is(actual['selectors.browserhacks.total_unique'].value, 2)
+	t.is(actual['selectors.browserhacks.totalUnique'].value, 2)
 	t.is(actual['selectors.browserhacks.ratio'].value, 2 / 3)
 	t.deepEqual(actual['selectors.browserhacks.unique'].value, [
 		{ count: 1, value: '* html selector' },
@@ -172,7 +172,7 @@ test('it reports selector complexity', (t) => {
 
 	t.is(actual['selectors.complexity.average'].value, 26 / 6)
 	t.is(actual['selectors.complexity.total'].value, 26)
-	t.is(actual['selectors.complexity.total_unique'].value, 5)
+	t.is(actual['selectors.complexity.totalUnique'].value, 5)
 	t.deepEqual(actual['selectors.complexity.unique'].value, [
 		{ value: 3, count: 1 },
 		{ value: 2, count: 1 },
@@ -189,7 +189,7 @@ test('it reports complexity=1 for broken selectors', (t) => {
 	`)
 	t.is(actual['selectors.complexity.average'].value, 1)
 	t.is(actual['selectors.complexity.total'].value, 2)
-	t.is(actual['selectors.complexity.total_unique'].value, 1)
+	t.is(actual['selectors.complexity.totalUnique'].value, 1)
 })
 
 test('it reports selector specificity', (t) => {
@@ -219,7 +219,7 @@ test('it reports selector specificity', (t) => {
 		{ value: [0, 0, 0, 3], count: 1 },
 		{ value: [0, 1, 1, 1], count: 3 },
 	])
-	t.is(actual['selectors.specificity.total_unique'].value, 4)
+	t.is(actual['selectors.specificity.totalUnique'].value, 4)
 
 	// Average
 	t.deepEqual(actual['selectors.specificity.average'].value, [

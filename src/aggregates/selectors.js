@@ -101,7 +101,7 @@ module.exports = ({ atrules, rules }) => {
 			aggregate: AGGREGATES.SUM,
 		},
 		{
-			id: 'selectors.total_unique',
+			id: 'selectors.totalUnique',
 			value: unique.length,
 			format: FORMATS.COUNT,
 			aggregate: AGGREGATES.SUM,
@@ -119,7 +119,7 @@ module.exports = ({ atrules, rules }) => {
 			aggregate: AGGREGATES.SUM,
 		},
 		{
-			id: 'selectors.js.total_unique',
+			id: 'selectors.js.totalUnique',
 			value: jsUnique.length,
 			format: FORMATS.COUNT,
 			aggregate: AGGREGATES.SUM,
@@ -143,7 +143,7 @@ module.exports = ({ atrules, rules }) => {
 			aggregate: AGGREGATES.SUM,
 		},
 		{
-			id: 'selectors.id.total_unique',
+			id: 'selectors.id.totalUnique',
 			value: idUnique.length,
 			format: FORMATS.COUNT,
 			aggregate: AGGREGATES.SUM,
@@ -167,7 +167,7 @@ module.exports = ({ atrules, rules }) => {
 			aggregate: AGGREGATES.SUM,
 		},
 		{
-			id: 'selectors.accessibility.total_unique',
+			id: 'selectors.accessibility.totalUnique',
 			value: accessibilityUnique.length,
 			format: FORMATS.COUNT,
 			aggregate: AGGREGATES.SUM,
@@ -191,7 +191,7 @@ module.exports = ({ atrules, rules }) => {
 			aggregate: AGGREGATES.SUM,
 		},
 		{
-			id: 'selectors.universal.total_unique',
+			id: 'selectors.universal.totalUnique',
 			value: universalUnique.length,
 			format: FORMATS.COUNT,
 			aggregate: AGGREGATES.SUM,
@@ -215,7 +215,7 @@ module.exports = ({ atrules, rules }) => {
 			aggregate: AGGREGATES.SUM,
 		},
 		{
-			id: 'selectors.browserhacks.total_unique',
+			id: 'selectors.browserhacks.totalUnique',
 			value: browserhacksUnique.length,
 			format: FORMATS.COUNT,
 			aggregate: AGGREGATES.SUM,
@@ -263,7 +263,7 @@ module.exports = ({ atrules, rules }) => {
 			aggregate: AGGREGATES.SUM,
 		},
 		{
-			id: 'selectors.complexity.total_unique',
+			id: 'selectors.complexity.totalUnique',
 			value: complexitiesUnique.length,
 			format: FORMATS.COUNT,
 			aggregate: AGGREGATES.SUM,
@@ -299,7 +299,7 @@ module.exports = ({ atrules, rules }) => {
 			aggregate: AGGREGATES.LIST,
 		},
 		{
-			id: 'selectors.specificity.total_unique',
+			id: 'selectors.specificity.totalUnique',
 			value: specificitiesUnique.length,
 			format: FORMATS.COUNT,
 			aggregate: AGGREGATES.SUM,
