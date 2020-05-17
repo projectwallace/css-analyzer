@@ -94,12 +94,25 @@ function stripDeclarationAnalysis(declaration) {
 }
 
 function withAtruleAnalysis(atrule) {
+	let key = atrule.arguments
+	const descriptors = atrule.declarations.map(withDeclarationAnalysis)
+
+	// Uniqueness for @font-face is based on the `src` property,
+	// because this is very likely to be unique
+	if (atrule.name === 'font-face') {
+		const src = descriptors.find(
+			(descriptor) => descriptor.property.name === 'src'
+		)
+		key = src.value.value
+	}
+
 	return {
 		...atrule,
-		declarations: atrule.declarations.map(withDeclarationAnalysis),
+		declarations: descriptors,
 		stats: {
 			isVendorPrefixed: false,
 			isBrowserHack: false,
+			key,
 		},
 	}
 }

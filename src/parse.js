@@ -83,12 +83,14 @@ module.exports = (css, options) => {
 			// don't try to get declarations from those
 			//
 			// Example: `@charset 'UTF-8';`
-			if (node.block === null) return
+			let declarations = []
 
-			const declarations = csstree
-				.toPlainObject(node.block)
-				.children.filter((child) => child.type === 'Declaration')
-				.map(declaration)
+			if (node.block !== null) {
+				declarations = csstree
+					.toPlainObject(node.block)
+					.children.filter((child) => child.type === 'Declaration')
+					.map(declaration)
+			}
 
 			atrules = atrules.concat(atrule(node, { declarations }))
 		},

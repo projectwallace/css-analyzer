@@ -10,7 +10,7 @@ function stripUnique(item) {
 	}
 }
 
-module.exports = ({ atrules, rules }) => {
+module.exports = ({ rules }) => {
 	const selectors = rules
 		.map((rule) => rule.selectors)
 		.reduce((all, current) => all.concat(current), [])
@@ -65,33 +65,44 @@ module.exports = ({ atrules, rules }) => {
 		}))
 	).map(({ count, value }) => ({ count, value: value.stats.specificity }))
 
-	const [maxSpecificitySelector] = selectors.sort((a, b) =>
-		specificity.compare(b.value, a.value)
-	)
-	const maxSpecificity = maxSpecificitySelector.stats.specificity
-	const maxSpecificitySelectors = uniqueWithCount(
-		selectors.filter(
-			(s) => specificity.compare(s.stats.specificity, maxSpecificity) === 0
+	let maxSpecificitySelector = undefined
+	let maxSpecificity = undefined
+	let maxSpecificitySelectors = []
+	let totalSpecificity = [0, 0, 0, 0]
+	let averageSpecificity = [0, 0, 0, 0]
+
+	// Explicit test if we have any selectors. There are common
+	// cases where stylesheets don't contain selectors, like
+	// Google Fonts stylesheets that only contain @font-face rules.
+	if (selectors.length > 0) {
+		;[maxSpecificitySelector] = selectors.sort((a, b) =>
+			specificity.compare(b.value, a.value)
 		)
-	).map(stripUnique)
-	const totalSpecificity = selectors
-		.map((s) => s.stats.specificity)
-		.reduce(
-			(total, specificity) => {
-				total[0] += specificity[0]
-				total[1] += specificity[1]
-				total[2] += specificity[2]
-				total[3] += specificity[3]
-				return total
-			},
-			[0, 0, 0, 0]
-		)
-	const averageSpecificity = [
-		totalSpecificity[0] / selectors.length,
-		totalSpecificity[1] / selectors.length,
-		totalSpecificity[2] / selectors.length,
-		totalSpecificity[3] / selectors.length,
-	]
+		maxSpecificity = maxSpecificitySelector.stats.specificity
+		maxSpecificitySelectors = uniqueWithCount(
+			selectors.filter(
+				(s) => specificity.compare(s.stats.specificity, maxSpecificity) === 0
+			)
+		).map(stripUnique)
+		totalSpecificity = selectors
+			.map((s) => s.stats.specificity)
+			.reduce(
+				(total, specificity) => {
+					total[0] += specificity[0]
+					total[1] += specificity[1]
+					total[2] += specificity[2]
+					total[3] += specificity[3]
+					return total
+				},
+				[0, 0, 0, 0]
+			)
+		averageSpecificity = [
+			totalSpecificity[0] / selectors.length,
+			totalSpecificity[1] / selectors.length,
+			totalSpecificity[2] / selectors.length,
+			totalSpecificity[3] / selectors.length,
+		]
+	}
 
 	return [
 		{
