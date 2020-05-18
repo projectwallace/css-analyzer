@@ -1,8 +1,11 @@
 const csstree = require('css-tree')
 const isPropertyBrowserhack = require('is-property-browserhack')
-const isSelectorBrowserHack = require('is-selector-browserhack')
+const isSelectorBrowserhack = require('is-selector-browserhack')
+const isMediaBrowserhack = require('is-media-browserhack')
+const isSupportsBrowserhack = require('is-supports-browserhack')
 const selectorComplexity = require('selector-complexity')
 const specificity = require('specificity')
+const isVendorPrefixed = require('is-vendor-prefixed')
 
 function withSelectorAnalysis(selector) {
 	const { value } = selector
@@ -19,7 +22,7 @@ function withSelectorAnalysis(selector) {
 		stats: {
 			key: value,
 			specificity: specificity.calculate(value).shift().specificityArray,
-			isBrowserhack: isSelectorBrowserHack(value),
+			isBrowserhack: isSelectorBrowserhack(value),
 			isId: /(?![^[]*])#/.test(value),
 			isUniversal: /(?![^[]*])\*/.test(value),
 			isJavaScript: /[.|#(?:=")]js/i.test(value),
@@ -106,12 +109,31 @@ function withAtruleAnalysis(atrule) {
 		key = src.value.value
 	}
 
+	if (atrule.name.endsWith('keyframes')) {
+		// atrule.name contains an optional vendor prefix
+		// which is important for marking the keyframes as unique
+		key = `@${atrule.name} ${atrule.arguments}`
+	}
+
 	return {
 		...atrule,
 		declarations: descriptors,
 		stats: {
-			isVendorPrefixed: false,
-			isBrowserHack: false,
+			isVendorPrefixed: ((atrule) => {
+				if (atrule.name.endsWith('keyframes')) {
+					return isVendorPrefixed(atrule.name)
+				}
+				return false
+			})(atrule),
+			isBrowserhack: ((atrule) => {
+				if (atrule.name === 'media') {
+					return isMediaBrowserhack(atrule.arguments)
+				}
+				if (atrule.name === 'supports') {
+					return isSupportsBrowserhack(atrule.arguments)
+				}
+				return false
+			})(atrule),
 			key,
 		},
 	}

@@ -82,7 +82,11 @@ module.exports = (css, options) => {
 			// Some Atrules don't have a body,
 			// don't try to get declarations from those
 			//
-			// Example: `@charset 'UTF-8';`
+			// Examples:
+			// ```css
+			// 		@charset 'UTF-8';
+			// 		@import url("/fonts.css")
+			// ```
 			let declarations = []
 
 			if (node.block !== null) {
