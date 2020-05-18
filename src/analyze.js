@@ -60,7 +60,18 @@ function stripPropertyAnalysis(property) {
 function withValueAnalysis(value) {
 	return {
 		...value,
-		stats: {},
+		stats: {
+			isVendorPrefixed: void 0,
+			isBrowserhack: void 0,
+			colors: void 0,
+			fontsize: void 0,
+			fontfamily: void 0,
+			textshadow: void 0,
+			boxshadow: void 0,
+			animationduration: void 0,
+			animationfunction: void 0,
+			key: value.value,
+		},
 	}
 }
 
