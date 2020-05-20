@@ -36,6 +36,7 @@ test('it counts the total values', (t) => {
 	`)
 
 	t.is(actual['values.total'].value, 6)
+	t.is(actual['values.totalUnique'].value, 6)
 })
 
 test('it analyzes vendor prefixed values', (t) => {

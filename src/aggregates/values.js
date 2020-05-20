@@ -15,6 +15,8 @@ module.exports = ({ rules }) => {
 		.reduce((all, current) => all.concat(current), [])
 		.map((declaration) => declaration.value)
 
+	const uniqueValues = uniqueWithCount(values)
+
 	// Vendor prefixes
 	const vendorPrefixes = values.filter((p) => p.stats.isVendorPrefixed)
 	const uniqueVendorPrefixes = uniqueWithCount(vendorPrefixes).map(stripUnique)
@@ -23,6 +25,12 @@ module.exports = ({ rules }) => {
 		{
 			id: 'values.total',
 			value: values.length,
+			format: FORMATS.COUNT,
+			aggregate: AGGREGATES.SUM,
+		},
+		{
+			id: 'values.totalUnique',
+			value: uniqueValues.length,
 			format: FORMATS.COUNT,
 			aggregate: AGGREGATES.SUM,
 		},
