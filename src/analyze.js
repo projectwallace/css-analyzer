@@ -6,6 +6,9 @@ const isSupportsBrowserhack = require('is-supports-browserhack')
 const selectorComplexity = require('selector-complexity')
 const specificity = require('specificity')
 const isVendorPrefixed = require('is-vendor-prefixed')
+const vendorPrefixes = require('vendor-prefixes')
+
+const PREFIX_REGEX = new RegExp(`^${vendorPrefixes().join('|')}`)
 
 function withSelectorAnalysis(selector) {
 	const { value } = selector
@@ -61,7 +64,7 @@ function withValueAnalysis(value) {
 	return {
 		...value,
 		stats: {
-			isVendorPrefixed: void 0,
+			isVendorPrefixed: PREFIX_REGEX.test(value.value),
 			isBrowserhack: void 0,
 			colors: void 0,
 			fontsize: void 0,

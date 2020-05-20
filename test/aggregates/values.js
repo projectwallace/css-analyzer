@@ -37,3 +37,27 @@ test('it counts the total values', (t) => {
 
 	t.is(actual['values.total'].value, 6)
 })
+
+test('it analyzes vendor prefixed values', (t) => {
+	const fixture = `
+		selector {
+			background: -webkit-linear-gradient(transparent, transparent);
+			background: -moz-linear-gradient(transparent, transparent);
+			background: -ms-linear-gradient(transparent, transparent);
+			background: -o-linear-gradient(transparent, transparent);
+
+			/* Not prefixed values */
+			-webkit-appearance: none;
+		}
+	`
+	const actual = analyze(fixture)
+
+	t.is(actual['values.prefixed.total'].value, 4)
+	t.is(actual['values.prefixed.totalUnique'].value, 4)
+	t.deepEqual(actual['values.prefixed.unique'].value, [
+		{ count: 1, value: '-webkit-linear-gradient(transparent, transparent)' },
+		{ count: 1, value: '-moz-linear-gradient(transparent, transparent)' },
+		{ count: 1, value: '-ms-linear-gradient(transparent, transparent)' },
+		{ count: 1, value: '-o-linear-gradient(transparent, transparent)' },
+	])
+})
