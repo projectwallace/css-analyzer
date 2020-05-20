@@ -60,4 +60,5 @@ test('it analyzes vendor prefixed values', (t) => {
 		{ count: 1, value: '-ms-linear-gradient(transparent, transparent)' },
 		{ count: 1, value: '-o-linear-gradient(transparent, transparent)' },
 	])
+	t.is(actual['values.prefixed.ratio'].value, 4 / 5)
 })

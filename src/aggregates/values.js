@@ -44,5 +44,11 @@ module.exports = ({ rules }) => {
 			format: FORMATS.VALUE,
 			aggregate: AGGREGATES.LIST,
 		},
+		{
+			id: 'values.prefixed.ratio',
+			value: vendorPrefixes.length / values.length,
+			format: FORMATS.RATIO,
+			aggregate: AGGREGATES.RATIO,
+		},
 	]
 }
