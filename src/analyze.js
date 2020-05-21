@@ -61,12 +61,16 @@ function stripPropertyAnalysis(property) {
 	return rest
 }
 
-function withValueAnalysis(value) {
+function withValueAnalysis(declaration) {
+	const value = declaration.value.value
+	console.log({ declaration })
+
 	return {
-		...value,
+		...declaration.value,
 		stats: {
-			isVendorPrefixed: PREFIX_REGEX.test(value.value),
-			isBrowserhack: isValueBrowserhack(value.value),
+			isVendorPrefixed: PREFIX_REGEX.test(value),
+			isBrowserhack: isValueBrowserhack(value),
+			zindex: declaration.property.name === 'z-index' ? value : void 0,
 			colors: void 0,
 			fontsize: void 0,
 			fontfamily: void 0,
@@ -74,7 +78,7 @@ function withValueAnalysis(value) {
 			boxshadow: void 0,
 			animationduration: void 0,
 			animationfunction: void 0,
-			key: value.value,
+			key: value,
 		},
 	}
 }
@@ -93,7 +97,7 @@ function withDeclarationAnalysis(declaration) {
 		},
 		value: {
 			...declaration.value,
-			...withValueAnalysis(declaration.value),
+			...withValueAnalysis(declaration),
 		},
 		stats: {
 			complexity: -1,

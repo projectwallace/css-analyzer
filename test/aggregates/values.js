@@ -1,6 +1,8 @@
 const test = require('ava')
 const analyze = require('../../')
 
+// @TODO: Ignore keywords (auto, inherit, etc.)
+
 test('it counts the total values', (t) => {
 	const actual = analyze(`
 		selector {
@@ -88,4 +90,31 @@ test('it analyzes browserhacks', (t) => {
 		{ count: 1, value: `red \\\\9` },
 	])
 	t.is(actual['values.browserhacks.ratio'].value, 3 / 5)
+})
+
+test('it analyzes z-indexes', (t) => {
+	const fixture = `
+		selector {
+			z-index: 2;
+			z-index: 9999;
+			z-index: 0;
+			z-index: 0; /* duplicate */
+			z-index: -1;
+			z-index: -100;
+
+			/* Keywords are not included */
+			z-index: auto;
+		}
+	`
+	const actual = analyze(fixture)
+
+	t.is(actual['values.zindexes.total'].value, 6)
+	t.is(actual['values.zindexes.totalUnique'].value, 5)
+	t.deepEqual(actual['values.zindexes.unique'].value, [
+		{ count: 1, value: '2' },
+		{ count: 1, value: '9999' },
+		{ count: 2, value: '0' },
+		{ count: 1, value: '-1' },
+		{ count: 1, value: '-100' },
+	])
 })

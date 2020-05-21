@@ -2,6 +2,8 @@ const { FORMATS, AGGREGATES } = require('./_types')
 const { stripValueAnalysis } = require('../analyze')
 const uniqueWithCount = require('array-unique-with-count')
 
+const KEYWORDS = ['auto', 'inherit', 'initial', 'none', 'revert', 'unset']
+
 function stripUnique(item) {
 	return {
 		...item,
@@ -10,10 +12,10 @@ function stripUnique(item) {
 }
 
 module.exports = ({ rules }) => {
-	const values = rules
+	const declarations = rules
 		.map((rule) => rule.declarations)
 		.reduce((all, current) => all.concat(current), [])
-		.map((declaration) => declaration.value)
+	const values = declarations.map((declaration) => declaration.value)
 
 	const uniqueValues = uniqueWithCount(values)
 
@@ -24,6 +26,12 @@ module.exports = ({ rules }) => {
 	// Browserhacks
 	const browserhacks = values.filter((value) => value.stats.isBrowserhack)
 	const uniqueBrowserhacks = uniqueWithCount(browserhacks).map(stripUnique)
+
+	// Z-indexes
+	const zindexes = values
+		.filter((value) => value.stats.zindex)
+		.filter((value) => !KEYWORDS.includes(value.value))
+	const uniqueZindexes = uniqueWithCount(zindexes).map(stripUnique)
 
 	return [
 		{
@@ -85,6 +93,24 @@ module.exports = ({ rules }) => {
 			value: browserhacks.length / values.length,
 			format: FORMATS.RATIO,
 			aggregate: AGGREGATES.RATIO,
+		},
+		{
+			id: 'values.zindexes.total',
+			value: zindexes.length,
+			format: FORMATS.COUNT,
+			aggregate: AGGREGATES.SUM,
+		},
+		{
+			id: 'values.zindexes.totalUnique',
+			value: uniqueZindexes.length,
+			format: FORMATS.COUNT,
+			aggregate: AGGREGATES.SUM,
+		},
+		{
+			id: 'values.zindexes.unique',
+			value: uniqueZindexes,
+			format: FORMATS.VALUE,
+			aggregate: AGGREGATES.LIST,
 		},
 	]
 }

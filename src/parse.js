@@ -94,7 +94,7 @@ module.exports = (css, options) => {
 			// Examples:
 			// ```css
 			// 		@charset 'UTF-8';
-			// 		@import url("/fonts.css")
+			// 		@import url("/fonts.css");
 			// ```
 			let declarations = []
 
