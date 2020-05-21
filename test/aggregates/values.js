@@ -63,3 +63,29 @@ test('it analyzes vendor prefixed values', (t) => {
 	])
 	t.is(actual['values.prefixed.ratio'].value, 4 / 5)
 })
+
+test.only('it analyzes browserhacks', (t) => {
+	const fixture = `
+		selector {
+			color: red!ie;
+			color: red !ie;
+			color: red \\\\9;
+
+			/* Not a hack: */
+			color: blue;
+			color: blue !important;
+		}
+	`
+	const actual = analyze(fixture)
+
+	t.is(actual['values.browserhacks.total'].value, 3)
+
+	// @TODO: these should be 3 unique values, because of
+	//        spacing around !ie
+	t.is(actual['values.browserhacks.totalUnique'].value, 2)
+	t.deepEqual(actual['values.browserhacks.unique'].value, [
+		{ count: 2, value: `red!ie` },
+		{ count: 1, value: `red \\\\9` },
+	])
+	t.is(actual['values.browserhacks.ratio'].value, 3 / 5)
+})

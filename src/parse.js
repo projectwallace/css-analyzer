@@ -12,17 +12,26 @@ function property(str) {
 	}
 }
 
-function value(val) {
+function value(val, important) {
+	// Important is either true, false or a string
+	// Example: 'ie' when using `color: blue !ie`
+	if (typeof important === 'string') {
+		val += `!${important}`
+	}
+
 	return {
 		value: val,
 	}
 }
 
 function declaration(decl) {
+	// when using a value like `blue !ie`, CSSTree marks the
+	// `important` property as `'ie'`.
+
 	return {
-		isImportant: Boolean(decl.important),
+		isImportant: typeof decl.important === 'boolean' && decl.important === true,
 		property: property(decl.property),
-		value: value(decl.value.value),
+		value: value(decl.value.value, decl.important),
 	}
 }
 

@@ -18,8 +18,12 @@ module.exports = ({ rules }) => {
 	const uniqueValues = uniqueWithCount(values)
 
 	// Vendor prefixes
-	const vendorPrefixes = values.filter((p) => p.stats.isVendorPrefixed)
+	const vendorPrefixes = values.filter((value) => value.stats.isVendorPrefixed)
 	const uniqueVendorPrefixes = uniqueWithCount(vendorPrefixes).map(stripUnique)
+
+	// Browserhacks
+	const browserhacks = values.filter((value) => value.stats.isBrowserhack)
+	const uniqueBrowserhacks = uniqueWithCount(browserhacks).map(stripUnique)
 
 	return [
 		{
@@ -55,6 +59,30 @@ module.exports = ({ rules }) => {
 		{
 			id: 'values.prefixed.ratio',
 			value: vendorPrefixes.length / values.length,
+			format: FORMATS.RATIO,
+			aggregate: AGGREGATES.RATIO,
+		},
+		{
+			id: 'values.browserhacks.total',
+			value: browserhacks.length,
+			format: FORMATS.COUNT,
+			aggregate: AGGREGATES.SUM,
+		},
+		{
+			id: 'values.browserhacks.totalUnique',
+			value: uniqueBrowserhacks.length,
+			format: FORMATS.COUNT,
+			aggregate: AGGREGATES.SUM,
+		},
+		{
+			id: 'values.browserhacks.unique',
+			value: uniqueBrowserhacks,
+			format: FORMATS.VALUE,
+			aggregate: AGGREGATES.LIST,
+		},
+		{
+			id: 'values.browserhacks.ratio',
+			value: browserhacks.length / values.length,
 			format: FORMATS.RATIO,
 			aggregate: AGGREGATES.RATIO,
 		},

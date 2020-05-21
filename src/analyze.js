@@ -1,5 +1,6 @@
 const csstree = require('css-tree')
 const isPropertyBrowserhack = require('is-property-browserhack')
+const isValueBrowserhack = require('is-value-browserhack')
 const isSelectorBrowserhack = require('is-selector-browserhack')
 const isMediaBrowserhack = require('is-media-browserhack')
 const isSupportsBrowserhack = require('is-supports-browserhack')
@@ -65,7 +66,7 @@ function withValueAnalysis(value) {
 		...value,
 		stats: {
 			isVendorPrefixed: PREFIX_REGEX.test(value.value),
-			isBrowserhack: void 0,
+			isBrowserhack: isValueBrowserhack(value.value),
 			colors: void 0,
 			fontsize: void 0,
 			fontfamily: void 0,
