@@ -64,7 +64,7 @@ test('it analyzes vendor prefixed values', (t) => {
 	t.is(actual['values.prefixed.ratio'].value, 4 / 5)
 })
 
-test.only('it analyzes browserhacks', (t) => {
+test('it analyzes browserhacks', (t) => {
 	const fixture = `
 		selector {
 			color: red!ie;
