@@ -8,6 +8,7 @@
 ![Dependencies Status](https://img.shields.io/david/dev/projectwallace/css-analyzer.svg)
 [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
 [![Project: Wallace](https://img.shields.io/badge/Project-Wallace-29c87d.svg)](https://www.projectwallace.com/oss)
+[![Financial Contributors on Open Collective](https://opencollective.com/projectwallace/all/badge.svg?label=financial+contributors)](https://opencollective.com/projectwallace) 
 
 > Analyze your CSS
 
@@ -275,7 +276,7 @@ analyze(`
   "values.animations.timingFunctions.unique": [],
   "values.animations.timingFunctions.totalUnique": 0
 }
-````
+```
 
 ## Related projects
 
@@ -284,3 +285,33 @@ analyze(`
 - [Constyble](https://github.com/bartveneman/constyble) - CSS Complexity linter
 - [Color Sorter](https://github.com/bartveneman/color-sorter) - Sort CSS colors
   by hue, saturation, lightness and opacity
+
+## Contributors
+
+### Code Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/projectwallace/css-analyzer/graphs/contributors"><img src="https://opencollective.com/projectwallace/contributors.svg?width=890&button=false" /></a>
+
+### Financial Contributors
+
+Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/projectwallace/contribute)]
+
+#### Individuals
+
+<a href="https://opencollective.com/projectwallace"><img src="https://opencollective.com/projectwallace/individuals.svg?width=890"></a>
+
+#### Organizations
+
+Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/projectwallace/contribute)]
+
+<a href="https://opencollective.com/projectwallace/organization/0/website"><img src="https://opencollective.com/projectwallace/organization/0/avatar.svg"></a>
+<a href="https://opencollective.com/projectwallace/organization/1/website"><img src="https://opencollective.com/projectwallace/organization/1/avatar.svg"></a>
+<a href="https://opencollective.com/projectwallace/organization/2/website"><img src="https://opencollective.com/projectwallace/organization/2/avatar.svg"></a>
+<a href="https://opencollective.com/projectwallace/organization/3/website"><img src="https://opencollective.com/projectwallace/organization/3/avatar.svg"></a>
+<a href="https://opencollective.com/projectwallace/organization/4/website"><img src="https://opencollective.com/projectwallace/organization/4/avatar.svg"></a>
+<a href="https://opencollective.com/projectwallace/organization/5/website"><img src="https://opencollective.com/projectwallace/organization/5/avatar.svg"></a>
+<a href="https://opencollective.com/projectwallace/organization/6/website"><img src="https://opencollective.com/projectwallace/organization/6/avatar.svg"></a>
+<a href="https://opencollective.com/projectwallace/organization/7/website"><img src="https://opencollective.com/projectwallace/organization/7/avatar.svg"></a>
+<a href="https://opencollective.com/projectwallace/organization/8/website"><img src="https://opencollective.com/projectwallace/organization/8/avatar.svg"></a>
+<a href="https://opencollective.com/projectwallace/organization/9/website"><img src="https://opencollective.com/projectwallace/organization/9/avatar.svg"></a>
