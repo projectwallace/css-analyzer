@@ -128,6 +128,10 @@ test('it analyzes text-shadows', (t) => {
 			text-shadow: red 0 -2px;
 			text-shadow: 1px 1px 2px black, 0 0 1em blue, 0 0 0.2em blue;
 
+			-webkit-text-shadow: 1px 1px 2px black;
+			-moz-text-shadow: 1px 1px 2px black;
+			-ms-text-shadow: 1px 1px 2px black;
+
 			text-shadow: inherit;
 			text-shadow: none;
 			text-shadow: initial;
@@ -136,15 +140,45 @@ test('it analyzes text-shadows', (t) => {
 	`
 	const actual = analyze(fixture)
 
-	t.is(actual['values.textshadows.total'].value, 7)
+	t.is(actual['values.textshadows.total'].value, 10)
 	t.is(actual['values.textshadows.totalUnique'].value, 7)
 	t.deepEqual(actual['values.textshadows.unique'].value, [
-		{ count: 1, value: '1px 1px 2px black' },
+		{ count: 4, value: '1px 1px 2px black' },
 		{ count: 1, value: '#fc0 1px 0 10px' },
 		{ count: 1, value: '5px 5px #558abb' },
 		{ count: 1, value: 'white 2px 5px' },
 		{ count: 1, value: '5px 10px' },
 		{ count: 1, value: 'red 0 -2px' },
 		{ count: 1, value: '1px 1px 2px black, 0 0 1em blue, 0 0 0.2em blue' },
+	])
+
+	t.is(actual['values.textshadows.prefixed.total'].value, 3)
+	t.is(actual['values.textshadows.prefixed.ratio'].value, 3 / 14)
+	t.is(actual['values.textshadows.prefixed.totalUnique'].value, 3)
+	t.deepEqual(actual['values.textshadows.prefixed.unique'].value, [
+		{
+			count: 1,
+			value: {
+				property: { name: '-webkit-text-shadow' },
+				value: { value: '1px 1px 2px black' },
+				isImportant: false,
+			},
+		},
+		{
+			count: 1,
+			value: {
+				property: { name: '-moz-text-shadow' },
+				value: { value: '1px 1px 2px black' },
+				isImportant: false,
+			},
+		},
+		{
+			count: 1,
+			value: {
+				property: { name: '-ms-text-shadow' },
+				value: { value: '1px 1px 2px black' },
+				isImportant: false,
+			},
+		},
 	])
 })

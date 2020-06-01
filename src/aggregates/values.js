@@ -1,5 +1,5 @@
 const { FORMATS, AGGREGATES } = require('./_types')
-const { stripValueAnalysis } = require('../analyze')
+const { stripValueAnalysis, stripDeclarationAnalysis } = require('../analyze')
 const uniqueWithCount = require('array-unique-with-count')
 
 const KEYWORDS = ['auto', 'inherit', 'initial', 'none', 'revert', 'unset']
@@ -27,10 +27,27 @@ module.exports = ({ rules }) => {
 	const browserhacks = values.filter((value) => value.stats.isBrowserhack)
 	const uniqueBrowserhacks = uniqueWithCount(browserhacks).map(stripUnique)
 
-	const textshadows = values
-		.filter((value) => value.stats.textshadow)
-		.filter((value) => !KEYWORDS.includes(value.value))
-	const uniqueTextshadows = uniqueWithCount(textshadows).map(stripUnique)
+	// Text-shadows
+	const textshadows = declarations
+		.filter(({ value }) => value.stats.textshadow)
+		.filter(({ value }) => !KEYWORDS.includes(value.value))
+	const uniqueTextshadows = uniqueWithCount(
+		textshadows.map(({ value }) => value)
+	).map(stripUnique)
+	const prefixedTextshadows = textshadows.filter(
+		({ property }) => property.stats.isVendorPrefixed
+	)
+	const uniquePrefixedTextshadows = uniqueWithCount(prefixedTextshadows).map(
+		(item) => {
+			return {
+				...item,
+				// value: stripDeclarationAnalysis(item.value).value,
+				// property: stripDeclarationAnalysis(item.value).property
+
+				value: stripDeclarationAnalysis(item.value),
+			}
+		}
+	)
 
 	// Z-indexes
 	const zindexes = values
@@ -115,6 +132,30 @@ module.exports = ({ rules }) => {
 			id: 'values.textshadows.unique',
 			value: uniqueTextshadows,
 			format: FORMATS.VALUE,
+			aggregate: AGGREGATES.LIST,
+		},
+		{
+			id: 'values.textshadows.prefixed.total',
+			value: prefixedTextshadows.length,
+			format: FORMATS.COUNT,
+			aggregate: AGGREGATES.SUM,
+		},
+		{
+			id: 'values.textshadows.prefixed.ratio',
+			value: prefixedTextshadows.length / values.length,
+			format: FORMATS.RATIO,
+			aggregate: AGGREGATES.RATIO,
+		},
+		{
+			id: 'values.textshadows.prefixed.totalUnique',
+			value: uniquePrefixedTextshadows.length,
+			format: FORMATS.COUNT,
+			aggregate: AGGREGATES.SUM,
+		},
+		{
+			id: 'values.textshadows.prefixed.unique',
+			value: uniquePrefixedTextshadows,
+			format: FORMATS.DECLARATION,
 			aggregate: AGGREGATES.LIST,
 		},
 		{
