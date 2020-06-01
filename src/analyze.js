@@ -63,7 +63,6 @@ function stripPropertyAnalysis(property) {
 
 function withValueAnalysis(declaration) {
 	const value = declaration.value.value
-	console.log({ declaration })
 
 	return {
 		...declaration.value,
@@ -74,7 +73,9 @@ function withValueAnalysis(declaration) {
 			colors: void 0,
 			fontsize: void 0,
 			fontfamily: void 0,
-			textshadow: void 0,
+			textshadow: declaration.property.name.endsWith('text-shadow')
+				? value
+				: void 0,
 			boxshadow: void 0,
 			animationduration: void 0,
 			animationfunction: void 0,

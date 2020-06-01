@@ -1,8 +1,6 @@
 const test = require('ava')
 const analyze = require('../../')
 
-// @TODO: Ignore keywords (auto, inherit, etc.)
-
 test('it counts the total values', (t) => {
 	const actual = analyze(`
 		selector {
@@ -116,5 +114,37 @@ test('it analyzes z-indexes', (t) => {
 		{ count: 2, value: '0' },
 		{ count: 1, value: '-1' },
 		{ count: 1, value: '-100' },
+	])
+})
+
+test('it analyzes text-shadows', (t) => {
+	const fixture = `
+		selector {
+			text-shadow: 1px 1px 2px black;
+			text-shadow: #fc0 1px 0 10px;
+			text-shadow: 5px 5px #558abb;
+			text-shadow: white 2px 5px;
+			text-shadow: 5px 10px;
+			text-shadow: red 0 -2px;
+			text-shadow: 1px 1px 2px black, 0 0 1em blue, 0 0 0.2em blue;
+
+			text-shadow: inherit;
+			text-shadow: none;
+			text-shadow: initial;
+			text-shadow: unset;
+		}
+	`
+	const actual = analyze(fixture)
+
+	t.is(actual['values.textshadows.total'].value, 7)
+	t.is(actual['values.textshadows.totalUnique'].value, 7)
+	t.deepEqual(actual['values.textshadows.unique'].value, [
+		{ count: 1, value: '1px 1px 2px black' },
+		{ count: 1, value: '#fc0 1px 0 10px' },
+		{ count: 1, value: '5px 5px #558abb' },
+		{ count: 1, value: 'white 2px 5px' },
+		{ count: 1, value: '5px 10px' },
+		{ count: 1, value: 'red 0 -2px' },
+		{ count: 1, value: '1px 1px 2px black, 0 0 1em blue, 0 0 0.2em blue' },
 	])
 })

@@ -27,6 +27,11 @@ module.exports = ({ rules }) => {
 	const browserhacks = values.filter((value) => value.stats.isBrowserhack)
 	const uniqueBrowserhacks = uniqueWithCount(browserhacks).map(stripUnique)
 
+	const textshadows = values
+		.filter((value) => value.stats.textshadow)
+		.filter((value) => !KEYWORDS.includes(value.value))
+	const uniqueTextshadows = uniqueWithCount(textshadows).map(stripUnique)
+
 	// Z-indexes
 	const zindexes = values
 		.filter((value) => value.stats.zindex)
@@ -93,6 +98,24 @@ module.exports = ({ rules }) => {
 			value: browserhacks.length / values.length,
 			format: FORMATS.RATIO,
 			aggregate: AGGREGATES.RATIO,
+		},
+		{
+			id: 'values.textshadows.total',
+			value: textshadows.length,
+			format: FORMATS.COUNT,
+			aggregate: AGGREGATES.SUM,
+		},
+		{
+			id: 'values.textshadows.totalUnique',
+			value: uniqueTextshadows.length,
+			format: FORMATS.COUNT,
+			aggregate: AGGREGATES.SUM,
+		},
+		{
+			id: 'values.textshadows.unique',
+			value: uniqueTextshadows,
+			format: FORMATS.VALUE,
+			aggregate: AGGREGATES.LIST,
 		},
 		{
 			id: 'values.zindexes.total',
