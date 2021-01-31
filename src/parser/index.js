@@ -21,13 +21,12 @@ module.exports = async css => {
     return Promise.resolve(processNodes(rootNode))
   } catch (error) {
     const {line, column, reason} = error
+    const message = error.showSourceCode
+      ? `${reason} at line ${line}, column ${column}:\n\n${error.showSourceCode(
+        false
+      )}`
+      : `${reason} at line ${line}, column ${column}:\n\n${error.source}`
 
-    return Promise.reject(
-      new SyntaxError(
-        `${reason} at line ${line}, column ${column}:\n\n${error.showSourceCode(
-          false
-        )}`
-      )
-    )
+    return Promise.reject(new SyntaxError(message))
   }
 }
