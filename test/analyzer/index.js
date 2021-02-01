@@ -5,9 +5,10 @@ test('it breaks with invalid CSS', async t => {
   const cssWithSyntaxError = 'a { color red }'
   const error = await t.throwsAsync(analyzer(cssWithSyntaxError))
 
+  t.true(error.message.includes('Unknown word at line 1, column 5:'))
   t.is(
     error.message,
-    'Unknown word at line 1, column 5:\n\n> 1 | a { color red }\n    |     ^'
+    'Unknown word at line 1, column 5:\n\na { color red }'
   )
 })
 
