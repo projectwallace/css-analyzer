@@ -1,6 +1,6 @@
 {
   "name": "@projectwallace/css-analyzer",
-  "version": "5.0.0-alpha.1",
+  "version": "5.0.0-alpha.2",
   "author": "Bart Veneman",
   "repository": {
     "type": "git",
@@ -37,10 +37,7 @@
     "metrics"
   ],
   "files": [
-    "dist",
-    "src",
-    "!src/__fixtures__",
-    "!*.test.js"
+    "dist"
   ],
   "dependencies": {
     "css-tree": "^2.0.1"
