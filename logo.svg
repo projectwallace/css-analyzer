@@ -1,0 +1,9 @@
+<svg viewBox="0 0 15 15"
+  xmlns="http://www.w3.org/2000/svg">
+  <title>CSS Analyzer</title>
+  <rect fill="#29c87d" width="6" height="1" y="3" x="3"></rect>
+  <rect fill="#29c87d" width="3" height="1" y="5" x="3"></rect>
+  <rect fill="#da2b2b" width="9" height="1" y="7" x="3"></rect>
+  <rect fill="#29c87d" width="5" height="1" y="9" x="3"></rect>
+  <rect fill="#29c87d" width="7" height="1" y="11" x="3"></rect>
+</svg>
