@@ -1,6 +1,6 @@
 {
   "name": "@projectwallace/css-analyzer",
-  "version": "4.0.3",
+  "version": "5.0.0-alpha.1",
   "author": "Bart Veneman",
   "repository": {
     "type": "git",
@@ -9,84 +9,45 @@
   "homepage": "https://www.projectwallace.com/oss",
   "issues": "https://github.com/projectwallace/css-analyzer/issues",
   "license": "MIT",
+  "type": "module",
+  "source": "src/index.js",
+  "exports": "./dist/analyzer.js",
+  "main": "./dist/analyzer.cjs",
+  "module": "./dist/analyzer.module.js",
+  "unpkg": "./dist/analyzer.umd.js",
   "engines": {
-    "node": ">=10.0"
+    "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
+  },
+  "scripts": {
+    "test": "uvu",
+    "test:watch": "watchlist src -- npm test",
+    "build": "microbundle",
+    "dev": "microbundle watch"
   },
   "keywords": [
     "projectwallace",
     "wallace",
     "css",
+    "stylesheet",
     "stats",
     "statistics",
     "analytics",
-    "cssstats",
-    "parker",
     "performance",
     "styleguide",
     "metrics"
   ],
-  "main": "src/analyzer/index.js",
   "files": [
-    "src"
+    "src",
+    "!src/__fixtures__",
+    "!*.test.js"
   ],
-  "scripts": {
-    "test": "xo && nyc ava"
-  },
-  "xo": {
-    "space": true,
-    "semicolon": false,
-    "rules": {
-      "operator-linebreak": "off",
-      "space-before-function-paren": "off"
-    }
-  },
-  "prettier": {
-    "semi": false,
-    "singleQuote": true,
-    "bracketSpacing": false,
-    "overrides": [
-      {
-        "files": "*.json",
-        "options": {
-          "useTabs": false
-        }
-      }
-    ]
-  },
   "dependencies": {
-    "color-sorter": "^4.0.1",
-    "css-at-supports-browser-h4cks-analyzer": "^2.0.0",
-    "css-media-query-browser-h4cks-analyzer": "^2.0.0",
-    "css-property-browser-h4cks-analyzer": "^2.0.0",
-    "css-selector-browser-h4cks-analyzer": "^2.0.0",
-    "css-selector-complexity": "^0.1.2",
-    "css-shorthand-expand": "^1.2.0",
-    "css-time-sort": "^1.0.0",
-    "css-unit-sort": "^3.3.1",
-    "css-value-browser-h4cks-analyzer": "^2.0.0",
-    "flat": "^5.0.0",
-    "gzip-size": "^5.1.1",
-    "is-vendor-prefixed": "^3.3.1",
-    "path": "^0.12.7",
-    "postcss": "^8.2.10",
-    "postcss-values-parser": "^3.1.1",
-    "specificity": "^0.4.1",
-    "split-css-value": "^0.1.1",
-    "split-lines": "^2.0.0",
-    "string-natural-compare": "^3.0.1",
-    "tinycolor2": "^1.4.1",
-    "vendor-prefixes": "^1.0.0"
+    "css-tree": "^2.0.1"
   },
   "devDependencies": {
-    "ava": "^3.5.0",
-    "coveralls": "^3.0.9",
-    "nyc": "^15.0.0",
-    "xo": "^0.28.0"
-  },
-  "nyc": {
-    "reporter": [
-      "lcov",
-      "text"
-    ]
+    "benchmark": "^2.1.4",
+    "microbundle": "^0.13.3",
+    "uvu": "^0.5.1",
+    "watchlist": "^0.2.3"
   }
 }

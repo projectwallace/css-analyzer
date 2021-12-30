@@ -1,15 +1,30 @@
-# css-analyzer
+# CSS Analyzer
 
-[![NPM Version](https://img.shields.io/npm/v/@projectwallace/css-analyzer.svg)](https://www.npmjs.com/package/@projectwallace/css-analyzer)
-![Node.js CI](https://github.com/projectwallace/css-analyzer/workflows/Node.js%20CI/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/projectwallace/css-analyzer/badge.svg?branch=master)](https://coveralls.io/github/projectwallace/css-analyzer?branch=master)
-![Dependencies Status](https://img.shields.io/david/projectwallace/css-analyzer.svg)
-![Dependencies Status](https://img.shields.io/david/dev/projectwallace/css-analyzer.svg)
+<div align="center">
+  <img src="logo.svg" height="160" width="160" alt="Analyzer logo">
+</div>
 
-> Analyze your CSS
+<div align="center">
+  <a href="https://npmjs.org/package/@projectwallace/css-analyzer">
+    <img src="https://badgen.net/npm/v/@projectwallace/css-analyzer" alt="version" />
+  </a>
+  <a href="https://npmjs.org/package/@projectwallace/css-analyzer">
+    <img src="https://badgen.now.sh/npm/dm/@projectwallace/css-analyzer" alt="downloads" />
+  </a>
+  <a href="https://packagephobia.com/result?p=%40projectwallace%2Fcss-analyzer">
+    <img src="https://packagephobia.com/badge?p=%40projectwallace%2Fcss-analyzer" alt="install size" />
+  </a>
+</div>
 
-A module that goes through your CSS to find all kinds of relevant statistics,
-like the amount of rules, the amount of `!important`s, unique colors, and so on.
+<div align="center">
+A <b>CSS analyzer</b> that goes through your CSS to find all kinds of relevant statistics.
+</div>
+
+## Features
+
+* Extremely **detailed** (150+ metrics)
+* Super **[fast](/benchmark)**
+* Supports both NodeJS and browsers
 
 ## Install
 
@@ -17,18 +32,14 @@ like the amount of rules, the amount of `!important`s, unique colors, and so on.
 npm install @projectwallace/css-analyzer
 ```
 
-or
-
-```sh
-yarn add @projectwallace/css-analyzer
-```
-
 ## Usage
 
-```js
-const analyze = require('@projectwallace/css-analyzer');
+### Analyzing CSS
 
-analyze(`
+```js
+import { analyze } from '@projectwallace/css-analyzer'
+
+const result = analyze(`
 	p {
 		color: blue;
 		font-size: 100%;
@@ -38,246 +49,367 @@ analyze(`
 		background-color: whitesmoke;
 	}
 `)
-  .then(result => console.log(result))
-  .catch(error => console.error(error))
-}
 ```
+<details>
+  <summary>More examples output can be found in <a href="src/__fixtures__">the fixtures folder</a> and looks roughly like this:</summary>
 
 ```json
 {
-  "stylesheets.size.uncompressed.totalBytes": 115,
-  "stylesheets.size.compressed.gzip.totalBytes": 121,
-  "stylesheets.size.compressed.gzip.compressionRatio": -0.05217391304347818,
-  "stylesheets.simplicity": 1,
-  "stylesheets.cohesion.average": 1.5,
-  "stylesheets.cohesion.min.count": 2,
-  "stylesheets.cohesion.min.value.declarations": [
-    {
-      "property": "color",
-      "value": "blue",
-      "important": false
-    },
-    {
-      "property": "font-size",
-      "value": "100%",
-      "important": false
+  "stylesheet": {
+    "sourceLinesOfCode": 5,
+    "linesOfCode": 8,
+    "size": 113,
+    "comments": {
+      "total": 0,
+      "size": 0
     }
-  ],
-  "stylesheets.cohesion.min.value.selectors": [
-    "p"
-  ],
-  "stylesheets.browserhacks.total": 0,
-  "stylesheets.browserhacks.totalUnique": 0,
-  "stylesheets.linesOfCode.total": 10,
-  "stylesheets.linesOfCode.sourceLinesOfCode.total": 5,
-  "atrules.charsets.total": 0,
-  "atrules.charsets.unique": [],
-  "atrules.charsets.totalUnique": 0,
-  "atrules.documents.total": 0,
-  "atrules.documents.unique": [],
-  "atrules.documents.totalUnique": 0,
-  "atrules.fontfaces.total": 0,
-  "atrules.fontfaces.unique": [],
-  "atrules.fontfaces.totalUnique": 0,
-  "atrules.imports.total": 0,
-  "atrules.imports.unique": [],
-  "atrules.imports.totalUnique": 0,
-  "atrules.keyframes.total": 0,
-  "atrules.keyframes.unique": [],
-  "atrules.keyframes.totalUnique": 0,
-  "atrules.keyframes.prefixed.total": 0,
-  "atrules.keyframes.prefixed.unique": [],
-  "atrules.keyframes.prefixed.totalUnique": 0,
-  "atrules.keyframes.prefixed.share": 0,
-  "atrules.mediaqueries.total": 0,
-  "atrules.mediaqueries.unique": [],
-  "atrules.mediaqueries.totalUnique": 0,
-  "atrules.mediaqueries.browserhacks.total": 0,
-  "atrules.mediaqueries.browserhacks.unique": [],
-  "atrules.mediaqueries.browserhacks.totalUnique": 0,
-  "atrules.namespaces.total": 0,
-  "atrules.namespaces.unique": [],
-  "atrules.namespaces.totalUnique": 0,
-  "atrules.pages.total": 0,
-  "atrules.pages.unique": [],
-  "atrules.pages.totalUnique": 0,
-  "atrules.supports.total": 0,
-  "atrules.supports.unique": [],
-  "atrules.supports.totalUnique": 0,
-  "atrules.supports.browserhacks.total": 0,
-  "atrules.supports.browserhacks.unique": [],
-  "atrules.supports.browserhacks.totalUnique": 0,
-  "rules.total": 2,
-  "rules.empty.total": 0,
-  "rules.selectors.average": 1,
-  "rules.selectors.minimum.count": 1,
-  "rules.selectors.minimum.value": [
-    ".component[data-state=\"loading\"]"
-  ],
-  "rules.selectors.maximum.count": 1,
-  "rules.selectors.maximum.value": [
-    "p"
-  ],
-  "selectors.total": 2,
-  "selectors.totalUnique": 2,
-  "selectors.js.total": 0,
-  "selectors.js.unique": [],
-  "selectors.js.totalUnique": 0,
-  "selectors.id.total": 0,
-  "selectors.id.unique": [],
-  "selectors.id.totalUnique": 0,
-  "selectors.universal.total": 0,
-  "selectors.universal.unique": [],
-  "selectors.universal.totalUnique": 0,
-  "selectors.accessibility.total": 0,
-  "selectors.accessibility.unique": [],
-  "selectors.accessibility.totalUnique": 0,
-  "selectors.specificity.top": [
-    {
-      "count": 1,
-      "value": ".component[data-state=\"loading\"]",
-      "specificity": {
-        "a": 0,
-        "b": 0,
-        "c": 2,
-        "d": 0
+  },
+  "atrules": {
+    "fontface": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": [],
+      "uniquenessRatio": 1
+    },
+    "import": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0
+    },
+    "media": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0
+    },
+    "charset": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0
+    },
+    "supports": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0
+    },
+    "keyframes": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0,
+      "prefixed": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0,
+        "ratio": null
       }
     },
-    {
-      "count": 1,
-      "value": "p",
-      "specificity": {
-        "a": 0,
-        "b": 0,
-        "c": 0,
-        "d": 1
+    "container": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0
+    }
+  },
+  "rules": {
+    "total": 2,
+    "empty": {
+      "total": 0,
+      "ratio": 0
+    },
+    "selectors": {
+      "min": 1,
+      "max": 1,
+      "mean": 1,
+      "mode": 1,
+      "median": 1,
+      "range": 0,
+      "sum": 2,
+      "items": [
+        1,
+        1
+      ]
+    },
+    "declarations": {
+      "min": 1,
+      "max": 2,
+      "mean": 1.5,
+      "mode": 1.5,
+      "median": 1.5,
+      "range": 1,
+      "sum": 3,
+      "items": [
+        2,
+        1
+      ]
+    }
+  },
+  "selectors": {
+    "total": 2,
+    "totalUnique": 2,
+    "uniquenessRatio": 1,
+    "specificity": {
+      "sum": [
+        0,
+        2,
+        1
+      ],
+      "min": [
+        0,
+        0,
+        1
+      ],
+      "max": [
+        0,
+        2,
+        0
+      ],
+      "mean": [
+        0,
+        1,
+        0.5
+      ],
+      "mode": [
+        0,
+        1,
+        0.5
+      ],
+      "median": [
+        0,
+        1,
+        0.5
+      ],
+      "items": [
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          2,
+          0
+        ]
+      ]
+    },
+    "complexity": {
+      "min": 1,
+      "max": 3,
+      "mean": 2,
+      "mode": 2,
+      "median": 2,
+      "range": 2,
+      "sum": 4,
+      "total": 2,
+      "totalUnique": 2,
+      "unique": {
+        "1": 1,
+        "3": 1
+      },
+      "uniquenessRatio": 1,
+      "items": [
+        1,
+        3
+      ]
+    },
+    "id": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0,
+      "ratio": 0
+    },
+    "accessibility": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0,
+      "ratio": 0
+    },
+    "keyframes": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0,
+      "ratio": 0
+    }
+  },
+  "declarations": {
+    "total": 3,
+    "unique": {
+      "total": 3,
+      "ratio": 1
+    },
+    "importants": {
+      "total": 0,
+      "ratio": 0,
+      "inKeyframes": {
+        "total": 0,
+        "ratio": 0
       }
     }
-  ],
-  "selectors.specificity.max.value.a": 0,
-  "selectors.specificity.max.value.b": 0,
-  "selectors.specificity.max.value.c": 2,
-  "selectors.specificity.max.value.d": 0,
-  "selectors.specificity.max.count": 1,
-  "selectors.specificity.max.selectors": [
-    {
-      "count": 1,
-      "value": ".component[data-state=\"loading\"]",
-      "specificity": {
-        "a": 0,
-        "b": 0,
-        "c": 2,
-        "d": 0
+  },
+  "properties": {
+    "total": 3,
+    "totalUnique": 3,
+    "unique": {
+      "color": 1,
+      "font-size": 1,
+      "background-color": 1
+    },
+    "uniquenessRatio": 1,
+    "prefixed": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0,
+      "ratio": 0
+    },
+    "custom": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0,
+      "ratio": 0
+    },
+    "browserhacks": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0,
+      "ratio": 0
+    }
+  },
+  "values": {
+    "colors": {
+      "total": 2,
+      "totalUnique": 2,
+      "unique": {
+        "blue": 1,
+        "whitesmoke": 1
+      },
+      "uniquenessRatio": 1,
+      "itemsPerContext": {
+        "color": {
+          "total": 1,
+          "totalUnique": 1,
+          "unique": {
+            "blue": 1
+          },
+          "uniquenessRatio": 1
+        },
+        "background-color": {
+          "total": 1,
+          "totalUnique": 1,
+          "unique": {
+            "whitesmoke": 1
+          },
+          "uniquenessRatio": 1
+        }
       }
-    }
-  ],
-  "selectors.complexity.max.value": 3,
-  "selectors.complexity.max.selectors": [
-    {
-      "value": ".component[data-state=\"loading\"]",
-      "count": 1
-    }
-  ],
-  "selectors.complexity.max.count": 1,
-  "selectors.complexity.average": 2,
-  "selectors.complexity.sum": 4,
-  "selectors.complexity.unique": [
-    {
-      "value": 1,
-      "count": 1
     },
-    {
-      "value": 3,
-      "count": 1
-    }
-  ],
-  "selectors.complexity.totalUnique": 2,
-  "selectors.browserhacks.total": 0,
-  "selectors.browserhacks.unique": [],
-  "selectors.browserhacks.totalUnique": 0,
-  "declarations.total": 3,
-  "declarations.totalUnique": 3,
-  "declarations.importants.total": 0,
-  "declarations.importants.share": 0,
-  "properties.total": 3,
-  "properties.unique": [
-    {
-      "value": "background-color",
-      "count": 1
+    "fontFamilies": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0
     },
-    {
-      "value": "color",
-      "count": 1
+    "fontSizes": {
+      "total": 1,
+      "totalUnique": 1,
+      "unique": {
+        "100%": 1
+      },
+      "uniquenessRatio": 1
     },
-    {
-      "value": "font-size",
-      "count": 1
-    }
-  ],
-  "properties.totalUnique": 3,
-  "properties.prefixed.total": 0,
-  "properties.prefixed.unique": [],
-  "properties.prefixed.totalUnique": 0,
-  "properties.prefixed.share": 0,
-  "properties.browserhacks.total": 0,
-  "properties.browserhacks.unique": [],
-  "properties.browserhacks.totalUnique": 0,
-  "values.total": 3,
-  "values.prefixed.total": 0,
-  "values.prefixed.unique": [],
-  "values.prefixed.totalUnique": 0,
-  "values.prefixed.share": 0,
-  "values.fontsizes.total": 1,
-  "values.fontsizes.unique": [
-    {
-      "value": "100%",
-      "count": 1
-    }
-  ],
-  "values.fontsizes.totalUnique": 1,
-  "values.fontfamilies.total": 0,
-  "values.fontfamilies.unique": [],
-  "values.fontfamilies.totalUnique": 0,
-  "values.colors.total": 2,
-  "values.colors.unique": [
-    {
-      "value": "blue",
-      "count": 1
+    "zindexes": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0
     },
-    {
-      "value": "whitesmoke",
-      "count": 1
+    "textShadows": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0
+    },
+    "boxShadows": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0
+    },
+    "animations": {
+      "durations": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      },
+      "timingFunctions": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
+    },
+    "prefixes": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0
+    },
+    "units": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0,
+      "itemsPerContext": {}
     }
-  ],
-  "values.colors.totalUnique": 2,
-  "values.colors.duplicates.unique": [],
-  "values.colors.duplicates.totalUnique": 0,
-  "values.colors.duplicates.total": 0,
-  "values.browserhacks.total": 0,
-  "values.browserhacks.unique": [],
-  "values.browserhacks.totalUnique": 0,
-  "values.boxshadows.total": 0,
-  "values.boxshadows.unique": [],
-  "values.boxshadows.totalUnique": 0,
-  "values.textshadows.total": 0,
-  "values.textshadows.unique": [],
-  "values.textshadows.totalUnique": 0,
-  "values.zindexes.total": 0,
-  "values.zindexes.unique": [],
-  "values.zindexes.totalUnique": 0,
-  "values.animations.durations.total": 0,
-  "values.animations.durations.unique": [],
-  "values.animations.durations.totalUnique": 0,
-  "values.animations.timingFunctions.total": 0,
-  "values.animations.timingFunctions.unique": [],
-  "values.animations.timingFunctions.totalUnique": 0
+  },
+  "__meta__": {
+    "parseTime": 4,
+    "analyzeTime": 5,
+    "total": 10
+  }
 }
-````
+```
+</details>
+
+### Comparing specificity
+
+```js
+import { compareSpecificity } from '@projectwallace/css-analyzer'
+
+const result = [
+  [0,1,1],
+  [2,0,0],
+  [0,0,1],
+].sort((a, b) => compareSpecificity(a, b))
+
+// => result:
+// [
+//   [2,0,0],
+//   [0,1,1],
+//   [0,0,1],
+// ]
+
+const isSpecificityEqual = compareSpecificity(
+  [0,1,0],
+  [0,1,0]
+) === 0
+// => isSpecificityEqual: true
+```
 
 ## Related projects
 
-- [Wallace CLI](https://github.com/bartveneman/wallace-cli) - CLI tool for
+- [Wallace CLI](https://github.com/projectwallace/wallace-cli) - CLI tool for
   @projectwallace/css-analyzer
-- [Constyble](https://github.com/bartveneman/constyble) - CSS Complexity linter
-- [Color Sorter](https://github.com/bartveneman/color-sorter) - Sort CSS colors
+- [Constyble](https://github.com/projectwallace/constyble) - CSS Complexity linter
+- [Color Sorter](https://github.com/projectwallace/color-sorter) - Sort CSS colors
   by hue, saturation, lightness and opacity
