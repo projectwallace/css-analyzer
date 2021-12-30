@@ -37,6 +37,7 @@
     "metrics"
   ],
   "files": [
+    "dist",
     "src",
     "!src/__fixtures__",
     "!*.test.js"
