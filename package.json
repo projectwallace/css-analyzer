@@ -10,11 +10,17 @@
   "issues": "https://github.com/projectwallace/css-analyzer/issues",
   "license": "MIT",
   "type": "module",
+  "files": [
+    "dist"
+  ],
   "source": "src/index.js",
-  "exports": "./dist/analyzer.js",
   "main": "./dist/analyzer.cjs",
   "module": "./dist/analyzer.module.js",
   "unpkg": "./dist/analyzer.umd.js",
+  "exports": {
+    "require": "./dist/analyzer.cjs",
+    "default": "./dist/analyzer.modern.js"
+  },
   "engines": {
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
   },
@@ -36,16 +42,13 @@
     "styleguide",
     "metrics"
   ],
-  "files": [
-    "dist"
-  ],
   "dependencies": {
     "css-tree": "^2.0.1"
   },
   "devDependencies": {
     "benchmark": "^2.1.4",
-    "microbundle": "^0.13.3",
-    "uvu": "^0.5.1",
+    "microbundle": "^0.14.2",
+    "uvu": "^0.5.3",
     "watchlist": "^0.2.3"
   }
 }
