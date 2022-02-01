@@ -87,7 +87,7 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
   return {
     total: totalSelectors,
     totalUnique,
-    uniquenessRatio: totalUnique / totalSelectors,
+    uniquenessRatio: totalSelectors === 0 ? 0 : totalUnique / totalSelectors,
     specificity: {
       sum: [aggregatesA.sum, aggregatesB.sum, aggregatesC.sum],
       min: minSpecificity,
@@ -104,15 +104,15 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
     },
     id: {
       ...ids.count(),
-      ratio: ids.size() / totalSelectors,
+      ratio: totalSelectors === 0 ? 0 : ids.size() / totalSelectors,
     },
     accessibility: {
       ...a11y.count(),
-      ratio: a11y.size() / totalSelectors,
+      ratio: totalSelectors === 0 ? 0 : a11y.size() / totalSelectors,
     },
     keyframes: {
       ...keyframes.count(),
-      ratio: keyframes.size() / totalSelectors,
+      ratio: totalSelectors === 0 ? 0 : keyframes.size() / totalSelectors,
     }
   }
 }

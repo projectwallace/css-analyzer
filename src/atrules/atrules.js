@@ -64,7 +64,7 @@ const analyzeAtRules = ({ atrules, stringifyNode }) => {
       ...keyframes.count(),
       prefixed: {
         ...prefixedKeyframes.count(),
-        ratio: prefixedKeyframes.size() / keyframes.size()
+        ratio: keyframes.size() === 0 ? 0 : prefixedKeyframes.size() / keyframes.size()
       }
     },
     container: containers.count(),

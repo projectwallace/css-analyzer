@@ -221,6 +221,25 @@ AtRules('analyzes @keyframes', () => {
   assert.equal(actual, expected)
 })
 
+AtRules('counts ratio correctly when no @keyframes present', () => {
+  const fixture = `@media (min-width: 0px) {}`
+  const actual = analyze(fixture)
+  const expected = {
+    total: 0,
+    totalUnique: 0,
+    unique: {},
+    uniquenessRatio: 0,
+    prefixed: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+      ratio: 0,
+    },
+  }
+  assert.equal(actual.atrules.keyframes, expected)
+})
+
 AtRules('analyzes container queries', () => {
   // Fixture contains examples from the spec.
   // https://drafts.csswg.org/css-contain-3/

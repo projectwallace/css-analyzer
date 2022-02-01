@@ -1,4 +1,7 @@
 class CountableCollection {
+  /**
+   * @param {string[]} initial
+   */
   constructor(initial) {
     this.items = {}
     this.total = 0
