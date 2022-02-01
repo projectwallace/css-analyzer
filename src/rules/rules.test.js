@@ -13,6 +13,39 @@ Rules('should count rules', () => {
   `).rules.total, 2)
 })
 
+Rules('should handle CSS without rules', () => {
+  const fixture = `@media (min-width: 0px) {}`
+  const actual = analyze(fixture)
+  const expected = {
+    total: 0,
+    empty: {
+      total: 0,
+      ratio: 0
+    },
+    selectors: {
+      min: 0,
+      max: 0,
+      mean: 0,
+      mode: 0,
+      median: 0,
+      range: 0,
+      sum: 0,
+      items: [],
+    },
+    declarations: {
+      min: 0,
+      max: 0,
+      mean: 0,
+      mode: 0,
+      median: 0,
+      range: 0,
+      sum: 0,
+      items: [],
+    },
+  }
+  assert.equal(actual.rules, expected)
+})
+
 Rules('should count empty rules', () => {
   assert.is(1, analyze(`test{}`).rules.empty.total)
   assert.is(analyze('@media print {}').rules.empty.total, 0)

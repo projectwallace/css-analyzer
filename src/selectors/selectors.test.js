@@ -25,6 +25,66 @@ Selectors('are analyzed', () => {
   assert.equal(actual, 2)
 })
 
+Selectors('handles CSS without selectors', () => {
+  const fixture = `
+    @font-face {
+      font-family: url('/test');
+      font-family: test;
+    }
+  `
+  const actual = analyze(fixture)
+  const expected = {
+    total: 0,
+    totalUnique: 0,
+    uniquenessRatio: 0,
+    specificity: {
+      sum: [0, 0, 0],
+      min: undefined,
+      max: undefined,
+      mean: [0, 0, 0],
+      mode: [0, 0, 0],
+      median: [0, 0, 0],
+      items: [],
+    },
+    complexity: {
+      min: 0,
+      max: 0,
+      mean: 0,
+      mode: 0,
+      median: 0,
+      range: 0,
+      sum: 0,
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+      items: [],
+    },
+    id: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+      ratio: 0,
+    },
+    accessibility: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+      ratio: 0,
+    },
+    keyframes: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+      ratio: 0,
+    },
+  }
+  assert.equal(actual.selectors, expected)
+})
+
 Selectors('have their complexity calculated', () => {
   const fixture = `
     rule {

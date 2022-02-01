@@ -39,7 +39,7 @@ const analyzeRules = ({ rules }) => {
     total: totalRules,
     empty: {
       total: emptyRules,
-      ratio: emptyRules / totalRules
+      ratio: totalRules === 0 ? 0 : emptyRules / totalRules
     },
     selectors: {
       ...selectorsPerRule.aggregate(),
