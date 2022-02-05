@@ -2,6 +2,7 @@ import { CountableCollection } from '../countable-collection.js'
 import { hasVendorPrefix } from '../vendor-prefix.js'
 
 const analyzeAtRules = ({ atrules, stringifyNode }) => {
+  /** @type {{[index: string]: string}[]} */
   const fontfaces = []
   const imports = new CountableCollection()
   const medias = new CountableCollection()
@@ -13,11 +14,13 @@ const analyzeAtRules = ({ atrules, stringifyNode }) => {
 
   const machine = {
     'font-face': (node) => {
+      /** @type {[index: string]: string} */
       const descriptors = {}
 
-      node.block.children.forEach(descriptor => {
-        descriptors[descriptor.property] = stringifyNode(descriptor.value)
-      })
+      node.block.children.forEach(
+        /** @param {import('css-tree').Declaration} descriptor */
+        descriptor => (descriptors[descriptor.property] = stringifyNode(descriptor.value))
+      )
 
       fontfaces.push(descriptors)
     },
@@ -30,6 +33,7 @@ const analyzeAtRules = ({ atrules, stringifyNode }) => {
   }
 
   for (let i = 0; i < atrules.length; i++) {
+    /** @type {import('css-tree').Atrule} */
     const node = atrules[i]
     const nodeName = node.name
     const action = machine[nodeName]

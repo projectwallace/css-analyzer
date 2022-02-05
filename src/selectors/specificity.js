@@ -1,15 +1,9 @@
 import * as csstree from 'css-tree'
 
 /**
- * @typedef {[number, number, number]} Specificity
- *
- * @typedef {import('css-tree').Selector} Selector
- */
-
-/**
  * Compare specificity A to Specificity B
- * @param {Specificity} a - Specificity A
- * @param {Specificity} b - Specificity B
+ * @param {[number,number,number]} a - Specificity A
+ * @param {[number,number,number]} b - Specificity B
  * @returns {number} sortIndex - 0 when a==b, 1 when a<b, -1 when a>b
  */
 function compareSpecificity(a, b) {
@@ -43,10 +37,12 @@ function selectorListSpecificities(selectorListAst) {
 
 /**
  * Get the Specificity for the AST of a Selector Node
- * @param {import('css-tree').Node} ast - AST Node for a Selector
+ * @param {import('css-tree').Selector} ast - AST Node for a Selector
  * @return {Object}
- * @property {Specificity} specificity
+ * @property {[number,number,number]} specificity
  * @property {number} complexity
+ * @property {Boolean} isId
+ * @property {Boolean} isA11y
  */
 const analyzeSpecificity = (ast) => {
   let A = 0
@@ -187,7 +183,7 @@ const analyzeSpecificity = (ast) => {
   })
 
   return {
-    /** @type Specificity */
+    /** @type {[number,number,number]} */
     specificity: [A, B, C],
     complexity,
     isId: A > 0,

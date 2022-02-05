@@ -2,6 +2,7 @@ import * as csstree from 'css-tree'
 import { AggregateCollection } from '../aggregate-collection.js'
 
 const analyzeRules = ({ rules }) => {
+  /** @type number */
   const totalRules = rules.length
   const selectorsPerRule = new AggregateCollection(totalRules)
   const declarationsPerRule = new AggregateCollection(totalRules)

@@ -51,18 +51,18 @@ function Median(arr) {
 
 class AggregateCollection {
   constructor(size) {
-    /** @type Number[] */
+    /** @type number[] */
     this.items = new Uint8Array(size)
     this.sum = 0
     this.cursor = 0
   }
 
   /**
-   * Add a new Integer to the AggregateCollection
-   * @param {number} item - The item to add to the AggregateCollection
+   * Add a new Integer at the end of this AggregateCollection
+   * @param {number} item - The item to add
    */
   add(item) {
-    this.items[this.cursor] = (item)
+    this.items[this.cursor] = item
     this.sum += item
     this.cursor++
   }
@@ -101,6 +101,9 @@ class AggregateCollection {
     }
   }
 
+  /**
+   * @returns {number[]} All items in this collection
+   */
   toArray() {
     return Array.from(
       this.items.subarray(0, this.cursor)
