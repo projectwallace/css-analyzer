@@ -2,8 +2,6 @@ import { analyzeSpecificity, compareSpecificity } from './specificity.js'
 import { AggregateCollection } from '../aggregate-collection.js'
 import { CountableCollection } from '../countable-collection.js'
 
-/** @typedef {[number, number, number]} Specificity */
-
 const analyzeSelectors = ({ stringifyNode, selectors }) => {
   const counts = Object.create(null)
   const cache = Object.create(null)

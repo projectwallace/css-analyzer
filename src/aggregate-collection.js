@@ -102,7 +102,6 @@ class AggregateCollection {
   }
 
   /**
-   *
    * @returns {number[]} All items in this collection
    */
   toArray() {
