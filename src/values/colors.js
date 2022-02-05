@@ -186,7 +186,3 @@ export const colorFunctions = {
   oklch: 1,
   color: 1,
 }
-
-export const analyzeColors = ({ colors }) => {
-  return colors.count()
-}

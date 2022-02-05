@@ -21,6 +21,7 @@
     "require": "./dist/analyzer.cjs",
     "default": "./dist/analyzer.modern.js"
   },
+  "types": "./dist/analyzer.d.ts",
   "engines": {
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
   },

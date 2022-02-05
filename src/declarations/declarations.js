@@ -1,4 +1,5 @@
 const analyzeDeclarations = ({ stringifyNode, declarations }) => {
+  /** @type number */
   const total = declarations.length
   const cache = Object.create(null)
   let importants = 0

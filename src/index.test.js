@@ -3,7 +3,6 @@ import * as assert from 'uvu/assert';
 import { analyze, compareSpecificity } from './index.js'
 import { readFileSync } from 'fs'
 
-
 const fixtures = [
   'bol-com-20190617.css',
   'css-tricks-20190319.css',
@@ -24,7 +23,7 @@ const fixtures = [
 const Api = suite('Public API')
 
 Api('exposes the analyze method', () => {
-  assert.is(typeof compareSpecificity, 'function')
+  assert.is(typeof analyze, 'function')
 })
 
 Api('exposes the compareSpecificity method', () => {

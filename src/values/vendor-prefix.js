@@ -30,6 +30,7 @@ const analyzeVendorPrefixes = ({ values, stringifyNode }) => {
   const all = new CountableCollection()
 
   for (let i = 0; i < values.length; i++) {
+    /** @type {import('css-tree').Value} */
     const value = values[i]
 
     if (value.children && isAstVendorPrefixed(value.children)) {

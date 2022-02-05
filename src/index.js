@@ -1,7 +1,7 @@
 import * as csstree from 'css-tree'
 import { compareSpecificity } from './selectors/specificity.js'
 import { analyzeRules } from './rules/rules.js'
-import { analyzeColors, colorFunctions, colorNames } from './values/colors.js'
+import { colorFunctions, colorNames } from './values/colors.js'
 import { analyzeFontFamilies } from './values/font-families.js'
 import { analyzeFontSizes } from './values/font-sizes.js'
 import { analyzeDeclarations } from './declarations/declarations.js'
@@ -11,13 +11,12 @@ import { analyzeValues } from './values/values.js'
 import { analyzeAnimations } from './values/animations.js'
 import { analyzeVendorPrefixes } from './values/vendor-prefix.js'
 import { analyzeAtRules } from './atrules/atrules.js'
-import { CountableCollection } from './countable-collection.js'
 import { ContextCollection } from './context-collection.js'
+import { CountableCollection } from './countable-collection.js'
 
 /**
- *
+ * Analyze CSS
  * @param {string} css
- * @returns
  */
 const analyze = (css) => {
   const start = new Date()
@@ -28,7 +27,7 @@ const analyze = (css) => {
 
   /**
    * Recreate the authored CSS from a CSSTree node
-   * @param {import('css-tree').Node} node - Node from CSSTree AST to stringify
+   * @param {import('css-tree').CssNode} node - Node from CSSTree AST to stringify
    * @returns {string} str - The stringified node
    */
   function stringifyNode(node) {
@@ -253,7 +252,7 @@ const analyze = (css) => {
     declarations: analyzeDeclarations({ stringifyNode, declarations }),
     properties: analyzeProperties({ properties }),
     values: {
-      colors: analyzeColors({ colors }),
+      colors: colors.count(),
       fontFamilies: analyzeFontFamilies({ stringifyNode, fontValues, fontFamilyValues }),
       fontSizes: analyzeFontSizes({ stringifyNode, fontValues, fontSizeValues }),
       zindexes: analyzeValues({ values: zindex, stringifyNode }),
@@ -271,4 +270,7 @@ const analyze = (css) => {
   }
 }
 
-export { analyze, compareSpecificity }
+export {
+  analyze,
+  compareSpecificity,
+}

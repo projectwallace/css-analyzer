@@ -7,11 +7,12 @@ import { CountableCollection } from '../countable-collection.js'
 const analyzeSelectors = ({ stringifyNode, selectors }) => {
   const counts = Object.create(null)
   const cache = Object.create(null)
+  /** @type number */
   const totalSelectors = selectors.length
 
-  /** @type Specificity|undefined */
+  /** @type [number,number,number] */
   let maxSpecificity
-  /** @type Specificity|undefined */
+  /** @type [number,number,number] */
   let minSpecificity
   let specificityA = new AggregateCollection(totalSelectors)
   let specificityB = new AggregateCollection(totalSelectors)
@@ -19,14 +20,18 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
   let totalUnique = 0
   const complexityAggregator = new AggregateCollection(totalSelectors);
 
+  /** @type [number,number,number][] */
   const specificities = []
+  /** @type number[] */
   const complexities = []
   const ids = new CountableCollection()
   const a11y = new CountableCollection()
   const keyframes = new CountableCollection()
 
   for (let i = 0; i < totalSelectors; i++) {
+    /** @type import('css-tree').Selector */
     const node = selectors[i];
+    /** @type string */
     const value = stringifyNode(node)
 
     if (node.isKeyframeSelector) {
@@ -89,12 +94,19 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
     totalUnique,
     uniquenessRatio: totalSelectors === 0 ? 0 : totalUnique / totalSelectors,
     specificity: {
-      sum: [aggregatesA.sum, aggregatesB.sum, aggregatesC.sum],
+      /** @type [number, number, number] */
       min: minSpecificity,
+      /** @type [number, number, number] */
       max: maxSpecificity,
+      /** @type [number, number, number] */
+      sum: [aggregatesA.sum, aggregatesB.sum, aggregatesC.sum],
+      /** @type [number, number, number] */
       mean: [aggregatesA.mean, aggregatesB.mean, aggregatesC.mean],
+      /** @type [number, number, number] */
       mode: [aggregatesA.mode, aggregatesB.mode, aggregatesC.mode],
+      /** @type [number, number, number] */
       median: [aggregatesA.median, aggregatesB.median, aggregatesC.median],
+      /** @type [number, number, number][] */
       items: specificities
     },
     complexity: {
