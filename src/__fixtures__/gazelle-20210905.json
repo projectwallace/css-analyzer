@@ -6,6 +6,16 @@
     "comments": {
       "total": 66,
       "size": 2795
+    },
+    "embeddedContent": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0,
+      "size": {
+        "total": 0,
+        "ratio": 0
+      }
     }
   },
   "atrules": {

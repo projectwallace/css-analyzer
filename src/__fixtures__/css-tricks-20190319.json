@@ -6,6 +6,18 @@
     "comments": {
       "total": 39,
       "size": 2552
+    },
+    "embeddedContent": {
+      "total": 1,
+      "totalUnique": 1,
+      "unique": {
+        "data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 13 24'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='9.31' y1='12.13' x2='9.91' y2='14.89' gradientTransform='matrix(0, 1, 1, 0, -6.5, 5.5)' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%23ff8a00'/%3E%3Cstop offset='1' stop-color='%23da1b60'/%3E%3C/linearGradient%3E%3ClinearGradient id='b' x1='-4.24' y1='12.93' x2='-3.47' y2='13.15' xlink:href='%23a'/%3E%3ClinearGradient id='c' x1='12.48' y1='13.07' x2='17.01' y2='13.73' xlink:href='%23a'/%3E%3C/defs%3E%3Ctitle%3EAsset 4%3C/title%3E%3Cpath d='M6.5,7V23' fill='none' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' stroke='url(%23a)'/%3E%3Cpath d='M6.5,1V2' fill='none' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' stroke='url(%23b)'/%3E%3Cpath d='M12,17.5,6.5,23,1,17.5' fill='none' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' stroke='url(%23c)'/%3E%3C/svg%3E": 1
+      },
+      "uniquenessRatio": 1,
+      "size": {
+        "total": 1017,
+        "ratio": 0.005218970985189823
+      }
     }
   },
   "atrules": {

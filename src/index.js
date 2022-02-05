@@ -95,6 +95,7 @@ const analyze = (css) => {
   const durations = []
   const colors = new ContextCollection()
   const units = new ContextCollection()
+  const embeds = new CountableCollection()
 
   csstree.walk(ast, {
     enter: function (node) {
@@ -127,6 +128,12 @@ const analyze = (css) => {
           units.push(node.unit, this.declaration.property)
 
           return this.skip
+        }
+        case 'Url': {
+          if (node.value.startsWith('data:')) {
+            embeds.push(node.value)
+          }
+          break
         }
         case 'Declaration': {
           declarations.push({
@@ -221,6 +228,8 @@ const analyze = (css) => {
       }
     }
   })
+  const embeddedContent = embeds.count()
+  const embedSize = Object.keys(embeddedContent.unique).join('').length
 
   return {
     stylesheet: {
@@ -231,6 +240,12 @@ const analyze = (css) => {
         total: totalComments,
         size: commentsSize,
       },
+      embeddedContent: Object.assign(embeddedContent, {
+        size: {
+          total: embedSize,
+          ratio: css.length === 0 ? 0 : embedSize / css.length,
+        },
+      }),
     },
     atrules: analyzeAtRules({ atrules, stringifyNode }),
     rules: analyzeRules({ rules }),
