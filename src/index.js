@@ -1,6 +1,6 @@
 import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
-import { property as cssProperty } from 'css-tree'
+// import { property as cssProperty } from 'css-tree'
 import { compareSpecificity } from './selectors/specificity.js'
 import { analyzeRules } from './rules/rules.js'
 import { colorFunctions, colorNames } from './values/colors.js'
@@ -145,7 +145,13 @@ const analyze = (css) => {
           const { value, property } = node
           const fullProperty = {
             authored: property,
-            ...cssProperty(property)
+            // ...cssProperty(property)
+            basename: property,
+            name: property,
+            hack: false,
+            vendor: '',
+            prefix: '',
+            custom: false,
           }
 
           properties.push(fullProperty)
