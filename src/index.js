@@ -1,4 +1,6 @@
-import * as csstree from 'css-tree'
+import parse from 'css-tree/parser'
+import walk from 'css-tree/walker'
+import { property as getProperty } from '../node_modules/css-tree/lib/utils/names.js'
 import { compareSpecificity } from './selectors/specificity.js'
 import { analyzeRules } from './rules/rules.js'
 import { colorFunctions, colorNames } from './values/colors.js'
@@ -66,7 +68,7 @@ const analyze = (css) => {
   let totalComments = 0
   let commentsSize = 0
 
-  const ast = csstree.parse(css, {
+  const ast = parse(css, {
     parseAtrulePrelude: false,
     parseCustomProperty: true, // To find font-families, colors, etc.
     positions: true, // So we can use stringifyNode()
@@ -96,7 +98,7 @@ const analyze = (css) => {
   const units = new ContextCollection()
   const embeds = new CountableCollection()
 
-  csstree.walk(ast, {
+  walk(ast, {
     enter: function (node) {
       switch (node.type) {
         case 'Atrule': {
@@ -141,10 +143,9 @@ const analyze = (css) => {
           })
 
           const { value, property } = node
-          const fullProperty = {
-            authored: property,
-            ...csstree.property(property)
-          }
+          const fullProperty = Object.assign({
+            authored: property
+          }, getProperty(property))
 
           properties.push(fullProperty)
           values.push(value)
@@ -192,7 +193,7 @@ const analyze = (css) => {
             }
           }
 
-          csstree.walk(node.value, {
+          walk(value, {
             enter: function (valueNode) {
               switch (valueNode.type) {
                 case 'Hash': {

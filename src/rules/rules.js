@@ -1,4 +1,4 @@
-import * as csstree from 'css-tree'
+import walk from 'css-tree/walker'
 import { AggregateCollection } from '../aggregate-collection.js'
 
 const analyzeRules = ({ rules }) => {
@@ -13,7 +13,7 @@ const analyzeRules = ({ rules }) => {
     let selectors = 0
     let declarations = 0
 
-    csstree.walk(rules[i], {
+    walk(rules[i], {
       enter: function (childNode) {
         if (childNode.type === 'Selector') {
           selectors++

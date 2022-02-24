@@ -1,4 +1,4 @@
-import * as csstree from 'css-tree'
+import walk from 'css-tree/walker'
 import { CountableCollection } from '../countable-collection.js'
 
 const sizeKeywords = {
@@ -47,7 +47,7 @@ const analyzeFontSizes = ({ stringifyNode, fontSizeValues, fontValues }) => {
     let operator = false
     let size
 
-    csstree.walk(fontNode, {
+    walk(fontNode, {
       enter: function (fontNode) {
         switch (fontNode.type) {
           case 'Number': {

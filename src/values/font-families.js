@@ -1,4 +1,5 @@
-import * as csstree from 'css-tree'
+import walk from 'css-tree/walker'
+import generate from 'css-tree/generator'
 import { CountableCollection } from '../countable-collection.js'
 
 const systemKeywords = {
@@ -69,7 +70,7 @@ const analyzeFontFamilies = ({ fontValues, fontFamilyValues }) => {
 
     const parts = []
 
-    csstree.walk(value, {
+    walk(value, {
       reverse: true,
       enter: function (fontNode) {
         if (fontNode.type === 'String') {
@@ -87,7 +88,7 @@ const analyzeFontFamilies = ({ fontValues, fontFamilyValues }) => {
       }
     })
 
-    all.push(parts.map(csstree.generate).join(''))
+    all.push(parts.map(generate).join(''))
   }
 
   return all.count()

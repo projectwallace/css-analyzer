@@ -1,4 +1,5 @@
-import * as csstree from 'css-tree'
+import parse from 'css-tree/parser'
+import walk from 'css-tree/walker'
 
 /**
  * Compare specificity A to Specificity B
@@ -25,7 +26,7 @@ function compareSpecificity(a, b) {
  */
 function selectorListSpecificities(selectorListAst) {
   const childSelectors = []
-  csstree.walk(selectorListAst, {
+  walk(selectorListAst, {
     visit: 'Selector',
     enter(node) {
       childSelectors.push(analyzeSpecificity(node))
@@ -51,7 +52,7 @@ const analyzeSpecificity = (ast) => {
   let complexity = 0
   let isA11y = false
 
-  csstree.walk(ast, {
+  walk(ast, {
     enter: function (selector) {
       switch (selector.type) {
         case 'IdSelector': {
@@ -94,9 +95,8 @@ const analyzeSpecificity = (ast) => {
 
           // CSSTree doesn't parse the arguments of :is, :has and :matches,
           // so we need to create an AST out of them ourselves
-          if (['is', 'has', 'matches'].includes(selector.name)) {
-            const rawSelectorList = csstree.find(selector, ({ type }) => type === 'Raw')
-            const childAst = csstree.parse(rawSelectorList.value, { context: 'selectorList' })
+          if (['is', 'has', 'matches', '-webkit-any', '-moz-any'].includes(selector.name)) {
+            const childAst = parse(selector.children.first.value, { context: 'selectorList' })
             const selectorList = selectorListSpecificities(childAst)
             const [topA, topB, topC] = selectorList[0].specificity
             A += topA
@@ -157,8 +157,7 @@ const analyzeSpecificity = (ast) => {
           // The specificity of a :where() pseudo-class is replaced by zero,
           // but it does count towards complexity.
           if (selector.name === 'where') {
-            const rawSelectorList = csstree.find(selector, ({ type }) => type === 'Raw')
-            const childAst = csstree.parse(rawSelectorList.value, { context: 'selectorList' })
+            const childAst = parse(selector.children.first.value, { context: 'selectorList' })
             const childSelectors = selectorListSpecificities(childAst)
 
             for (let i = 0; i < childSelectors.length; i++) {
