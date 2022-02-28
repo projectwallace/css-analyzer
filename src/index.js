@@ -1,6 +1,6 @@
 import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
-import { property as getProperty } from '../node_modules/css-tree/lib/utils/names.js'
+import { property as getProperty } from 'css-tree/utils'
 import { compareSpecificity } from './selectors/specificity.js'
 import { analyzeRules } from './rules/rules.js'
 import { colorFunctions, colorNames } from './values/colors.js'

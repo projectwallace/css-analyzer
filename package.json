@@ -28,7 +28,7 @@
   "scripts": {
     "test": "uvu",
     "test:watch": "watchlist src -- npm test",
-    "build": "microbundle",
+    "build": "microbundle --external=none",
     "dev": "microbundle watch"
   },
   "keywords": [
@@ -44,7 +44,7 @@
     "metrics"
   ],
   "dependencies": {
-    "css-tree": "^2.0.1"
+    "css-tree": "^2.1.0"
   },
   "devDependencies": {
     "benchmark": "^2.1.4",
