@@ -28,7 +28,7 @@
   "scripts": {
     "test": "uvu",
     "test:watch": "watchlist src -- npm test",
-    "build": "microbundle --external=none",
+    "build": "microbundle",
     "dev": "microbundle watch"
   },
   "keywords": [
