@@ -69,7 +69,7 @@ const analyze = (css) => {
   let commentsSize = 0
 
   const ast = parse(css, {
-    parseAtrulePrelude: false,
+    parseAtrulePrelude: true,
     parseCustomProperty: true, // To find font-families, colors, etc.
     positions: true, // So we can use stringifyNode()
     onComment: function (comment) {

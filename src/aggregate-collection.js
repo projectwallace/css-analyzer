@@ -81,6 +81,7 @@ class AggregateCollection {
     }
 
     /** @type Number[] */
+    // TODO: avoid the sort() by keeping track of min+max in private vars
     const sorted = new Uint8Array(
       this.items.slice(0, this.cursor)
     ).sort((a, b) => a - b)

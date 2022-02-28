@@ -1,3 +1,6 @@
+
+import walk from 'css-tree/walker'
+import { AggregateCollection } from '../aggregate-collection.js'
 import { CountableCollection } from '../countable-collection.js'
 import { hasVendorPrefix } from '../vendor-prefix.js'
 
@@ -5,9 +8,11 @@ const analyzeAtRules = ({ atrules, stringifyNode }) => {
   /** @type {{[index: string]: string}[]} */
   const fontfaces = []
   const imports = new CountableCollection()
+  const importComplexities = []
   const medias = new CountableCollection()
   const charsets = new CountableCollection()
   const supports = new CountableCollection()
+  const supportComplexities = []
   const keyframes = new CountableCollection()
   const prefixedKeyframes = new CountableCollection()
   const containers = new CountableCollection()
@@ -24,12 +29,40 @@ const analyzeAtRules = ({ atrules, stringifyNode }) => {
 
       fontfaces.push(descriptors)
     },
-    'media': node => medias.push(node.prelude.value),
-    'supports': node => supports.push(node.prelude.value),
-    'keyframes': node => keyframes.push(`@${node.name} ${node.prelude.value}`),
-    'import': node => imports.push(node.prelude.value),
-    'charset': node => charsets.push(node.prelude.value),
-    'container': node => containers.push(node.prelude.value),
+    'media': node => medias.push(stringifyNode(node.prelude)),
+    'supports': node => {
+      supports.push(stringifyNode(node.prelude))
+      let complexity = 0
+      walk(node.prelude, function (preludeChild) {
+        if (preludeChild.type === 'Declaration') {
+          complexity += 1
+        }
+        if (preludeChild.name === 'not') {
+          complexity += 1
+        }
+      })
+      supportComplexities.push(complexity)
+      return node.break
+    },
+    'keyframes': node => keyframes.push(`@${node.name} ${stringifyNode(node.prelude)}`),
+    'import': node => {
+      imports.push(stringifyNode(node.prelude))
+      let complexity = 0
+      walk(node.prelude, function (preludeChild) {
+        if (preludeChild.type !== 'MediaQuery') {
+          return preludeChild.skip
+        }
+
+        preludeChild.children.forEach(mqChild => {
+          if (mqChild.name === 'and') return
+          complexity += 1
+        })
+      })
+      importComplexities.push(complexity)
+      return node.break
+    },
+    'charset': node => charsets.push(stringifyNode(node.prelude)),
+    'container': node => containers.push(stringifyNode(node.prelude)),
   }
 
   for (let i = 0; i < atrules.length; i++) {
@@ -43,7 +76,7 @@ const analyzeAtRules = ({ atrules, stringifyNode }) => {
     }
 
     if (nodeName.endsWith('keyframes')) {
-      const name = `@${nodeName} ${node.prelude.value}`
+      const name = `@${nodeName} ${stringifyNode(node.prelude)}`
       keyframes.push(name)
 
       if (hasVendorPrefix(nodeName)) {
@@ -53,6 +86,12 @@ const analyzeAtRules = ({ atrules, stringifyNode }) => {
     }
   }
 
+  const importsAggregator = new AggregateCollection(importComplexities.length)
+  importComplexities.map(c => importsAggregator.add(c))
+
+  const supportsAggregator = new AggregateCollection(supportComplexities.length)
+  supportComplexities.map(c => supportsAggregator.add(c))
+
   return {
     fontface: {
       total: fontfaces.length,
@@ -60,10 +99,20 @@ const analyzeAtRules = ({ atrules, stringifyNode }) => {
       unique: fontfaces,
       uniquenessRatio: 1
     },
-    import: imports.count(),
+    import: Object.assign(
+      imports.count(), {
+      complexity: Object.assign({
+        items: importComplexities,
+      }, importsAggregator.aggregate()),
+    }),
     media: medias.count(),
     charset: charsets.count(),
-    supports: supports.count(),
+    supports: Object.assign(
+      supports.count(), {
+      complexity: Object.assign({
+        items: supportComplexities,
+      }, supportsAggregator.aggregate()),
+    }),
     keyframes: {
       ...keyframes.count(),
       prefixed: {

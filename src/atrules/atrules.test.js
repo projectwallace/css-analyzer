@@ -100,7 +100,22 @@ AtRules('finds @imports', () => {
       'url("https://example.com/with-media-query") screen and (min-width: 33em)': 1,
       'url("https://example.com/with-multiple-media-queries") screen, projection': 1,
     },
-    uniquenessRatio: 4 / 4
+    uniquenessRatio: 4 / 4,
+    complexity: {
+      items: [
+        0,
+        0,
+        2,
+        2,
+      ],
+      min: 0,
+      max: 2,
+      mode: 1,
+      median: 1,
+      mean: 1,
+      sum: 4,
+      range: 2,
+    },
   }
 
   assert.equal(actual, expected)
@@ -130,6 +145,8 @@ AtRules('finds @supports', () => {
     @supports (filter: blur(5px)) {}
     @supports (display: table-cell) and (display: list-item) {}
     @supports (-webkit-appearance: none) {}
+    @supports not (display: flex) {}
+    @supports ((display: -webkit-flex) or (display: -moz-flex) or (display: flex)) and (-webkit-appearance: caret) {}
 
     @media (min-width: 0) {
       @supports (-webkit-appearance: none) {}
@@ -137,14 +154,33 @@ AtRules('finds @supports', () => {
   `
   const actual = analyze(fixture).atrules.supports
   const expected = {
-    total: 4,
-    totalUnique: 3,
+    total: 6,
+    totalUnique: 5,
     unique: {
       '(filter: blur(5px))': 1,
       '(display: table-cell) and (display: list-item)': 1,
+      'not (display: flex)': 1,
+      '((display: -webkit-flex) or (display: -moz-flex) or (display: flex)) and (-webkit-appearance: caret)': 1,
       '(-webkit-appearance: none)': 2,
     },
-    uniquenessRatio: 3 / 4
+    uniquenessRatio: 5 / 6,
+    complexity: {
+      items: [
+        1,
+        2,
+        1,
+        2,
+        4,
+        1,
+      ],
+      min: 1,
+      max: 4,
+      mode: 1,
+      median: 1.5,
+      mean: 11 / 6,
+      sum: 11,
+      range: 3,
+    },
   }
 
   assert.equal(actual, expected)
