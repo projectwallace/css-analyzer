@@ -68,6 +68,7 @@ const analyzeSpecificity = (ast) => {
           B++
           complexity++
 
+          // Add 1 for [attr=value] (or any variation using *= $= ^= |= )
           if (Boolean(selector.value)) {
             complexity++
           }
@@ -84,49 +85,66 @@ const analyzeSpecificity = (ast) => {
           break
         }
         case 'PseudoClassSelector': {
-          if (['before', 'after', 'first-letter', 'first-line'].includes(selector.name)) {
-            C++
-            complexity++
-            return this.skip
-          }
-          // The specificity of an :is(), :not(), or :has() pseudo-class is
-          // replaced by the specificity of the most specific complex
-          // selector in its selector list argument.
-          if (['where', 'is', 'has', 'matches', '-webkit-any', '-moz-any', 'not', 'nth-child', 'nth-last-child'].includes(selector.name)) {
-            // The specificity of an :nth-child() or :nth-last-child() selector
-            // is the specificity of the pseudo class itself (counting as one
-            // pseudo-class selector) plus the specificity of the most
-            // specific complex selector in its selector list argument (if any).
-            if (['nth-child', 'nth-last-child'].includes(selector.name)) {
-              // +1 for the pseudo class itself
+          switch (selector.name) {
+            case 'before':
+            case 'after':
+            case 'first-letter':
+            case 'first-line': {
+              C++
+              complexity++
+              return this.skip
+            }
+
+            // The specificity of an :is(), :not(), or :has() pseudo-class is
+            // replaced by the specificity of the most specific complex
+            // selector in its selector list argument.
+            case 'where':
+            case 'is':
+            case 'has':
+            case 'matches':
+            case '-webkit-any':
+            case '-moz-any':
+            case 'not':
+            case 'nth-child':
+            case 'nth-last-child': {
+              // The specificity of an :nth-child() or :nth-last-child() selector
+              // is the specificity of the pseudo class itself (counting as one
+              // pseudo-class selector) plus the specificity of the most
+              // specific complex selector in its selector list argument (if any).
+              if (['nth-child', 'nth-last-child'].includes(selector.name)) {
+                // +1 for the pseudo class itself
+                B++
+              }
+
+              const selectorList = selectorListSpecificities(selector)
+
+              // Bail out for empty/non-existent :nth-child() params
+              if (selectorList.length === 0) return
+
+              // The specificity of a :where() pseudo-class is replaced by zero,
+              // but it does count towards complexity.
+              if (selector.name !== 'where') {
+                const [topA, topB, topC] = selectorList[0].specificity
+                A += topA
+                B += topB
+                C += topC
+              }
+
+              for (let i = 0; i < selectorList.length; i++) {
+                complexity += selectorList[i].complexity
+              }
+
+              complexity++
+              return this.skip
+            }
+
+            default: {
+              // Regular pseudo classes have specificity [0,1,0]
+              complexity++
               B++
+              return this.skip
             }
-
-            const selectorList = selectorListSpecificities(selector)
-
-            // Bail out for empty/non-existent :nth-child() params
-            if (selectorList.length === 0) return
-
-            // The specificity of a :where() pseudo-class is replaced by zero,
-            // but it does count towards complexity.
-            if (selector.name !== 'where') {
-              const [topA, topB, topC] = selectorList[0].specificity
-              A += topA
-              B += topB
-              C += topC
-            }
-
-            for (let i = 0; i < selectorList.length; i++) {
-              complexity += selectorList[i].complexity
-            }
-            complexity++
-            return this.skip
           }
-
-          // Regular pseudo classes have specificity [0,1,0]
-          complexity++
-          B++
-          break
         }
         case 'Combinator': {
           complexity++
