@@ -1,4 +1,3 @@
-import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
 
 /**
@@ -69,9 +68,11 @@ const analyzeSpecificity = (ast) => {
           B++
           complexity++
 
+          // Add 1 for [attr=value] (or any variation using *= $= ^= |= )
           if (Boolean(selector.value)) {
             complexity++
           }
+
           isA11y = selector.name.name === 'role' || selector.name.name.startsWith('aria-')
           break
         }
@@ -84,94 +85,66 @@ const analyzeSpecificity = (ast) => {
           break
         }
         case 'PseudoClassSelector': {
-          if (['before', 'after', 'first-letter', 'first-line'].includes(selector.name)) {
-            C++
-            complexity++
-            return this.skip
-          }
-          // The specificity of an :is(), :not(), or :has() pseudo-class is
-          // replaced by the specificity of the most specific complex
-          // selector in its selector list argument.
-
-          // CSSTree doesn't parse the arguments of :is, :has and :matches,
-          // so we need to create an AST out of them ourselves
-          if (['is', 'has', 'matches', '-webkit-any', '-moz-any'].includes(selector.name)) {
-            const childAst = parse(selector.children.first.value, { context: 'selectorList' })
-            const selectorList = selectorListSpecificities(childAst)
-            const [topA, topB, topC] = selectorList[0].specificity
-            A += topA
-            B += topB
-            C += topC
-
-            for (let i = 0; i < selectorList.length; i++) {
-              complexity += selectorList[i].complexity
-            }
-            complexity++
-            return
-          }
-
-          // CSSTree *does* parse the arguments of the :not() pseudo-class,
-          // so we have direct access to the AST, instead of having to parse
-          // the arguments ourselves.
-          if (selector.name === 'not') {
-            const selectorList = selectorListSpecificities(selector)
-            const [topA, topB, topC] = selectorList[0].specificity
-            A += topA
-            B += topB
-            C += topC
-
-            for (let i = 0; i < selectorList.length; i++) {
-              complexity += selectorList[i].complexity
-            }
-            complexity++
-            return this.skip
-          }
-
-          // The specificity of an :nth-child() or :nth-last-child() selector
-          // is the specificity of the pseudo class itself (counting as one
-          // pseudo-class selector) plus the specificity of the most
-          // specific complex selector in its selector list argument (if any).
-          if (['nth-child', 'nth-last-child'].includes(selector.name)) {
-            // +1 for the pseudo class itself
-            B++
-
-            const childSelectors = selectorListSpecificities(selector)
-
-            if (childSelectors.length === 0) {
-              return
+          switch (selector.name) {
+            case 'before':
+            case 'after':
+            case 'first-letter':
+            case 'first-line': {
+              C++
+              complexity++
+              return this.skip
             }
 
-            const [topA, topB, topC] = childSelectors[0].specificity
-            A += topA
-            B += topB
-            C += topC
+            // The specificity of an :is(), :not(), or :has() pseudo-class is
+            // replaced by the specificity of the most specific complex
+            // selector in its selector list argument.
+            case 'where':
+            case 'is':
+            case 'has':
+            case 'matches':
+            case '-webkit-any':
+            case '-moz-any':
+            case 'not':
+            case 'nth-child':
+            case 'nth-last-child': {
+              // The specificity of an :nth-child() or :nth-last-child() selector
+              // is the specificity of the pseudo class itself (counting as one
+              // pseudo-class selector) plus the specificity of the most
+              // specific complex selector in its selector list argument (if any).
+              if (['nth-child', 'nth-last-child'].includes(selector.name)) {
+                // +1 for the pseudo class itself
+                B++
+              }
 
-            for (let i = 0; i < childSelectors.length; i++) {
-              complexity += childSelectors[i].complexity;
+              const selectorList = selectorListSpecificities(selector)
+
+              // Bail out for empty/non-existent :nth-child() params
+              if (selectorList.length === 0) return
+
+              // The specificity of a :where() pseudo-class is replaced by zero,
+              // but it does count towards complexity.
+              if (selector.name !== 'where') {
+                const [topA, topB, topC] = selectorList[0].specificity
+                A += topA
+                B += topB
+                C += topC
+              }
+
+              for (let i = 0; i < selectorList.length; i++) {
+                complexity += selectorList[i].complexity
+              }
+
+              complexity++
+              return this.skip
             }
 
-            complexity++
-            return
-          }
-
-          // The specificity of a :where() pseudo-class is replaced by zero,
-          // but it does count towards complexity.
-          if (selector.name === 'where') {
-            const childAst = parse(selector.children.first.value, { context: 'selectorList' })
-            const childSelectors = selectorListSpecificities(childAst)
-
-            for (let i = 0; i < childSelectors.length; i++) {
-              complexity += childSelectors[i].complexity;
+            default: {
+              // Regular pseudo classes have specificity [0,1,0]
+              complexity++
+              B++
+              return this.skip
             }
-
-            complexity++
-            return
           }
-
-          // Regular pseudo classes have specificity [0,1,0]
-          complexity++
-          B++
-          break
         }
         case 'Combinator': {
           complexity++
