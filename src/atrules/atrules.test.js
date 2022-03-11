@@ -89,32 +89,38 @@ AtRules('finds @imports', () => {
     @import url("https://example.com/with-url");
     @import url("https://example.com/with-media-query") screen and (min-width: 33em);
     @import url("https://example.com/with-multiple-media-queries") screen, projection;
+    @import url("narrow.css") supports(display: flex) handheld and (max-width: 400px);
+    @import url("fallback-layout.css") supports(not (display: flex));
   `
   const actual = analyze(fixture).atrules.import
   const expected = {
-    total: 4,
-    totalUnique: 4,
+    total: 6,
+    totalUnique: 6,
     unique: {
       '"https://example.com/without-url"': 1,
       'url("https://example.com/with-url")': 1,
       'url("https://example.com/with-media-query") screen and (min-width: 33em)': 1,
       'url("https://example.com/with-multiple-media-queries") screen, projection': 1,
+      'url("narrow.css") supports(display: flex) handheld and (max-width: 400px)': 1,
+      'url("fallback-layout.css") supports(not (display: flex))': 1,
     },
-    uniquenessRatio: 4 / 4,
+    uniquenessRatio: 6 / 6,
     complexity: {
       items: [
         0,
         0,
         2,
         2,
+        4,
+        3,
       ],
       min: 0,
-      max: 2,
+      max: 4,
       mode: 1,
       median: 1,
-      mean: 1,
-      sum: 4,
-      range: 2,
+      mean: 6 / 11,
+      sum: 11,
+      range: 4,
     },
   }
 
