@@ -4,6 +4,111 @@ import { analyze } from '../index.js'
 
 const AtRules = suite('at-rules')
 
+AtRules('finds @layer', () => {
+  // Fixture is pretty much a straight copy from all code examples from
+  // https://css-tricks.com/css-cascade-layers/
+  const fixture = `
+    /* establish a layer order up-front, from lowest to highest priority */
+    @layer reset, defaults, patterns, components, utilities, overrides;
+
+    /* add styles to layers */
+    @layer utilities {
+      /* high layer priority, despite low specificity */
+      [data-color='brand'] {
+        color: var(--brand, rebeccapurple);
+      }
+    }
+
+    @layer defaults {
+      /* higher specificity, but lower layer priority */
+      a:any-link { color: maroon; }
+    }
+
+    /* un-layered styles have the highest priority */
+    a {
+      color: mediumvioletred;
+    }
+
+    @layer layer-1 { a { color: red; } }
+    @layer layer-2 { a { color: orange; } }
+    @layer layer-3 {
+      @layer sub-layer-1 { a { color: yellow; } }
+      @layer sub-layer-2 { a { color: green; } }
+      /* un-nested */ a { color: blue; }
+    }
+    /* un-layered */ a { color: indigo; }
+
+    @layer reset, defaults, framework;
+    @layer components, defaults, framework, reset, utilities;
+
+    @layer one {
+      /* sorting the sub-layers */
+      @layer two, three;
+
+      /* styles ... */
+      @layer three { /* styles ... */ }
+      @layer two { /* styles ... */ }
+    }
+
+    /* sorting nested layers directly */
+    @layer one.two, one.three;
+
+    /* adding to nested layers directly */
+    @layer one.three { /* ... */ }
+    @layer one.two { /* ... */ }
+
+    @layer reset.type, default.type, reset.media, default.media;
+
+    @layer
+      reset,
+      default,
+      themes,
+      patterns,
+      layouts,
+      components,
+      utilities;
+
+    @layer components {
+      @layer defaults, structures, themes, utilities;
+    }
+  `
+  const actual = analyze(fixture).atrules.layer
+  const expected = {
+    total: 46,
+    totalUnique: 25,
+    unique: {
+      "defaults": 5,
+      "layer-1": 1,
+      "layer-2": 1,
+      "layer-3": 1,
+      "sub-layer-1": 1,
+      "sub-layer-2": 1,
+      "reset": 4,
+      "framework": 2,
+      "components": 4,
+      "utilities": 5,
+      "one": 1,
+      "two": 2,
+      "three": 2,
+      "one.two": 2,
+      "one.three": 2,
+      "reset.type": 1,
+      "default.type": 1,
+      "reset.media": 1,
+      "default.media": 1,
+      "default": 1,
+      "themes": 2,
+      "patterns": 2,
+      "layouts": 1,
+      "structures": 1,
+      "overrides": 1,
+    },
+    uniquenessRatio: 25 / 46
+  }
+
+  assert.equal(actual, expected)
+})
+
 AtRules('finds @font-face', () => {
   const fixture = `
     @font-face {
@@ -89,18 +194,29 @@ AtRules('finds @imports', () => {
     @import url("https://example.com/with-url");
     @import url("https://example.com/with-media-query") screen and (min-width: 33em);
     @import url("https://example.com/with-multiple-media-queries") screen, projection;
+
+    /* styles imported into to the <layer-name> layer */
+    @import url('example.css') layer(named-layer);
+
+    /* styles imported into to a new anonymous layer */
+    @import url('../example.css') layer;
+
+    @import url('remedy.css') layer(reset.remedy);
   `
   const actual = analyze(fixture).atrules.import
   const expected = {
-    total: 4,
-    totalUnique: 4,
+    total: 7,
+    totalUnique: 7,
     unique: {
       '"https://example.com/without-url"': 1,
       'url("https://example.com/with-url")': 1,
       'url("https://example.com/with-media-query") screen and (min-width: 33em)': 1,
       'url("https://example.com/with-multiple-media-queries") screen, projection': 1,
+      'url(\'example.css\') layer(named-layer)': 1,
+      'url(\'../example.css\') layer': 1,
+      'url(\'remedy.css\') layer(reset.remedy)': 1,
     },
-    uniquenessRatio: 4 / 4
+    uniquenessRatio: 1,
   }
 
   assert.equal(actual, expected)

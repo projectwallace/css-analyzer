@@ -4,6 +4,7 @@ import { hasVendorPrefix } from '../vendor-prefix.js'
 const analyzeAtRules = ({ atrules, stringifyNode }) => {
   /** @type {{[index: string]: string}[]} */
   const fontfaces = []
+  const layers = new CountableCollection()
   const imports = new CountableCollection()
   const medias = new CountableCollection()
   const charsets = new CountableCollection()
@@ -30,6 +31,12 @@ const analyzeAtRules = ({ atrules, stringifyNode }) => {
     'import': node => imports.push(node.prelude.value),
     'charset': node => charsets.push(node.prelude.value),
     'container': node => containers.push(node.prelude.value),
+    'layer': node => {
+      node.prelude.value.trim()
+        .split(',')
+        .map(name => name.trim())
+        .forEach(name => layers.push(name))
+    },
   }
 
   for (let i = 0; i < atrules.length; i++) {
@@ -72,6 +79,7 @@ const analyzeAtRules = ({ atrules, stringifyNode }) => {
       }
     },
     container: containers.count(),
+    layer: layers.count(),
   }
 }
 
