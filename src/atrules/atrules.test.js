@@ -8,11 +8,6 @@ AtRules('finds @layer', () => {
   // Fixture is pretty much a straight copy from all code examples from
   // https://css-tricks.com/css-cascade-layers/
   const fixture = `
-    /*@layer theme.local {
-      /* styles here will override theme.bootstrap */
-      /* but not interfere with styles from components.bootstrap */
-    }*/
-
     /* establish a layer order up-front, from lowest to highest priority */
     @layer reset, defaults, patterns, components, utilities, overrides;
 
@@ -79,19 +74,19 @@ AtRules('finds @layer', () => {
   `
   const actual = analyze(fixture).atrules.layer
   const expected = {
-    total: 39,
-    totalUnique: 24,
+    total: 46,
+    totalUnique: 25,
     unique: {
-      "defaults": 4,
+      "defaults": 5,
       "layer-1": 1,
       "layer-2": 1,
       "layer-3": 1,
       "sub-layer-1": 1,
       "sub-layer-2": 1,
-      "reset": 3,
+      "reset": 4,
       "framework": 2,
-      "components": 3,
-      "utilities": 3,
+      "components": 4,
+      "utilities": 5,
       "one": 1,
       "two": 2,
       "three": 2,
@@ -103,11 +98,12 @@ AtRules('finds @layer', () => {
       "default.media": 1,
       "default": 1,
       "themes": 2,
-      "patterns": 1,
+      "patterns": 2,
       "layouts": 1,
       "structures": 1,
+      "overrides": 1,
     },
-    uniquenessRatio: 24 / 39
+    uniquenessRatio: 25 / 46
   }
 
   assert.equal(actual, expected)
