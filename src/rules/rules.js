@@ -4,8 +4,8 @@ import { AggregateCollection } from '../aggregate-collection.js'
 const analyzeRules = ({ rules }) => {
   /** @type number */
   const totalRules = rules.length
-  const selectorsPerRule = new AggregateCollection(totalRules)
-  const declarationsPerRule = new AggregateCollection(totalRules)
+  const selectorsPerRule = new AggregateCollection()
+  const declarationsPerRule = new AggregateCollection()
 
   let emptyRules = 0
 

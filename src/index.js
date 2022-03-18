@@ -115,7 +115,7 @@ const analyze = (css) => {
             isKeyframeSelector: this.atrule && this.atrule.name.endsWith('keyframes')
           })
 
-          // Avoid further walking of selectors to not mess with
+          // Avoid deeper walking of selectors to not mess with
           // our specificity calculations in case of a selector
           // with :where() or :is() that contain SelectorLists
           // as children
@@ -193,34 +193,32 @@ const analyze = (css) => {
             }
           }
 
-          walk(value, {
-            enter: function (valueNode) {
-              switch (valueNode.type) {
-                case 'Hash': {
-                  colors.push(stringifyNode(valueNode), property)
+          walk(value, function (valueNode) {
+            switch (valueNode.type) {
+              case 'Hash': {
+                colors.push(stringifyNode(valueNode), property)
 
+                return this.skip
+              }
+              case 'Identifier': {
+                const { name } = valueNode
+                // Bail out if it can't be a color name
+                // 20 === 'lightgoldenrodyellow'.length
+                // 3 === 'red'.length
+                if (name.length > 20 || name.length < 3) {
                   return this.skip
                 }
-                case 'Identifier': {
-                  const { name } = valueNode
-                  // Bail out if it can't be a color name
-                  // 20 === 'lightgoldenrodyellow'.length
-                  // 3 === 'red'.length
-                  if (name.length > 20 || name.length < 3) {
-                    return this.skip
-                  }
-                  if (colorNames[name.toLowerCase()]) {
-                    colors.push(stringifyNode(valueNode), property)
-                  }
-                  return this.skip
+                if (colorNames[name.toLowerCase()]) {
+                  colors.push(stringifyNode(valueNode), property)
                 }
-                case 'Function': {
-                  if (colorFunctions[valueNode.name.toLowerCase()]) {
-                    colors.push(stringifyNode(valueNode), property)
-                  }
-                  // No this.skip here intentionally,
-                  // otherwise we'll miss colors in linear-gradient() etc.
+                return this.skip
+              }
+              case 'Function': {
+                if (colorFunctions[valueNode.name.toLowerCase()]) {
+                  colors.push(stringifyNode(valueNode), property)
                 }
+                // No this.skip here intentionally,
+                // otherwise we'll miss colors in linear-gradient() etc.
               }
             }
           })

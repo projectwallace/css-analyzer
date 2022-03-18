@@ -12,11 +12,11 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
   let maxSpecificity
   /** @type [number,number,number] */
   let minSpecificity
-  let specificityA = new AggregateCollection(totalSelectors)
-  let specificityB = new AggregateCollection(totalSelectors)
-  let specificityC = new AggregateCollection(totalSelectors)
+  let specificityA = new AggregateCollection()
+  let specificityB = new AggregateCollection()
+  let specificityC = new AggregateCollection()
   let totalUnique = 0
-  const complexityAggregator = new AggregateCollection(totalSelectors);
+  const complexityAggregator = new AggregateCollection()
 
   /** @type [number,number,number][] */
   const specificities = []

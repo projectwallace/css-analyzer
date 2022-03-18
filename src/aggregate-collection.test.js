@@ -5,7 +5,7 @@ import { AggregateCollection } from './aggregate-collection.js'
 const CollectionSuite = suite('AggregateCollection')
 
 CollectionSuite('aggregates correctly', () => {
-  const fixture = new AggregateCollection(6)
+  const fixture = new AggregateCollection()
   fixture.add(1)
   fixture.add(2)
   fixture.add(25)
@@ -28,7 +28,7 @@ CollectionSuite('aggregates correctly', () => {
 })
 
 CollectionSuite('handles collections without values', () => {
-  const fixture = new AggregateCollection(0)
+  const fixture = new AggregateCollection()
   const aggregate = fixture.aggregate()
   const items = fixture.toArray()
 
