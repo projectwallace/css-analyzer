@@ -49,16 +49,16 @@ const analyze = (css) => {
       const line = lines[i - 1]
       // First line
       if (i === start.line) {
-        value = value.concat(line.substring(start.column - 1), '\n')
+        value += line.substring(start.column - 1) + '\n'
         continue
       }
       // Last line
       if (i === end.line) {
-        value = value.concat(line.substring(0, end.column - 1))
+        value += line.substring(0, end.column - 1)
         continue
       }
       // All lines in between first and last
-      value = value.concat(line, '\n')
+      value += line + '\n'
     }
 
     return value
