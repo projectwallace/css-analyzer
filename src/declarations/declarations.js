@@ -1,4 +1,4 @@
-const analyzeDeclarations = ({ stringifyNode, declarations }) => {
+const analyzeDeclarations = ({ declarations }) => {
   /** @type number */
   const total = declarations.length
   const cache = Object.create(null)
@@ -7,17 +7,15 @@ const analyzeDeclarations = ({ stringifyNode, declarations }) => {
   let totalInKeyframes = 0
 
   for (let i = 0; i < total; i++) {
-    const declaration = declarations[i]
+    const { stringified, important, inKeyframe } = declarations[i]
 
-    if (declaration.important === true) {
+    if (important === true) {
       importants++
 
-      if (declaration.inKeyframe) {
+      if (inKeyframe) {
         totalInKeyframes++
       }
     }
-
-    const stringified = stringifyNode(declaration)
 
     if (!cache[stringified]) {
       cache[stringified] = 1

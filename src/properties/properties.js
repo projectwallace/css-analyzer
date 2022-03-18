@@ -1,27 +1,28 @@
 import { CountableCollection } from '../countable-collection.js'
 
 const analyzeProperties = ({ properties }) => {
-  const all = new CountableCollection(properties.map(p => p.authored))
+  const all = new CountableCollection()
   const prefixed = new CountableCollection()
   const hacks = new CountableCollection()
   const customs = new CountableCollection()
   const totalProperties = properties.length
 
   for (let i = 0; i < totalProperties; i++) {
-    const property = properties[i]
+    const { vendor, hack, custom, authored } = properties[i]
+    all.push(authored)
 
-    if (property.vendor) {
-      prefixed.push(property.authored)
+    if (vendor) {
+      prefixed.push(authored)
       continue
     }
 
-    if (property.hack) {
-      hacks.push(property.authored)
+    if (hack) {
+      hacks.push(authored)
       continue
     }
 
-    if (property.custom) {
-      customs.push(property.authored)
+    if (custom) {
+      customs.push(authored)
       continue
     }
   }

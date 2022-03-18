@@ -10,30 +10,30 @@ const analyzeRules = ({ rules }) => {
   let emptyRules = 0
 
   for (let i = 0; i < totalRules; i++) {
-    let selectors = 0
-    let declarations = 0
+    let numSelectors = 0
+    let numDeclarations = 0
 
     walk(rules[i], {
       enter: function (childNode) {
         if (childNode.type === 'Selector') {
-          selectors++
+          numSelectors++
           return this.skip
         }
 
         if (childNode.type === 'Declaration') {
-          declarations++
+          numDeclarations++
           return this.skip
         }
       }
     })
 
-    if (declarations === 0) {
+    if (numDeclarations === 0) {
       emptyRules++
     }
 
     // For later aggregations
-    selectorsPerRule.add(selectors)
-    declarationsPerRule.add(declarations)
+    selectorsPerRule.add(numSelectors)
+    declarationsPerRule.add(numDeclarations)
   }
 
   return {

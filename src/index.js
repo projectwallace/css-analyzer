@@ -43,25 +43,25 @@ const analyze = (css) => {
     }
 
     // Multi-line nodes
-    const value = []
+    let value = ''
 
     for (let i = start.line; i <= end.line; i++) {
       const line = lines[i - 1]
       // First line
       if (i === start.line) {
-        value.push(line.substring(start.column - 1))
+        value = value.concat(line.substring(start.column - 1), '\n')
         continue
       }
       // Last line
       if (i === end.line) {
-        value.push(line.substring(0, end.column - 1))
+        value = value.concat(line.substring(0, end.column - 1))
         continue
       }
       // All lines in between first and last
-      value.push(line)
+      value = value.concat(line, '\n')
     }
 
-    return value.join('\n')
+    return value
   }
 
   const startParse = new Date()
@@ -102,7 +102,11 @@ const analyze = (css) => {
     enter: function (node) {
       switch (node.type) {
         case 'Atrule': {
-          atrules.push(node)
+          atrules.push({
+            name: node.name,
+            prelude: node.prelude && node.prelude.value,
+            block: node.name === 'font-face' && node.block,
+          })
           break
         }
         case 'Rule': {
@@ -138,8 +142,9 @@ const analyze = (css) => {
         }
         case 'Declaration': {
           declarations.push({
-            ...node,
-            inKeyframe: this.atrule && this.atrule.name.endsWith('keyframes')
+            important: node.important,
+            inKeyframe: this.atrule && this.atrule.name.endsWith('keyframes'),
+            stringified: stringifyNode(node),
           })
 
           const { value, property } = node
@@ -178,17 +183,17 @@ const analyze = (css) => {
             }
             case 'transition':
             case 'animation': {
-              animations.push(node)
+              animations.push(value.children)
               break
             }
             case 'animation-duration':
             case 'transition-duration': {
-              durations.push(value)
+              durations.push(stringifyNode(value))
               break
             }
             case 'transition-timing-function':
             case 'animation-timing-function': {
-              timingFunctions.push(value)
+              timingFunctions.push(stringifyNode(value))
               break
             }
           }
@@ -248,7 +253,7 @@ const analyze = (css) => {
     atrules: analyzeAtRules({ atrules, stringifyNode }),
     rules: analyzeRules({ rules }),
     selectors: analyzeSelectors({ stringifyNode, selectors }),
-    declarations: analyzeDeclarations({ stringifyNode, declarations }),
+    declarations: analyzeDeclarations({ declarations }),
     properties: analyzeProperties({ properties }),
     values: {
       colors: colors.count(),
