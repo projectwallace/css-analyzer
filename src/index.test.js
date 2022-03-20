@@ -35,29 +35,4 @@ Api('does not break on CSS Syntax Errors', () => {
   assert.not.throws(() => analyze('test { color red }'))
 })
 
-Api('serializes into small objects', () => {
-  for (const { css, fileName } of fixtures) {
-    const actual = JSON.stringify(analyze(css))
-    let allowed = 0.51
-    if (fileName.includes('facebook')) {
-      allowed = 0.75 // because of embedded content
-    }
-    assert.ok(
-      actual.length < css.length * allowed,
-      `Expected serialized size to be smaller (${actual.length} serialized vs. ${css.length} raw css (${actual.length / css.length}) on ${fileName})`
-    )
-  }
-})
-
-Api('it runs fast', () => {
-  const start = Date.now()
-  for (const { css } of fixtures) {
-    analyze(css)
-  }
-  const end = Date.now()
-  const actual = end - start
-
-  assert.ok(actual < 3000, `Expected to be fast (3000ms), but took ${actual}ms`)
-})
-
 Api.run()

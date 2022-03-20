@@ -4741,9 +4741,9 @@
     }
   },
   "selectors": {
-    "total": 2807,
+    "total": 2799,
     "totalUnique": 2648,
-    "uniquenessRatio": 0.9433558959743499,
+    "uniquenessRatio": 0.946052161486245,
     "specificity": {
       "min": [
         0,
@@ -21612,7 +21612,7 @@
         "[role=button]": 1
       },
       "uniquenessRatio": 1,
-      "ratio": 0.0003562522265764161
+      "ratio": 0.0003572704537334762
     },
     "keyframes": {
       "total": 8,
@@ -21622,8 +21622,7 @@
         "to": 2,
         "50%": 2
       },
-      "uniquenessRatio": 0.375,
-      "ratio": 0.0028500178126113287
+      "uniquenessRatio": 0.375
     }
   },
   "declarations": {

@@ -5,15 +5,15 @@
 `node benchmark/benchmark.js`
 
 ```
-Bol.com                 (468 kB):   9.49 ops/sec
-Bootstrap 5.0.0         (195 kB):  22.74 ops/sec
-CSS-Tricks              (195 kB):  21.86 ops/sec
-Facebook.com            (268 kB):  14.43 ops/sec
-GitHub.com              (514 kB):  10.78 ops/sec
-Gazelle.nl              (972 kB):   3.50 ops/sec
-Lego.com                (246 kB):  18.89 ops/sec
-Smashing Magazine.com   (1.1 MB):   3.84 ops/sec
-Trello.com              (312 kB):  13.08 ops/sec
+Bol.com                 (468 kB):  10.07 ops/sec
+Bootstrap 5.0.0         (195 kB):  23.98 ops/sec
+CSS-Tricks              (195 kB):  23.00 ops/sec
+Facebook.com            (268 kB):  15.66 ops/sec
+GitHub.com              (514 kB):  11.47 ops/sec
+Gazelle.nl              (972 kB):   3.38 ops/sec
+Lego.com                (246 kB):  19.81 ops/sec
+Smashing Magazine.com   (1.1 MB):   3.79 ops/sec
+Trello.com              (312 kB):  13.15 ops/sec
 ```
 
 ## Parsing vs. analyzing

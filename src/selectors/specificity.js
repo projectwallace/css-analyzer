@@ -130,7 +130,11 @@ const analyzeSpecificity = (node) => {
             }
 
             for (let i = 0; i < selectorList.length; i++) {
-              complexity += selectorList[i].complexity
+              const listItem = selectorList[i]
+              if (listItem.isA11y) {
+                isA11y = true
+              }
+              complexity += listItem.complexity
             }
 
             complexity++

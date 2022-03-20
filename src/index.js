@@ -8,7 +8,6 @@ import { analyzeFontFamilies } from './values/font-families.js'
 import { analyzeFontSizes } from './values/font-sizes.js'
 import { analyzeDeclarations } from './declarations/declarations.js'
 import { analyzeSelectors } from './selectors/selectors.js'
-import { analyzeProperties } from './properties/properties.js'
 import { analyzeValues } from './values/values.js'
 import { analyzeAnimations } from './values/animations.js'
 import { analyzeVendorPrefixes } from './values/vendor-prefix.js'
@@ -82,8 +81,14 @@ const analyze = (css) => {
   const atrules = []
   const rules = []
   const selectors = []
+  const keyframeSelectors = new CountableCollection()
   const declarations = []
-  const properties = []
+  let importantDeclarations = 0
+  let importantsInKeyframes = 0
+  const properties = new CountableCollection()
+  const propertyHacks = new CountableCollection()
+  const propertyVendorPrefixes = new CountableCollection()
+  const customProperties = new CountableCollection()
   const values = []
   const zindex = []
   const textShadows = []
@@ -114,10 +119,11 @@ const analyze = (css) => {
           break
         }
         case 'Selector': {
-          selectors.push({
-            ...node,
-            isKeyframeSelector: this.atrule && this.atrule.name.endsWith('keyframes')
-          })
+          if (this.atrule && this.atrule.name.endsWith('keyframes')) {
+            keyframeSelectors.push(stringifyNode(node))
+            return this.skip
+          }
+          selectors.push(node)
 
           // Avoid deeper walking of selectors to not mess with
           // our specificity calculations in case of a selector
@@ -141,18 +147,31 @@ const analyze = (css) => {
           break
         }
         case 'Declaration': {
-          declarations.push({
-            important: node.important,
-            inKeyframe: this.atrule && this.atrule.name.endsWith('keyframes'),
-            stringified: stringifyNode(node),
-          })
+          if (node.important) {
+            importantDeclarations++
+
+            if (this.atrule && this.atrule.name.endsWith('keyframes')) {
+              importantsInKeyframes++
+            }
+          }
+
+          declarations.push(stringifyNode(node))
 
           const { value, property } = node
-          const fullProperty = Object.assign({
-            authored: property
-          }, getProperty(property))
+          const fullProperty = getProperty(property)
 
-          properties.push(fullProperty)
+          properties.push(property)
+
+          if (fullProperty.vendor) {
+            propertyVendorPrefixes.push(property)
+          }
+          if (fullProperty.hack) {
+            propertyHacks.push(property)
+          }
+          if (fullProperty.custom) {
+            customProperties.push(property)
+          }
+
           values.push(value)
 
           switch (fullProperty.basename) {
@@ -236,7 +255,7 @@ const analyze = (css) => {
 
   return {
     stylesheet: {
-      sourceLinesOfCode: atrules.length + selectors.length + declarations.length,
+      sourceLinesOfCode: atrules.length + selectors.length + declarations.length + keyframeSelectors.size(),
       linesOfCode: lines.length,
       size: css.length,
       comments: {
@@ -252,9 +271,36 @@ const analyze = (css) => {
     },
     atrules: analyzeAtRules({ atrules, stringifyNode }),
     rules: analyzeRules({ rules }),
-    selectors: analyzeSelectors({ stringifyNode, selectors }),
-    declarations: analyzeDeclarations({ declarations }),
-    properties: analyzeProperties({ properties }),
+    selectors: {
+      ...analyzeSelectors({ stringifyNode, selectors }),
+      keyframes: keyframeSelectors.count(),
+    },
+    declarations: {
+      ...analyzeDeclarations({ declarations }),
+      importants: {
+        total: importantDeclarations,
+        ratio: declarations.length === 0 ? 0 : importantDeclarations / declarations.length,
+        inKeyframes: {
+          total: importantsInKeyframes,
+          ratio: importantDeclarations === 0 ? 0 : importantsInKeyframes / importantDeclarations,
+        },
+      },
+    },
+    properties: {
+      ...properties.count(),
+      prefixed: {
+        ...propertyVendorPrefixes.count(),
+        ratio: propertyVendorPrefixes.size() / properties.size(),
+      },
+      custom: {
+        ...customProperties.count(),
+        ratio: customProperties.size() / properties.size(),
+      },
+      browserhacks: {
+        ...propertyHacks.count(),
+        ratio: propertyHacks.size() / properties.size(),
+      }
+    },
     values: {
       colors: colors.count(),
       fontFamilies: analyzeFontFamilies({ stringifyNode, fontValues, fontFamilyValues }),

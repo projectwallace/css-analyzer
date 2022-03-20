@@ -20,9 +20,10 @@ Selectors('are analyzed', () => {
       }
     }
   `
-  const actual = analyze(fixture).selectors.total
+  const actual = analyze(fixture).selectors
 
-  assert.equal(actual, 2)
+  assert.equal(actual.total, 2)
+  assert.equal(actual.totalUnique, 2)
 })
 
 Selectors('handles CSS without selectors', () => {
@@ -32,7 +33,7 @@ Selectors('handles CSS without selectors', () => {
       font-family: test;
     }
   `
-  const actual = analyze(fixture)
+  const actual = analyze(fixture).selectors
   const expected = {
     total: 0,
     totalUnique: 0,
@@ -79,10 +80,9 @@ Selectors('handles CSS without selectors', () => {
       totalUnique: 0,
       unique: {},
       uniquenessRatio: 0,
-      ratio: 0,
     },
   }
-  assert.equal(actual.selectors, expected)
+  assert.equal(actual, expected)
 })
 
 Selectors('have their complexity calculated', () => {
@@ -180,9 +180,8 @@ Selectors('counts <keyframes-selector>s', () => {
       }
     }
   `
-  const result = analyze(fixture)
-  const actual = result.selectors
-  assert.is(actual.total, 6)
+  const actual = analyze(fixture).selectors
+  assert.is(actual.total, 2)
   assert.equal(actual.keyframes, {
     total: 4,
     totalUnique: 3,
@@ -192,7 +191,6 @@ Selectors('counts <keyframes-selector>s', () => {
       '50%': 1
     },
     uniquenessRatio: 3 / 4,
-    ratio: 4 / 6
   })
 })
 
@@ -225,7 +223,8 @@ Selectors('counts ID selectors', () => {
 Selectors('counts Accessibility selectors', () => {
   const fixture = `
     [aria-hidden],
-    img[role="presentation"] {}
+    img[role="presentation"],
+    .selector:not([role="tablist"]) {}
 
     /* false positives */
     img[loading="lazy"],
@@ -233,14 +232,15 @@ Selectors('counts Accessibility selectors', () => {
   `
   const actual = analyze(fixture).selectors.accessibility
   const expected = {
-    total: 2,
-    totalUnique: 2,
+    total: 3,
+    totalUnique: 3,
     unique: {
       '[aria-hidden]': 1,
       'img[role="presentation"]': 1,
+      '.selector:not([role="tablist"])': 1,
     },
     uniquenessRatio: 1 / 1,
-    ratio: 2 / 4
+    ratio: 3 / 5
   }
 
   assert.equal(actual, expected)

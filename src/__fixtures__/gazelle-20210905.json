@@ -15335,9 +15335,9 @@
     }
   },
   "selectors": {
-    "total": 11833,
+    "total": 11773,
     "totalUnique": 9512,
-    "uniquenessRatio": 0.8038536296797093,
+    "uniquenessRatio": 0.8079503949715451,
     "specificity": {
       "min": [
         0,
@@ -86442,11 +86442,11 @@
         "#surveyBody #closeModalBtn::after": 1
       },
       "uniquenessRatio": 0.8426724137931034,
-      "ratio": 0.039212372179498016
+      "ratio": 0.03941221438885586
     },
     "accessibility": {
-      "total": 14,
-      "totalUnique": 12,
+      "total": 15,
+      "totalUnique": 13,
       "unique": {
         ".select2-results__option[aria-selected]": 1,
         ".select2-container--default .select2-results__option[role=group]": 1,
@@ -86457,12 +86457,13 @@
         ".select2-container--classic .select2-results__option[aria-disabled=true]": 1,
         ".select2-container--classic .select2-results__option--highlighted[aria-selected]": 1,
         "body[aria-busy=\"false\"] .page.messages .messages .message:not(.error)": 2,
+        ".specifications__wrapper:not([role=\"tablist\"])": 1,
         ".finance-modal .modal-content .modal-header .modal-menu .method-modal-collapsible[aria-expanded='true']": 2,
         ".finance-modal .modal-content .modal-header .modal-menu .method-modal-collapsible[aria-expanded='true'] .method-modal-collapsible__icon": 1,
         "[role=button]": 1
       },
-      "uniquenessRatio": 0.8571428571428571,
-      "ratio": 0.0011831319192089917
+      "uniquenessRatio": 0.8666666666666667,
+      "ratio": 0.0012741017582604264
     },
     "keyframes": {
       "total": 60,
@@ -86475,8 +86476,7 @@
         "50%": 3,
         "30%": 4
       },
-      "uniquenessRatio": 0.1,
-      "ratio": 0.005070565368038536
+      "uniquenessRatio": 0.1
     }
   },
   "declarations": {

@@ -24,19 +24,12 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
   const complexities = []
   const ids = new CountableCollection()
   const a11y = new CountableCollection()
-  const keyframes = new CountableCollection()
 
   for (let i = 0; i < totalSelectors; i++) {
     /** @type import('css-tree').Selector */
     const node = selectors[i];
     /** @type string */
     const value = stringifyNode(node)
-
-    if (node.isKeyframeSelector) {
-      keyframes.push(value)
-      // Do not attempt to further analyze <keyframe-selectors>
-      continue
-    }
 
     const { specificity, complexity, isId, isA11y } = cache[value] || analyzeSpecificity(node)
 
@@ -120,10 +113,6 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
       ...a11y.count(),
       ratio: totalSelectors === 0 ? 0 : a11y.size() / totalSelectors,
     },
-    keyframes: {
-      ...keyframes.count(),
-      ratio: totalSelectors === 0 ? 0 : keyframes.size() / totalSelectors,
-    }
   }
 }
 

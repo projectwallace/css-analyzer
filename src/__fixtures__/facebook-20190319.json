@@ -8640,9 +8640,9 @@
     }
   },
   "selectors": {
-    "total": 4587,
+    "total": 4496,
     "totalUnique": 4408,
-    "uniquenessRatio": 0.9609766732068891,
+    "uniquenessRatio": 0.9804270462633452,
     "specificity": {
       "min": [
         0,
@@ -35793,7 +35793,7 @@
         "#bootloader_P_mr5": 1
       },
       "uniquenessRatio": 0.9819819819819819,
-      "ratio": 0.02419882275997384
+      "ratio": 0.02468861209964413
     },
     "accessibility": {
       "total": 1,
@@ -35802,7 +35802,7 @@
         "div._4-i2 div[role=\"document\"]": 1
       },
       "uniquenessRatio": 1,
-      "ratio": 0.00021800741225201656
+      "ratio": 0.00022241992882562276
     },
     "keyframes": {
       "total": 91,
@@ -35864,8 +35864,7 @@
         "5%": 1,
         "55%": 1
       },
-      "uniquenessRatio": 0.6043956043956044,
-      "ratio": 0.019838674514933506
+      "uniquenessRatio": 0.6043956043956044
     }
   },
   "declarations": {

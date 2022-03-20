@@ -4121,9 +4121,9 @@
     }
   },
   "selectors": {
-    "total": 2701,
+    "total": 2641,
     "totalUnique": 1923,
-    "uniquenessRatio": 0.7119585338763421,
+    "uniquenessRatio": 0.7281332828474063,
     "specificity": {
       "min": [
         0,
@@ -20471,7 +20471,7 @@
         "#l-modal .l-modal__iframe::-webkit-scrollbar": 1
       },
       "uniquenessRatio": 0.8193916349809885,
-      "ratio": 0.19474268789337282
+      "ratio": 0.1991669822037107
     },
     "accessibility": {
       "total": 0,
@@ -20489,8 +20489,7 @@
         "60%": 6,
         "85%": 6
       },
-      "uniquenessRatio": 0.06666666666666667,
-      "ratio": 0.022213994816734542
+      "uniquenessRatio": 0.06666666666666667
     }
   },
   "declarations": {

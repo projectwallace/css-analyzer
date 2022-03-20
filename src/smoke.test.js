@@ -29,10 +29,11 @@ Object.entries({
   // delete result.__meta__
   // fs.writeFileSync(`./src/__fixtures__/${fileName}.json`, JSON.stringify(result, null, 2))
   Smoke(name, () => {
-    assert.not.throws(() => analyze(css))
-    const result = analyze(css)
-    delete result.__meta__
-    assert.fixture(JSON.stringify(result, null, 2), json)
+    assert.not.throws(() => {
+      const result = analyze(css)
+      delete result.__meta__
+      assert.fixture(JSON.stringify(result, null, 2), json)
+    })
   })
 })
 

@@ -5181,9 +5181,9 @@
     }
   },
   "selectors": {
-    "total": 3043,
+    "total": 3019,
     "totalUnique": 2767,
-    "uniquenessRatio": 0.909300032862307,
+    "uniquenessRatio": 0.9165286518714806,
     "specificity": {
       "min": [
         0,
@@ -23424,7 +23424,7 @@
         ".jump-to-suggestions-results-container [aria-selected=true] .d-on-nav-focus": 1
       },
       "uniquenessRatio": 0.9821428571428571,
-      "ratio": 0.018402891883010187
+      "ratio": 0.018549188473004307
     },
     "keyframes": {
       "total": 24,
@@ -23435,8 +23435,7 @@
         "10%": 1,
         "50%": 2
       },
-      "uniquenessRatio": 0.16666666666666666,
-      "ratio": 0.007886953664147224
+      "uniquenessRatio": 0.16666666666666666
     }
   },
   "declarations": {
