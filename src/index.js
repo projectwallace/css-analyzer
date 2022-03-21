@@ -290,15 +290,15 @@ const analyze = (css) => {
       ...properties.count(),
       prefixed: {
         ...propertyVendorPrefixes.count(),
-        ratio: propertyVendorPrefixes.size() / properties.size(),
+        ratio: properties.size() === 0 ? 0 : propertyVendorPrefixes.size() / properties.size(),
       },
       custom: {
         ...customProperties.count(),
-        ratio: customProperties.size() / properties.size(),
+        ratio: properties.size() === 0 ? 0 : customProperties.size() / properties.size(),
       },
       browserhacks: {
         ...propertyHacks.count(),
-        ratio: propertyHacks.size() / properties.size(),
+        ratio: properties.size() === 0 ? 0 : propertyHacks.size() / properties.size(),
       }
     },
     values: {

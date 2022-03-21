@@ -81,9 +81,9 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
     uniquenessRatio: selectors.length === 0 ? 0 : totalUnique / totalSelectors,
     specificity: {
       /** @type [number, number, number] */
-      min: minSpecificity,
+      min: minSpecificity === undefined ? [0, 0, 0] : minSpecificity,
       /** @type [number, number, number] */
-      max: maxSpecificity,
+      max: maxSpecificity === undefined ? [0, 0, 0] : maxSpecificity,
       /** @type [number, number, number] */
       sum: [aggregatesA.sum, aggregatesB.sum, aggregatesC.sum],
       /** @type [number, number, number] */

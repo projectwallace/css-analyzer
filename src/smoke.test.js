@@ -28,12 +28,14 @@ Object.entries({
   // const result = analyze(css)
   // delete result.__meta__
   // fs.writeFileSync(`./src/__fixtures__/${fileName}.json`, JSON.stringify(result, null, 2))
-  Smoke(name, () => {
-    assert.not.throws(() => {
-      const result = analyze(css)
-      delete result.__meta__
-      assert.fixture(JSON.stringify(result, null, 2), json)
-    })
+  Smoke(`${name} should not throw`, () => {
+    assert.not.throws(() => analyze(css))
+  })
+
+  Smoke(`${name} matches fixture`, () => {
+    const result = analyze(css)
+    delete result.__meta__
+    assert.fixture(JSON.stringify(result, null, 2), json)
   })
 })
 

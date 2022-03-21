@@ -40,8 +40,8 @@ Selectors('handles CSS without selectors', () => {
     uniquenessRatio: 0,
     specificity: {
       sum: [0, 0, 0],
-      min: undefined,
-      max: undefined,
+      min: [0, 0, 0],
+      max: [0, 0, 0],
       mean: [0, 0, 0],
       mode: [0, 0, 0],
       median: [0, 0, 0],

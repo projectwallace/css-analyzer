@@ -65,7 +65,7 @@ const analyzeAtRules = ({ atrules, stringifyNode }) => {
       total: fontfaces.length,
       totalUnique: fontfaces.length,
       unique: fontfaces,
-      uniquenessRatio: 1
+      uniquenessRatio: fontfaces.length === 0 ? 0 : 1
     },
     import: imports.count(),
     media: medias.count(),
