@@ -14,6 +14,7 @@ import { analyzeVendorPrefixes } from './values/vendor-prefix.js'
 import { analyzeAtRules } from './atrules/atrules.js'
 import { ContextCollection } from './context-collection.js'
 import { CountableCollection } from './countable-collection.js'
+import { NodeCollection } from './node-collection.js'
 
 /**
  * Analyze CSS
@@ -62,6 +63,33 @@ const analyze = (css) => {
 
     return value
   }
+  function stringFromPoints(startLine, startCol, endLine, endCol) {
+    // Single-line nodes
+    if (endLine - startLine === 0) {
+      return lines[startLine - 1].substring(startCol - 1, endCol - 1)
+    }
+
+    // Multi-line nodes
+    let value = ''
+
+    for (let i = startLine; i <= endLine; i++) {
+      const line = lines[i - 1]
+      // First line
+      if (i === startLine) {
+        value += line.substring(startCol - 1) + '\n'
+        continue
+      }
+      // Last line
+      if (i === endLine) {
+        value += line.substring(0, endCol - 1)
+        continue
+      }
+      // All lines in between first and last
+      value += line + '\n'
+    }
+
+    return value
+  }
 
   const startParse = new Date()
   let totalComments = 0
@@ -81,6 +109,7 @@ const analyze = (css) => {
   const atrules = []
   const rules = []
   const selectors = []
+  const selectorCollection = new NodeCollection(20000)
   const keyframeSelectors = new CountableCollection()
   const declarations = []
   let importantDeclarations = 0
@@ -124,6 +153,7 @@ const analyze = (css) => {
             return this.skip
           }
           selectors.push(node)
+          selectorCollection.push(node)
 
           // Avoid deeper walking of selectors to not mess with
           // our specificity calculations in case of a selector
@@ -253,6 +283,8 @@ const analyze = (css) => {
   const embeddedContent = embeds.count()
   const embedSize = Object.keys(embeddedContent.unique).join('').length
 
+  const selectorTotals = selectorCollection.count(stringFromPoints)
+
   return {
     stylesheet: {
       sourceLinesOfCode: atrules.length + selectors.length + declarations.length + keyframeSelectors.size(),
@@ -272,7 +304,10 @@ const analyze = (css) => {
     atrules: analyzeAtRules({ atrules, stringifyNode }),
     rules: analyzeRules({ rules }),
     selectors: {
-      ...analyzeSelectors({ stringifyNode, selectors }),
+      total: selectorTotals.total,
+      totalUnique: selectorTotals.totalUnique,
+      uniquenessRatio: selectorTotals.total === 0 ? 0 : selectorTotals.totalUnique / selectorTotals.total,
+      ...analyzeSelectors({ stringifyNode, selectors, stringFromPoints }),
       keyframes: keyframeSelectors.count(),
     },
     declarations: {

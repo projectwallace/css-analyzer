@@ -1,10 +1,9 @@
 import { analyzeSpecificity, compareSpecificity } from './specificity.js'
 import { AggregateCollection } from '../aggregate-collection.js'
 import { CountableCollection } from '../countable-collection.js'
+import { NodeCollection } from '../node-collection.js'
 
-const analyzeSelectors = ({ stringifyNode, selectors }) => {
-  const counts = Object.create(null)
-  const cache = Object.create(null)
+const analyzeSelectors = ({ stringifyNode, selectors, stringFromPoints }) => {
   /** @type number */
   const totalSelectors = selectors.length
 
@@ -22,31 +21,20 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
   const specificities = []
   /** @type number[] */
   const complexities = []
-  const ids = new CountableCollection()
-  const a11y = new CountableCollection()
+  const ids = new NodeCollection(selectors.length)
+  const a11y = new NodeCollection(selectors.length)
 
   for (let i = 0; i < totalSelectors; i++) {
     /** @type import('css-tree').Selector */
     const node = selectors[i];
-    /** @type string */
-    const value = stringifyNode(node)
-
-    const { specificity, complexity, isId, isA11y } = cache[value] || analyzeSpecificity(node)
+    const { specificity, complexity, isId, isA11y } = analyzeSpecificity(node)
 
     if (isId) {
-      ids.push(value)
+      ids.push(node)
     }
 
     if (isA11y) {
-      a11y.push(value)
-    }
-
-    if (!cache[value]) {
-      cache[value] = { complexity, specificity, isId, isA11y }
-      totalUnique++
-      counts[value] = 1
-    } else {
-      counts[value]++
+      a11y.push(node)
     }
 
     complexityAggregator.add(complexity)
@@ -81,9 +69,6 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
   const complexityCount = new CountableCollection(complexities).count()
 
   return {
-    total: totalSelectors,
-    totalUnique,
-    uniquenessRatio: totalSelectors === 0 ? 0 : totalUnique / totalSelectors,
     specificity: {
       /** @type [number, number, number] */
       min: minSpecificity,
@@ -106,11 +91,11 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
       items: complexities,
     },
     id: {
-      ...ids.count(),
+      ...ids.count(stringFromPoints),
       ratio: totalSelectors === 0 ? 0 : ids.size() / totalSelectors,
     },
     accessibility: {
-      ...a11y.count(),
+      ...a11y.count(stringFromPoints),
       ratio: totalSelectors === 0 ? 0 : a11y.size() / totalSelectors,
     },
   }
