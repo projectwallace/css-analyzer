@@ -246,4 +246,62 @@ Selectors('counts Accessibility selectors', () => {
   assert.equal(actual, expected)
 })
 
+Selectors('handles emoji selectors', () => {
+  const fixture = `
+    .💩 {}
+  `
+  const result = analyze(fixture)
+  const actual = result.selectors
+
+  const expected = {
+    total: 1,
+    totalUnique: 1,
+    uniquenessRatio: 1,
+    specificity: {
+      sum: [0, 1, 0],
+      min: [0, 1, 0],
+      max: [0, 1, 0],
+      mean: [0, 1, 0],
+      mode: [0, 1, 0],
+      median: [0, 1, 0],
+      items: [[0, 1, 0]],
+    },
+    complexity: {
+      min: 1,
+      max: 1,
+      mean: 1,
+      mode: 1,
+      median: 1,
+      range: 0,
+      sum: 1,
+      total: 1,
+      totalUnique: 1,
+      unique: { 1: 1 },
+      uniquenessRatio: 1,
+      items: [1],
+    },
+    id: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+      ratio: 0,
+    },
+    accessibility: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+      ratio: 0,
+    },
+    keyframes: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+    },
+  }
+  assert.equal(actual, expected)
+})
+
 Selectors.run()
