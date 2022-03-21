@@ -8,7 +8,6 @@ import { analyzeFontFamilies } from './values/font-families.js'
 import { analyzeFontSizes } from './values/font-sizes.js'
 import { analyzeDeclarations } from './declarations/declarations.js'
 import { analyzeSelectors } from './selectors/selectors.js'
-import { analyzeProperties } from './properties/properties.js'
 import { analyzeValues } from './values/values.js'
 import { analyzeAnimations } from './values/animations.js'
 import { analyzeVendorPrefixes } from './values/vendor-prefix.js'
@@ -43,25 +42,25 @@ const analyze = (css) => {
     }
 
     // Multi-line nodes
-    const value = []
+    let value = ''
 
     for (let i = start.line; i <= end.line; i++) {
       const line = lines[i - 1]
       // First line
       if (i === start.line) {
-        value.push(line.substring(start.column - 1))
+        value += line.substring(start.column - 1) + '\n'
         continue
       }
       // Last line
       if (i === end.line) {
-        value.push(line.substring(0, end.column - 1))
+        value += line.substring(0, end.column - 1)
         continue
       }
       // All lines in between first and last
-      value.push(line)
+      value += line + '\n'
     }
 
-    return value.join('\n')
+    return value
   }
 
   const startParse = new Date()
@@ -82,8 +81,14 @@ const analyze = (css) => {
   const atrules = []
   const rules = []
   const selectors = []
+  const keyframeSelectors = new CountableCollection()
   const declarations = []
-  const properties = []
+  let importantDeclarations = 0
+  let importantsInKeyframes = 0
+  const properties = new CountableCollection()
+  const propertyHacks = new CountableCollection()
+  const propertyVendorPrefixes = new CountableCollection()
+  const customProperties = new CountableCollection()
   const values = []
   const zindex = []
   const textShadows = []
@@ -102,7 +107,11 @@ const analyze = (css) => {
     enter: function (node) {
       switch (node.type) {
         case 'Atrule': {
-          atrules.push(node)
+          atrules.push({
+            name: node.name,
+            prelude: node.prelude && node.prelude.value,
+            block: node.name === 'font-face' && node.block,
+          })
           break
         }
         case 'Rule': {
@@ -110,10 +119,11 @@ const analyze = (css) => {
           break
         }
         case 'Selector': {
-          selectors.push({
-            ...node,
-            isKeyframeSelector: this.atrule && this.atrule.name.endsWith('keyframes')
-          })
+          if (this.atrule && this.atrule.name.endsWith('keyframes')) {
+            keyframeSelectors.push(stringifyNode(node))
+            return this.skip
+          }
+          selectors.push(node)
 
           // Avoid deeper walking of selectors to not mess with
           // our specificity calculations in case of a selector
@@ -137,17 +147,31 @@ const analyze = (css) => {
           break
         }
         case 'Declaration': {
-          declarations.push({
-            ...node,
-            inKeyframe: this.atrule && this.atrule.name.endsWith('keyframes')
-          })
+          if (node.important) {
+            importantDeclarations++
+
+            if (this.atrule && this.atrule.name.endsWith('keyframes')) {
+              importantsInKeyframes++
+            }
+          }
+
+          declarations.push(stringifyNode(node))
 
           const { value, property } = node
-          const fullProperty = Object.assign({
-            authored: property
-          }, getProperty(property))
+          const fullProperty = getProperty(property)
 
-          properties.push(fullProperty)
+          properties.push(property)
+
+          if (fullProperty.vendor) {
+            propertyVendorPrefixes.push(property)
+          }
+          if (fullProperty.hack) {
+            propertyHacks.push(property)
+          }
+          if (fullProperty.custom) {
+            customProperties.push(property)
+          }
+
           values.push(value)
 
           switch (fullProperty.basename) {
@@ -178,17 +202,17 @@ const analyze = (css) => {
             }
             case 'transition':
             case 'animation': {
-              animations.push(node)
+              animations.push(value.children)
               break
             }
             case 'animation-duration':
             case 'transition-duration': {
-              durations.push(value)
+              durations.push(stringifyNode(value))
               break
             }
             case 'transition-timing-function':
             case 'animation-timing-function': {
-              timingFunctions.push(value)
+              timingFunctions.push(stringifyNode(value))
               break
             }
           }
@@ -231,7 +255,7 @@ const analyze = (css) => {
 
   return {
     stylesheet: {
-      sourceLinesOfCode: atrules.length + selectors.length + declarations.length,
+      sourceLinesOfCode: atrules.length + selectors.length + declarations.length + keyframeSelectors.size(),
       linesOfCode: lines.length,
       size: css.length,
       comments: {
@@ -247,9 +271,36 @@ const analyze = (css) => {
     },
     atrules: analyzeAtRules({ atrules, stringifyNode }),
     rules: analyzeRules({ rules }),
-    selectors: analyzeSelectors({ stringifyNode, selectors }),
-    declarations: analyzeDeclarations({ stringifyNode, declarations }),
-    properties: analyzeProperties({ properties }),
+    selectors: {
+      ...analyzeSelectors({ stringifyNode, selectors }),
+      keyframes: keyframeSelectors.count(),
+    },
+    declarations: {
+      ...analyzeDeclarations({ declarations }),
+      importants: {
+        total: importantDeclarations,
+        ratio: declarations.length === 0 ? 0 : importantDeclarations / declarations.length,
+        inKeyframes: {
+          total: importantsInKeyframes,
+          ratio: importantDeclarations === 0 ? 0 : importantsInKeyframes / importantDeclarations,
+        },
+      },
+    },
+    properties: {
+      ...properties.count(),
+      prefixed: {
+        ...propertyVendorPrefixes.count(),
+        ratio: propertyVendorPrefixes.size() / properties.size(),
+      },
+      custom: {
+        ...customProperties.count(),
+        ratio: customProperties.size() / properties.size(),
+      },
+      browserhacks: {
+        ...propertyHacks.count(),
+        ratio: propertyHacks.size() / properties.size(),
+      }
+    },
     values: {
       colors: colors.count(),
       fontFamilies: analyzeFontFamilies({ stringifyNode, fontValues, fontFamilyValues }),

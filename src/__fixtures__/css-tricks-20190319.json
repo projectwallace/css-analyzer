@@ -3290,9 +3290,9 @@
     }
   },
   "selectors": {
-    "total": 2529,
+    "total": 2511,
     "totalUnique": 2102,
-    "uniquenessRatio": 0.8311585606959272,
+    "uniquenessRatio": 0.8371166865790521,
     "specificity": {
       "min": [
         0,
@@ -18782,7 +18782,7 @@
         "#post-284267::after": 1
       },
       "uniquenessRatio": 0.8215962441314554,
-      "ratio": 0.16844602609727166
+      "ratio": 0.16965352449223417
     },
     "accessibility": {
       "total": 0,
@@ -18801,8 +18801,7 @@
         "from": 3,
         "to": 5
       },
-      "uniquenessRatio": 0.2777777777777778,
-      "ratio": 0.0071174377224199285
+      "uniquenessRatio": 0.2777777777777778
     }
   },
   "declarations": {

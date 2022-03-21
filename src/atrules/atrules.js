@@ -25,14 +25,14 @@ const analyzeAtRules = ({ atrules, stringifyNode }) => {
 
       fontfaces.push(descriptors)
     },
-    'media': node => medias.push(node.prelude.value),
-    'supports': node => supports.push(node.prelude.value),
-    'keyframes': node => keyframes.push(`@${node.name} ${node.prelude.value}`),
-    'import': node => imports.push(node.prelude.value),
-    'charset': node => charsets.push(node.prelude.value),
-    'container': node => containers.push(node.prelude.value),
+    'media': node => medias.push(node.prelude),
+    'supports': node => supports.push(node.prelude),
+    'keyframes': node => keyframes.push(`@${node.name} ${node.prelude}`),
+    'import': node => imports.push(node.prelude),
+    'charset': node => charsets.push(node.prelude),
+    'container': node => containers.push(node.prelude),
     'layer': node => {
-      node.prelude.value.trim()
+      node.prelude.trim()
         .split(',')
         .map(name => name.trim())
         .forEach(name => layers.push(name))
@@ -42,18 +42,18 @@ const analyzeAtRules = ({ atrules, stringifyNode }) => {
   for (let i = 0; i < atrules.length; i++) {
     /** @type {import('css-tree').Atrule} */
     const node = atrules[i]
-    const nodeName = node.name
-    const action = machine[nodeName]
+    const atRuleName = node.name
+    const action = machine[atRuleName]
     if (action) {
       action(node)
       continue
     }
 
-    if (nodeName.endsWith('keyframes')) {
-      const name = `@${nodeName} ${node.prelude.value}`
+    if (atRuleName.endsWith('keyframes')) {
+      const name = `@${atRuleName} ${node.prelude}`
       keyframes.push(name)
 
-      if (hasVendorPrefix(nodeName)) {
+      if (hasVendorPrefix(atRuleName)) {
         prefixedKeyframes.push(name)
       }
       continue

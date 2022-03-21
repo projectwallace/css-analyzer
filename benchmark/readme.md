@@ -5,15 +5,15 @@
 `node benchmark/benchmark.js`
 
 ```
-Bol.com                 (468 kB):   9.19 ops/sec
-Bootstrap 5.0.0         (195 kB):  21.28 ops/sec
-CSS-Tricks              (195 kB):  20.07 ops/sec
-Facebook.com            (268 kB):  13.70 ops/sec
-GitHub.com              (514 kB):  10.29 ops/sec
-Gazelle.nl              (972 kB):   3.14 ops/sec
-Lego.com                (246 kB):  17.43 ops/sec
-Smashing Magazine.com   (1.1 MB):   3.29 ops/sec
-Trello.com              (312 kB):  12.23 ops/sec
+Bol.com                 (468 kB):  10.07 ops/sec
+Bootstrap 5.0.0         (195 kB):  23.98 ops/sec
+CSS-Tricks              (195 kB):  23.00 ops/sec
+Facebook.com            (268 kB):  15.66 ops/sec
+GitHub.com              (514 kB):  11.47 ops/sec
+Gazelle.nl              (972 kB):   3.38 ops/sec
+Lego.com                (246 kB):  19.81 ops/sec
+Smashing Magazine.com   (1.1 MB):   3.79 ops/sec
+Trello.com              (312 kB):  13.15 ops/sec
 ```
 
 ## Parsing vs. analyzing
@@ -24,13 +24,13 @@ Trello.com              (312 kB):  12.23 ops/sec
 ====================================================================
 File                    | Size   |  total | parse | Analyze        |
 ====================================================================
-Bol.com                 | 468 kB |  330ms | 201ms |  128ms (38.8%) |
-Bootstrap 5.0.0         | 195 kB |  130ms |  88ms |   41ms (31.5%) |
-CSS-Tricks              | 195 kB |  102ms |  62ms |   40ms (39.2%) |
-Facebook.com            | 268 kB |  144ms |  69ms |   75ms (52.1%) |
-GitHub.com              | 514 kB |  195ms |  90ms |  104ms (53.3%) |
-Gazelle.nl              | 972 kB |  442ms | 209ms |  229ms (51.8%) |
-Lego.com                | 246 kB |   89ms |  42ms |   46ms (51.7%) |
-Smashing Magazine.com   | 1.1 MB |  356ms | 166ms |  189ms (53.1%) |
-Trello.com              | 312 kB |  136ms |  50ms |   86ms (63.2%) |
+Bol.com                 | 468 kB |  328ms | 205ms |  122ms (37.2%) |
+Bootstrap 5.0.0         | 195 kB |  142ms | 102ms |   40ms (28.2%) |
+CSS-Tricks              | 195 kB |  113ms |  60ms |   53ms (46.9%) |
+Facebook.com            | 268 kB |  132ms |  69ms |   62ms (47.0%) |
+GitHub.com              | 514 kB |  203ms | 114ms |   87ms (42.9%) |
+Gazelle.nl              | 972 kB |  366ms | 228ms |  134ms (36.6%) |
+Lego.com                | 246 kB |   86ms |  38ms |   48ms (55.8%) |
+Smashing Magazine.com   | 1.1 MB |  428ms | 219ms |  208ms (48.6%) |
+Trello.com              | 312 kB |  131ms |  72ms |   59ms (45.0%) |
 ```

@@ -3,10 +3,9 @@ import { AggregateCollection } from '../aggregate-collection.js'
 import { CountableCollection } from '../countable-collection.js'
 
 const analyzeSelectors = ({ stringifyNode, selectors }) => {
-  const counts = Object.create(null)
-  const cache = Object.create(null)
   /** @type number */
   const totalSelectors = selectors.length
+  const counts = Object.create(null)
 
   /** @type [number,number,number] */
   let maxSpecificity
@@ -15,7 +14,6 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
   let specificityA = new AggregateCollection()
   let specificityB = new AggregateCollection()
   let specificityC = new AggregateCollection()
-  let totalUnique = 0
   const complexityAggregator = new AggregateCollection()
 
   /** @type [number,number,number][] */
@@ -24,21 +22,12 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
   const complexities = []
   const ids = new CountableCollection()
   const a11y = new CountableCollection()
-  const keyframes = new CountableCollection()
 
   for (let i = 0; i < totalSelectors; i++) {
     /** @type import('css-tree').Selector */
     const node = selectors[i];
-    /** @type string */
     const value = stringifyNode(node)
-
-    if (node.isKeyframeSelector) {
-      keyframes.push(value)
-      // Do not attempt to further analyze <keyframe-selectors>
-      continue
-    }
-
-    const { specificity, complexity, isId, isA11y } = cache[value] || analyzeSpecificity(node)
+    const { specificity, complexity, isId, isA11y } = analyzeSpecificity(node)
 
     if (isId) {
       ids.push(value)
@@ -48,12 +37,10 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
       a11y.push(value)
     }
 
-    if (!cache[value]) {
-      cache[value] = { complexity, specificity, isId, isA11y }
-      totalUnique++
-      counts[value] = 1
-    } else {
+    if (counts[value]) {
       counts[value]++
+    } else {
+      counts[value] = 1
     }
 
     complexityAggregator.add(complexity)
@@ -86,11 +73,12 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
   const aggregatesB = specificityB.aggregate()
   const aggregatesC = specificityC.aggregate()
   const complexityCount = new CountableCollection(complexities).count()
+  const totalUnique = Object.values(counts).length
 
   return {
-    total: totalSelectors,
-    totalUnique,
-    uniquenessRatio: totalSelectors === 0 ? 0 : totalUnique / totalSelectors,
+    total: selectors.length,
+    totalUnique: totalUnique,
+    uniquenessRatio: selectors.length === 0 ? 0 : totalUnique / totalSelectors,
     specificity: {
       /** @type [number, number, number] */
       min: minSpecificity,
@@ -120,10 +108,6 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
       ...a11y.count(),
       ratio: totalSelectors === 0 ? 0 : a11y.size() / totalSelectors,
     },
-    keyframes: {
-      ...keyframes.count(),
-      ratio: totalSelectors === 0 ? 0 : keyframes.size() / totalSelectors,
-    }
   }
 }
 

@@ -7356,9 +7356,9 @@
     }
   },
   "selectors": {
-    "total": 7634,
+    "total": 7616,
     "totalUnique": 6268,
-    "uniquenessRatio": 0.8210636625622216,
+    "uniquenessRatio": 0.8230042016806722,
     "specificity": {
       "min": [
         0,
@@ -53134,7 +53134,7 @@
         "#uitgelicht-editorials .more-link": 1
       },
       "uniquenessRatio": 1,
-      "ratio": 0.0015719151165837044
+      "ratio": 0.0015756302521008404
     },
     "accessibility": {
       "total": 0,
@@ -53150,8 +53150,7 @@
         "0%": 9,
         "to": 9
       },
-      "uniquenessRatio": 0.1111111111111111,
-      "ratio": 0.002357872674875557
+      "uniquenessRatio": 0.1111111111111111
     }
   },
   "declarations": {

@@ -18720,9 +18720,9 @@
     }
   },
   "selectors": {
-    "total": 12012,
+    "total": 11676,
     "totalUnique": 4390,
-    "uniquenessRatio": 0.36546786546786547,
+    "uniquenessRatio": 0.3759849263446386,
     "specificity": {
       "min": [
         0,
@@ -88862,7 +88862,7 @@
         ".articlepage #main": 1
       },
       "uniquenessRatio": 0.4411764705882353,
-      "ratio": 0.0028305028305028305
+      "ratio": 0.0029119561493662215
     },
     "accessibility": {
       "total": 62,
@@ -88901,7 +88901,7 @@
         ".accordion-item-toggle[aria-expanded=true]+.accordion-desc": 2
       },
       "uniquenessRatio": 0.5,
-      "ratio": 0.005161505161505162
+      "ratio": 0.005310037684138403
     },
     "keyframes": {
       "total": 336,
@@ -88930,8 +88930,7 @@
         "from": 4,
         "to": 20
       },
-      "uniquenessRatio": 0.06547619047619048,
-      "ratio": 0.027972027972027972
+      "uniquenessRatio": 0.06547619047619048
     }
   },
   "declarations": {

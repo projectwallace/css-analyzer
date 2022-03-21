@@ -6,7 +6,7 @@ const keywords = {
   'initial': 1,
   'unset': 1,
   'revert': 1,
-  'none': 1, // for `text-shadow`
+  'none': 1, // for `text-shadow` and `box-shadow`
 }
 
 const analyzeValues = ({ values, stringifyNode }) => {

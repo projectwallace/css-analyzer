@@ -1,6 +1,6 @@
 import benchmark from 'benchmark'
 import byteSize from './format-filesize.js'
-import { analyze as analyzeCss } from '../dist/analyzer.cjs'
+import { analyze as analyzeCss } from '../dist/analyzer.modern.js'
 import * as fs from 'fs'
 const files = [
   ['bol-com-20190617', 'Bol.com'],

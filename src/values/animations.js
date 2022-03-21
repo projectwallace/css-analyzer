@@ -11,16 +11,15 @@ const timingKeywords = {
 }
 
 const analyzeAnimations = ({ animations, durations, timingFunctions, stringifyNode }) => {
-  const allDurations = new CountableCollection(durations.map(stringifyNode))
-  const allTimingFunctions = new CountableCollection(timingFunctions.map(stringifyNode))
+  const allDurations = new CountableCollection(durations)
+  const allTimingFunctions = new CountableCollection(timingFunctions)
 
   for (let index = 0; index < animations.length; index++) {
-    const node = animations[index]
     // Flag to know if we've grabbed the first Duration
     // yet (the first Dimension in a shorthand)
     let durationFound = false
 
-    node.value.children.forEach(child => {
+    animations[index].forEach(child => {
       // Right after a ',' we start over again
       if (child.type === 'Operator') {
         return durationFound = false
