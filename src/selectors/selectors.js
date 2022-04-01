@@ -5,8 +5,7 @@ import { CountableCollection } from '../countable-collection.js'
 const analyzeSelectors = ({ stringifyNode, selectors }) => {
   /** @type number */
   const totalSelectors = selectors.length
-  const counts = Object.create(null)
-
+  const selectorCounts = Object.create(null)
   /** @type [number,number,number] */
   let maxSpecificity
   /** @type [number,number,number] */
@@ -15,7 +14,6 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
   let specificityB = new AggregateCollection()
   let specificityC = new AggregateCollection()
   const complexityAggregator = new AggregateCollection()
-
   /** @type [number,number,number][] */
   const specificities = []
   /** @type number[] */
@@ -37,10 +35,10 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
       a11y.push(value)
     }
 
-    if (counts[value]) {
-      counts[value]++
+    if (selectorCounts[value]) {
+      selectorCounts[value]++
     } else {
-      counts[value] = 1
+      selectorCounts[value] = 1
     }
 
     complexityAggregator.add(complexity)
@@ -73,12 +71,12 @@ const analyzeSelectors = ({ stringifyNode, selectors }) => {
   const aggregatesB = specificityB.aggregate()
   const aggregatesC = specificityC.aggregate()
   const complexityCount = new CountableCollection(complexities).count()
-  const totalUnique = Object.values(counts).length
+  const totalUniqueSelectors = Object.values(selectorCounts).length
 
   return {
     total: selectors.length,
-    totalUnique: totalUnique,
-    uniquenessRatio: selectors.length === 0 ? 0 : totalUnique / totalSelectors,
+    totalUnique: totalUniqueSelectors,
+    uniquenessRatio: selectors.length === 0 ? 0 : totalUniqueSelectors / totalSelectors,
     specificity: {
       /** @type [number, number, number] */
       min: minSpecificity === undefined ? [0, 0, 0] : minSpecificity,

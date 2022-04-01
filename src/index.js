@@ -1,19 +1,19 @@
 import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
 import { property as getProperty } from 'css-tree/utils'
-import { compareSpecificity } from './selectors/specificity.js'
 import { analyzeRules } from './rules/rules.js'
+import { analyzeSpecificity, compareSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorNames } from './values/colors.js'
 import { analyzeFontFamilies } from './values/font-families.js'
 import { analyzeFontSizes } from './values/font-sizes.js'
 import { analyzeDeclarations } from './declarations/declarations.js'
-import { analyzeSelectors } from './selectors/selectors.js'
 import { analyzeValues } from './values/values.js'
 import { analyzeAnimations } from './values/animations.js'
 import { analyzeVendorPrefixes } from './values/vendor-prefix.js'
 import { analyzeAtRules } from './atrules/atrules.js'
 import { ContextCollection } from './context-collection.js'
 import { CountableCollection } from './countable-collection.js'
+import { AggregateCollection } from './aggregate-collection.js'
 
 /**
  * Analyze CSS
@@ -80,7 +80,6 @@ const analyze = (css) => {
   const startAnalysis = new Date()
   const atrules = []
   const rules = []
-  const selectors = []
   const keyframeSelectors = new CountableCollection()
   const declarations = []
   let importantDeclarations = 0
@@ -103,6 +102,24 @@ const analyze = (css) => {
   const units = new ContextCollection()
   const embeds = new CountableCollection()
 
+  // SELECTORS
+  /** @type number */
+  const selectorCounts = Object.create(null)
+  /** @type [number,number,number] */
+  let maxSpecificity
+  /** @type [number,number,number] */
+  let minSpecificity
+  let specificityA = new AggregateCollection()
+  let specificityB = new AggregateCollection()
+  let specificityC = new AggregateCollection()
+  const complexityAggregator = new AggregateCollection()
+  /** @type [number,number,number][] */
+  const specificities = []
+  /** @type number[] */
+  const complexities = []
+  const ids = new CountableCollection()
+  const a11y = new CountableCollection()
+
   walk(ast, {
     enter: function (node) {
       switch (node.type) {
@@ -119,11 +136,53 @@ const analyze = (css) => {
           break
         }
         case 'Selector': {
+          const selector = stringifyNode(node)
+
           if (this.atrule && this.atrule.name.endsWith('keyframes')) {
-            keyframeSelectors.push(stringifyNode(node))
+            keyframeSelectors.push(selector)
             return this.skip
           }
-          selectors.push(node)
+
+          const { specificity, complexity, isId, isA11y } = analyzeSpecificity(node)
+
+          if (isId) {
+            ids.push(selector)
+          }
+
+          if (isA11y) {
+            a11y.push(selector)
+          }
+
+          if (selectorCounts[selector]) {
+            selectorCounts[selector]++
+          } else {
+            selectorCounts[selector] = 1
+          }
+
+          complexityAggregator.add(complexity)
+
+          if (maxSpecificity === undefined) {
+            maxSpecificity = specificity
+          }
+
+          if (minSpecificity === undefined) {
+            minSpecificity = specificity
+          }
+
+          specificityA.add(specificity[0])
+          specificityB.add(specificity[1])
+          specificityC.add(specificity[2])
+
+          if (minSpecificity !== undefined && compareSpecificity(minSpecificity, specificity) < 0) {
+            minSpecificity = specificity
+          }
+
+          if (maxSpecificity !== undefined && compareSpecificity(maxSpecificity, specificity) > 0) {
+            maxSpecificity = specificity
+          }
+
+          specificities.push(specificity)
+          complexities.push(complexity)
 
           // Avoid deeper walking of selectors to not mess with
           // our specificity calculations in case of a selector
@@ -253,9 +312,16 @@ const analyze = (css) => {
   const embeddedContent = embeds.count()
   const embedSize = Object.keys(embeddedContent.unique).join('').length
 
+  const totalSelectors = complexities.length
+  const aggregatesA = specificityA.aggregate()
+  const aggregatesB = specificityB.aggregate()
+  const aggregatesC = specificityC.aggregate()
+  const complexityCount = new CountableCollection(complexities).count()
+  const totalUniqueSelectors = Object.values(selectorCounts).length
+
   return {
     stylesheet: {
-      sourceLinesOfCode: atrules.length + selectors.length + declarations.length + keyframeSelectors.size(),
+      sourceLinesOfCode: atrules.length + totalSelectors + declarations.length + keyframeSelectors.size(),
       linesOfCode: lines.length,
       size: css.length,
       comments: {
@@ -272,7 +338,38 @@ const analyze = (css) => {
     atrules: analyzeAtRules({ atrules, stringifyNode }),
     rules: analyzeRules({ rules }),
     selectors: {
-      ...analyzeSelectors({ stringifyNode, selectors }),
+      total: totalSelectors,
+      totalUnique: totalUniqueSelectors,
+      uniquenessRatio: totalSelectors === 0 ? 0 : totalUniqueSelectors / totalSelectors,
+      specificity: {
+        /** @type [number, number, number] */
+        min: minSpecificity === undefined ? [0, 0, 0] : minSpecificity,
+        /** @type [number, number, number] */
+        max: maxSpecificity === undefined ? [0, 0, 0] : maxSpecificity,
+        /** @type [number, number, number] */
+        sum: [aggregatesA.sum, aggregatesB.sum, aggregatesC.sum],
+        /** @type [number, number, number] */
+        mean: [aggregatesA.mean, aggregatesB.mean, aggregatesC.mean],
+        /** @type [number, number, number] */
+        mode: [aggregatesA.mode, aggregatesB.mode, aggregatesC.mode],
+        /** @type [number, number, number] */
+        median: [aggregatesA.median, aggregatesB.median, aggregatesC.median],
+        /** @type [number, number, number][] */
+        items: specificities
+      },
+      complexity: {
+        ...complexityAggregator.aggregate(),
+        ...complexityCount,
+        items: complexities,
+      },
+      id: {
+        ...ids.count(),
+        ratio: totalSelectors === 0 ? 0 : ids.size() / totalSelectors,
+      },
+      accessibility: {
+        ...a11y.count(),
+        ratio: totalSelectors === 0 ? 0 : a11y.size() / totalSelectors,
+      },
       keyframes: keyframeSelectors.count(),
     },
     declarations: {
