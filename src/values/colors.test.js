@@ -29,14 +29,18 @@ Colors('finds hex colors', () => {
       test: #777;
     }
 
+    test-hex-casing {
+      casing: #AaBbCc;
+    }
+
     #not-a-color {
       margin: 0;
     }
   `).values.colors;
 
   const expected = {
-    total: 9,
-    totalUnique: 8,
+    total: 10,
+    totalUnique: 9,
     unique: {
       '#000': 1,
       '#1111': 1,
@@ -46,8 +50,9 @@ Colors('finds hex colors', () => {
       '#555': 1,
       '#666': 1,
       '#777': 1,
+      '#AaBbCc': 1,
     },
-    uniquenessRatio: 8 / 9,
+    uniquenessRatio: 9 / 10,
     itemsPerContext: {
       color: {
         total: 4,
@@ -90,6 +95,14 @@ Colors('finds hex colors', () => {
         uniquenessRatio: 1,
         unique: {
           '#777': 1,
+        },
+      },
+      'casing': {
+        total: 1,
+        totalUnique: 1,
+        uniquenessRatio: 1,
+        unique: {
+          '#AaBbCc': 1,
         },
       },
     },

@@ -1,19 +1,18 @@
 import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
 import { property as getProperty } from 'css-tree/utils'
-import { compareSpecificity } from './selectors/specificity.js'
-import { analyzeRules } from './rules/rules.js'
+import { analyzeRule } from './rules/rules.js'
+import { analyzeSpecificity, compareSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorNames } from './values/colors.js'
 import { analyzeFontFamilies } from './values/font-families.js'
 import { analyzeFontSizes } from './values/font-sizes.js'
-import { analyzeDeclarations } from './declarations/declarations.js'
-import { analyzeSelectors } from './selectors/selectors.js'
 import { analyzeValues } from './values/values.js'
 import { analyzeAnimations } from './values/animations.js'
 import { analyzeVendorPrefixes } from './values/vendor-prefix.js'
 import { analyzeAtRules } from './atrules/atrules.js'
 import { ContextCollection } from './context-collection.js'
 import { CountableCollection } from './countable-collection.js'
+import { AggregateCollection } from './aggregate-collection.js'
 
 /**
  * Analyze CSS
@@ -78,17 +77,25 @@ const analyze = (css) => {
   })
 
   const startAnalysis = new Date()
+  const embeds = new CountableCollection()
   const atrules = []
-  const rules = []
-  const selectors = []
+
+  let totalRules = 0
+  let emptyRules = 0
+  const selectorsPerRule = new AggregateCollection()
+  const declarationsPerRule = new AggregateCollection()
+
   const keyframeSelectors = new CountableCollection()
-  const declarations = []
+  const declarationsCache = Object.create(null)
+  let totalDeclarations = 0
   let importantDeclarations = 0
   let importantsInKeyframes = 0
+
   const properties = new CountableCollection()
   const propertyHacks = new CountableCollection()
   const propertyVendorPrefixes = new CountableCollection()
   const customProperties = new CountableCollection()
+
   const values = []
   const zindex = []
   const textShadows = []
@@ -101,161 +108,244 @@ const analyze = (css) => {
   const durations = []
   const colors = new ContextCollection()
   const units = new ContextCollection()
-  const embeds = new CountableCollection()
 
-  walk(ast, {
-    enter: function (node) {
-      switch (node.type) {
-        case 'Atrule': {
-          atrules.push({
-            name: node.name,
-            prelude: node.prelude && node.prelude.value,
-            block: node.name === 'font-face' && node.block,
-          })
-          break
-        }
-        case 'Rule': {
-          rules.push(node)
-          break
-        }
-        case 'Selector': {
-          if (this.atrule && this.atrule.name.endsWith('keyframes')) {
-            keyframeSelectors.push(stringifyNode(node))
-            return this.skip
-          }
-          selectors.push(node)
+  // SELECTORS
+  /** @type number */
+  const selectorCounts = Object.create(null)
+  /** @type [number,number,number] */
+  let maxSpecificity
+  /** @type [number,number,number] */
+  let minSpecificity
+  let specificityA = new AggregateCollection()
+  let specificityB = new AggregateCollection()
+  let specificityC = new AggregateCollection()
+  const complexityAggregator = new AggregateCollection()
+  /** @type [number,number,number][] */
+  const specificities = []
+  /** @type number[] */
+  const complexities = []
+  const ids = new CountableCollection()
+  const a11y = new CountableCollection()
 
-          // Avoid deeper walking of selectors to not mess with
-          // our specificity calculations in case of a selector
-          // with :where() or :is() that contain SelectorLists
-          // as children
+  walk(ast, function (node) {
+    switch (node.type) {
+      case 'Atrule': {
+        atrules.push({
+          name: node.name,
+          prelude: node.prelude && node.prelude.value,
+          block: node.name === 'font-face' && node.block,
+        })
+        break
+      }
+      case 'Rule': {
+        const [numSelectors, numDeclarations] = analyzeRule(node)
+
+        totalRules++
+
+        if (numDeclarations === 0) {
+          emptyRules++
+        }
+
+        selectorsPerRule.add(numSelectors)
+        declarationsPerRule.add(numDeclarations)
+        break
+      }
+      case 'Selector': {
+        const selector = stringifyNode(node)
+
+        if (this.atrule && this.atrule.name.endsWith('keyframes')) {
+          keyframeSelectors.push(selector)
           return this.skip
         }
-        case 'Dimension': {
-          if (!this.declaration) {
+
+        const { specificity, complexity, isId, isA11y } = analyzeSpecificity(node)
+
+        if (isId) {
+          ids.push(selector)
+        }
+
+        if (isA11y) {
+          a11y.push(selector)
+        }
+
+        if (selectorCounts[selector]) {
+          selectorCounts[selector]++
+        } else {
+          selectorCounts[selector] = 1
+        }
+
+        complexityAggregator.add(complexity)
+
+        if (maxSpecificity === undefined) {
+          maxSpecificity = specificity
+        }
+
+        if (minSpecificity === undefined) {
+          minSpecificity = specificity
+        }
+
+        specificityA.add(specificity[0])
+        specificityB.add(specificity[1])
+        specificityC.add(specificity[2])
+
+        if (minSpecificity !== undefined && compareSpecificity(minSpecificity, specificity) < 0) {
+          minSpecificity = specificity
+        }
+
+        if (maxSpecificity !== undefined && compareSpecificity(maxSpecificity, specificity) > 0) {
+          maxSpecificity = specificity
+        }
+
+        specificities.push(specificity)
+        complexities.push(complexity)
+
+        // Avoid deeper walking of selectors to not mess with
+        // our specificity calculations in case of a selector
+        // with :where() or :is() that contain SelectorLists
+        // as children
+        return this.skip
+      }
+      case 'Dimension': {
+        if (!this.declaration) {
+          break
+        }
+
+        units.push(node.unit, this.declaration.property)
+
+        return this.skip
+      }
+      case 'Url': {
+        if (node.value.startsWith('data:')) {
+          embeds.push(node.value)
+        }
+        break
+      }
+      case 'Declaration': {
+        totalDeclarations++
+
+        const declaration = stringifyNode(node)
+        if (declarationsCache[declaration]) {
+          declarationsCache[declaration]++
+        } else {
+          declarationsCache[declaration] = 1
+        }
+
+        if (node.important) {
+          importantDeclarations++
+
+          if (this.atrule && this.atrule.name.endsWith('keyframes')) {
+            importantsInKeyframes++
+          }
+        }
+
+        const { value, property } = node
+        const fullProperty = getProperty(property)
+
+        properties.push(property)
+
+        if (fullProperty.vendor) {
+          propertyVendorPrefixes.push(property)
+        }
+        if (fullProperty.hack) {
+          propertyHacks.push(property)
+        }
+        if (fullProperty.custom) {
+          customProperties.push(property)
+        }
+
+        values.push(value)
+
+        switch (fullProperty.basename) {
+          case 'z-index': {
+            zindex.push(value)
             break
           }
-
-          units.push(node.unit, this.declaration.property)
-
-          return this.skip
+          case 'text-shadow': {
+            textShadows.push(value)
+            break
+          }
+          case 'box-shadow': {
+            boxShadows.push(value)
+            break
+          }
+          case 'font': {
+            fontValues.push(value)
+            break
+          }
+          case 'font-family': {
+            fontFamilyValues.push(stringifyNode(value))
+            // Prevent analyzer to find color names in this property
+            return this.skip
+          }
+          case 'font-size': {
+            fontSizeValues.push(stringifyNode(value))
+            break
+          }
+          case 'transition':
+          case 'animation': {
+            animations.push(value.children)
+            break
+          }
+          case 'animation-duration':
+          case 'transition-duration': {
+            durations.push(stringifyNode(value))
+            break
+          }
+          case 'transition-timing-function':
+          case 'animation-timing-function': {
+            timingFunctions.push(stringifyNode(value))
+            break
+          }
         }
-        case 'Url': {
-          if (node.value.startsWith('data:')) {
-            embeds.push(node.value)
-          }
-          break
-        }
-        case 'Declaration': {
-          if (node.important) {
-            importantDeclarations++
 
-            if (this.atrule && this.atrule.name.endsWith('keyframes')) {
-              importantsInKeyframes++
-            }
-          }
+        walk(value, function (valueNode) {
+          switch (valueNode.type) {
+            case 'Hash': {
+              colors.push('#' + valueNode.value, property)
 
-          declarations.push(stringifyNode(node))
-
-          const { value, property } = node
-          const fullProperty = getProperty(property)
-
-          properties.push(property)
-
-          if (fullProperty.vendor) {
-            propertyVendorPrefixes.push(property)
-          }
-          if (fullProperty.hack) {
-            propertyHacks.push(property)
-          }
-          if (fullProperty.custom) {
-            customProperties.push(property)
-          }
-
-          values.push(value)
-
-          switch (fullProperty.basename) {
-            case 'z-index': {
-              zindex.push(value)
-              break
-            }
-            case 'text-shadow': {
-              textShadows.push(value)
-              break
-            }
-            case 'box-shadow': {
-              boxShadows.push(value)
-              break
-            }
-            case 'font': {
-              fontValues.push(value)
-              break
-            }
-            case 'font-family': {
-              fontFamilyValues.push(stringifyNode(value))
-              // Prevent analyzer to find color names in this property
               return this.skip
             }
-            case 'font-size': {
-              fontSizeValues.push(stringifyNode(value))
-              break
+            case 'Identifier': {
+              const { name } = valueNode
+              // Bail out if it can't be a color name
+              // 20 === 'lightgoldenrodyellow'.length
+              // 3 === 'red'.length
+              if (name.length > 20 || name.length < 3) {
+                return this.skip
+              }
+              if (colorNames[name.toLowerCase()]) {
+                colors.push(stringifyNode(valueNode), property)
+              }
+              return this.skip
             }
-            case 'transition':
-            case 'animation': {
-              animations.push(value.children)
-              break
-            }
-            case 'animation-duration':
-            case 'transition-duration': {
-              durations.push(stringifyNode(value))
-              break
-            }
-            case 'transition-timing-function':
-            case 'animation-timing-function': {
-              timingFunctions.push(stringifyNode(value))
-              break
+            case 'Function': {
+              if (colorFunctions[valueNode.name.toLowerCase()]) {
+                colors.push(stringifyNode(valueNode), property)
+              }
+              // No this.skip here intentionally,
+              // otherwise we'll miss colors in linear-gradient() etc.
             }
           }
-
-          walk(value, function (valueNode) {
-            switch (valueNode.type) {
-              case 'Hash': {
-                colors.push(stringifyNode(valueNode), property)
-
-                return this.skip
-              }
-              case 'Identifier': {
-                const { name } = valueNode
-                // Bail out if it can't be a color name
-                // 20 === 'lightgoldenrodyellow'.length
-                // 3 === 'red'.length
-                if (name.length > 20 || name.length < 3) {
-                  return this.skip
-                }
-                if (colorNames[name.toLowerCase()]) {
-                  colors.push(stringifyNode(valueNode), property)
-                }
-                return this.skip
-              }
-              case 'Function': {
-                if (colorFunctions[valueNode.name.toLowerCase()]) {
-                  colors.push(stringifyNode(valueNode), property)
-                }
-                // No this.skip here intentionally,
-                // otherwise we'll miss colors in linear-gradient() etc.
-              }
-            }
-          })
-        }
+        })
       }
     }
   })
+
   const embeddedContent = embeds.count()
   const embedSize = Object.keys(embeddedContent.unique).join('').length
 
+  const totalUniqueDeclarations = Object.keys(declarationsCache).length
+
+  const totalSelectors = complexities.length
+  const aggregatesA = specificityA.aggregate()
+  const aggregatesB = specificityB.aggregate()
+  const aggregatesC = specificityC.aggregate()
+  const complexityCount = new CountableCollection(complexities).count()
+  const totalUniqueSelectors = Object.values(selectorCounts).length
+
   return {
     stylesheet: {
-      sourceLinesOfCode: atrules.length + selectors.length + declarations.length + keyframeSelectors.size(),
+      sourceLinesOfCode: atrules.length + totalSelectors + totalDeclarations + keyframeSelectors.size(),
       linesOfCode: lines.length,
       size: css.length,
       comments: {
@@ -270,16 +360,58 @@ const analyze = (css) => {
       }),
     },
     atrules: analyzeAtRules({ atrules, stringifyNode }),
-    rules: analyzeRules({ rules }),
+    rules: {
+      total: totalRules,
+      empty: {
+        total: emptyRules,
+        ratio: totalRules === 0 ? 0 : emptyRules / totalRules
+      },
+      selectors: {
+        ...selectorsPerRule.aggregate(),
+        items: selectorsPerRule.toArray(),
+      },
+      declarations: {
+        ...declarationsPerRule.aggregate(),
+        items: declarationsPerRule.toArray()
+      },
+    },
     selectors: {
-      ...analyzeSelectors({ stringifyNode, selectors }),
+      total: totalSelectors,
+      totalUnique: totalUniqueSelectors,
+      uniquenessRatio: totalSelectors === 0 ? 0 : totalUniqueSelectors / totalSelectors,
+      specificity: {
+        min: minSpecificity === undefined ? [0, 0, 0] : minSpecificity,
+        max: maxSpecificity === undefined ? [0, 0, 0] : maxSpecificity,
+        sum: [aggregatesA.sum, aggregatesB.sum, aggregatesC.sum],
+        mean: [aggregatesA.mean, aggregatesB.mean, aggregatesC.mean],
+        mode: [aggregatesA.mode, aggregatesB.mode, aggregatesC.mode],
+        median: [aggregatesA.median, aggregatesB.median, aggregatesC.median],
+        items: specificities
+      },
+      complexity: {
+        ...complexityAggregator.aggregate(),
+        ...complexityCount,
+        items: complexities,
+      },
+      id: {
+        ...ids.count(),
+        ratio: totalSelectors === 0 ? 0 : ids.size() / totalSelectors,
+      },
+      accessibility: {
+        ...a11y.count(),
+        ratio: totalSelectors === 0 ? 0 : a11y.size() / totalSelectors,
+      },
       keyframes: keyframeSelectors.count(),
     },
     declarations: {
-      ...analyzeDeclarations({ declarations }),
+      total: totalDeclarations,
+      unique: {
+        total: totalUniqueDeclarations,
+        ratio: totalDeclarations === 0 ? 0 : totalUniqueDeclarations / totalDeclarations,
+      },
       importants: {
         total: importantDeclarations,
-        ratio: declarations.length === 0 ? 0 : importantDeclarations / declarations.length,
+        ratio: totalDeclarations === 0 ? 0 : importantDeclarations / totalDeclarations,
         inKeyframes: {
           total: importantsInKeyframes,
           ratio: importantDeclarations === 0 ? 0 : importantsInKeyframes / importantDeclarations,

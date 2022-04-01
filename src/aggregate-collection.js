@@ -82,7 +82,7 @@ class AggregateCollection {
     const max = sorted[sorted.length - 1]
 
     const sum = this.items.reduce((total, num) => (total += num))
-    const mode = Mode(sorted)
+    const mode = Mode(this.items)
     const median = Median(sorted)
 
     return {
