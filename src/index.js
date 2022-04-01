@@ -301,7 +301,7 @@ const analyze = (css) => {
         walk(value, function (valueNode) {
           switch (valueNode.type) {
             case 'Hash': {
-              colors.push(stringifyNode(valueNode), property)
+              colors.push('#' + valueNode.value, property)
 
               return this.skip
             }

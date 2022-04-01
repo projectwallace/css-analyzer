@@ -7,7 +7,7 @@ const files = [
   ['css-tricks-20190319', 'CSS-Tricks', 50],
   ['facebook-20190319', 'Facebook.com', 75],
   ['github-20210501', 'GitHub.com', 95],
-  ['gazelle-20210905', 'Gazelle.nl', 312],
+  ['gazelle-20210905', 'Gazelle.nl', 325],
   ['lego-20190617', 'Lego.com', 62],
   ['smashing-magazine-20190319', 'Smashing Magazine.com', 300],
   ['trello-20190617', 'Trello.com', 86]
@@ -47,6 +47,6 @@ suite.forEach(([name, fn, expectedDuration]) => {
   console.log(
     name,
     `${duration}ms`.padStart(6, ' '),
-    `(${overtime >= 0 ? '-' : '+'}${Math.abs(overtime)}ms ${Math.round(overtime / duration * 100)}%)`
+    `(${overtime >= 0 ? '-' : '+'}${Math.abs(overtime)}ms ${Math.round(Math.abs(overtime) / duration * 100)}%)`
   )
 })
