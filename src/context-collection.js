@@ -5,7 +5,6 @@ class ContextCollection {
     this.list = new CountableCollection()
     /** @type {[index; string]: CountableCollection} */
     this.contexts = {}
-    this.contextCount = 0
   }
 
   /**
@@ -18,7 +17,6 @@ class ContextCollection {
 
     if (!this.contexts[context]) {
       this.contexts[context] = new CountableCollection()
-      this.contextCount++
     }
 
     this.contexts[context].push(item)
