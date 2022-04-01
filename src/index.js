@@ -6,7 +6,6 @@ import { analyzeSpecificity, compareSpecificity } from './selectors/specificity.
 import { colorFunctions, colorNames } from './values/colors.js'
 import { analyzeFontFamilies } from './values/font-families.js'
 import { analyzeFontSizes } from './values/font-sizes.js'
-import { analyzeDeclarations } from './declarations/declarations.js'
 import { analyzeValues } from './values/values.js'
 import { analyzeAnimations } from './values/animations.js'
 import { analyzeVendorPrefixes } from './values/vendor-prefix.js'
@@ -81,7 +80,8 @@ const analyze = (css) => {
   const atrules = []
   const rules = []
   const keyframeSelectors = new CountableCollection()
-  const declarations = []
+  const declarationsCache = Object.create(null)
+  let totalDeclarations = 0
   let importantDeclarations = 0
   let importantsInKeyframes = 0
   const properties = new CountableCollection()
@@ -206,6 +206,15 @@ const analyze = (css) => {
           break
         }
         case 'Declaration': {
+          totalDeclarations++
+
+          const declaration = stringifyNode(node)
+          if (declarationsCache[declaration]) {
+            declarationsCache[declaration]++
+          } else {
+            declarationsCache[declaration] = 1
+          }
+
           if (node.important) {
             importantDeclarations++
 
@@ -213,8 +222,6 @@ const analyze = (css) => {
               importantsInKeyframes++
             }
           }
-
-          declarations.push(stringifyNode(node))
 
           const { value, property } = node
           const fullProperty = getProperty(property)
@@ -312,6 +319,8 @@ const analyze = (css) => {
   const embeddedContent = embeds.count()
   const embedSize = Object.keys(embeddedContent.unique).join('').length
 
+  const totalUniqueDeclarations = Object.keys(declarationsCache).length
+
   const totalSelectors = complexities.length
   const aggregatesA = specificityA.aggregate()
   const aggregatesB = specificityB.aggregate()
@@ -321,7 +330,7 @@ const analyze = (css) => {
 
   return {
     stylesheet: {
-      sourceLinesOfCode: atrules.length + totalSelectors + declarations.length + keyframeSelectors.size(),
+      sourceLinesOfCode: atrules.length + totalSelectors + totalDeclarations + keyframeSelectors.size(),
       linesOfCode: lines.length,
       size: css.length,
       comments: {
@@ -373,10 +382,14 @@ const analyze = (css) => {
       keyframes: keyframeSelectors.count(),
     },
     declarations: {
-      ...analyzeDeclarations({ declarations }),
+      total: totalDeclarations,
+      unique: {
+        total: totalUniqueDeclarations,
+        ratio: totalDeclarations === 0 ? 0 : totalUniqueDeclarations / totalDeclarations,
+      },
       importants: {
         total: importantDeclarations,
-        ratio: declarations.length === 0 ? 0 : importantDeclarations / declarations.length,
+        ratio: totalDeclarations === 0 ? 0 : importantDeclarations / totalDeclarations,
         inKeyframes: {
           total: importantsInKeyframes,
           ratio: importantDeclarations === 0 ? 0 : importantsInKeyframes / importantDeclarations,
