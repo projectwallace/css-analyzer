@@ -239,63 +239,63 @@ const analyze = (css) => {
         }
 
         const { value, property } = node
-        const fullProperty = getProperty(property)
 
         properties.push(property)
+        values.push(value)
 
-        if (fullProperty.vendor) {
+        // Process properties first that don't have colors,
+        // so we can avoid further walking them;
+        // They're also typically not vendor prefixed,
+        if (property === 'z-index') {
+          zindex.push(value)
+          return this.skip
+        }
+        if (property === 'font') {
+          fontValues.push(value)
+          break
+        }
+        if (property === 'font-size') {
+          fontSizeValues.push(stringifyNode(value))
+          break
+        }
+        if (property === 'font-family') {
+          fontFamilyValues.push(stringifyNode(value))
+          break
+        }
+
+        const {
+          vendor: isVendor,
+          hack: isHack,
+          custom: isCustom,
+          basename,
+        } = getProperty(property)
+
+        if (isVendor) {
           propertyVendorPrefixes.push(property)
         }
-        if (fullProperty.hack) {
+        if (isHack) {
           propertyHacks.push(property)
         }
-        if (fullProperty.custom) {
+        if (isCustom) {
           customProperties.push(property)
         }
 
-        values.push(value)
+        if (basename === 'transition' || basename === 'animation') {
+          animations.push(value.children)
+          break
+        } else if (basename === 'animation-duration' || basename === 'transition-duration') {
+          durations.push(stringifyNode(value))
+          break
+        } else if (basename === 'transition-timing-function' || basename === 'animation-timing-function') {
+          timingFunctions.push(stringifyNode(value))
+          break
+        }
 
-        switch (fullProperty.basename) {
-          case 'z-index': {
-            zindex.push(value)
-            break
-          }
-          case 'text-shadow': {
-            textShadows.push(value)
-            break
-          }
-          case 'box-shadow': {
-            boxShadows.push(value)
-            break
-          }
-          case 'font': {
-            fontValues.push(value)
-            break
-          }
-          case 'font-family': {
-            fontFamilyValues.push(stringifyNode(value))
-            // Prevent analyzer to find color names in this property
-            return this.skip
-          }
-          case 'font-size': {
-            fontSizeValues.push(stringifyNode(value))
-            break
-          }
-          case 'transition':
-          case 'animation': {
-            animations.push(value.children)
-            break
-          }
-          case 'animation-duration':
-          case 'transition-duration': {
-            durations.push(stringifyNode(value))
-            break
-          }
-          case 'transition-timing-function':
-          case 'animation-timing-function': {
-            timingFunctions.push(stringifyNode(value))
-            break
-          }
+        // These properties potentially contain colors
+        if (basename === 'text-shadow') {
+          textShadows.push(value)
+        } else if (basename === 'box-shadow') {
+          boxShadows.push(value)
         }
 
         walk(value, function (valueNode) {

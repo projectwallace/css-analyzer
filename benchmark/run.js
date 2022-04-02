@@ -2,15 +2,15 @@ import byteSize from './format-filesize.js'
 import { analyze as analyzeCss } from '../dist/analyzer.modern.js'
 import * as fs from 'fs'
 const files = [
-  ['bol-com-20190617', 'Bol.com', 127],
+  ['bol-com-20190617', 'Bol.com', 117],
   ['bootstrap-5.0.0', 'Bootstrap 5.0.0', 49],
   ['css-tricks-20190319', 'CSS-Tricks', 50],
-  ['facebook-20190319', 'Facebook.com', 75],
+  ['facebook-20190319', 'Facebook.com', 71],
   ['github-20210501', 'GitHub.com', 95],
-  ['gazelle-20210905', 'Gazelle.nl', 325],
-  ['lego-20190617', 'Lego.com', 62],
-  ['smashing-magazine-20190319', 'Smashing Magazine.com', 300],
-  ['trello-20190617', 'Trello.com', 86]
+  ['gazelle-20210905', 'Gazelle.nl', 312],
+  ['lego-20190617', 'Lego.com', 59],
+  ['smashing-magazine-20190319', 'Smashing Magazine.com', 285],
+  ['trello-20190617', 'Trello.com', 80]
 ]
 
 let maxLen = -1
@@ -35,7 +35,7 @@ files.forEach(([filename, name, expectedDuration]) => {
   ])
 })
 
-const RUN_COUNT = 20
+const RUN_COUNT = 25
 
 suite.forEach(([name, fn, expectedDuration]) => {
   const start = new Date()
@@ -47,6 +47,6 @@ suite.forEach(([name, fn, expectedDuration]) => {
   console.log(
     name,
     `${duration}ms`.padStart(6, ' '),
-    `(${overtime >= 0 ? '-' : '+'}${Math.abs(overtime)}ms ${Math.round(Math.abs(overtime) / duration * 100)}%)`
+    `(${overtime >= 0 ? '-' : '+'}${Math.abs(overtime)}ms ${Math.round(Math.abs(overtime) / duration * 100)}%)`,
   )
 })
