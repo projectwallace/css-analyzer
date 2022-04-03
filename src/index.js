@@ -1,6 +1,5 @@
 import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
-import { property as getProperty } from 'css-tree/utils'
 import { analyzeRule } from './rules/rules.js'
 import { analyzeSpecificity, compareSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorNames } from './values/colors.js'
@@ -13,6 +12,9 @@ import { analyzeAtRules } from './atrules/atrules.js'
 import { ContextCollection } from './context-collection.js'
 import { CountableCollection } from './countable-collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
+import { strEquals, startsWith, endsWith } from './string-utils.js'
+import { hasVendorPrefix } from './vendor-prefix.js'
+import { isCustom, isHack, isProperty } from './properties/property-utils.js'
 
 /**
  * Analyze CSS
@@ -133,7 +135,7 @@ const analyze = (css) => {
         atrules.push({
           name: node.name,
           prelude: node.prelude && node.prelude.value,
-          block: node.name === 'font-face' && node.block,
+          block: strEquals('font-face', node.name) && node.block,
         })
         break
       }
@@ -153,7 +155,7 @@ const analyze = (css) => {
       case 'Selector': {
         const selector = stringifyNode(node)
 
-        if (this.atrule && this.atrule.name.endsWith('keyframes')) {
+        if (this.atrule && endsWith('keyframes', this.atrule.name)) {
           keyframeSelectors.push(selector)
           return this.skip
         }
@@ -215,7 +217,7 @@ const analyze = (css) => {
         return this.skip
       }
       case 'Url': {
-        if (node.value.startsWith('data:')) {
+        if (startsWith('data:', node.value)) {
           embeds.push(node.value)
         }
         break
@@ -233,7 +235,7 @@ const analyze = (css) => {
         if (node.important) {
           importantDeclarations++
 
-          if (this.atrule && this.atrule.name.endsWith('keyframes')) {
+          if (this.atrule && endsWith('keyframes', this.atrule.name)) {
             importantsInKeyframes++
           }
         }
@@ -243,59 +245,43 @@ const analyze = (css) => {
         properties.push(property)
         values.push(value)
 
-        // Process properties first that don't have colors,
-        // so we can avoid further walking them;
-        // They're also typically not vendor prefixed,
-        if (property === 'z-index') {
-          zindex.push(value)
-          return this.skip
-        }
-        if (property === 'font') {
-          fontValues.push(value)
-          break
-        }
-        if (property === 'font-size') {
-          fontSizeValues.push(stringifyNode(value))
-          break
-        }
-        if (property === 'font-family') {
-          fontFamilyValues.push(stringifyNode(value))
-          break
-        }
-
-        const {
-          vendor: isVendor,
-          hack: isHack,
-          custom: isCustom,
-          basename,
-        } = getProperty(property)
-
-        if (isVendor) {
+        if (hasVendorPrefix(property)) {
           propertyVendorPrefixes.push(property)
-        }
-        if (isHack) {
+        } else if (isHack(property)) {
           propertyHacks.push(property)
-        }
-        if (isCustom) {
+        } else if (isCustom(property)) {
           customProperties.push(property)
         }
 
-        if (basename === 'transition' || basename === 'animation') {
+        // Process properties first that don't have colors,
+        // so we can avoid further walking them;
+        if (isProperty('z-index', property)) {
+          zindex.push(value)
+          return this.skip
+        } else if (isProperty('font', property)) {
+          fontValues.push(value)
+          break
+        } else if (isProperty('font-size', property)) {
+          fontSizeValues.push(stringifyNode(value))
+          break
+        } else if (isProperty('font-family', property)) {
+          fontFamilyValues.push(stringifyNode(value))
+          break
+        } else if (isProperty('transition', property) || isProperty('animation', property)) {
           animations.push(value.children)
           break
-        } else if (basename === 'animation-duration' || basename === 'transition-duration') {
+        } else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
           durations.push(stringifyNode(value))
           break
-        } else if (basename === 'transition-timing-function' || basename === 'animation-timing-function') {
+        } else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
           timingFunctions.push(stringifyNode(value))
           break
-        }
-
-        // These properties potentially contain colors
-        if (basename === 'text-shadow') {
+        } else if (isProperty('text-shadow', property)) {
           textShadows.push(value)
-        } else if (basename === 'box-shadow') {
+          // no break here: potentially contains colors
+        } else if (isProperty('box-shadow', property)) {
           boxShadows.push(value)
+          // no break here: potentially contains colors
         }
 
         walk(value, function (valueNode) {

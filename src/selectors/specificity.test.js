@@ -7,10 +7,12 @@ const Specificity = suite('Specificity')
 Specificity('handles the universal selector', () => {
   const fixture = `
     * {}
+  test * {}
   `
   const actual = analyze(fixture).selectors.specificity.items
   const expected = [
     [0, 0, 0],
+    [0, 0, 1],
   ]
   assert.equal(actual, expected)
 })

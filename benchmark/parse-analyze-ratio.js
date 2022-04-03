@@ -6,6 +6,7 @@ const files = [
   ['bootstrap-5.0.0', 'Bootstrap 5.0.0'],
   ['cnn-20220403', 'CNN'],
   ['css-tricks-20190319', 'CSS-Tricks'],
+  ['cnn-20220403', 'CNN'],
   ['facebook-20190319', 'Facebook.com'],
   ['github-20210501', 'GitHub.com'],
   ['gazelle-20210905', 'Gazelle.nl'],
@@ -23,14 +24,14 @@ files.forEach(([, name]) => {
 })
 
 console.log('Running benchmark on /dist/analyzer.js:')
-const header = `${'File'.padEnd(maxLen + 2)} | ${'Size'.padEnd(6)} |  total | parse | Analyze        |`
+const header = `${'File'.padEnd(maxLen + 2)} | ${'Size'.padStart(7)} |  total | parse | Analyze        |`
 console.log(''.padEnd(header.length, '='))
 console.log(header)
 console.log(''.padEnd(header.length, '='))
 
 files.forEach(([filename, name]) => {
   const css = fs.readFileSync(`./src/__fixtures__/${filename}.css`, 'utf-8')
-  const fileSize = byteSize(css.length).padStart(6)
+  const fileSize = byteSize(css.length).padStart(7)
   const result = analyzeCss(css)
 
   name = name.padEnd(maxLen + 2)

@@ -113,6 +113,10 @@ Selectors('have their specificity calculated', () => {
       color: green;
     }
 
+    * {
+      color: brown;
+    }
+
     @media print {
       @media (min-width: 1000px) {
         @supports (display: grid) {
@@ -125,12 +129,13 @@ Selectors('have their specificity calculated', () => {
   `
   const actual = analyze(fixture)
   const expected = [
-    [0, 0, 1,],
-    [0, 0, 1,]
+    [0, 0, 1],
+    [0, 0, 0],
+    [0, 0, 1]
   ]
 
   assert.equal(actual.selectors.specificity.items, expected)
-  assert.equal(actual.selectors.total, 2)
+  assert.equal(actual.selectors.total, 3)
 })
 
 Selectors('calculates selector uniqueness', () => {

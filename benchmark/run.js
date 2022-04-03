@@ -6,6 +6,7 @@ const files = [
   ['bootstrap-5.0.0', 'Bootstrap 5.0.0', 49],
   ['cnn-20220403', 'CNN', 360],
   ['css-tricks-20190319', 'CSS-Tricks', 50],
+  ['cnn-20220403', 'CNN', 360],
   ['facebook-20190319', 'Facebook.com', 71],
   ['github-20210501', 'GitHub.com', 95],
   ['gazelle-20210905', 'Gazelle.nl', 312],

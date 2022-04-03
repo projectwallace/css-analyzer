@@ -47,33 +47,31 @@ const analyzeFontSizes = ({ stringifyNode, fontSizeValues, fontValues }) => {
     let operator = false
     let size
 
-    walk(fontNode, {
-      enter: function (fontNode) {
-        switch (fontNode.type) {
-          case 'Number': {
-            // Special case for `font: 0/0 a`
-            if (fontNode.value.charCodeAt(0) === ZERO) {
-              size = '0'
-              return this.break
-            }
+    walk(fontNode, function (fontNode) {
+      switch (fontNode.type) {
+        case 'Number': {
+          // Special case for `font: 0/0 a`
+          if (fontNode.value.charCodeAt(0) === ZERO) {
+            size = '0'
+            return this.break
           }
-          case 'Operator': {
-            if (fontNode.value.charCodeAt(0) === SLASH) {
-              operator = true
-            }
-            break
+        }
+        case 'Operator': {
+          if (fontNode.value.charCodeAt(0) === SLASH) {
+            operator = true
           }
-          case 'Dimension': {
-            if (!operator) {
-              size = stringifyNode(fontNode)
-              return this.break
-            }
+          break
+        }
+        case 'Dimension': {
+          if (!operator) {
+            size = stringifyNode(fontNode)
+            return this.break
           }
-          case 'Identifier': {
-            if (sizeKeywords[fontNode.name]) {
-              size = fontNode.name
-              return this.break
-            }
+        }
+        case 'Identifier': {
+          if (sizeKeywords[fontNode.name]) {
+            size = fontNode.name
+            return this.break
           }
         }
       }
