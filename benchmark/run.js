@@ -4,6 +4,7 @@ import * as fs from 'fs'
 const files = [
   ['bol-com-20190617', 'Bol.com', 117],
   ['bootstrap-5.0.0', 'Bootstrap 5.0.0', 49],
+  ['cnn-20220403', 'CNN', 360],
   ['css-tricks-20190319', 'CSS-Tricks', 50],
   ['facebook-20190319', 'Facebook.com', 71],
   ['github-20210501', 'GitHub.com', 95],
@@ -29,7 +30,7 @@ files.forEach(([filename, name, expectedDuration]) => {
   const css = fs.readFileSync(`./src/__fixtures__/${filename}.css`, 'utf-8')
   const fileSize = byteSize(css.length)
   suite.push([
-    `${name.padEnd(maxLen + 2)} (${fileSize.padStart(6)})`,
+    `${name.padEnd(maxLen + 2)} (${fileSize.padStart(7)})`,
     () => analyzeCss(css),
     expectedDuration
   ])
@@ -50,3 +51,5 @@ suite.forEach(([name, fn, expectedDuration]) => {
     `(${overtime >= 0 ? '-' : '+'}${Math.abs(overtime)}ms ${Math.round(Math.abs(overtime) / duration * 100)}%)`,
   )
 })
+
+console.log(`Memory used: ${Math.ceil(process.memoryUsage().heapUsed / 1024 / 1024)}MB`)

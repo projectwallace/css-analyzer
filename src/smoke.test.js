@@ -8,6 +8,7 @@ const Smoke = suite('Smoke testing')
 Object.entries({
   'Bol.com': 'bol-com-20190617',
   'Bootstrap v5.0.0': 'bootstrap-5.0.0',
+  'CNN': 'cnn-20220403',
   'CSS Tricks': 'css-tricks-20190319',
   'Facebook': 'facebook-20190319',
   'GitHub': 'github-20210501',
