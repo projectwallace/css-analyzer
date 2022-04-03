@@ -1,5 +1,6 @@
 import { CountableCollection } from '../countable-collection.js'
 import { hasVendorPrefix } from '../vendor-prefix.js'
+import { endsWith } from '../string-utils.js'
 
 const analyzeAtRules = ({ atrules, stringifyNode }) => {
   /** @type {{[index: string]: string}[]} */
@@ -49,7 +50,7 @@ const analyzeAtRules = ({ atrules, stringifyNode }) => {
       continue
     }
 
-    if (atRuleName.endsWith('keyframes')) {
+    if (endsWith('keyframes', atRuleName)) {
       const name = `@${atRuleName} ${node.prelude}`
       keyframes.push(name)
 

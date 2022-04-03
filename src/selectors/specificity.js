@@ -1,4 +1,5 @@
 import walk from 'css-tree/walker'
+import { startsWith } from '../string-utils.js'
 
 /**
  * Compare specificity A to Specificity B
@@ -72,15 +73,19 @@ const analyzeSpecificity = (node) => {
           complexity++
         }
 
-        isA11y = selector.name.name === 'role' || selector.name.name.startsWith('aria-')
+        isA11y = selector.name.name === 'role' || startsWith('aria-', selector.name.name)
         break
       }
       case 'PseudoElementSelector':
       case 'TypeSelector': {
-        if (selector.name !== '*') {
-          C++
-        }
         complexity++
+
+        // 42 === '*'.charCodeAt(0)
+        if (selector.name.charCodeAt(0) === 42 && selector.name.length === 1) {
+          break
+        }
+
+        C++
         break
       }
       case 'PseudoClassSelector': {
@@ -110,7 +115,7 @@ const analyzeSpecificity = (node) => {
             // is the specificity of the pseudo class itself (counting as one
             // pseudo-class selector) plus the specificity of the most
             // specific complex selector in its selector list argument (if any).
-            if (['nth-child', 'nth-last-child'].includes(selector.name)) {
+            if (selector.name === 'nth-child' || selector.name === 'nth-last-child') {
               // +1 for the pseudo class itself
               B++
             }

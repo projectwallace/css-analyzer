@@ -143417,11 +143417,12 @@
       }
     },
     "fontFamilies": {
-      "total": 816,
-      "totalUnique": 38,
+      "total": 817,
+      "totalUnique": 39,
       "unique": {
         "sans-serif": 2,
         "monospace,serif": 1,
+        "courier new,monospace": 1,
         "CNN": 28,
         "CNN Condensed": 4,
         "CNN Clock": 14,
@@ -143459,7 +143460,7 @@
         "cnn-icons ": 2,
         "CNN, \"Helvetica Neue\", Verdana, Helvetica, Arial, Utkal, sans-serif": 1
       },
-      "uniquenessRatio": 0.04656862745098039
+      "uniquenessRatio": 0.04773561811505508
     },
     "fontSizes": {
       "total": 2328,

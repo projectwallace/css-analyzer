@@ -10,6 +10,7 @@ Animations('finds simple durations', () => {
       animation-duration: 1s;
       animation-duration: 2ms;
       transition-duration: 300ms;
+      --my-transition-duration: 0s;
     }
   `
   const actual = analyze(fixture).values.animations.durations
@@ -34,6 +35,9 @@ Animations('finds simple timing functions', () => {
 
       transition-timing-function: steps(3);
       transition-timing-function: cubic-bezier(0, 1, 0, 1);
+
+      --my-animation-timing-function: invalid;
+      --my-transition-timing-function: invalid;
     }
   `
   const actual = analyze(fixture).values.animations.timingFunctions
@@ -59,6 +63,9 @@ Animations('finds shorthand durations', () => {
       transition: all 3s;
       transition: all 4s cubic-bezier(0,1,0,1);
       transition: all 5s linear 5000ms;
+
+      --my-animation: invalid;
+      --my-transition: invalid;
     }
   `
   const actual = analyze(fixture).values.animations.durations
@@ -86,6 +93,9 @@ Animations('finds shorthand timing functions', () => {
       transition: all 3s;
       transition: all 4s cubic-bezier(0,1,0,1);
       transition: all 5s linear 5000ms;
+
+      --my-animation: invalid;
+      --my-transition: invalid;
     }
   `
   const actual = analyze(fixture).values.animations.timingFunctions
