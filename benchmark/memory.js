@@ -26,15 +26,16 @@ console.log('Running benchmark on /dist/analyzer.js:')
 
 const suite = []
 
-files.forEach(([filename, name, expectedDuration]) => {
+files.forEach(([filename, name]) => {
   const css = fs.readFileSync(`./src/__fixtures__/${filename}.css`, 'utf-8')
   const fileSize = byteSize(css.length)
   suite.push([
     `${name.padEnd(maxLen + 2)} (${fileSize.padStart(7)})`,
     () => analyzeCss(css),
-    `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(3)}MB`
   ])
 })
+
+let startMemory = process.memoryUsage().heapUsed
 
 suite.forEach(([name, fn, memory]) => {
   const start = new Date()
@@ -43,7 +44,7 @@ suite.forEach(([name, fn, memory]) => {
   console.log(
     name,
     `${duration}ms`.padStart(6, ' '),
-    memory,
   )
 })
 
+console.log(((process.memoryUsage().heapUsed - startMemory) / 1024 / 1024).toFixed(2) + 'MB')
