@@ -695,6 +695,58 @@ Colors.skip('ignores color names that are not actual colors', () => {
   assert.equal(actual, expected)
 })
 
+Colors('finds colors in var() as fallback values', () => {
+  const fixture = `
+    test {
+      --main: #aaa;
+      color: var(--main, #eee);
+
+      /* from github */
+      box-shadow: 0 3px 12px var(--color-fade-black-15), 0 0 1px rgba(27, 31, 35, .2);
+    }
+  `
+  const result = analyze(fixture)
+  const actual = result.values.colors
+  const expected = {
+    total: 3,
+    totalUnique: 3,
+    unique: {
+      '#aaa': 1,
+      '#eee': 1,
+      'rgba(27, 31, 35, .2)': 1,
+    },
+    uniquenessRatio: 3 / 3,
+    itemsPerContext: {
+      '--main': {
+        total: 1,
+        totalUnique: 1,
+        unique: {
+          '#aaa': 1,
+        },
+        uniquenessRatio: 1,
+      },
+      'color': {
+        total: 1,
+        totalUnique: 1,
+        unique: {
+          '#eee': 1,
+        },
+        uniquenessRatio: 1,
+      },
+      'box-shadow': {
+        total: 1,
+        totalUnique: 1,
+        unique: {
+          'rgba(27, 31, 35, .2)': 1,
+        },
+        uniquenessRatio: 1,
+      },
+    },
+  }
+
+  assert.equal(actual, expected)
+})
+
 Colors('ignores CSS keywords', () => {
   const fixture = `
     testColorKeywords {
