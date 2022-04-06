@@ -362,14 +362,14 @@ const analyze = (css) => {
         total: emptyRules,
         ratio: totalRules === 0 ? 0 : emptyRules / totalRules
       },
-      selectors: {
-        ...selectorsPerRule.aggregate(),
+      selectors: Object.assign(
+        selectorsPerRule.aggregate(), {
         items: selectorsPerRule.toArray(),
-      },
-      declarations: {
-        ...declarationsPerRule.aggregate(),
+      }),
+      declarations: Object.assign(
+        declarationsPerRule.aggregate(), {
         items: declarationsPerRule.toArray()
-      },
+      }),
     },
     selectors: {
       total: totalSelectors,
@@ -384,19 +384,19 @@ const analyze = (css) => {
         median: [aggregatesA.median, aggregatesB.median, aggregatesC.median],
         items: specificities
       },
-      complexity: {
-        ...complexityAggregator.aggregate(),
-        ...complexityCount,
-        items: complexities,
-      },
-      id: {
-        ...ids.count(),
+      complexity: Object.assign(
+        complexityAggregator.aggregate(),
+        complexityCount, {
+        items: complexities
+      }),
+      id: Object.assign(
+        ids.count(), {
         ratio: totalSelectors === 0 ? 0 : ids.size() / totalSelectors,
-      },
-      accessibility: {
-        ...a11y.count(),
+      }),
+      accessibility: Object.assign(
+        a11y.count(), {
         ratio: totalSelectors === 0 ? 0 : a11y.size() / totalSelectors,
-      },
+      }),
       keyframes: keyframeSelectors.count(),
     },
     declarations: {
@@ -414,21 +414,21 @@ const analyze = (css) => {
         },
       },
     },
-    properties: {
-      ...properties.count(),
-      prefixed: {
-        ...propertyVendorPrefixes.count(),
+    properties: Object.assign(
+      properties.count(), {
+      prefixed: Object.assign(
+        propertyVendorPrefixes.count(), {
         ratio: properties.size() === 0 ? 0 : propertyVendorPrefixes.size() / properties.size(),
-      },
-      custom: {
-        ...customProperties.count(),
+      }),
+      custom: Object.assign(
+        customProperties.count(), {
         ratio: properties.size() === 0 ? 0 : customProperties.size() / properties.size(),
-      },
-      browserhacks: {
-        ...propertyHacks.count(),
+      }),
+      browserhacks: Object.assign(
+        propertyHacks.count(), {
         ratio: properties.size() === 0 ? 0 : propertyHacks.size() / properties.size(),
-      }
-    },
+      }),
+    }),
     values: {
       colors: colors.count(),
       fontFamilies: analyzeFontFamilies({ stringifyNode, fontValues, fontFamilyValues }),

@@ -72,13 +72,13 @@ const analyzeAtRules = ({ atrules, stringifyNode }) => {
     media: medias.count(),
     charset: charsets.count(),
     supports: supports.count(),
-    keyframes: {
-      ...keyframes.count(),
-      prefixed: {
-        ...prefixedKeyframes.count(),
+    keyframes: Object.assign(
+      keyframes.count(), {
+      prefixed: Object.assign(
+        prefixedKeyframes.count(), {
         ratio: keyframes.size() === 0 ? 0 : prefixedKeyframes.size() / keyframes.size()
-      }
-    },
+      }),
+    }),
     container: containers.count(),
     layer: layers.count(),
   }
