@@ -222,69 +222,43 @@ const analyze = (css) => {
         }
         break
       }
-      case 'Declaration': {
-        totalDeclarations++
+      case 'Value': {
+        values.push(node)
 
-        const declaration = stringifyNode(node)
-        if (declarationsCache[declaration]) {
-          declarationsCache[declaration]++
-        } else {
-          declarationsCache[declaration] = 1
-        }
-
-        if (node.important) {
-          importantDeclarations++
-
-          if (this.atrule && endsWith('keyframes', this.atrule.name)) {
-            importantsInKeyframes++
-          }
-        }
-
-        const { value, property } = node
-
-        properties.push(property)
-        values.push(value)
-
-        if (hasVendorPrefix(property)) {
-          propertyVendorPrefixes.push(property)
-        } else if (isHack(property)) {
-          propertyHacks.push(property)
-        } else if (isCustom(property)) {
-          customProperties.push(property)
-        }
+        const property = this.declaration.property
 
         // Process properties first that don't have colors,
         // so we can avoid further walking them;
         if (isProperty('z-index', property)) {
-          zindex.push(value)
+          zindex.push(node)
           return this.skip
         } else if (isProperty('font', property)) {
-          fontValues.push(value)
+          fontValues.push(node)
           break
         } else if (isProperty('font-size', property)) {
-          fontSizeValues.push(stringifyNode(value))
+          fontSizeValues.push(stringifyNode(node))
           break
         } else if (isProperty('font-family', property)) {
-          fontFamilyValues.push(stringifyNode(value))
+          fontFamilyValues.push(stringifyNode(node))
           break
         } else if (isProperty('transition', property) || isProperty('animation', property)) {
-          animations.push(value.children)
+          animations.push(node.children)
           break
         } else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
-          durations.push(stringifyNode(value))
+          durations.push(stringifyNode(node))
           break
         } else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
-          timingFunctions.push(stringifyNode(value))
+          timingFunctions.push(stringifyNode(node))
           break
         } else if (isProperty('text-shadow', property)) {
-          textShadows.push(value)
+          textShadows.push(node)
           // no break here: potentially contains colors
         } else if (isProperty('box-shadow', property)) {
-          boxShadows.push(value)
+          boxShadows.push(node)
           // no break here: potentially contains colors
         }
 
-        walk(value, function (valueNode) {
+        walk(node, function (valueNode) {
           switch (valueNode.type) {
             case 'Hash': {
               colors.push('#' + valueNode.value, property)
@@ -305,6 +279,10 @@ const analyze = (css) => {
               return this.skip
             }
             case 'Function': {
+              // Don't walk var() multiple times
+              if (strEquals('var', valueNode.name)) {
+                return this.skip
+              }
               if (colorFunctions[valueNode.name.toLowerCase()]) {
                 colors.push(stringifyNode(valueNode), property)
               }
@@ -313,6 +291,38 @@ const analyze = (css) => {
             }
           }
         })
+        break
+      }
+      case 'Declaration': {
+        totalDeclarations++
+
+        const declaration = stringifyNode(node)
+        if (declarationsCache[declaration]) {
+          declarationsCache[declaration]++
+        } else {
+          declarationsCache[declaration] = 1
+        }
+
+        if (node.important) {
+          importantDeclarations++
+
+          if (this.atrule && endsWith('keyframes', this.atrule.name)) {
+            importantsInKeyframes++
+          }
+        }
+
+        const { property } = node
+
+        properties.push(property)
+
+        if (hasVendorPrefix(property)) {
+          propertyVendorPrefixes.push(property)
+        } else if (isHack(property)) {
+          propertyHacks.push(property)
+        } else if (isCustom(property)) {
+          customProperties.push(property)
+        }
+        break
       }
     }
   })
