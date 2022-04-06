@@ -4,15 +4,15 @@ class CountableCollection {
    */
   constructor(initial) {
     /** @type [index: string]: string */
-    this.items = {}
+    this._items = {}
     /** @type number */
-    this.total = 0
+    this._total = 0
     /** @type number */
-    this.totalUnique = 0
+    this._totalUnique = 0
 
     if (initial) {
-      for (let index = 0; index < initial.length; index++) {
-        this.push(initial[index])
+      for (let i = 0; i < initial.length; i++) {
+        this.push(initial[i])
       }
     }
   }
@@ -23,15 +23,15 @@ class CountableCollection {
    * @returns {void}
    */
   push(item) {
-    this.total++
+    this._total++
 
-    if (this.items[item]) {
-      this.items[item]++
+    if (this._items[item]) {
+      this._items[item]++
       return
     }
 
-    this.items[item] = 1
-    this.totalUnique++
+    this._items[item] = 1
+    this._totalUnique++
   }
 
   /**
@@ -39,7 +39,7 @@ class CountableCollection {
    * @returns {number} the size of this collection
    */
   size() {
-    return this.total
+    return this._total
   }
 
   /**
@@ -47,10 +47,10 @@ class CountableCollection {
    */
   count() {
     return {
-      total: this.total,
-      totalUnique: this.totalUnique,
-      unique: this.items,
-      uniquenessRatio: this.total === 0 ? 0 : this.totalUnique / this.total,
+      total: this._total,
+      totalUnique: this._totalUnique,
+      unique: this._items,
+      uniquenessRatio: this._total === 0 ? 0 : this._totalUnique / this._total,
     }
   }
 }

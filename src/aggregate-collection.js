@@ -52,7 +52,7 @@ function Median(arr) {
 class AggregateCollection {
   constructor() {
     /** @type number[] */
-    this.items = []
+    this._items = []
   }
 
   /**
@@ -60,11 +60,11 @@ class AggregateCollection {
    * @param {number} item - The item to add
    */
   add(item) {
-    this.items.push(item)
+    this._items.push(item)
   }
 
   aggregate() {
-    if (this.items.length === 0) {
+    if (this._items.length === 0) {
       return {
         min: 0,
         max: 0,
@@ -77,18 +77,18 @@ class AggregateCollection {
     }
 
     /** @type Number[] */
-    const sorted = this.items.slice().sort((a, b) => a - b)
+    const sorted = this._items.slice().sort((a, b) => a - b)
     const min = sorted[0]
     const max = sorted[sorted.length - 1]
 
-    const sum = this.items.reduce((total, num) => (total += num))
-    const mode = Mode(this.items)
+    const sum = this._items.reduce((total, num) => (total += num))
+    const mode = Mode(this._items)
     const median = Median(sorted)
 
     return {
       min,
       max,
-      mean: sum / this.items.length,
+      mean: sum / this._items.length,
       mode,
       median,
       range: max - min,
@@ -97,10 +97,10 @@ class AggregateCollection {
   }
 
   /**
-   * @returns {number[]} All items in this collection
+   * @returns {number[]} All _items in this collection
    */
   toArray() {
-    return this.items
+    return this._items
   }
 }
 
