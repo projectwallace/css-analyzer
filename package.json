@@ -51,5 +51,8 @@
     "microbundle": "^0.14.2",
     "uvu": "^0.5.3",
     "watchlist": "^0.2.3"
+  },
+  "mangle": {
+    "regex": "^_"
   }
 }

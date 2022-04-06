@@ -15,6 +15,7 @@ import { AggregateCollection } from './aggregate-collection.js'
 import { strEquals, startsWith, endsWith } from './string-utils.js'
 import { hasVendorPrefix } from './vendor-prefix.js'
 import { isCustom, isHack, isProperty } from './properties/property-utils.js'
+import { OccurrenceCounter } from './occurrence-counter.js'
 
 /**
  * Analyze CSS
@@ -88,7 +89,7 @@ const analyze = (css) => {
   const declarationsPerRule = new AggregateCollection()
 
   const keyframeSelectors = new CountableCollection()
-  const declarationsCache = Object.create(null)
+  const uniqueDeclarations = new OccurrenceCounter()
   let totalDeclarations = 0
   let importantDeclarations = 0
   let importantsInKeyframes = 0
@@ -113,7 +114,7 @@ const analyze = (css) => {
 
   // SELECTORS
   /** @type number */
-  const selectorCounts = Object.create(null)
+  const uniqueSelectors = new OccurrenceCounter()
   /** @type [number,number,number] */
   let maxSpecificity
   /** @type [number,number,number] */
@@ -170,12 +171,7 @@ const analyze = (css) => {
           a11y.push(selector)
         }
 
-        if (selectorCounts[selector]) {
-          selectorCounts[selector]++
-        } else {
-          selectorCounts[selector] = 1
-        }
-
+        uniqueSelectors.push(selector)
         complexityAggregator.add(complexity)
 
         if (maxSpecificity === undefined) {
@@ -297,11 +293,7 @@ const analyze = (css) => {
         totalDeclarations++
 
         const declaration = stringifyNode(node)
-        if (declarationsCache[declaration]) {
-          declarationsCache[declaration]++
-        } else {
-          declarationsCache[declaration] = 1
-        }
+        uniqueDeclarations.push(declaration)
 
         if (node.important) {
           importantDeclarations++
@@ -330,14 +322,14 @@ const analyze = (css) => {
   const embeddedContent = embeds.count()
   const embedSize = Object.keys(embeddedContent.unique).join('').length
 
-  const totalUniqueDeclarations = Object.keys(declarationsCache).length
+  const totalUniqueDeclarations = uniqueDeclarations.count()
 
   const totalSelectors = complexities.length
   const aggregatesA = specificityA.aggregate()
   const aggregatesB = specificityB.aggregate()
   const aggregatesC = specificityC.aggregate()
   const complexityCount = new CountableCollection(complexities).count()
-  const totalUniqueSelectors = Object.values(selectorCounts).length
+  const totalUniqueSelectors = uniqueSelectors.count()
 
   return {
     stylesheet: {
