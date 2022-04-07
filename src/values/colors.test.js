@@ -662,6 +662,7 @@ Colors('does not report false positives for color keywords', () => {
 
       /* Not the black color keyword */
       font-family: Arial Black, Arial Bold, Gadget, sans-serif;
+      font: 1em/1 Black;
     }
   `).values.colors
   const expected = {

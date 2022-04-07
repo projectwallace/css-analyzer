@@ -76,6 +76,7 @@ class AggregateCollection {
       }
     }
 
+    // TODO: can we avoid this sort()? It's slow
     /** @type Number[] */
     const sorted = this._items.slice().sort((a, b) => a - b)
     const min = sorted[0]
