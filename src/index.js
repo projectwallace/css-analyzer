@@ -6,7 +6,7 @@ import { colorFunctions, colorNames } from './values/colors.js'
 import { isFontFamilyKeyword, getFamilyFromFont } from './values/font-families.js'
 import { isFontSizeKeyword, getSizeFromFont } from './values/font-sizes.js'
 import { isValueKeyword } from './values/values.js'
-import { analyzeAnimations } from './values/animations.js'
+import { analyzeAnimation } from './values/animations.js'
 import { isAstVendorPrefixed } from './values/vendor-prefix.js'
 import { analyzeAtRules } from './atrules/atrules.js'
 import { ContextCollection } from './context-collection.js'
@@ -105,9 +105,8 @@ const analyze = (css) => {
   const boxShadows = new CountableCollection()
   const fontFamilies = new CountableCollection()
   const fontSizes = new CountableCollection()
-  const animations = []
-  const timingFunctions = []
-  const durations = []
+  const timingFunctions = new CountableCollection()
+  const durations = new CountableCollection()
   const colors = new ContextCollection()
   const units = new ContextCollection()
 
@@ -257,7 +256,13 @@ const analyze = (css) => {
           }
           break
         } else if (isProperty('transition', property) || isProperty('animation', property)) {
-          animations.push(node.children)
+          const [times, fns] = analyzeAnimation(node.children, stringifyNode)
+          for (let i = 0; i < times.length; i++) {
+            durations.push(times[i])
+          }
+          for (let i = 0; i < fns.length; i++) {
+            timingFunctions.push(fns[i])
+          }
           break
         } else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
           durations.push(stringifyNode(node))
@@ -451,7 +456,10 @@ const analyze = (css) => {
       zindexes: zindex.count(),
       textShadows: textShadows.count(),
       boxShadows: boxShadows.count(),
-      animations: analyzeAnimations({ animations, timingFunctions, durations, stringifyNode }),
+      animations: {
+        durations: durations.count(),
+        timingFunctions: timingFunctions.count(),
+      },
       prefixes: vendorPrefixedValues.count(),
       units: units.count(),
     },

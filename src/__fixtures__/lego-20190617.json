@@ -21160,17 +21160,17 @@
         "totalUnique": 13,
         "unique": {
           "0": 2,
-          "400ms": 1,
-          ".3s": 7,
-          ".15s": 8,
-          ".5s,.4s": 2,
           ".2s": 7,
-          ".1s": 2,
           "150ms": 7,
+          "400ms": 1,
           "0s": 10,
           "100ms": 1,
           "300ms": 4,
+          ".3s": 7,
           "2s": 2,
+          ".15s": 8,
+          ".5s,.4s": 2,
+          ".1s": 2,
           ".5s": 2
         },
         "uniquenessRatio": 0.23636363636363636
@@ -21179,9 +21179,9 @@
         "total": 36,
         "totalUnique": 4,
         "unique": {
-          "linear": 12,
-          "ease-in-out": 11,
           "ease": 7,
+          "ease-in-out": 11,
+          "linear": 12,
           "ease-out": 6
         },
         "uniquenessRatio": 0.1111111111111111

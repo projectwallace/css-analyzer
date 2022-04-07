@@ -88384,7 +88384,6 @@
         "total": 392,
         "totalUnique": 34,
         "unique": {
-          ".35s": 3,
           "0.3s": 37,
           "250ms": 19,
           ".75s": 1,
@@ -88410,6 +88409,7 @@
           "0.1s": 3,
           "1400ms": 7,
           ".15s": 9,
+          ".35s": 3,
           "2s": 3,
           "0.15s": 3,
           "0.35s": 1,
@@ -88425,11 +88425,11 @@
         "total": 285,
         "totalUnique": 8,
         "unique": {
-          "ease": 132,
           "ease-out": 7,
           "ease-in-out": 79,
           "linear": 32,
           "cubic-bezier(.25, .1, .25, 1)": 19,
+          "ease": 132,
           "steps(4, end)": 7,
           "cubic-bezier(0.25, 0.8, 0.25, 1)": 8,
           "cubic-bezier(0.4, 0, 0.2, 1)": 1

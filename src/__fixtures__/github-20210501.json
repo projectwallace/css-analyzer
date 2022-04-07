@@ -33549,7 +33549,9 @@
         "total": 31,
         "totalUnique": 13,
         "unique": {
+          ".2s": 4,
           ".1s\n": 3,
+          ".12s": 1,
           ".1s": 1,
           "1s": 3,
           ".3s\n": 2,
@@ -33557,8 +33559,6 @@
           ".15s": 1,
           "2s": 1,
           ".5s\n": 1,
-          ".2s": 4,
-          ".12s": 1,
           "1.06s": 2,
           "3s": 1,
           ".4s": 6
@@ -33569,16 +33569,16 @@
         "total": 19,
         "totalUnique": 12,
         "unique": {
+          "cubic-bezier(.3, 0, .5, 1)": 3,
+          "ease-out": 2,
           "ease-in": 1,
           "ease-in-out\n": 1,
           "ease-out\n": 1,
-          "ease-out": 2,
           "ease-in\n": 1,
           "ease": 1,
           "ease-in-out": 2,
           "cubic-bezier(.2, 0, .13, 1.5)\n": 1,
           "linear": 2,
-          "cubic-bezier(.3, 0, .5, 1)": 3,
           "steps(1)": 2,
           "cubic-bezier(.73, .005, .22, 1)": 2
         },

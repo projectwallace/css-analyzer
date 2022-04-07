@@ -37522,9 +37522,9 @@
         "total": 34,
         "totalUnique": 3,
         "unique": {
-          "ease-out": 4,
           "ease-in-out": 24,
-          "ease": 6
+          "ease": 6,
+          "ease-out": 4
         },
         "uniquenessRatio": 0.08823529411764706
       }
