@@ -22670,19 +22670,18 @@
       }
     },
     "fontFamilies": {
-      "total": 6,
-      "totalUnique": 4,
+      "total": 5,
+      "totalUnique": 3,
       "unique": {
         "var(--bs-font-sans-serif)": 3,
         "var(--bs-font-monospace)": 1,
-        "inherit": 1,
         "var(--bs-font-monospace) ": 1
       },
-      "uniquenessRatio": 0.6666666666666666
+      "uniquenessRatio": 0.6
     },
     "fontSizes": {
-      "total": 82,
-      "totalUnique": 36,
+      "total": 79,
+      "totalUnique": 35,
       "unique": {
         "1rem": 9,
         "calc(1.375rem + 1.5vw)": 2,
@@ -22697,7 +22696,6 @@
         "0.875em": 10,
         "0.75em": 2,
         "1em": 2,
-        "inherit": 3,
         "calc(1.625rem + 4.5vw)": 1,
         "5rem": 1,
         "calc(1.575rem + 3.9vw)": 1,
@@ -22721,7 +22719,7 @@
         "1.75rem ": 1,
         "1.5rem ": 1
       },
-      "uniquenessRatio": 0.43902439024390244
+      "uniquenessRatio": 0.4430379746835443
     },
     "zindexes": {
       "total": 37,

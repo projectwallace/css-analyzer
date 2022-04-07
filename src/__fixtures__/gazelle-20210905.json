@@ -88025,8 +88025,8 @@
       }
     },
     "fontFamilies": {
-      "total": 64,
-      "totalUnique": 27,
+      "total": 55,
+      "totalUnique": 26,
       "unique": {
         "Arial, Helvetica, sans-serif": 4,
         "'ProximaNova'": 3,
@@ -88043,7 +88043,6 @@
         "monospace, monospace": 1,
         "'Glyphicons Halflings'": 2,
         "\"Helvetica Neue\", Helvetica, Arial, sans-serif": 3,
-        "inherit": 9,
         "Menlo, Monaco, Consolas, \"Courier New\", monospace\n": 1,
         "serif": 1,
         "Arial, Baskerville, monospace": 1,
@@ -88056,11 +88055,11 @@
         "Arial,Helvetica,sans-serif": 2,
         "a": 1
       },
-      "uniquenessRatio": 0.421875
+      "uniquenessRatio": 0.4727272727272727
     },
     "fontSizes": {
-      "total": 842,
-      "totalUnique": 136,
+      "total": 837,
+      "totalUnique": 135,
       "unique": {
         "0": 3,
         "12px": 83,
@@ -88176,7 +88175,6 @@
         "2em\n": 1,
         "80%\n": 1,
         "75%": 2,
-        "inherit": 5,
         "65%\n": 1,
         "75%\n": 1,
         "36px\n": 1,
@@ -88199,7 +88197,7 @@
         "14px ": 4,
         "16px ": 4
       },
-      "uniquenessRatio": 0.16152019002375298
+      "uniquenessRatio": 0.16129032258064516
     },
     "zindexes": {
       "total": 180,

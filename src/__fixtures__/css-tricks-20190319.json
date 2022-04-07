@@ -19647,25 +19647,24 @@
       }
     },
     "fontFamilies": {
-      "total": 38,
-      "totalUnique": 10,
+      "total": 35,
+      "totalUnique": 9,
       "unique": {
         "Rubik": 2,
         "-system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\"": 2,
         "Rubik,Lato,\"Lucida Grande\",\"Lucida Sans Unicode\",Tahoma,Sans-Serif": 16,
         "\"Operator Mono SSm A\",\"Operator Mono SSm B\",\"Operator Mono\",\"Source Code Pro\",Menlo,Consolas,Monaco,monospace": 10,
-        "inherit": 3,
         "sans-serif": 1,
         "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif": 1,
         "serif": 1,
         "'Helvetica Neue', Arial, Helvetica, 'Nimbus Sans L', sans-serif": 1,
         "Inconsolata, Consolas, Monaco, Lucida Console, monospace": 1
       },
-      "uniquenessRatio": 0.2631578947368421
+      "uniquenessRatio": 0.2571428571428571
     },
     "fontSizes": {
-      "total": 170,
-      "totalUnique": 49,
+      "total": 169,
+      "totalUnique": 48,
       "unique": {
         "0": 2,
         "100%": 1,
@@ -19714,10 +19713,9 @@
         "11px": 8,
         "1.3em": 1,
         "1.8em": 1,
-        "1.4em": 1,
-        "inherit": 1
+        "1.4em": 1
       },
-      "uniquenessRatio": 0.28823529411764703
+      "uniquenessRatio": 0.28402366863905326
     },
     "zindexes": {
       "total": 43,

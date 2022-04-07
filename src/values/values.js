@@ -1,30 +1,17 @@
-import { CountableCollection } from '../countable-collection.js'
-
 const keywords = {
   'auto': 1,
   'inherit': 1,
   'initial': 1,
   'unset': 1,
   'revert': 1,
-  'none': 1, // for `text-shadow` and `box-shadow`
+  'none': 1, // for `text-shadow`, `box-shadow` and `background`
 }
 
-const analyzeValues = ({ values, stringifyNode }) => {
-  const all = new CountableCollection()
+export function isValueKeyword(node) {
+  if (!node.children) return false
+  const firstChild = node.children.first
 
-  for (let i = 0; i < values.length; i++) {
-    const node = values[i]
-    const firstChild = node.children.first
-
-    if (!firstChild) continue
-    if (firstChild.type === 'Identifier' && keywords[firstChild.name]) continue
-
-    all.push(stringifyNode(node))
-  }
-
-  return all.count()
-}
-
-export {
-  analyzeValues
+  if (!firstChild) return false
+  if (node.children.size > 1) return false
+  return firstChild.type === 'Identifier' && keywords[firstChild.name]
 }

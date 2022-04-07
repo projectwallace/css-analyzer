@@ -5,9 +5,9 @@ import { analyzeSpecificity, compareSpecificity } from './selectors/specificity.
 import { colorFunctions, colorNames } from './values/colors.js'
 import { analyzeFontFamilies } from './values/font-families.js'
 import { analyzeFontSizes } from './values/font-sizes.js'
-import { analyzeValues } from './values/values.js'
+import { isValueKeyword } from './values/values.js'
 import { analyzeAnimations } from './values/animations.js'
-import { analyzeVendorPrefixes } from './values/vendor-prefix.js'
+import { isAstVendorPrefixed } from './values/vendor-prefix.js'
 import { analyzeAtRules } from './atrules/atrules.js'
 import { ContextCollection } from './context-collection.js'
 import { CountableCollection } from './countable-collection.js'
@@ -99,10 +99,10 @@ const analyze = (css) => {
   const propertyVendorPrefixes = new CountableCollection()
   const customProperties = new CountableCollection()
 
-  const values = []
-  const zindex = []
-  const textShadows = []
-  const boxShadows = []
+  const vendorPrefixedValues = new CountableCollection()
+  const zindex = new CountableCollection()
+  const textShadows = new CountableCollection()
+  const boxShadows = new CountableCollection()
   const fontValues = []
   const fontFamilyValues = []
   const fontSizeValues = []
@@ -219,14 +219,22 @@ const analyze = (css) => {
         break
       }
       case 'Value': {
-        values.push(node)
+        if (isValueKeyword(node)) {
+          break
+        }
 
         const property = this.declaration.property
+
+        if (isAstVendorPrefixed(node)) {
+          vendorPrefixedValues.push(stringifyNode(node))
+        }
 
         // Process properties first that don't have colors,
         // so we can avoid further walking them;
         if (isProperty('z-index', property)) {
-          zindex.push(node)
+          if (!isValueKeyword(node)) {
+            zindex.push(stringifyNode(node))
+          }
           return this.skip
         } else if (isProperty('font', property)) {
           fontValues.push(node)
@@ -247,10 +255,14 @@ const analyze = (css) => {
           timingFunctions.push(stringifyNode(node))
           break
         } else if (isProperty('text-shadow', property)) {
-          textShadows.push(node)
+          if (!isValueKeyword(node)) {
+            textShadows.push(stringifyNode(node))
+          }
           // no break here: potentially contains colors
         } else if (isProperty('box-shadow', property)) {
-          boxShadows.push(node)
+          if (!isValueKeyword(node)) {
+            boxShadows.push(stringifyNode(node))
+          }
           // no break here: potentially contains colors
         }
 
@@ -425,11 +437,11 @@ const analyze = (css) => {
       colors: colors.count(),
       fontFamilies: analyzeFontFamilies({ stringifyNode, fontValues, fontFamilyValues }),
       fontSizes: analyzeFontSizes({ stringifyNode, fontValues, fontSizeValues }),
-      zindexes: analyzeValues({ values: zindex, stringifyNode }),
-      textShadows: analyzeValues({ values: textShadows, stringifyNode }),
-      boxShadows: analyzeValues({ values: boxShadows, stringifyNode }),
+      zindexes: zindex.count(),
+      textShadows: textShadows.count(),
+      boxShadows: boxShadows.count(),
       animations: analyzeAnimations({ animations, timingFunctions, durations, stringifyNode }),
-      prefixes: analyzeVendorPrefixes({ values, stringifyNode }),
+      prefixes: vendorPrefixedValues.count(),
       units: units.count(),
     },
     __meta__: {

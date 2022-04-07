@@ -143417,8 +143417,8 @@
       }
     },
     "fontFamilies": {
-      "total": 817,
-      "totalUnique": 39,
+      "total": 802,
+      "totalUnique": 37,
       "unique": {
         "sans-serif": 2,
         "monospace,serif": 1,
@@ -143437,12 +143437,10 @@
         "CNN,\"Helvetica Neue\",Helvetica,Arial,Utkal,sans-serif": 20,
         "STYLE,Helvetica Neue,Helvetica,Arial,Utkal,sans-serif": 1,
         "CNN,Helvetica Neue,Arial Black,Helvetica,Arial,Utkal,sans-serif": 4,
-        "inherit": 14,
         "CNN,Helvetica Neue,Verdana,Helvetica,Arial,Utkal,sans-serif": 1,
         "Arial": 5,
         "monospace,monospace": 1,
         "Helvetica,sans-serif": 1,
-        "initial": 1,
         "Helvetica,Arial,sans-serif": 1,
         "\"Segoe UI\",\"Open Sans\",\"Helvetica Neue\",Helvetica,Arial": 1,
         "monospace, serif": 1,
@@ -143460,11 +143458,11 @@
         "cnn-icons ": 2,
         "CNN, \"Helvetica Neue\", Verdana, Helvetica, Arial, Utkal, sans-serif": 1
       },
-      "uniquenessRatio": 0.04773561811505508
+      "uniquenessRatio": 0.046134663341645885
     },
     "fontSizes": {
-      "total": 2328,
-      "totalUnique": 421,
+      "total": 2308,
+      "totalUnique": 419,
       "unique": {
         "0": 7,
         "100%": 5,
@@ -143773,7 +143771,6 @@
         "14.4px": 4,
         ".96rem": 1,
         ".9em": 3,
-        "inherit": 19,
         ".875em": 1,
         "23px": 1,
         "1.53333rem": 2,
@@ -143878,7 +143875,6 @@
         "0.813em": 9,
         "0.69em": 3,
         "0.812em": 5,
-        "initial": 1,
         "0.72em": 1,
         "0.688em": 1,
         "0.85em": 2,
@@ -143888,7 +143884,7 @@
         "1.32rem ": 1,
         "64px": 1
       },
-      "uniquenessRatio": 0.18084192439862543
+      "uniquenessRatio": 0.1815424610051993
     },
     "zindexes": {
       "total": 401,

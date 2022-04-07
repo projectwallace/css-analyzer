@@ -37399,13 +37399,12 @@
       }
     },
     "fontFamilies": {
-      "total": 73,
-      "totalUnique": 11,
+      "total": 71,
+      "totalUnique": 10,
       "unique": {
         "sans-serif": 2,
         "\"Charlie Text\",sans-serif": 4,
         "SFMono-Regular,Menlo,Monaco,Consolas,\"Liberation Mono\",\"Courier New\",monospace": 4,
-        "inherit": 2,
         "\"Charlie Display\",sans-serif": 2,
         "'Charlie Display'": 28,
         "'Charlie Text'": 24,
@@ -37414,11 +37413,11 @@
         "jaf-facitweb, \"Helvetica Neue\", Arial, sans-serif": 2,
         "a": 2
       },
-      "uniquenessRatio": 0.1506849315068493
+      "uniquenessRatio": 0.14084507042253522
     },
     "fontSizes": {
-      "total": 110,
-      "totalUnique": 28,
+      "total": 106,
+      "totalUnique": 27,
       "unique": {
         "0": 2,
         "75%": 4,
@@ -37426,7 +37425,6 @@
         "1.5625rem": 16,
         "1.09375rem": 12,
         "90%": 4,
-        "inherit": 4,
         "80%": 10,
         "1em": 2,
         "1.5rem": 2,
@@ -37449,7 +37447,7 @@
         "15px": 2,
         "15pt": 1
       },
-      "uniquenessRatio": 0.2545454545454545
+      "uniquenessRatio": 0.25471698113207547
     },
     "zindexes": {
       "total": 22,

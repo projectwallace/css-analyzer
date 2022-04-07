@@ -89939,8 +89939,8 @@
       }
     },
     "fontFamilies": {
-      "total": 851,
-      "totalUnique": 15,
+      "total": 845,
+      "totalUnique": 14,
       "unique": {
         "ElenaInitial": 85,
         "Elena": 88,
@@ -89954,15 +89954,14 @@
         "monospace": 4,
         "Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace": 4,
         "Courier new,Consolas,monospace": 2,
-        "inherit": 6,
         "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif": 2,
         "Arial,serif": 2
       },
-      "uniquenessRatio": 0.01762632197414806
+      "uniquenessRatio": 0.016568047337278107
     },
     "fontSizes": {
-      "total": 1018,
-      "totalUnique": 108,
+      "total": 1002,
+      "totalUnique": 107,
       "unique": {
         ".8em": 100,
         ".7em": 66,
@@ -89996,7 +89995,6 @@
         ".85em": 28,
         "1.1em": 35,
         "16px": 6,
-        "inherit": 16,
         ".6em": 16,
         "calc(1em + .25vw)": 6,
         "1.5em": 26,
@@ -90073,7 +90071,7 @@
         "calc(22px + 1vw)": 2,
         "13px": 4
       },
-      "uniquenessRatio": 0.10609037328094302
+      "uniquenessRatio": 0.10678642714570859
     },
     "zindexes": {
       "total": 169,

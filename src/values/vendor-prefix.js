@@ -1,46 +1,30 @@
-import { CountableCollection } from '../countable-collection.js'
 import { hasVendorPrefix } from '../vendor-prefix.js'
 
-function isAstVendorPrefixed(children) {
-  children = children.toArray()
+export function isAstVendorPrefixed(node) {
+  if (!node.children) {
+    return false
+  }
+
+  const children = node.children.toArray()
 
   for (let index = 0; index < children.length; index++) {
-    const child = children[index];
+    const node = children[index]
+    const { type, name } = node;
 
-    if (child.type === 'Identifier' && child.name.length >= 3) {
-      if (hasVendorPrefix(child.name)) {
-        return true
-      }
+    if (type === 'Identifier' && hasVendorPrefix(name)) {
+      return true
     }
 
-    if (child.type === 'Function') {
-      if (hasVendorPrefix(child.name)) {
+    if (type === 'Function') {
+      if (hasVendorPrefix(name)) {
         return true
       }
 
-      if (child.children && isAstVendorPrefixed(child.children)) {
+      if (isAstVendorPrefixed(node)) {
         return true
       }
     }
   }
+
   return false
-}
-
-const analyzeVendorPrefixes = ({ values, stringifyNode }) => {
-  const all = new CountableCollection()
-
-  for (let i = 0; i < values.length; i++) {
-    /** @type {import('css-tree').Value} */
-    const value = values[i]
-
-    if (value.children && isAstVendorPrefixed(value.children)) {
-      all.push(stringifyNode(value))
-    }
-  }
-
-  return all.count()
-}
-
-export {
-  analyzeVendorPrefixes
 }

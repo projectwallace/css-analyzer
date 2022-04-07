@@ -53765,26 +53765,25 @@
       }
     },
     "fontFamilies": {
-      "total": 59,
-      "totalUnique": 11,
+      "total": 55,
+      "totalUnique": 10,
       "unique": {
         "\"Produkt\"": 3,
         "\"Graphik\"": 2,
         "'Bol Symbols'": 7,
         "Graphik,Arial,Helvetica,sans-serif": 16,
         "Produkt,Arial,Helvetica,sans-serif": 9,
-        "inherit": 4,
         "'Bol Symbols',Graphik": 12,
         "\"ClarendonURW-Med\",Georgia,serif": 1,
         "Arial,sans-serif": 1,
         "'Clarendon FS Medium',Georgia,serif": 1,
         "\"Bol Symbols\", \"Open Sans\"": 3
       },
-      "uniquenessRatio": 0.1864406779661017
+      "uniquenessRatio": 0.18181818181818182
     },
     "fontSizes": {
-      "total": 213,
-      "totalUnique": 76,
+      "total": 209,
+      "totalUnique": 75,
       "unique": {
         ".857em": 3,
         "1em": 35,
@@ -53808,7 +53807,6 @@
         "5em": 2,
         ".85714em": 8,
         "2.5em": 1,
-        "inherit": 4,
         ".75em": 2,
         ".875em": 1,
         "4.5rem": 1,
@@ -53863,7 +53861,7 @@
         "1.85714rem": 2,
         "2.28571rem": 2
       },
-      "uniquenessRatio": 0.3568075117370892
+      "uniquenessRatio": 0.3588516746411483
     },
     "zindexes": {
       "total": 61,

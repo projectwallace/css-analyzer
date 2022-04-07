@@ -36823,8 +36823,8 @@
       }
     },
     "fontFamilies": {
-      "total": 43,
-      "totalUnique": 18,
+      "total": 37,
+      "totalUnique": 17,
       "unique": {
         "Helvetica, Arial, sans-serif": 18,
         "Helvetica Neue, Helvetica, Arial, sans-serif": 1,
@@ -36832,7 +36832,6 @@
         "'Segoe UI Historic'": 2,
         "Segoe UI Historic, Segoe UI, Helvetica, Arial, sans-serif": 1,
         "Roboto, Helvetica, Arial, sans-serif": 1,
-        "inherit": 6,
         "Menlo, Consolas, Monaco, monospace": 1,
         "Georgia, serif": 1,
         "'Open Dyslexic'": 1,
@@ -36845,11 +36844,11 @@
         "Georgia, Lucida Grande, Tahoma, Verdana, Arial, sans-serif": 3,
         "Helvetica,Arial,sans-serif": 1
       },
-      "uniquenessRatio": 0.4186046511627907
+      "uniquenessRatio": 0.4594594594594595
     },
     "fontSizes": {
-      "total": 172,
-      "totalUnique": 41,
+      "total": 171,
+      "totalUnique": 40,
       "unique": {
         "0": 4,
         "12px": 34,
@@ -36884,7 +36883,6 @@
         "1.25rem": 1,
         ".5rem": 1,
         "1.125rem": 1,
-        "inherit": 1,
         "1.75rem": 1,
         "2rem": 1,
         "1rem": 1,
@@ -36893,7 +36891,7 @@
         "1.5rem": 1,
         "1.375rem": 1
       },
-      "uniquenessRatio": 0.23837209302325582
+      "uniquenessRatio": 0.23391812865497075
     },
     "zindexes": {
       "total": 52,

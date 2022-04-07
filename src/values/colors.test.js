@@ -767,15 +767,31 @@ Colors('ignores CSS keywords', () => {
       color: unset;
       color: initial;
       color: transparent;
+      background: none;
+    }
+
+    positive {
+      background: none 0px 0px repeat scroll rgb(0, 0, 0);
     }
   `
   const actual = analyze(fixture).values.colors
   const expected = {
-    total: 0,
-    totalUnique: 0,
-    unique: {},
-    uniquenessRatio: 0,
-    itemsPerContext: {},
+    total: 1,
+    totalUnique: 1,
+    unique: {
+      'rgb(0, 0, 0)': 1,
+    },
+    uniquenessRatio: 1,
+    itemsPerContext: {
+      background: {
+        total: 1,
+        totalUnique: 1,
+        unique: {
+          'rgb(0, 0, 0)': 1,
+        },
+        uniquenessRatio: 1,
+      },
+    },
   }
 
   assert.equal(actual, expected)

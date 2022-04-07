@@ -21036,13 +21036,11 @@
       }
     },
     "fontFamilies": {
-      "total": 109,
-      "totalUnique": 14,
+      "total": 105,
+      "totalUnique": 12,
       "unique": {
         "'Lato'": 18,
         "'Lato',Arial,sans-serif": 4,
-        "inherit ": 2,
-        "inherit": 2,
         "'Lato',Arial,sans-serif ": 1,
         "Verdana,Geneva,Tahoma,sans-serif": 1,
         "\"Helvetica Neue\",Helvetica,sans-serif": 1,
@@ -21054,11 +21052,11 @@
         "FuturaPTBold": 12,
         "FuturaPTBold,Arial,sans-serif": 3
       },
-      "uniquenessRatio": 0.12844036697247707
+      "uniquenessRatio": 0.11428571428571428
     },
     "fontSizes": {
-      "total": 173,
-      "totalUnique": 47,
+      "total": 171,
+      "totalUnique": 45,
       "unique": {
         "0": 1,
         "16px": 2,
@@ -21067,11 +21065,9 @@
         "12px": 4,
         "10px": 1,
         "20px": 1,
-        "inherit": 1,
         "16px ": 1,
         "18px ": 1,
         "14px ": 1,
-        "inherit ": 1,
         "28px ": 3,
         "15.45454502px": 1,
         "24px": 3,
@@ -21108,7 +21104,7 @@
         "2.125rem": 1,
         "3.125rem": 1
       },
-      "uniquenessRatio": 0.27167630057803466
+      "uniquenessRatio": 0.2631578947368421
     },
     "zindexes": {
       "total": 30,
