@@ -22,7 +22,7 @@ files.forEach(([, name]) => {
   }
 })
 
-console.log('Running benchmark on /dist/analyzer.js:')
+console.log('Running benchmark on /dist/analyzer.modern.js:')
 const header = `${'File'.padEnd(maxLen + 2)} | ${'Size'.padStart(7)} |  total | parse | Analyze        |`
 console.log(''.padEnd(header.length, '='))
 console.log(header)

@@ -53,6 +53,6 @@
     "watchlist": "^0.2.3"
   },
   "mangle": {
-    "regex": "^_"
+    "regex": "^_[^_]"
   }
 }
