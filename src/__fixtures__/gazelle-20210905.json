@@ -88036,6 +88036,7 @@
         "'Gazelle'\n": 4,
         "'ProximaNova', Helvetica, Arial, sans-serif\n": 1,
         "'luma-icons'": 2,
+        "Arial,Helvetica,sans-serif": 2,
         "'bluefoot-icons'": 5,
         "'bluefoot-icons'\n": 1,
         "Consolas, \"Liberation Mono\", Menlo, Courier, monospace": 1,
@@ -88045,15 +88046,14 @@
         "\"Helvetica Neue\", Helvetica, Arial, sans-serif": 3,
         "Menlo, Monaco, Consolas, \"Courier New\", monospace\n": 1,
         "serif": 1,
+        "a": 1,
         "Arial, Baskerville, monospace": 1,
         "\"Open Sans\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen-Sans, Ubuntu, Cantarell, \"Helvetica Neue\", sans-serif": 4,
         "proximaNova-light": 1,
         "proximaNova-regular": 1,
         "proximaNova-bold": 1,
         "proximaNova-regular, Arial, sans-serif": 1,
-        "proximaNova-bold, Arial, sans-serif": 3,
-        "Arial,Helvetica,sans-serif": 2,
-        "a": 1
+        "proximaNova-bold, Arial, sans-serif": 3
       },
       "uniquenessRatio": 0.4727272727272727
     },

@@ -33421,14 +33421,14 @@
         "sans-serif": 1,
         "monospace, monospace": 1,
         "-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji": 1,
+        "SFMono-Regular,Consolas,LiberationMono,Menlo,monospace": 2,
         "SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace": 2,
         "SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace\n": 1,
+        "-apple-system,BlinkMacSystemFont,SegoeUI,Helvetica,Arial,sans-serif,AppleColorEmoji,SegoeUIEmoji": 1,
         "monospace": 1,
         "monospace\n": 1,
         "SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace": 1,
-        "Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol": 1,
-        "SFMono-Regular,Consolas,LiberationMono,Menlo,monospace": 2,
-        "-apple-system,BlinkMacSystemFont,SegoeUI,Helvetica,Arial,sans-serif,AppleColorEmoji,SegoeUIEmoji": 1
+        "Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol": 1
       },
       "uniquenessRatio": 0.8461538461538461
     },
@@ -33441,6 +33441,7 @@
         "75%": 1,
         "1em\n": 1,
         "14px": 14,
+        "11px": 2,
         "32px\n": 1,
         "24px\n": 1,
         "20px\n": 2,
@@ -33464,8 +33465,7 @@
         "70%\n": 1,
         "90%": 1,
         "0\n": 1,
-        "1em": 1,
-        "11px": 2
+        "1em": 1
       },
       "uniquenessRatio": 0.3448275862068966
     },

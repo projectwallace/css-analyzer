@@ -1,5 +1,4 @@
 import walk from 'css-tree/walker'
-import { CountableCollection } from '../countable-collection.js'
 
 const sizeKeywords = {
   'xx-small': 1,
@@ -32,59 +31,44 @@ const keywords = {
 const ZERO = 48 // '0'.charCodeAt(0) === 48
 const SLASH = 47 // '/'.charCodeAt(0) === 47
 
-const analyzeFontSizes = ({ stringifyNode, fontSizeValues, fontValues }) => {
-  const all = new CountableCollection(fontSizeValues)
-
-  for (let index = 0; index < fontValues.length; index++) {
-    const fontNode = fontValues[index];
-    // Try to eliminate a keyword before we continue
-    const firstChild = fontNode.children.first
-
-    if (firstChild.type === 'Identifier' && keywords[firstChild.name]) {
-      continue
-    }
-
-    let operator = false
-    let size
-
-    walk(fontNode, function (fontNode) {
-      switch (fontNode.type) {
-        case 'Number': {
-          // Special case for `font: 0/0 a`
-          if (fontNode.value.charCodeAt(0) === ZERO) {
-            size = '0'
-            return this.break
-          }
-        }
-        case 'Operator': {
-          if (fontNode.value.charCodeAt(0) === SLASH) {
-            operator = true
-          }
-          break
-        }
-        case 'Dimension': {
-          if (!operator) {
-            size = stringifyNode(fontNode)
-            return this.break
-          }
-        }
-        case 'Identifier': {
-          if (sizeKeywords[fontNode.name]) {
-            size = fontNode.name
-            return this.break
-          }
-        }
-      }
-    })
-
-    if (size) {
-      all.push(size)
-    }
-  }
-
-  return all.count()
+export function isFontSizeKeyword(node) {
+  const firstChild = node.children.first
+  return firstChild.type === 'Identifier' && keywords[firstChild.name]
 }
 
-export {
-  analyzeFontSizes
+export function getSizeFromFont(node) {
+  let operator = false
+  let size
+
+  walk(node, function (fontNode) {
+    switch (fontNode.type) {
+      case 'Number': {
+        // Special case for `font: 0/0 a`
+        if (fontNode.value.charCodeAt(0) === ZERO) {
+          size = '0'
+          return this.break
+        }
+      }
+      case 'Operator': {
+        if (fontNode.value.charCodeAt(0) === SLASH) {
+          operator = true
+        }
+        break
+      }
+      case 'Dimension': {
+        if (!operator) {
+          size = fontNode.value + fontNode.unit
+          return this.break
+        }
+      }
+      case 'Identifier': {
+        if (sizeKeywords[fontNode.name]) {
+          size = fontNode.name
+          return this.break
+        }
+      }
+    }
+  })
+
+  return size
 }

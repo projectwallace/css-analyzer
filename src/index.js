@@ -3,8 +3,8 @@ import walk from 'css-tree/walker'
 import { analyzeRule } from './rules/rules.js'
 import { analyzeSpecificity, compareSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorNames } from './values/colors.js'
-import { analyzeFontFamilies } from './values/font-families.js'
-import { analyzeFontSizes } from './values/font-sizes.js'
+import { isFontFamilyKeyword, getFamilyFromFont } from './values/font-families.js'
+import { isFontSizeKeyword, getSizeFromFont } from './values/font-sizes.js'
 import { isValueKeyword } from './values/values.js'
 import { analyzeAnimations } from './values/animations.js'
 import { isAstVendorPrefixed } from './values/vendor-prefix.js'
@@ -103,9 +103,8 @@ const analyze = (css) => {
   const zindex = new CountableCollection()
   const textShadows = new CountableCollection()
   const boxShadows = new CountableCollection()
-  const fontValues = []
-  const fontFamilyValues = []
-  const fontSizeValues = []
+  const fontFamilies = new CountableCollection()
+  const fontSizes = new CountableCollection()
   const animations = []
   const timingFunctions = []
   const durations = []
@@ -237,13 +236,25 @@ const analyze = (css) => {
           }
           return this.skip
         } else if (isProperty('font', property)) {
-          fontValues.push(node)
+          if (!isFontFamilyKeyword(node)) {
+            fontFamilies.push(getFamilyFromFont(node, stringifyNode))
+          }
+          if (!isFontSizeKeyword(node)) {
+            const size = getSizeFromFont(node)
+            if (size) {
+              fontSizes.push(size)
+            }
+          }
           break
         } else if (isProperty('font-size', property)) {
-          fontSizeValues.push(stringifyNode(node))
+          if (!isFontSizeKeyword(node)) {
+            fontSizes.push(stringifyNode(node))
+          }
           break
         } else if (isProperty('font-family', property)) {
-          fontFamilyValues.push(stringifyNode(node))
+          if (!isFontFamilyKeyword(node)) {
+            fontFamilies.push(stringifyNode(node))
+          }
           break
         } else if (isProperty('transition', property) || isProperty('animation', property)) {
           animations.push(node.children)
@@ -435,8 +446,8 @@ const analyze = (css) => {
     }),
     values: {
       colors: colors.count(),
-      fontFamilies: analyzeFontFamilies({ stringifyNode, fontValues, fontFamilyValues }),
-      fontSizes: analyzeFontSizes({ stringifyNode, fontValues, fontSizeValues }),
+      fontFamilies: fontFamilies.count(),
+      fontSizes: fontSizes.count(),
       zindexes: zindex.count(),
       textShadows: textShadows.count(),
       boxShadows: boxShadows.count(),

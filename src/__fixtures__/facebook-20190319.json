@@ -36835,14 +36835,14 @@
         "Menlo, Consolas, Monaco, monospace": 1,
         "Georgia, serif": 1,
         "'Open Dyslexic'": 1,
+        "Helvetica,Arial,sans-serif": 1,
         "'Freight Sans Bold', Helvetica, Arial, sans-serif": 1,
         "'Freight Sans', Helvetica, Arial, sans-serif": 1,
         "'Freight Sans'": 1,
         "'Freight Sans Bold'": 1,
         "'Freight Sans', Helvetica, Arial, sans-serif ": 1,
         "'Freight Sans Bold', Helvetica, Arial, sans-serif ": 1,
-        "Georgia, Lucida Grande, Tahoma, Verdana, Arial, sans-serif": 3,
-        "Helvetica,Arial,sans-serif": 1
+        "Georgia, Lucida Grande, Tahoma, Verdana, Arial, sans-serif": 3
       },
       "uniquenessRatio": 0.4594594594594595
     },

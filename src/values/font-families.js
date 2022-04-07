@@ -1,5 +1,5 @@
 import walk from 'css-tree/walker'
-import { CountableCollection } from '../countable-collection.js'
+// import { CountableCollection } from '../countable-collection.js'
 
 const systemKeywords = {
   // Global CSS keywords
@@ -54,59 +54,102 @@ const keywordDisallowList = {
 
 const COMMA = 44 // ','.charCodeAt(0) === 44
 
-const analyzeFontFamilies = ({ fontValues, fontFamilyValues, stringifyNode }) => {
-  const all = new CountableCollection(fontFamilyValues)
+export function isFontFamilyKeyword(node) {
+  const firstChild = node.children.first
+  return firstChild.type === 'Identifier' && systemKeywords[firstChild.name]
+}
 
-  for (let index = 0; index < fontValues.length; index++) {
-    const value = fontValues[index]
+export function getFamilyFromFont(node, stringifyNode) {
+  let parts = ''
 
-    // Avoid tree traversal as soon as possible
-    const firstChild = value.children.first
-
-    if (firstChild.type === 'Identifier' && systemKeywords[firstChild.name]) {
-      continue
-    }
-
-    let parts = ''
-
-    walk(value, {
-      reverse: true,
-      enter: function (fontNode) {
-        if (fontNode.type === 'String') {
-          const loc = fontNode.loc.start
-          // Stringify the first character to get the correct quote character
-          const quote = stringifyNode({
-            loc: {
-              start: {
-                line: loc.line,
-                column: loc.column
-              },
-              end: {
-                line: loc.line,
-                column: loc.column + 1
-              }
+  walk(node, {
+    reverse: true,
+    enter: function (fontNode) {
+      if (fontNode.type === 'String') {
+        const loc = fontNode.loc.start
+        // Stringify the first character to get the correct quote character
+        const quote = stringifyNode({
+          loc: {
+            start: {
+              line: loc.line,
+              column: loc.column
+            },
+            end: {
+              line: loc.line,
+              column: loc.column + 1
             }
-          })
-          return parts = quote + fontNode.value + quote + parts
-        }
-        if (fontNode.type === 'Operator' && fontNode.value.charCodeAt(0) === COMMA) {
-          return parts = fontNode.value + parts
-        }
-        if (fontNode.type === 'Identifier') {
-          if (keywordDisallowList[fontNode.name]) {
-            return this.skip
           }
-          return parts = fontNode.name + parts
-        }
+        })
+        return parts = quote + fontNode.value + quote + parts
       }
-    })
+      if (fontNode.type === 'Operator' && fontNode.value.charCodeAt(0) === COMMA) {
+        return parts = fontNode.value + parts
+      }
+      if (fontNode.type === 'Identifier') {
+        if (keywordDisallowList[fontNode.name]) {
+          return this.skip
+        }
+        return parts = fontNode.name + parts
+      }
+    }
+  })
 
-    all.push(parts)
-  }
-
-  return all.count()
+  return parts
 }
 
-export {
-  analyzeFontFamilies
-}
+// const analyzeFontFamilies = ({ fontValues, fontFamilyValues, stringifyNode }) => {
+//   const all = new CountableCollection(fontFamilyValues)
+
+//   for (let index = 0; index < fontValues.length; index++) {
+//     const value = fontValues[index]
+
+//     // Avoid tree traversal as soon as possible
+//     const firstChild = value.children.first
+
+//     if (firstChild.type === 'Identifier' && systemKeywords[firstChild.name]) {
+//       continue
+//     }
+
+//     let parts = ''
+
+//     walk(value, {
+//       reverse: true,
+//       enter: function (fontNode) {
+//         if (fontNode.type === 'String') {
+//           const loc = fontNode.loc.start
+//           // Stringify the first character to get the correct quote character
+//           const quote = stringifyNode({
+//             loc: {
+//               start: {
+//                 line: loc.line,
+//                 column: loc.column
+//               },
+//               end: {
+//                 line: loc.line,
+//                 column: loc.column + 1
+//               }
+//             }
+//           })
+//           return parts = quote + fontNode.value + quote + parts
+//         }
+//         if (fontNode.type === 'Operator' && fontNode.value.charCodeAt(0) === COMMA) {
+//           return parts = fontNode.value + parts
+//         }
+//         if (fontNode.type === 'Identifier') {
+//           if (keywordDisallowList[fontNode.name]) {
+//             return this.skip
+//           }
+//           return parts = fontNode.name + parts
+//         }
+//       }
+//     })
+
+//     all.push(parts)
+//   }
+
+//   return all.count()
+// }
+
+// export {
+//   analyzeFontFamilies
+// }
