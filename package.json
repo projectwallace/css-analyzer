@@ -14,12 +14,13 @@
     "dist"
   ],
   "source": "src/index.js",
-  "main": "./dist/analyzer.cjs",
-  "module": "./dist/analyzer.module.js",
-  "unpkg": "./dist/analyzer.umd.js",
+  "main": "./dist/analyzer.umd.js",
+  "module": "./dist/analyzer.es.js",
   "exports": {
-    "require": "./dist/analyzer.cjs",
-    "default": "./dist/analyzer.modern.js"
+    ".": {
+      "import": "./dist/analyzer.es.js",
+      "require": "./dist/analyzer.umd.js"
+    }
   },
   "types": "./dist/index.d.ts",
   "engines": {
@@ -27,9 +28,7 @@
   },
   "scripts": {
     "test": "uvu",
-    "test:watch": "watchlist src -- npm test",
-    "build": "microbundle",
-    "dev": "microbundle watch"
+    "build": "vite build"
   },
   "keywords": [
     "projectwallace",
@@ -47,12 +46,8 @@
     "css-tree": "^2.1.0"
   },
   "devDependencies": {
-    "benchmark": "^2.1.4",
-    "microbundle": "^0.14.2",
+    "rollup-plugin-typescript2": "^0.31.2",
     "uvu": "^0.5.3",
-    "watchlist": "^0.2.3"
-  },
-  "mangle": {
-    "regex": "^_[^_]"
+    "vite": "^2.9.1"
   }
 }

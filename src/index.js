@@ -357,6 +357,7 @@ const analyze = (css) => {
   const aggregatesB = specificityB.aggregate()
   const aggregatesC = specificityC.aggregate()
   const complexityCount = new CountableCollection(complexities).count()
+  /** @type number */
   const totalUniqueSelectors = uniqueSelectors.count()
 
   return {
