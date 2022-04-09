@@ -11,7 +11,7 @@ module.exports = defineConfig({
       fileName: (format) => `analyzer.${format}.js`,
     },
     rollupOptions: {
-      external: ['css-tree/walker', 'css-tree/parser'],
+      external: [],
       plugins: [
         typescript({
           tsconfigDefaults: {
