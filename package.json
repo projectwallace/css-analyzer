@@ -27,9 +27,7 @@
   },
   "scripts": {
     "test": "uvu",
-    "test:watch": "watchlist src -- npm test",
-    "build": "microbundle",
-    "dev": "microbundle watch"
+    "build": "microbundle"
   },
   "keywords": [
     "projectwallace",
@@ -47,10 +45,8 @@
     "css-tree": "^2.1.0"
   },
   "devDependencies": {
-    "benchmark": "^2.1.4",
     "microbundle": "^0.14.2",
-    "uvu": "^0.5.3",
-    "watchlist": "^0.2.3"
+    "uvu": "^0.5.3"
   },
   "mangle": {
     "regex": "^_[^_]"

@@ -3,16 +3,16 @@
 ## Running time
 
 ```
-Bol.com                 ( 468 kB)  120ms
-Bootstrap 5.0.0         ( 195 kB)   50ms
-CNN                     (1.77 MB)  377ms
-CSS-Tricks              ( 195 kB)   54ms
-Facebook.com            ( 268 kB)   75ms
-GitHub.com              ( 514 kB)   93ms
-Gazelle.nl              ( 972 kB)  307ms
-Lego.com                ( 246 kB)   56ms
-Smashing Magazine.com   ( 1.1 MB)  298ms
-Trello.com              ( 312 kB)   82ms
+Bol.com                  468 kB  114ms  4.11 MB/s
+Bootstrap 5.0.0          195 kB   48ms  4.06 MB/s
+CNN                     1.77 MB  380ms  4.65 MB/s
+CSS-Tricks               195 kB   50ms   3.9 MB/s
+Facebook.com             268 kB   71ms  3.78 MB/s
+GitHub.com               514 kB   92ms  5.59 MB/s
+Gazelle.nl               972 kB  296ms  3.28 MB/s
+Lego.com                 246 kB   57ms  4.31 MB/s
+Smashing Magazine.com    1.1 MB  288ms  3.83 MB/s
+Trello.com               312 kB   75ms  4.15 MB/s
 ```
 
 ## Parsing vs. analyzing
