@@ -8,7 +8,6 @@ import { isFontSizeKeyword, getSizeFromFont } from './values/font-sizes.js'
 import { isValueKeyword } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isAstVendorPrefixed } from './values/vendor-prefix.js'
-import { analyzeAtRules } from './atrules/atrules.js'
 import { ContextCollection } from './context-collection.js'
 import { CountableCollection } from './countable-collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
@@ -65,9 +64,12 @@ const analyze = (css) => {
     return value
   }
 
-  const startParse = new Date()
+  // Stylesheet
   let totalComments = 0
   let commentsSize = 0
+  const embeds = new CountableCollection()
+
+  const startParse = new Date()
 
   const ast = parse(css, {
     parseAtrulePrelude: false,
@@ -80,37 +82,28 @@ const analyze = (css) => {
   })
 
   const startAnalysis = new Date()
-  const embeds = new CountableCollection()
-  const atrules = []
 
+  // Atrules
+  let totalAtRules = 0
+  /** @type {{[index: string]: string}[]} */
+  const fontfaces = []
+  const layers = new CountableCollection()
+  const imports = new CountableCollection()
+  const medias = new CountableCollection()
+  const charsets = new CountableCollection()
+  const supports = new CountableCollection()
+  const keyframes = new CountableCollection()
+  const prefixedKeyframes = new CountableCollection()
+  const containers = new CountableCollection()
+
+  // Rules
   let totalRules = 0
   let emptyRules = 0
   const selectorsPerRule = new AggregateCollection()
   const declarationsPerRule = new AggregateCollection()
 
-  const keyframeSelectors = new CountableCollection()
-  const uniqueDeclarations = new OccurrenceCounter()
-  let totalDeclarations = 0
-  let importantDeclarations = 0
-  let importantsInKeyframes = 0
-
-  const properties = new CountableCollection()
-  const propertyHacks = new CountableCollection()
-  const propertyVendorPrefixes = new CountableCollection()
-  const customProperties = new CountableCollection()
-
-  const vendorPrefixedValues = new CountableCollection()
-  const zindex = new CountableCollection()
-  const textShadows = new CountableCollection()
-  const boxShadows = new CountableCollection()
-  const fontFamilies = new CountableCollection()
-  const fontSizes = new CountableCollection()
-  const timingFunctions = new CountableCollection()
-  const durations = new CountableCollection()
-  const colors = new ContextCollection()
-  const units = new ContextCollection()
-
   // SELECTORS
+  const keyframeSelectors = new CountableCollection()
   /** @type number */
   const uniqueSelectors = new OccurrenceCounter()
   /** @type [number,number,number] */
@@ -128,14 +121,84 @@ const analyze = (css) => {
   const ids = new CountableCollection()
   const a11y = new CountableCollection()
 
+  // Declarations
+  const uniqueDeclarations = new OccurrenceCounter()
+  let totalDeclarations = 0
+  let importantDeclarations = 0
+  let importantsInKeyframes = 0
+
+  // Properties
+  const properties = new CountableCollection()
+  const propertyHacks = new CountableCollection()
+  const propertyVendorPrefixes = new CountableCollection()
+  const customProperties = new CountableCollection()
+
+  // Values
+  const vendorPrefixedValues = new CountableCollection()
+  const zindex = new CountableCollection()
+  const textShadows = new CountableCollection()
+  const boxShadows = new CountableCollection()
+  const fontFamilies = new CountableCollection()
+  const fontSizes = new CountableCollection()
+  const timingFunctions = new CountableCollection()
+  const durations = new CountableCollection()
+  const colors = new ContextCollection()
+  const units = new ContextCollection()
+
   walk(ast, function (node) {
     switch (node.type) {
       case 'Atrule': {
-        atrules.push({
-          name: node.name,
-          prelude: node.prelude && node.prelude.value,
-          block: strEquals('font-face', node.name) && node.block,
-        })
+        totalAtRules++
+        const atRuleName = node.name
+
+        if (atRuleName === 'font-face') {
+          /** @type {[index: string]: string} */
+          const descriptors = {}
+
+          node.block.children.forEach(
+            /** @param {import('css-tree').Declaration} descriptor */
+            descriptor => (descriptors[descriptor.property] = stringifyNode(descriptor.value))
+          )
+
+          fontfaces.push(descriptors)
+          break
+        }
+        if (atRuleName === 'media') {
+          medias.push(node.prelude.value)
+          break
+        }
+        if (atRuleName === 'supports') {
+          supports.push(node.prelude.value)
+          break
+        }
+        if (endsWith('keyframes', atRuleName)) {
+          const name = '@' + atRuleName + ' ' + node.prelude.value
+          if (hasVendorPrefix(atRuleName)) {
+            prefixedKeyframes.push(name)
+          }
+          keyframes.push(name)
+          break
+        }
+        if (atRuleName === 'import') {
+          imports.push(node.prelude.value)
+          break
+        }
+        if (atRuleName === 'charset') {
+          charsets.push(node.prelude.value)
+          break
+        }
+        if (atRuleName === 'container') {
+          containers.push(node.prelude.value)
+          break
+        }
+        if (atRuleName === 'layer') {
+          containers.push(
+            node.prelude.value.trim()
+              .split(',')
+              .map(name => name.trim())
+              .forEach(name => layers.push(name))
+          )
+        }
         break
       }
       case 'Rule': {
@@ -361,7 +424,7 @@ const analyze = (css) => {
 
   return {
     stylesheet: {
-      sourceLinesOfCode: atrules.length + totalSelectors + totalDeclarations + keyframeSelectors.size(),
+      sourceLinesOfCode: totalAtRules + totalSelectors + totalDeclarations + keyframeSelectors.size(),
       linesOfCode: lines.length,
       size: css.length,
       comments: {
@@ -375,7 +438,27 @@ const analyze = (css) => {
         },
       }),
     },
-    atrules: analyzeAtRules({ atrules, stringifyNode }),
+    atrules: {
+      fontface: {
+        total: fontfaces.length,
+        totalUnique: fontfaces.length,
+        unique: fontfaces,
+        uniquenessRatio: fontfaces.length === 0 ? 0 : 1
+      },
+      import: imports.count(),
+      media: medias.count(),
+      charset: charsets.count(),
+      supports: supports.count(),
+      keyframes: Object.assign(
+        keyframes.count(), {
+        prefixed: Object.assign(
+          prefixedKeyframes.count(), {
+          ratio: keyframes.size() === 0 ? 0 : prefixedKeyframes.size() / keyframes.size()
+        }),
+      }),
+      container: containers.count(),
+      layer: layers.count(),
+    },
     rules: {
       total: totalRules,
       empty: {
