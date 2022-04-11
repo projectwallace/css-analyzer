@@ -418,6 +418,7 @@ const analyze = (css) => {
   const specificitiesC = specificityC.aggregate()
   const complexityCount = new CountableCollection(selectorComplexities.toArray()).count()
   const totalUniqueSelectors = uniqueSelectors.count()
+  const assign = Object.assign
 
   return {
     stylesheet: {
@@ -428,7 +429,7 @@ const analyze = (css) => {
         total: totalComments,
         size: commentsSize,
       },
-      embeddedContent: Object.assign(embeddedContent, {
+      embeddedContent: assign(embeddedContent, {
         size: {
           total: embedSize,
           ratio: css.length === 0 ? 0 : embedSize / css.length,
@@ -446,9 +447,9 @@ const analyze = (css) => {
       media: medias.count(),
       charset: charsets.count(),
       supports: supports.count(),
-      keyframes: Object.assign(
+      keyframes: assign(
         keyframes.count(), {
-        prefixed: Object.assign(
+        prefixed: assign(
           prefixedKeyframes.count(), {
           ratio: keyframes.size() === 0 ? 0 : prefixedKeyframes.size() / keyframes.size()
         }),
@@ -462,11 +463,11 @@ const analyze = (css) => {
         total: emptyRules,
         ratio: totalRules === 0 ? 0 : emptyRules / totalRules
       },
-      selectors: Object.assign(
+      selectors: assign(
         selectorsPerRule.aggregate(), {
         items: selectorsPerRule.toArray(),
       }),
-      declarations: Object.assign(
+      declarations: assign(
         declarationsPerRule.aggregate(), {
         items: declarationsPerRule.toArray()
       }),
@@ -484,16 +485,16 @@ const analyze = (css) => {
         median: [specificitiesA.median, specificitiesB.median, specificitiesC.median],
         items: specificities
       },
-      complexity: Object.assign(
+      complexity: assign(
         selectorComplexities.aggregate(),
         complexityCount, {
         items: selectorComplexities.toArray(),
       }),
-      id: Object.assign(
+      id: assign(
         ids.count(), {
         ratio: totalSelectors === 0 ? 0 : ids.size() / totalSelectors,
       }),
-      accessibility: Object.assign(
+      accessibility: assign(
         a11y.count(), {
         ratio: totalSelectors === 0 ? 0 : a11y.size() / totalSelectors,
       }),
@@ -514,17 +515,17 @@ const analyze = (css) => {
         },
       },
     },
-    properties: Object.assign(
+    properties: assign(
       properties.count(), {
-      prefixed: Object.assign(
+      prefixed: assign(
         propertyVendorPrefixes.count(), {
         ratio: properties.size() === 0 ? 0 : propertyVendorPrefixes.size() / properties.size(),
       }),
-      custom: Object.assign(
+      custom: assign(
         customProperties.count(), {
         ratio: properties.size() === 0 ? 0 : customProperties.size() / properties.size(),
       }),
-      browserhacks: Object.assign(
+      browserhacks: assign(
         propertyHacks.count(), {
         ratio: properties.size() === 0 ? 0 : propertyHacks.size() / properties.size(),
       }),
