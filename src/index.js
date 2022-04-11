@@ -113,11 +113,9 @@ const analyze = (css) => {
   let specificityA = new AggregateCollection()
   let specificityB = new AggregateCollection()
   let specificityC = new AggregateCollection()
-  const complexityAggregator = new AggregateCollection()
+  const selectorComplexities = new AggregateCollection()
   /** @type [number,number,number][] */
   const specificities = []
-  /** @type number[] */
-  const complexities = []
   const ids = new CountableCollection()
   const a11y = new CountableCollection()
 
@@ -233,7 +231,7 @@ const analyze = (css) => {
         }
 
         uniqueSelectors.push(selector)
-        complexityAggregator.add(complexity)
+        selectorComplexities.add(complexity)
 
         if (maxSpecificity === undefined) {
           maxSpecificity = specificity
@@ -256,7 +254,6 @@ const analyze = (css) => {
         }
 
         specificities.push(specificity)
-        complexities.push(complexity)
 
         // Avoid deeper walking of selectors to not mess with
         // our specificity calculations in case of a selector
@@ -415,11 +412,11 @@ const analyze = (css) => {
 
   const totalUniqueDeclarations = uniqueDeclarations.count()
 
-  const totalSelectors = complexities.length
-  const aggregatesA = specificityA.aggregate()
-  const aggregatesB = specificityB.aggregate()
-  const aggregatesC = specificityC.aggregate()
-  const complexityCount = new CountableCollection(complexities).count()
+  const totalSelectors = selectorComplexities.size()
+  const specificitiesA = specificityA.aggregate()
+  const specificitiesB = specificityB.aggregate()
+  const specificitiesC = specificityC.aggregate()
+  const complexityCount = new CountableCollection(selectorComplexities.toArray()).count()
   const totalUniqueSelectors = uniqueSelectors.count()
 
   return {
@@ -481,16 +478,16 @@ const analyze = (css) => {
       specificity: {
         min: minSpecificity === undefined ? [0, 0, 0] : minSpecificity,
         max: maxSpecificity === undefined ? [0, 0, 0] : maxSpecificity,
-        sum: [aggregatesA.sum, aggregatesB.sum, aggregatesC.sum],
-        mean: [aggregatesA.mean, aggregatesB.mean, aggregatesC.mean],
-        mode: [aggregatesA.mode, aggregatesB.mode, aggregatesC.mode],
-        median: [aggregatesA.median, aggregatesB.median, aggregatesC.median],
+        sum: [specificitiesA.sum, specificitiesB.sum, specificitiesC.sum],
+        mean: [specificitiesA.mean, specificitiesB.mean, specificitiesC.mean],
+        mode: [specificitiesA.mode, specificitiesB.mode, specificitiesC.mode],
+        median: [specificitiesA.median, specificitiesB.median, specificitiesC.median],
         items: specificities
       },
       complexity: Object.assign(
-        complexityAggregator.aggregate(),
+        selectorComplexities.aggregate(),
         complexityCount, {
-        items: complexities
+        items: selectorComplexities.toArray(),
       }),
       id: Object.assign(
         ids.count(), {

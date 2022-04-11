@@ -63,6 +63,10 @@ class AggregateCollection {
     this._items.push(item)
   }
 
+  size() {
+    return this._items.length
+  }
+
   aggregate() {
     if (this._items.length === 0) {
       return {
