@@ -96252,6 +96252,14 @@
       },
       "uniquenessRatio": 0.15698924731182795
     },
+    "browserhacks": {
+      "total": 1,
+      "totalUnique": 1,
+      "unique": {
+        "4px solid\\9": 1
+      },
+      "uniquenessRatio": 1
+    },
     "units": {
       "total": 7696,
       "totalUnique": 10,

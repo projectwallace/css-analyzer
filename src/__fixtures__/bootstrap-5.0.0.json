@@ -25223,6 +25223,12 @@
       },
       "uniquenessRatio": 0.5454545454545454
     },
+    "browserhacks": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0
+    },
     "units": {
       "total": 1571,
       "totalUnique": 7,

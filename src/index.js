@@ -135,6 +135,7 @@ const analyze = (css) => {
 
   // Values
   const vendorPrefixedValues = new CountableCollection()
+  const valueBrowserhacks = new CountableCollection()
   const zindex = new CountableCollection()
   const textShadows = new CountableCollection()
   const boxShadows = new CountableCollection()
@@ -284,10 +285,21 @@ const analyze = (css) => {
           break
         }
 
-        const property = this.declaration.property
+        const declaration = this.declaration
+        const { property, important } = declaration
 
         if (isAstVendorPrefixed(node)) {
           vendorPrefixedValues.push(stringifyNode(node))
+        }
+
+        // i.e. `property: value !ie`
+        if (typeof important === 'string') {
+          valueBrowserhacks.push(stringifyNode(node) + '!' + important)
+        }
+
+        // i.e. `property: value\9`
+        if (node.children?.last?.type === 'Identifier' && endsWith('\\9', node.children.last.name)) {
+          valueBrowserhacks.push(stringifyNode(node))
         }
 
         // Process properties first that don't have colors,
@@ -386,7 +398,7 @@ const analyze = (css) => {
         const declaration = stringifyNode(node)
         uniqueDeclarations.push(declaration)
 
-        if (node.important) {
+        if (node.important === true) {
           importantDeclarations++
 
           if (this.atrule && endsWith('keyframes', this.atrule.name)) {
@@ -580,6 +592,7 @@ const analyze = (css) => {
         timingFunctions: timingFunctions.count(),
       },
       prefixes: vendorPrefixedValues.count(),
+      browserhacks: valueBrowserhacks.count(),
       units: units.count(),
     },
     __meta__: {
