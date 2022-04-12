@@ -1,6 +1,5 @@
 import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
-import { analyzeRule } from './rules/rules.js'
 import { analyzeSpecificity, compareSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorNames } from './values/colors.js'
 import { isFontFamilyKeyword, getFamilyFromFont } from './values/font-families.js'
@@ -200,7 +199,8 @@ const analyze = (css) => {
         break
       }
       case 'Rule': {
-        const [numSelectors, numDeclarations] = analyzeRule(node)
+        const numSelectors = node.prelude.children ? node.prelude.children.size : 0
+        const numDeclarations = node.block.children ? node.block.children.size : 0
 
         totalRules++
 
