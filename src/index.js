@@ -1,5 +1,6 @@
 import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
+import { isSupportsBrowserhack } from './atrules/atrules.js'
 import { analyzeSpecificity, compareSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorNames } from './values/colors.js'
 import { isFontFamilyKeyword, getFamilyFromFont } from './values/font-families.js'
@@ -71,7 +72,6 @@ const analyze = (css) => {
   const startParse = Date.now()
 
   const ast = parse(css, {
-    parseAtrulePrelude: false,
     parseCustomProperty: true, // To find font-families, colors, etc.
     positions: true, // So we can use stringifyNode()
     onComment: function (comment) {
@@ -91,6 +91,7 @@ const analyze = (css) => {
   const medias = new CountableCollection()
   const charsets = new CountableCollection()
   const supports = new CountableCollection()
+  const supportsBrowserhacks = new CountableCollection()
   const keyframes = new CountableCollection()
   const prefixedKeyframes = new CountableCollection()
   const containers = new CountableCollection()
@@ -165,15 +166,18 @@ const analyze = (css) => {
           break
         }
         if (atRuleName === 'media') {
-          medias.push(node.prelude.value)
+          medias.push(stringifyNode(node.prelude))
           break
         }
         if (atRuleName === 'supports') {
-          supports.push(node.prelude.value)
+          supports.push(stringifyNode(node.prelude))
+          if (isSupportsBrowserhack(node.prelude)) {
+            supportsBrowserhacks.push(stringifyNode(node.prelude))
+          }
           break
         }
         if (endsWith('keyframes', atRuleName)) {
-          const name = '@' + atRuleName + ' ' + node.prelude.value
+          const name = '@' + atRuleName + ' ' + stringifyNode(node.prelude)
           if (hasVendorPrefix(atRuleName)) {
             prefixedKeyframes.push(name)
           }
@@ -181,15 +185,15 @@ const analyze = (css) => {
           break
         }
         if (atRuleName === 'import') {
-          imports.push(node.prelude.value)
+          imports.push(stringifyNode(node.prelude))
           break
         }
         if (atRuleName === 'charset') {
-          charsets.push(node.prelude.value)
+          charsets.push(stringifyNode(node.prelude))
           break
         }
         if (atRuleName === 'container') {
-          containers.push(node.prelude.value)
+          containers.push(stringifyNode(node.prelude))
           break
         }
         if (atRuleName === 'layer') {
@@ -470,7 +474,12 @@ const analyze = (css) => {
       import: imports.count(),
       media: medias.count(),
       charset: charsets.count(),
-      supports: supports.count(),
+      supports: assign(
+        supports.count(),
+        {
+          browserhacks: supportsBrowserhacks.count(),
+        },
+      ),
       keyframes: assign(
         keyframes.count(), {
         prefixed: assign(
