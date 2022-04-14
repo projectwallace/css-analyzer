@@ -100,6 +100,8 @@ const analyze = (css) => {
   let emptyRules = 0
   const selectorsPerRule = new AggregateCollection()
   const declarationsPerRule = new AggregateCollection()
+  const uniqueSelectorsPerRule = new CountableCollection()
+  const uniqueDeclarationsPerRule = new CountableCollection()
 
   // SELECTORS
   const keyframeSelectors = new CountableCollection()
@@ -209,7 +211,10 @@ const analyze = (css) => {
         }
 
         selectorsPerRule.add(numSelectors)
+        uniqueSelectorsPerRule.push(numSelectors)
+
         declarationsPerRule.add(numDeclarations)
+        uniqueDeclarationsPerRule.push(numDeclarations)
         break
       }
       case 'Selector': {
@@ -418,6 +423,8 @@ const analyze = (css) => {
   const specificitiesC = specificityC.aggregate()
   const complexityCount = new CountableCollection(selectorComplexities.toArray()).count()
   const totalUniqueSelectors = uniqueSelectors.count()
+  const uniqueSelectorsPerRuleCount = uniqueSelectorsPerRule.count()
+  const uniqueDeclarationsPerRuleCount = uniqueDeclarationsPerRule.count()
   const assign = Object.assign
 
   return {
@@ -464,13 +471,23 @@ const analyze = (css) => {
         ratio: totalRules === 0 ? 0 : emptyRules / totalRules
       },
       selectors: assign(
-        selectorsPerRule.aggregate(), {
-        items: selectorsPerRule.toArray(),
-      }),
+        selectorsPerRule.aggregate(),
+        {
+          items: selectorsPerRule.toArray(),
+          unique: uniqueSelectorsPerRuleCount.unique,
+          totalUnique: uniqueSelectorsPerRuleCount.totalUnique,
+          uniquenessRatio: uniqueSelectorsPerRuleCount.uniquenessRatio
+        },
+      ),
       declarations: assign(
-        declarationsPerRule.aggregate(), {
-        items: declarationsPerRule.toArray()
-      }),
+        declarationsPerRule.aggregate(),
+        {
+          items: declarationsPerRule.toArray(),
+          unique: uniqueDeclarationsPerRuleCount.unique,
+          totalUnique: uniqueDeclarationsPerRuleCount.totalUnique,
+          uniquenessRatio: uniqueDeclarationsPerRuleCount.uniquenessRatio,
+        },
+      ),
     },
     selectors: {
       total: totalSelectors,

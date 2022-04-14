@@ -119,7 +119,7 @@ Api('handles empty input gracefully', () => {
       "total": 0,
       "empty": {
         "total": 0,
-        "ratio": 0
+        "ratio": 0,
       },
       "selectors": {
         "min": 0,
@@ -129,7 +129,10 @@ Api('handles empty input gracefully', () => {
         "median": 0,
         "range": 0,
         "sum": 0,
-        "items": []
+        "items": [],
+        "unique": {},
+        "totalUnique": 0,
+        "uniquenessRatio": 0,
       },
       "declarations": {
         "min": 0,
@@ -139,7 +142,10 @@ Api('handles empty input gracefully', () => {
         "median": 0,
         "range": 0,
         "sum": 0,
-        "items": []
+        "items": [],
+        "unique": {},
+        "totalUnique": 0,
+        "uniquenessRatio": 0,
       }
     },
     "selectors": {
