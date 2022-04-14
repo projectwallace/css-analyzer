@@ -31,6 +31,9 @@ Rules('should handle CSS without rules', () => {
       range: 0,
       sum: 0,
       items: [],
+      unique: {},
+      totalUnique: 0,
+      uniquenessRatio: 0,
     },
     declarations: {
       min: 0,
@@ -41,6 +44,10 @@ Rules('should handle CSS without rules', () => {
       range: 0,
       sum: 0,
       items: [],
+      items: [],
+      unique: {},
+      totalUnique: 0,
+      uniquenessRatio: 0,
     },
   }
   assert.equal(actual.rules, expected)
@@ -275,6 +282,80 @@ Rules('return a list of selectors counts per rule', () => {
   `).rules.declarations.items
   const expected = [1, 2, 3, 2]
   assert.equal(actual, expected)
+})
+
+Rules('counts unique numbers of selectors per rule', () => {
+  const result = analyze(`
+    x {
+      a: 1;
+    }
+    a,
+    b {
+      a: 1;
+      b: 2;
+    }
+    c,
+    d,
+    e {
+      a: 1;
+      b: 2;
+      c: 3;
+    }
+
+    @media print {
+      @supports (display: grid) {
+        f {
+          a: 1;
+          b: 2;
+        }
+      }
+    }
+  `).rules.selectors
+
+  assert.equal(result.unique, {
+    1: 2,
+    2: 1,
+    3: 1,
+  })
+  assert.is(result.totalUnique, 3)
+  assert.is(result.uniquenessRatio, 3 / 4)
+})
+
+Rules('counts unique numbers of declarations per rule', () => {
+  const result = analyze(`
+    x {
+      a: 1;
+    }
+    a,
+    b {
+      a: 1;
+      b: 2;
+    }
+    c,
+    d,
+    e {
+      a: 1;
+      b: 2;
+      c: 3;
+    }
+
+    @media print {
+      @supports (display: grid) {
+        f {
+          a: 1;
+          b: 2;
+        }
+      }
+    }
+  `).rules.declarations
+
+  assert.equal(result.unique, {
+    1: 1,
+    2: 2,
+    3: 1,
+  })
+  assert.is(result.totalUnique, 3)
+  assert.is(result.uniquenessRatio, 3 / 4)
 })
 
 Rules.run()
