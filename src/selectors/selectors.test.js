@@ -46,6 +46,9 @@ Selectors('handles CSS without selectors', () => {
       mode: [0, 0, 0],
       median: [0, 0, 0],
       items: [],
+      unique: {},
+      totalUnique: 0,
+      uniquenessRatio: 0,
     },
     complexity: {
       min: 0,
@@ -270,6 +273,11 @@ Selectors('handles emoji selectors', () => {
       mode: [0, 1, 0],
       median: [0, 1, 0],
       items: [[0, 1, 0]],
+      unique: {
+        '0,1,0': 1,
+      },
+      totalUnique: 1,
+      uniquenessRatio: 1 / 1,
     },
     complexity: {
       min: 1,
