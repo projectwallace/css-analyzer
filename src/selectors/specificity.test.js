@@ -246,4 +246,32 @@ Specificity('calculates total specificity', () => {
   assert.equal(actual, [1, 4, 2])
 })
 
+Specificity('calculates specificity uniqueness', () => {
+  const fixture = `
+    *,
+    * + *,
+    a,
+    a b,
+    a + b,
+    a ~ b,
+    #id,
+    .className,
+    [attr],
+    [attr=value],
+    :where(#id, .class),
+    main > :is(h1, h2) {}
+  `
+  const actual = analyze(fixture).selectors.specificity
+
+  assert.equal(actual.unique, {
+    '0,0,0': 3,
+    '0,0,1': 1,
+    '0,0,2': 4,
+    '1,0,0': 1,
+    '0,1,0': 3,
+  })
+  assert.is(actual.totalUnique, 5)
+  assert.is(actual.uniquenessRatio, 5 / 12)
+})
+
 Specificity.run()

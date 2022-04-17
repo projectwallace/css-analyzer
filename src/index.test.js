@@ -158,24 +158,27 @@ Api('handles empty input gracefully', () => {
         "sum": [
           0,
           0,
-          0
+          0,
         ],
         "mean": [
           0,
           0,
-          0
+          0,
         ],
         "mode": [
           0,
           0,
-          0
+          0,
         ],
         "median": [
           0,
           0,
-          0
+          0,
         ],
-        "items": []
+        "items": [],
+        "unique": {},
+        "totalUnique": 0,
+        "uniquenessRatio": 0,
       },
       "complexity": {
         "min": 0,

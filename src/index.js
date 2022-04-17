@@ -103,7 +103,7 @@ const analyze = (css) => {
   const uniqueSelectorsPerRule = new CountableCollection()
   const uniqueDeclarationsPerRule = new CountableCollection()
 
-  // SELECTORS
+  // Selectors
   const keyframeSelectors = new CountableCollection()
   /** @type number */
   const uniqueSelectors = new OccurrenceCounter()
@@ -111,9 +111,10 @@ const analyze = (css) => {
   let maxSpecificity
   /** @type [number,number,number] */
   let minSpecificity
-  let specificityA = new AggregateCollection()
-  let specificityB = new AggregateCollection()
-  let specificityC = new AggregateCollection()
+  const specificityA = new AggregateCollection()
+  const specificityB = new AggregateCollection()
+  const specificityC = new AggregateCollection()
+  const uniqueSpecificities = new CountableCollection()
   const selectorComplexities = new AggregateCollection()
   /** @type [number,number,number][] */
   const specificities = []
@@ -237,6 +238,7 @@ const analyze = (css) => {
 
         uniqueSelectors.push(selector)
         selectorComplexities.add(complexity)
+        uniqueSpecificities.push(specificity)
 
         if (maxSpecificity === undefined) {
           maxSpecificity = specificity
@@ -421,6 +423,7 @@ const analyze = (css) => {
   const specificitiesA = specificityA.aggregate()
   const specificitiesB = specificityB.aggregate()
   const specificitiesC = specificityC.aggregate()
+  const uniqueSpecificitiesCount = uniqueSpecificities.count()
   const complexityCount = new CountableCollection(selectorComplexities.toArray()).count()
   const totalUniqueSelectors = uniqueSelectors.count()
   const uniqueSelectorsPerRuleCount = uniqueSelectorsPerRule.count()
@@ -500,7 +503,10 @@ const analyze = (css) => {
         mean: [specificitiesA.mean, specificitiesB.mean, specificitiesC.mean],
         mode: [specificitiesA.mode, specificitiesB.mode, specificitiesC.mode],
         median: [specificitiesA.median, specificitiesB.median, specificitiesC.median],
-        items: specificities
+        items: specificities,
+        unique: uniqueSpecificitiesCount.unique,
+        totalUnique: uniqueSpecificitiesCount.totalUnique,
+        uniquenessRatio: uniqueSpecificitiesCount.uniquenessRatio,
       },
       complexity: assign(
         selectorComplexities.aggregate(),
