@@ -4,7 +4,7 @@ import * as fs from 'fs'
 const files = [
   ['bol-com-20190617', 'Bol.com', 115],
   ['bootstrap-5.0.0', 'Bootstrap 5.0.0', 47],
-  ['cnn-20220403', 'CNN', 352],
+  ['cnn-20220403', 'CNN', 360],
   ['css-tricks-20190319', 'CSS-Tricks', 51],
   ['facebook-20190319', 'Facebook.com', 69],
   ['github-20210501', 'GitHub.com', 91],

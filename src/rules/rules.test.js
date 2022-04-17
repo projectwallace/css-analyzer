@@ -22,6 +22,19 @@ Rules('should handle CSS without rules', () => {
       total: 0,
       ratio: 0
     },
+    sizes: {
+      min: 0,
+      max: 0,
+      mean: 0,
+      mode: 0,
+      median: 0,
+      range: 0,
+      sum: 0,
+      items: [],
+      unique: {},
+      totalUnique: 0,
+      uniquenessRatio: 0,
+    },
     selectors: {
       min: 0,
       max: 0,
@@ -51,6 +64,55 @@ Rules('should handle CSS without rules', () => {
     },
   }
   assert.equal(actual.rules, expected)
+})
+
+Rules('counts sizes of rules', () => {
+  const result = analyze(`
+    x {
+      a: 1;
+    }
+    a,
+    b {
+      a: 1;
+      b: 2;
+    }
+    c,
+    d,
+    e {
+      a: 1;
+      b: 2;
+      c: 3;
+    }
+
+    @media print {
+      @supports (display: grid) {
+        f {
+          a: 1;
+          b: 2;
+        }
+      }
+    }
+  `)
+  const actual = result.rules.sizes
+
+  assert.equal(actual, {
+    min: 2,
+    max: 6,
+    mean: 3.75,
+    mode: 3.75,
+    median: 3.5,
+    range: 4,
+    sum: 15,
+    items: [2, 4, 6, 3],
+    unique: {
+      2: 1,
+      4: 1,
+      6: 1,
+      3: 1,
+    },
+    totalUnique: 4,
+    uniquenessRatio: 4 / 4,
+  })
 })
 
 Rules('should count empty rules', () => {
