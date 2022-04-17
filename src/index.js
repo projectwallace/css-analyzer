@@ -98,10 +98,9 @@ const analyze = (css) => {
   // Rules
   let totalRules = 0
   let emptyRules = 0
+  const ruleSizes = new AggregateCollection()
   const selectorsPerRule = new AggregateCollection()
   const declarationsPerRule = new AggregateCollection()
-  const uniqueSelectorsPerRule = new CountableCollection()
-  const uniqueDeclarationsPerRule = new CountableCollection()
 
   // SELECTORS
   const keyframeSelectors = new CountableCollection()
@@ -204,17 +203,15 @@ const analyze = (css) => {
         const numSelectors = node.prelude.children ? node.prelude.children.size : 0
         const numDeclarations = node.block.children ? node.block.children.size : 0
 
+        ruleSizes.add(numSelectors + numDeclarations)
+        selectorsPerRule.add(numSelectors)
+        declarationsPerRule.add(numDeclarations)
+
         totalRules++
 
         if (numDeclarations === 0) {
           emptyRules++
         }
-
-        selectorsPerRule.add(numSelectors)
-        uniqueSelectorsPerRule.push(numSelectors)
-
-        declarationsPerRule.add(numDeclarations)
-        uniqueDeclarationsPerRule.push(numDeclarations)
         break
       }
       case 'Selector': {
@@ -423,8 +420,9 @@ const analyze = (css) => {
   const specificitiesC = specificityC.aggregate()
   const complexityCount = new CountableCollection(selectorComplexities.toArray()).count()
   const totalUniqueSelectors = uniqueSelectors.count()
-  const uniqueSelectorsPerRuleCount = uniqueSelectorsPerRule.count()
-  const uniqueDeclarationsPerRuleCount = uniqueDeclarationsPerRule.count()
+  const uniqueRuleSize = new CountableCollection(ruleSizes.toArray()).count()
+  const uniqueSelectorsPerRule = new CountableCollection(selectorsPerRule.toArray()).count()
+  const uniqueDeclarationsPerRule = new CountableCollection(declarationsPerRule.toArray()).count()
   const assign = Object.assign
 
   return {
@@ -470,22 +468,31 @@ const analyze = (css) => {
         total: emptyRules,
         ratio: totalRules === 0 ? 0 : emptyRules / totalRules
       },
+      sizes: assign(
+        ruleSizes.aggregate(),
+        {
+          items: ruleSizes.toArray(),
+          unique: uniqueRuleSize.unique,
+          totalUnique: uniqueRuleSize.totalUnique,
+          uniquenessRatio: uniqueRuleSize.uniquenessRatio
+        },
+      ),
       selectors: assign(
         selectorsPerRule.aggregate(),
         {
           items: selectorsPerRule.toArray(),
-          unique: uniqueSelectorsPerRuleCount.unique,
-          totalUnique: uniqueSelectorsPerRuleCount.totalUnique,
-          uniquenessRatio: uniqueSelectorsPerRuleCount.uniquenessRatio
+          unique: uniqueSelectorsPerRule.unique,
+          totalUnique: uniqueSelectorsPerRule.totalUnique,
+          uniquenessRatio: uniqueSelectorsPerRule.uniquenessRatio
         },
       ),
       declarations: assign(
         declarationsPerRule.aggregate(),
         {
           items: declarationsPerRule.toArray(),
-          unique: uniqueDeclarationsPerRuleCount.unique,
-          totalUnique: uniqueDeclarationsPerRuleCount.totalUnique,
-          uniquenessRatio: uniqueDeclarationsPerRuleCount.uniquenessRatio,
+          unique: uniqueDeclarationsPerRule.unique,
+          totalUnique: uniqueDeclarationsPerRule.totalUnique,
+          uniquenessRatio: uniqueDeclarationsPerRule.uniquenessRatio,
         },
       ),
     },
