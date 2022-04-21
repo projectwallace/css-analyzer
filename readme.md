@@ -408,8 +408,12 @@ const isSpecificityEqual = compareSpecificity(
 
 ## Related projects
 
+- [CSS Code Quality Analyzer](https://github.com/projectwallace/css-code-quality) - 
+  A Code Quality analyzer that tells you how maintainable, complex and performant your CSS is
 - [Wallace CLI](https://github.com/projectwallace/wallace-cli) - CLI tool for
   @projectwallace/css-analyzer
 - [Constyble](https://github.com/projectwallace/constyble) - CSS Complexity linter
 - [Color Sorter](https://github.com/projectwallace/color-sorter) - Sort CSS colors
   by hue, saturation, lightness and opacity
+- [CSS Diff Github Action](https://github.com/projectwallace/css-diff-action) - A
+  GitHub action that comments on your PR to tell you how your code quality has changed
