@@ -10,7 +10,6 @@ Object.entries({
   'Bootstrap v5.0.0': 'bootstrap-5.0.0',
   'CNN': 'cnn-20220403',
   'CSS Tricks': 'css-tricks-20190319',
-  'CNN': 'cnn-20220403',
   'Facebook': 'facebook-20190319',
   'GitHub': 'github-20210501',
   'Lego.com': 'lego-20190617',
