@@ -532,6 +532,9 @@ const analyze = (css) => {
     },
     declarations: {
       total: totalDeclarations,
+      totalUnique: totalUniqueDeclarations,
+      uniquenessRatio: totalDeclarations === 0 ? 0 : totalUniqueDeclarations / totalDeclarations,
+      // @TODO: deprecated, remove in next major version
       unique: {
         total: totalUniqueDeclarations,
         ratio: totalDeclarations === 0 ? 0 : totalUniqueDeclarations / totalDeclarations,
