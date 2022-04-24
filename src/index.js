@@ -20,7 +20,7 @@ import { OccurrenceCounter } from './occurrence-counter.js'
  * @param {string} css
  */
 const analyze = (css) => {
-  const start = new Date()
+  const start = Date.now()
 
   // We need all lines later on when we need to stringify the AST again
   // e.g. for Selectors
@@ -68,7 +68,7 @@ const analyze = (css) => {
   let commentsSize = 0
   const embeds = new CountableCollection()
 
-  const startParse = new Date()
+  const startParse = Date.now()
 
   const ast = parse(css, {
     parseAtrulePrelude: false,
@@ -80,7 +80,7 @@ const analyze = (css) => {
     },
   })
 
-  const startAnalysis = new Date()
+  const startAnalysis = Date.now()
 
   // Atrules
   let totalAtRules = 0
@@ -576,8 +576,8 @@ const analyze = (css) => {
     },
     __meta__: {
       parseTime: startAnalysis - startParse,
-      analyzeTime: new Date() - startAnalysis,
-      total: new Date() - start
+      analyzeTime: Date.now() - startAnalysis,
+      total: Date.now() - start
     }
   }
 }
