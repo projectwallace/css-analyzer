@@ -24013,6 +24013,8 @@
   },
   "declarations": {
     "total": 4091,
+    "totalUnique": 1209,
+    "uniquenessRatio": 0.29552676607186507,
     "unique": {
       "total": 1209,
       "ratio": 0.29552676607186507

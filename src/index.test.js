@@ -212,6 +212,8 @@ Api('handles empty input gracefully', () => {
     },
     "declarations": {
       "total": 0,
+      "totalUnique": 0,
+      "uniquenessRatio": 0,
       "unique": {
         "total": 0,
         "ratio": 0
