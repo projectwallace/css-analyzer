@@ -5,8 +5,8 @@
  * @see https://stackoverflow.com/a/51276700
  */
 function hash(str) {
-  let hash = 0x811c9dc5
-  var prime = 0x000193
+  const prime = 403
+  let hash = 167
 
   for (let i = 0; i < str.length; i++) {
     hash = hash ^ str.charCodeAt(i)
@@ -32,11 +32,8 @@ export class OccurrenceCounter {
   push(item) {
     const key = hash(item)
 
-    if (this._items[key]) {
-      return this._items[key]++
-    }
-
-    return this._items[key] = 1
+    if (this._items[key]) return
+    this._items[key] = 1
   }
 
   count() {
