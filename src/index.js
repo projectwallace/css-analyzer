@@ -191,12 +191,10 @@ const analyze = (css) => {
           break
         }
         if (atRuleName === 'layer') {
-          containers.push(
-            node.prelude.value.trim()
-              .split(',')
-              .map(name => name.trim())
-              .forEach(name => layers.push(name))
-          )
+          node.prelude.value.trim()
+            .split(',')
+            .map(name => name.trim())
+            .forEach(name => layers.push(name))
         }
         break
       }
