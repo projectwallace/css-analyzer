@@ -27782,6 +27782,15 @@
       "unique": {},
       "uniquenessRatio": 0,
       "ratio": 0
+    },
+    "complexity": {
+      "min": 1,
+      "max": 2,
+      "mean": 1.6345252320985384,
+      "mode": 2,
+      "median": 2,
+      "range": 1,
+      "sum": 17782
     }
   },
   "values": {

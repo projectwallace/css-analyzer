@@ -131,6 +131,7 @@ const analyze = (css) => {
   const propertyHacks = new CountableCollection()
   const propertyVendorPrefixes = new CountableCollection()
   const customProperties = new CountableCollection()
+  const propertyComplexities = new AggregateCollection()
 
   // Values
   const vendorPrefixedValues = new CountableCollection()
@@ -399,10 +400,15 @@ const analyze = (css) => {
 
         if (hasVendorPrefix(property)) {
           propertyVendorPrefixes.push(property)
+          propertyComplexities.add(2)
         } else if (isHack(property)) {
           propertyHacks.push(property)
+          propertyComplexities.add(2)
         } else if (isCustom(property)) {
           customProperties.push(property)
+          propertyComplexities.add(2)
+        } else {
+          propertyComplexities.add(1)
         }
         break
       }
@@ -560,6 +566,7 @@ const analyze = (css) => {
         propertyHacks.count(), {
         ratio: properties.size() === 0 ? 0 : propertyHacks.size() / properties.size(),
       }),
+      complexity: propertyComplexities.aggregate(),
     }),
     values: {
       colors: colors.count(),

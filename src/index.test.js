@@ -252,6 +252,15 @@ Api('handles empty input gracefully', () => {
         "unique": {},
         "uniquenessRatio": 0,
         "ratio": 0
+      },
+      "complexity": {
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "mode": 0,
+        "median": 0,
+        "range": 0,
+        "sum": 0,
       }
     },
     "values": {

@@ -20805,6 +20805,15 @@
       "unique": {},
       "uniquenessRatio": 0,
       "ratio": 0
+    },
+    "complexity": {
+      "min": 1,
+      "max": 2,
+      "mean": 1.099009900990099,
+      "mode": 1,
+      "median": 1,
+      "range": 1,
+      "sum": 5106
     }
   },
   "values": {

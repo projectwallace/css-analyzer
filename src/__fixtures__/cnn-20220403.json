@@ -153466,6 +153466,15 @@
       },
       "uniquenessRatio": 1,
       "ratio": 0.0002878319061667986
+    },
+    "complexity": {
+      "min": 1,
+      "max": 2,
+      "mean": 1.0609484061308196,
+      "mode": 1,
+      "median": 1,
+      "range": 1,
+      "sum": 29488
     }
   },
   "values": {

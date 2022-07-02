@@ -135,4 +135,24 @@ Properties('counts custom properties', () => {
   assert.is(actual.ratio, 3 / 6)
 })
 
+Properties('calculates property complexity', () => {
+  const fixture = `
+    .property-complexity-fixture {
+      regular-property: 1;
+      --my-custom-property: 2;
+      *browserhack-property: 2;
+      -webkit-property: 2;
+    }
+  `
+  const actual = analyze(fixture).properties.complexity
+
+  assert.is(actual.max, 2)
+  assert.is(actual.mean, 1.75)
+  assert.is(actual.median, 2)
+  assert.is(actual.min, 1)
+  assert.is(actual.mode, 2)
+  assert.is(actual.range, 1)
+  assert.is(actual.sum, 7)
+})
+
 Properties.run()
