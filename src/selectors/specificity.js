@@ -1,5 +1,6 @@
 import walk from 'css-tree/walker'
 import { startsWith } from '../string-utils.js'
+import { hasVendorPrefix } from '../vendor-prefix.js'
 
 /**
  * Compare specificity A to Specificity B
@@ -80,6 +81,10 @@ const analyzeSpecificity = (node) => {
       case 'TypeSelector': {
         complexity++
 
+        if (hasVendorPrefix(selector.name)) {
+          complexity++
+        }
+
         // 42 === '*'.charCodeAt(0)
         if (selector.name.charCodeAt(0) === 42 && selector.name.length === 1) {
           break
@@ -111,6 +116,10 @@ const analyzeSpecificity = (node) => {
           case 'not':
           case 'nth-child':
           case 'nth-last-child': {
+            if (hasVendorPrefix(selector.name)) {
+              complexity++
+            }
+
             // The specificity of an :nth-child() or :nth-last-child() selector
             // is the specificity of the pseudo class itself (counting as one
             // pseudo-class selector) plus the specificity of the most

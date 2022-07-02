@@ -16,7 +16,10 @@ const fixture = `
   [attr],
   [attr=value],
   :where(#id, .class),
-  main > :is(h1, h2) {}
+  main > :is(h1, h2),
+  input[type=text]::-webkit-input-placeholder,
+  ::-webkit-scrollbar,
+  :-moz-any(header, footer) {}
 `
 
 Complexity('calculates complexity', () => {
@@ -34,6 +37,9 @@ Complexity('calculates complexity', () => {
     2,
     3,
     5,
+    5,
+    2,
+    4,
   ]
 
   assert.equal(actual, expected)
@@ -43,13 +49,14 @@ Complexity('calculates complexity uniqueness', () => {
   const actual = analyze(fixture).selectors.complexity
   const expected = {
     '1': 5,
-    '2': 1,
+    '2': 2,
     '3': 5,
-    '5': 1
+    '4': 1,
+    '5': 2,
   }
 
-  assert.is(actual.totalUnique, 4)
-  assert.is(actual.uniquenessRatio, 4 / 12)
+  assert.is(actual.totalUnique, 5)
+  assert.is(actual.uniquenessRatio, 5 / 15)
   assert.equal(actual.unique, expected)
 })
 
