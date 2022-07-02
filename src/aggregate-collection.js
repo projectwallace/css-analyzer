@@ -59,7 +59,7 @@ class AggregateCollection {
    * Add a new Integer at the end of this AggregateCollection
    * @param {number} item - The item to add
    */
-  add(item) {
+  push(item) {
     this._items.push(item)
   }
 

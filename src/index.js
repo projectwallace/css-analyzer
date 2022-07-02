@@ -203,9 +203,9 @@ const analyze = (css) => {
         const numSelectors = node.prelude.children ? node.prelude.children.size : 0
         const numDeclarations = node.block.children ? node.block.children.size : 0
 
-        ruleSizes.add(numSelectors + numDeclarations)
-        selectorsPerRule.add(numSelectors)
-        declarationsPerRule.add(numDeclarations)
+        ruleSizes.push(numSelectors + numDeclarations)
+        selectorsPerRule.push(numSelectors)
+        declarationsPerRule.push(numDeclarations)
 
         totalRules++
 
@@ -233,7 +233,7 @@ const analyze = (css) => {
         }
 
         uniqueSelectors.push(selector)
-        selectorComplexities.add(complexity)
+        selectorComplexities.push(complexity)
         uniqueSpecificities.push(specificity)
 
         if (maxSpecificity === undefined) {
@@ -244,9 +244,9 @@ const analyze = (css) => {
           minSpecificity = specificity
         }
 
-        specificityA.add(specificity[0])
-        specificityB.add(specificity[1])
-        specificityC.add(specificity[2])
+        specificityA.push(specificity[0])
+        specificityB.push(specificity[1])
+        specificityC.push(specificity[2])
 
         if (minSpecificity !== undefined && compareSpecificity(minSpecificity, specificity) < 0) {
           minSpecificity = specificity
@@ -400,15 +400,15 @@ const analyze = (css) => {
 
         if (hasVendorPrefix(property)) {
           propertyVendorPrefixes.push(property)
-          propertyComplexities.add(2)
+          propertyComplexities.push(2)
         } else if (isHack(property)) {
           propertyHacks.push(property)
-          propertyComplexities.add(2)
+          propertyComplexities.push(2)
         } else if (isCustom(property)) {
           customProperties.push(property)
-          propertyComplexities.add(2)
+          propertyComplexities.push(2)
         } else {
-          propertyComplexities.add(1)
+          propertyComplexities.push(1)
         }
         break
       }

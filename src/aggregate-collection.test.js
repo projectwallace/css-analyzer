@@ -6,12 +6,12 @@ const CollectionSuite = suite('AggregateCollection')
 
 CollectionSuite('aggregates correctly', () => {
   const fixture = new AggregateCollection()
-  fixture.add(1)
-  fixture.add(2)
-  fixture.add(25)
-  fixture.add(3)
-  fixture.add(4)
-  fixture.add(4)
+  fixture.push(1)
+  fixture.push(2)
+  fixture.push(25)
+  fixture.push(3)
+  fixture.push(4)
+  fixture.push(4)
   const actual = fixture.aggregate()
   const expected = {
     max: 25,
