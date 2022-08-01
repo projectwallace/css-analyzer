@@ -83,7 +83,38 @@
         "(min-width: 1030px)": 2,
         "(min-width: 1155px)": 2
       },
-      "uniquenessRatio": 0.39215686274509803
+      "uniquenessRatio": 0.39215686274509803,
+      "complexity": {
+        "unique": {
+          "(min-width: 480px)": 2,
+          "(min-width: 640px) and (max-width: 800px),(max-width: 639px)": 6,
+          "(min-width: 640px) and (max-width: 800px),(min-width: 801px)": 6,
+          "(-webkit-min-device-pixel-ratio: 2),(min-resolution: 2dppx)": 4,
+          "screen and (max-width: 980px)": 3,
+          "(min-width : 1265px)": 2,
+          "(min-width : 905px)": 2,
+          "(max-width: 955px)": 2,
+          "(min-width: 905px)": 2,
+          "(max-width: 905px)": 2,
+          "(max-width: 1265px)": 2,
+          "(max-width : 904px)": 2,
+          "(max-width: 1260px)": 2,
+          "(max-width : 1264px)": 2,
+          "(max-width: 904px)": 2,
+          "(min-width: 1610px)": 2,
+          "(max-width: 700px)": 2,
+          "(min-width: 1260px)": 2,
+          "(min-width: 1030px)": 2,
+          "(min-width: 1155px)": 2
+        },
+        "min": 2,
+        "max": 6,
+        "mean": 2.215686274509804,
+        "mode": 2,
+        "median": 2,
+        "range": 4,
+        "sum": 113
+      }
     },
     "charset": {
       "total": 0,

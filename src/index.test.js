@@ -57,7 +57,17 @@ Api('handles empty input gracefully', () => {
         "total": 0,
         "totalUnique": 0,
         "unique": {},
-        "uniquenessRatio": 0
+        "uniquenessRatio": 0,
+        "complexity": {
+          "unique": {},
+          "min": 0,
+          "max": 0,
+          "mean": 0,
+          "mode": 0,
+          "median": 0,
+          "range": 0,
+          "sum": 0,
+        },
       },
       "charset": {
         "total": 0,

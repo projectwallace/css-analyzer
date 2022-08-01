@@ -72,7 +72,39 @@
         "only screen and (max-width: 320px)": 1,
         "only screen and (max-width: 240px)": 1
       },
-      "uniquenessRatio": 0.16535433070866143
+      "uniquenessRatio": 0.16535433070866143,
+      "complexity": {
+        "unique": {
+          "(max-width:1200px)": 2,
+          "(max-width:800px)": 2,
+          "(max-width:1250px)": 2,
+          "(max-width:950px)": 2,
+          "(min-width:1200px)": 2,
+          "(max-width:1040px)": 2,
+          "(max-width:768px)": 2,
+          "(min-width:800px)": 2,
+          "(max-width:1433px)": 2,
+          "(max-width:1085px)": 2,
+          "(max-width:880px)": 2,
+          "screen and (max-width:400px)": 3,
+          "print": 1,
+          "(min-width:960px)": 2,
+          "(min-width:782px)": 2,
+          "(min-width:600px)": 2,
+          "(max-width:600px)": 2,
+          "screen and (max-device-width: 480px), screen and (-webkit-min-device-pixel-ratio: 2)": 6,
+          "only screen and (max-width: 480px)": 4,
+          "only screen and (max-width: 320px)": 4,
+          "only screen and (max-width: 240px)": 4
+        },
+        "min": 1,
+        "max": 6,
+        "mean": 2.078740157480315,
+        "mode": 2,
+        "median": 2,
+        "range": 5,
+        "sum": 264
+      }
     },
     "charset": {
       "total": 1,

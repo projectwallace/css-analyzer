@@ -142,7 +142,47 @@
         "(min-width:112.5em)": 7,
         "(max-width: 56.1875em)": 3
       },
-      "uniquenessRatio": 0.07360406091370558
+      "uniquenessRatio": 0.07360406091370558,
+      "complexity": {
+        "unique": {
+          "screen and (min-width:30em)": 3,
+          "screen and (min-width:48em)": 3,
+          "screen and (min-width:64em)": 3,
+          "screen and (min-width:101.625em)": 3,
+          "(min-width:56.25em)": 2,
+          "(min-width:37.5em)": 2,
+          "print": 1,
+          "screen and (max-width:767px)": 3,
+          "screen and (max-width:1023px)": 3,
+          "(hover:none)": 2,
+          "(min-width:56.25em) and (min-width:56.25em)": 4,
+          "(max-width:56.1875em)": 2,
+          "(max-width:56.1875em) and (hover:none)": 4,
+          "(max-width:37.4375em)": 2,
+          "screen and (min-width:768px) and (max-width:1023px)": 5,
+          "screen and (max-width:479px)": 3,
+          "screen and (min-width:41.25em)": 3,
+          "(max-width:56.1875em) and (min-width:37.5em)": 4,
+          "screen and (min-width:72em)": 3,
+          "screen and (min-width:30em) and (min-width:48em)": 5,
+          "screen and (min-width:30em) and (min-width:64em)": 5,
+          "screen and (max-width:767px) and (min-width:48em)": 5,
+          "screen and (min-width:48em) and (min-width:48em)": 5,
+          "screen and (min-width:21em)": 3,
+          "(max-width:74.9375em) and (min-width:56.25em)": 4,
+          "(min-width:75em)": 2,
+          "(max-width:112.4375em) and (min-width:75em)": 4,
+          "(min-width:112.5em)": 2,
+          "(max-width: 56.1875em)": 2
+        },
+        "min": 1,
+        "max": 5,
+        "mean": 2.8274111675126905,
+        "mode": 3,
+        "median": 3,
+        "range": 4,
+        "sum": 1114
+      }
     },
     "charset": {
       "total": 1,

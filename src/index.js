@@ -15,6 +15,42 @@ import { hasVendorPrefix } from './vendor-prefix.js'
 import { isCustom, isHack, isProperty } from './properties/property-utils.js'
 import { OccurrenceCounter } from './occurrence-counter.js'
 
+function mediaPreludeComplexity(prelude) {
+  let mqComplexity = 0
+
+  const ast = parse(`@media ${prelude} {}`, {
+    context: 'atrule',
+    parseAtrulePrelude: true
+  })
+
+  walk(ast, function (node) {
+    if (node.type === 'Identifier' && !strEquals('or', node.name) && !strEquals('and', node.name)) {
+      mqComplexity++
+    }
+    if (node.type === 'MediaFeature' || node.type === 'Dimension' || node.type === 'Number') {
+      mqComplexity++
+    }
+    // TODO: handle browserhacks \\0
+  })
+
+  return mqComplexity
+}
+
+function supportsConditionComplexity(prelude) {
+  let complexity = 0
+
+  const ast = parse(`@supports ${prelude} {}`, {
+    context: 'atrule',
+    parseAtrulePrelude: true
+  })
+
+  walk(conditionAst, function (node) {
+
+  })
+
+  return complexity
+}
+
 /**
  * Analyze CSS
  * @param {string} css
@@ -89,6 +125,9 @@ const analyze = (css) => {
   const layers = new CountableCollection()
   const imports = new CountableCollection()
   const medias = new CountableCollection()
+  const mediaComplexities = new AggregateCollection()
+  /** @type {[index: string]: number} */
+  const complexityPerMedia = {}
   const charsets = new CountableCollection()
   const supports = new CountableCollection()
   const keyframes = new CountableCollection()
@@ -165,10 +204,14 @@ const analyze = (css) => {
         }
         if (atRuleName === 'media') {
           medias.push(node.prelude.value)
+          const complexity = mediaPreludeComplexity(node.prelude.value)
+          mediaComplexities.push(complexity)
+          complexityPerMedia[node.prelude.value] = complexity
           break
         }
         if (atRuleName === 'supports') {
           supports.push(node.prelude.value)
+          // supportsConditionComplexity(node.prelude.value)
           break
         }
         if (endsWith('keyframes', atRuleName)) {
@@ -441,12 +484,15 @@ const analyze = (css) => {
         total: totalComments,
         size: commentsSize,
       },
-      embeddedContent: assign(embeddedContent, {
-        size: {
-          total: embedSize,
-          ratio: css.length === 0 ? 0 : embedSize / css.length,
-        },
-      }),
+      embeddedContent: assign(
+        embeddedContent,
+        {
+          size: {
+            total: embedSize,
+            ratio: css.length === 0 ? 0 : embedSize / css.length,
+          },
+        }
+      ),
     },
     atrules: {
       fontface: {
@@ -456,7 +502,17 @@ const analyze = (css) => {
         uniquenessRatio: fontfaces.length === 0 ? 0 : 1
       },
       import: imports.count(),
-      media: medias.count(),
+      media: assign(
+        medias.count(),
+        {
+          complexity: assign(
+            {
+              unique: complexityPerMedia,
+            },
+            mediaComplexities.aggregate(),
+          ),
+        },
+      ),
       charset: charsets.count(),
       supports: supports.count(),
       keyframes: assign(

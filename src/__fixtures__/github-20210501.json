@@ -54,7 +54,30 @@
         "(min-width:768px) and (max-width:1011px)": 1,
         "print": 1
       },
-      "uniquenessRatio": 0.10619469026548672
+      "uniquenessRatio": 0.10619469026548672,
+      "complexity": {
+        "unique": {
+          "(prefers-color-scheme:light)": 2,
+          "(prefers-color-scheme:dark)": 2,
+          "(min-width:768px)": 2,
+          "only screen and (-moz-min-device-pixel-ratio:2), only screen and (-webkit-min-device-pixel-ratio:2), only screen and (min--moz-device-pixel-ratio:2), only screen and (min-device-pixel-ratio:2), only screen and (min-resolution:2dppx), only screen and (min-resolution:192dpi)": 24,
+          "(min-width:544px)": 2,
+          "(min-width:1012px)": 2,
+          "(min-width:1280px)": 2,
+          "screen and (min-width:0\\0)": 3,
+          "(max-width:543px)": 2,
+          "(min-width:544px) and (max-width:767px)": 4,
+          "(min-width:768px) and (max-width:1011px)": 4,
+          "print": 1
+        },
+        "min": 1,
+        "max": 24,
+        "mean": 2.424778761061947,
+        "mode": 2,
+        "median": 2,
+        "range": 23,
+        "sum": 274
+      }
     },
     "charset": {
       "total": 0,

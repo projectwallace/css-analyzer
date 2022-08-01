@@ -66,7 +66,31 @@
         "(prefers-reduced-motion: reduce)": 24,
         "print": 1
       },
-      "uniquenessRatio": 0.14942528735632185
+      "uniquenessRatio": 0.14942528735632185,
+      "complexity": {
+        "unique": {
+          "(prefers-reduced-motion: no-preference)": 2,
+          "(min-width: 1200px)": 2,
+          "(min-width: 576px)": 2,
+          "(min-width: 768px)": 2,
+          "(min-width: 992px)": 2,
+          "(min-width: 1400px)": 2,
+          "(max-width: 575.98px)": 2,
+          "(max-width: 767.98px)": 2,
+          "(max-width: 991.98px)": 2,
+          "(max-width: 1199.98px)": 2,
+          "(max-width: 1399.98px)": 2,
+          "(prefers-reduced-motion: reduce)": 2,
+          "print": 1
+        },
+        "min": 1,
+        "max": 2,
+        "mean": 1.9885057471264367,
+        "mode": 2,
+        "median": 2,
+        "range": 1,
+        "sum": 173
+      }
     },
     "charset": {
       "total": 1,

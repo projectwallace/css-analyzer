@@ -449,7 +449,44 @@
         "screen and (min-width:48em) and (max-width:73.4375em)": 1,
         "screen and (max-width:61.4375em)": 4
       },
-      "uniquenessRatio": 0.07123287671232877
+      "uniquenessRatio": 0.07123287671232877,
+      "complexity": {
+        "unique": {
+          "screen and (min-width:1176px)": 3,
+          "screen and (max-width:1175px)": 3,
+          "screen and (min-width:576px)": 3,
+          "screen and (max-width:1439px)": 3,
+          "screen and (min-width:1440px)": 3,
+          "screen and (min-width:374px)": 3,
+          "screen and (min-width:984px)": 3,
+          "screen and (min-width:768px)": 3,
+          "screen and (max-width:575px)": 3,
+          "screen and (max-width:655px)": 3,
+          "(max-width: 1024.5px)": 2,
+          "(max-width: 768.5px)": 2,
+          "(max-width: 500.5px)": 2,
+          "screen and (min-width:23.375em)": 3,
+          "screen and (min-width:36em)": 3,
+          "screen and (min-width:48em)": 3,
+          "screen and (min-width:73.5em)": 3,
+          "screen and (min-width:61.5em)": 3,
+          "screen and (max-width:47.9375em)": 3,
+          "screen and (max-width:23.3125em)": 3,
+          "screen and (min-width:36em) and (max-width:47.9375em)": 5,
+          "screen and (max-width:35.9375em)": 3,
+          "screen and (min-width:90em)": 3,
+          "screen and (min-width:120.24048096em)": 3,
+          "screen and (min-width:48em) and (max-width:73.4375em)": 5,
+          "screen and (max-width:61.4375em)": 3
+        },
+        "min": 2,
+        "max": 5,
+        "mean": 3.0027397260273974,
+        "mode": 3,
+        "median": 3,
+        "range": 3,
+        "sum": 1096
+      }
     },
     "charset": {
       "total": 1,

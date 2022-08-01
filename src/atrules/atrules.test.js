@@ -273,6 +273,8 @@ AtRules('finds @media', () => {
     @media (min-width: 20px) {}
     @media (max-width: 200px) {}
     @media screen or print {}
+    @media screen, print {}
+    @media (hover: hover) {}
     @media \\0 all {}
 
     @supports (-webkit-appearance: none) {
@@ -281,18 +283,40 @@ AtRules('finds @media', () => {
   `
   const actual = analyze(fixture).atrules.media
   const expected = {
-    total: 7,
-    totalUnique: 7,
+    total: 9,
+    totalUnique: 9,
     unique: {
       'screen': 1,
       'screen and (min-width: 33em)': 1,
       '(min-width: 20px)': 1,
       '(max-width: 200px)': 1,
       'screen or print': 1,
+      'screen, print': 1,
+      '(hover: hover)': 1,
       '\\0 all': 1,
       '(min-width: 0)': 1,
     },
-    uniquenessRatio: 7 / 7
+    uniquenessRatio: 1,
+    complexity: {
+      unique: {
+        'screen': 1,
+        'screen and (min-width: 33em)': 3,
+        '(min-width: 20px)': 2,
+        '(max-width: 200px)': 2,
+        'screen or print': 2,
+        'screen, print': 2,
+        '(hover: hover)': 2,
+        '\\0 all': 1,
+        '(min-width: 0)': 2,
+      },
+      sum: 17,
+      mean: 17 / 9,
+      mode: 2,
+      max: 3,
+      min: 1,
+      median: 2,
+      range: 2,
+    }
   }
 
   assert.equal(actual, expected)
@@ -391,7 +415,7 @@ AtRules('analyzes container queries', () => {
     }
 
     /* Example 8 */
-    @container card (inline-size > 30em) and (--responsive = true) {
+    @container card (inline-size > 30em) and (--responsive: true) {
       /* styles */
     }
 
@@ -412,13 +436,30 @@ AtRules('analyzes container queries', () => {
       '(--cards)': 1,
       'page-layout (block-size > 12em)': 1,
       'component-library (inline-size > 30em)': 1,
-      'card (inline-size > 30em) and (--responsive = true)': 1,
+      'card (inline-size > 30em) and (--responsive: true)': 1,
       'type(inline-size)': 1,
     },
     uniquenessRatio: 7 / 7
   }
 
   assert.equal(actual, expected)
+})
+
+AtRules.skip('@import complexity', () => {
+  const fixture = `
+    @import "style0.css";
+    @import url("style1.css");
+    @import url("style2.css") screen, print;
+    @import url("style3.css") (min-width: 1000px);
+    @import url("style4.css") screen and (hover: hover);
+    @import url("style5.css") supports(display: grid);
+    @import url("style6.css") supports( -webkit-appearance: none );
+    @import url("style7.css") supports( supports-query ) (orientation: landscape) and not(hover);
+    @import url("style8.css") layer;
+    @import url("style9.css") layer( layer-name );
+    @import url("style10.css") layer( layer-name ) (min-width: 1000px);
+    @import url("style11.css") layer( layer-name ) supports( display: flex ) (min-width: 1000px);
+  `
 })
 
 AtRules.run()
