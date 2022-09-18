@@ -433,14 +433,28 @@ AtRules.only('finds @supports browserhacks', () => {
     @supports (-moz-appearance:meterbar) and (all:initial) {}
     @supports (-moz-appearance:meterbar) and (list-style-type:japanese-formal) {}
     @supports (-moz-appearance:meterbar) and (background-blend-mode:difference,normal) {}
+
+    /* Not a hack */
+    @supports (color: red) {}
   `
   const result = analyze(fixture)
   const actual = result.atrules.supports.browserhacks
   const expected = {
-    total: 3,
-    totalUnique: 3,
-    uniquenessRatio: 1,
-    unique: {}
+    total: 10,
+    totalUnique: 10,
+    uniquenessRatio: 10 / 10,
+    unique: {
+      '(-webkit-appearance:none)': 1,
+      '(-webkit-appearance: none)': 1,
+      '(-moz-appearance:meterbar)': 1,
+      '(-moz-appearance:meterbar) and (display:flex)': 1,
+      '(-moz-appearance:meterbar) and (cursor:zoom-in)': 1,
+      '(-moz-appearance:meterbar) and (background-attachment:local)': 1,
+      '(-moz-appearance:meterbar) and (image-orientation:90deg)': 1,
+      '(-moz-appearance:meterbar) and (all:initial)': 1,
+      '(-moz-appearance:meterbar) and (list-style-type:japanese-formal)': 1,
+      '(-moz-appearance:meterbar) and (background-blend-mode:difference,normal)': 1,
+    }
   }
 
   assert.equal(actual, expected)

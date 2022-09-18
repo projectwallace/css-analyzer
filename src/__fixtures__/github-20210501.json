@@ -69,7 +69,13 @@
         "(-webkit-touch-callout:none)": 1,
         "((-webkit-clip-path:polygon(50% 0, 100% 50%, 50% 100%)) or (clip-path:polygon(50% 0, 100% 50%, 50% 100%)))": 1
       },
-      "uniquenessRatio": 1
+      "uniquenessRatio": 1,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "keyframes": {
       "total": 13,

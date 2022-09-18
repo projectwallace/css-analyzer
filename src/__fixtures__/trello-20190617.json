@@ -382,7 +382,13 @@
       "unique": {
         "((position: -webkit-sticky) or (position: sticky))": 2
       },
-      "uniquenessRatio": 0.5
+      "uniquenessRatio": 0.5,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "keyframes": {
       "total": 0,

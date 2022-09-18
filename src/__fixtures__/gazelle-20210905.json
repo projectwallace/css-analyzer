@@ -179,7 +179,16 @@
         "(-webkit-appearance: none) and (not (stroke-color:transparent))": 1,
         "(-webkit-appearance:none)": 1
       },
-      "uniquenessRatio": 1
+      "uniquenessRatio": 1,
+      "browserhacks": {
+        "total": 2,
+        "totalUnique": 2,
+        "unique": {
+          "(-webkit-appearance: none) and (not (stroke-color:transparent))": 1,
+          "(-webkit-appearance:none)": 1
+        },
+        "uniquenessRatio": 1
+      }
     },
     "keyframes": {
       "total": 29,

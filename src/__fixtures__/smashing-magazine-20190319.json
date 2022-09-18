@@ -273,7 +273,13 @@
         "(grid-row-gap:0)": 2,
         "(display:grid)": 4
       },
-      "uniquenessRatio": 0.11428571428571428
+      "uniquenessRatio": 0.11428571428571428,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "keyframes": {
       "total": 108,

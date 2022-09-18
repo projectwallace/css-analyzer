@@ -89,7 +89,13 @@
         "(-webkit-overflow-scrolling:touch)": 1,
         "((position:-webkit-sticky) or (position:sticky))": 5
       },
-      "uniquenessRatio": 0.3333333333333333
+      "uniquenessRatio": 0.3333333333333333,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "keyframes": {
       "total": 11,

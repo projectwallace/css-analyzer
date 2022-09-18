@@ -160,7 +160,13 @@
         "((-webkit-backdrop-filter:blur()) or (backdrop-filter:blur()))": 2,
         "(display:grid)": 1
       },
-      "uniquenessRatio": 0.75
+      "uniquenessRatio": 0.75,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "keyframes": {
       "total": 9,

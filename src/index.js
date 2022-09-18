@@ -84,7 +84,7 @@ const analyze = (css) => {
 
   // Atrules
   let totalAtRules = 0
-  /** @type {{[index: string]: string}[]} */
+  /** @type {string}[]} */
   const fontfaces = []
   const layers = new CountableCollection()
   const imports = new CountableCollection()
@@ -105,7 +105,6 @@ const analyze = (css) => {
 
   // Selectors
   const keyframeSelectors = new CountableCollection()
-  /** @type number */
   const uniqueSelectors = new OccurrenceCounter()
   /** @type [number,number,number] */
   let maxSpecificity
@@ -165,6 +164,7 @@ const analyze = (css) => {
           fontfaces.push(descriptors)
           break
         }
+
         if (atRuleName === 'media') {
           medias.push(stringifyNode(node.prelude))
           break
@@ -397,6 +397,12 @@ const analyze = (css) => {
         break
       }
       case 'Declaration': {
+        // Do not process Declarations in atRule preludes
+        // because we will handle them manually
+        if (this.atrulePrelude !== null) {
+          return this.skip
+        }
+
         totalDeclarations++
 
         const declaration = stringifyNode(node)
