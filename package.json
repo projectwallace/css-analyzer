@@ -42,7 +42,7 @@
     "metrics"
   ],
   "dependencies": {
-    "css-tree": "^2.2.0"
+    "css-tree": "2.2.1"
   },
   "devDependencies": {
     "microbundle": "^0.15.0",
