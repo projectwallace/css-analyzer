@@ -448,11 +448,11 @@ AtRules.only('finds @supports browserhacks', () => {
 
 AtRules('finds browserhacks', () => {
   const fixture = `
-    @media screen and (min-width:0\0) {}
+    @media screen and (min-width:0\\0) {}
     @supports (-webkit-appearance:none) {}
     @media \\0 screen {}
     @media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) { .selector {} }
-    @media \0 all {}
+    @media \\0 all {}
     @media screen and (-moz-images-in-menus:0) {}
     @media screen and (min--moz-device-pixel-ratio:0) {}
     @media all and (min--moz-device-pixel-ratio:0) and (min-resolution: .001dpcm) {}
@@ -469,16 +469,16 @@ AtRules('finds browserhacks', () => {
     @media all and (min--moz-device-pixel-ratio:0) and (min-resolution: 3e1dpcm) {}
     @supports (-moz-appearance:meterbar) and (background-blend-mode:difference,normal) {}
     @-moz-document url-prefix() {}
-    @media screen\9 {}
-    @media \0screen\,screen\9 {}
-    @media \0screen {}
-    @media screen and (min-width:0\0) {}
+    @media screen\\9 {}
+    @media \\0screen\,screen\\9 {}
+    @media \\0screen {}
+    @media screen and (min-width:0\\0) {}
     @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {}
     @media screen { @media (min-width: 0px) {} }
     @media all and (-webkit-min-device-pixel-ratio:10000), not all and (-webkit-min-device-pixel-ratio:0) {}
     @media (min-resolution: .001dpcm) { _:-o-prefocus, .selector {} }
     @media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) { .selector {} }
-    @media screen and (min-width:0\0) {}
+    @media screen and (min-width:0\\0) {}
     @media screen { @media (min-width: 0px) {} }
     @media \\0 screen {}
   `
