@@ -170,9 +170,10 @@ const analyze = (css) => {
           break
         }
         if (atRuleName === 'supports') {
-          supports.push(stringifyNode(node.prelude))
+          const prelude = stringifyNode(node.prelude)
+          supports.push(prelude)
           if (isSupportsBrowserhack(node.prelude)) {
-            supportsBrowserhacks.push(stringifyNode(node.prelude))
+            supportsBrowserhacks.push(prelude)
           }
           break
         }
