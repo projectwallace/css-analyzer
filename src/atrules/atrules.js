@@ -2,30 +2,32 @@ import { strEquals } from '../string-utils.js'
 import walk from 'css-tree/walker'
 
 /**
- *
- * @param {*} declarationNode
+ * Check whether node.property === property and node.value === value,
+ * but case-insensitive and fast.
+ * @param {import('css-tree').Declaration} node
  * @param {string} property - The CSS property to compare with (case-insensitive)
  * @param {string} value - The identifier/keyword value to compare with
  * @returns true if declaratioNode is the given property: value, false otherwise
  */
-function isPropertyValue(declarationNode, property, value) {
-  return strEquals(property, declarationNode.property)
-    && declarationNode.value.children.first.type === 'Identifier'
-    && strEquals(value, declarationNode.value.children.first.name)
+function isPropertyValue(node, property, value) {
+  return strEquals(property, node.property)
+    && node.value.children.first.type === 'Identifier'
+    && strEquals(value, node.value.children.first.name)
 }
 
+/**
+ * Check if an @supports atRule is a browserhack
+ * @param {import('css-tree').AtrulePrelude} prelude
+ * @returns true if the atrule is a browserhack
+ */
 export function isSupportsBrowserhack(prelude) {
-  if (prelude.children.first.type !== 'Parentheses') {
-    return false
-  }
-
   let returnValue = false
 
-  walk(prelude, function (declarationNode) {
-    if (declarationNode.type === 'Declaration') {
+  walk(prelude, function (node) {
+    if (node.type === 'Declaration') {
       if (
-        isPropertyValue(declarationNode, '-webkit-appearance', 'none')
-        || isPropertyValue(declarationNode, '-moz-appearance', 'meterbar')
+        isPropertyValue(node, '-webkit-appearance', 'none')
+        || isPropertyValue(node, '-moz-appearance', 'meterbar')
       ) {
         returnValue = true
         return this.break
