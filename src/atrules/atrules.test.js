@@ -252,15 +252,51 @@ AtRules('finds @supports', () => {
     }
   `
   const actual = analyze(fixture).atrules.supports
+
+  assert.equal(actual.total, 4)
+  assert.equal(actual.totalUnique, 3)
+  assert.equal(actual.uniquenessRatio, 3 / 4)
+  assert.equal(actual.unique, {
+    '(filter: blur(5px))': 1,
+    '(display: table-cell) and (display: list-item)': 1,
+    '(-webkit-appearance: none)': 2,
+  })
+})
+
+AtRules('finds @supports browserhacks', () => {
+  const fixture = `
+    @supports (-webkit-appearance:none) {}
+    @supports (-webkit-appearance: none) {}
+    @supports (-moz-appearance:meterbar) {}
+    @supports (-moz-appearance:meterbar) and (display:flex) {}
+    @supports (-moz-appearance:meterbar) and (cursor:zoom-in) {}
+    @supports (-moz-appearance:meterbar) and (background-attachment:local) {}
+    @supports (-moz-appearance:meterbar) and (image-orientation:90deg) {}
+    @supports (-moz-appearance:meterbar) and (all:initial) {}
+    @supports (-moz-appearance:meterbar) and (list-style-type:japanese-formal) {}
+    @supports (-moz-appearance:meterbar) and (background-blend-mode:difference,normal) {}
+
+    /* Not a hack */
+    @supports (color: red) {}
+  `
+  const result = analyze(fixture)
+  const actual = result.atrules.supports.browserhacks
   const expected = {
-    total: 4,
-    totalUnique: 3,
+    total: 10,
+    totalUnique: 10,
+    uniquenessRatio: 10 / 10,
     unique: {
-      '(filter: blur(5px))': 1,
-      '(display: table-cell) and (display: list-item)': 1,
-      '(-webkit-appearance: none)': 2,
-    },
-    uniquenessRatio: 3 / 4
+      '(-webkit-appearance:none)': 1,
+      '(-webkit-appearance: none)': 1,
+      '(-moz-appearance:meterbar)': 1,
+      '(-moz-appearance:meterbar) and (display:flex)': 1,
+      '(-moz-appearance:meterbar) and (cursor:zoom-in)': 1,
+      '(-moz-appearance:meterbar) and (background-attachment:local)': 1,
+      '(-moz-appearance:meterbar) and (image-orientation:90deg)': 1,
+      '(-moz-appearance:meterbar) and (all:initial)': 1,
+      '(-moz-appearance:meterbar) and (list-style-type:japanese-formal)': 1,
+      '(-moz-appearance:meterbar) and (background-blend-mode:difference,normal)': 1,
+    }
   }
 
   assert.equal(actual, expected)
@@ -293,6 +329,46 @@ AtRules('finds @media', () => {
       '(min-width: 0)': 1,
     },
     uniquenessRatio: 7 / 7
+  }
+
+  assert.equal(actual, expected)
+})
+
+AtRules.skip('finds @media browserhacks', () => {
+  const fixture = `
+    @media screen and (min-width:0\\0) {}
+    @supports (-webkit-appearance:none) {}
+    @media \\0 screen {}
+    @media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) { .selector {} }
+    @media \\0 all {}
+    @media screen and (-moz-images-in-menus:0) {}
+    @media screen and (min--moz-device-pixel-ratio:0) {}
+    @media all and (min--moz-device-pixel-ratio:0) and (min-resolution: .001dpcm) {}
+    @media all and (-moz-images-in-menus:0) and (min-resolution: .001dpcm) {}
+    @media all and (min--moz-device-pixel-ratio:0) { @media (min-width: 0px) {} }
+    @media all and (-moz-images-in-menus:0) { @media (min-width: 0px) {} }
+    @media screen\\9 {}
+    @media \\0screen\,screen\\9 {}
+    @media \\0screen {}
+    @media screen and (min-width:0\\0) {}
+    @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {}
+    @media screen { @media (min-width: 0px) {} }
+    @media all and (-webkit-min-device-pixel-ratio:10000), not all and (-webkit-min-device-pixel-ratio:0) {}
+    @media (min-resolution: .001dpcm) { _:-o-prefocus, .selector {} }
+    @media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) { .selector {} }
+    @media screen and (min-width:0\\0) {}
+    @media screen { @media (min-width: 0px) {} }
+    @media \\0 screen {}
+    @media all and (min--moz-device-pixel-ratio:0) and (min-resolution: 3e1dpcm) {}
+  `
+
+  const result = analyze(fixture)
+  const actual = result.atrules
+  const expected = {
+    total: 3,
+    totalUnique: 3,
+    uniquenessRatio: 1,
+    unique: {}
   }
 
   assert.equal(actual, expected)
@@ -421,46 +497,7 @@ AtRules('analyzes container queries', () => {
   assert.equal(actual, expected)
 })
 
-AtRules.only('finds @supports browserhacks', () => {
-  const fixture = `
-    @supports (-webkit-appearance:none) {}
-    @supports (-webkit-appearance: none) {}
-    @supports (-moz-appearance:meterbar) {}
-    @supports (-moz-appearance:meterbar) and (display:flex) {}
-    @supports (-moz-appearance:meterbar) and (cursor:zoom-in) {}
-    @supports (-moz-appearance:meterbar) and (background-attachment:local) {}
-    @supports (-moz-appearance:meterbar) and (image-orientation:90deg) {}
-    @supports (-moz-appearance:meterbar) and (all:initial) {}
-    @supports (-moz-appearance:meterbar) and (list-style-type:japanese-formal) {}
-    @supports (-moz-appearance:meterbar) and (background-blend-mode:difference,normal) {}
-
-    /* Not a hack */
-    @supports (color: red) {}
-  `
-  const result = analyze(fixture)
-  const actual = result.atrules.supports.browserhacks
-  const expected = {
-    total: 10,
-    totalUnique: 10,
-    uniquenessRatio: 10 / 10,
-    unique: {
-      '(-webkit-appearance:none)': 1,
-      '(-webkit-appearance: none)': 1,
-      '(-moz-appearance:meterbar)': 1,
-      '(-moz-appearance:meterbar) and (display:flex)': 1,
-      '(-moz-appearance:meterbar) and (cursor:zoom-in)': 1,
-      '(-moz-appearance:meterbar) and (background-attachment:local)': 1,
-      '(-moz-appearance:meterbar) and (image-orientation:90deg)': 1,
-      '(-moz-appearance:meterbar) and (all:initial)': 1,
-      '(-moz-appearance:meterbar) and (list-style-type:japanese-formal)': 1,
-      '(-moz-appearance:meterbar) and (background-blend-mode:difference,normal)': 1,
-    }
-  }
-
-  assert.equal(actual, expected)
-})
-
-AtRules('finds browserhacks', () => {
+AtRules.skip('finds browserhacks', () => {
   const fixture = `
     @media screen and (min-width:0\\0) {}
     @supports (-webkit-appearance:none) {}
