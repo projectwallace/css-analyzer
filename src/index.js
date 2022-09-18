@@ -89,6 +89,7 @@ const analyze = (css) => {
   const layers = new CountableCollection()
   const imports = new CountableCollection()
   const medias = new CountableCollection()
+  const mediaBrowserhacks = new CountableCollection()
   const charsets = new CountableCollection()
   const supports = new CountableCollection()
   const supportsBrowserhacks = new CountableCollection()
@@ -198,7 +199,8 @@ const analyze = (css) => {
           break
         }
         if (atRuleName === 'layer') {
-          node.prelude.value.trim()
+          const prelude = stringifyNode(node.prelude)
+          prelude.trim()
             .split(',')
             .map(name => name.trim())
             .forEach(name => layers.push(name))
@@ -479,7 +481,12 @@ const analyze = (css) => {
         uniquenessRatio: fontfaces.length === 0 ? 0 : 1
       },
       import: imports.count(),
-      media: medias.count(),
+      media: assign(
+        medias.count(),
+        // {
+        //   browserhacks: mediaBrowserhacks.count(),
+        // }
+      ),
       charset: charsets.count(),
       supports: assign(
         supports.count(),
