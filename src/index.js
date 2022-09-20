@@ -1,6 +1,6 @@
 import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
-import { isSupportsBrowserhack } from './atrules/atrules.js'
+import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { analyzeSpecificity, compareSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorNames } from './values/colors.js'
 import { isFontFamilyKeyword, getFamilyFromFont } from './values/font-families.js'
@@ -167,7 +167,11 @@ const analyze = (css) => {
         }
 
         if (atRuleName === 'media') {
-          medias.push(stringifyNode(node.prelude))
+          const prelude = stringifyNode(node.prelude)
+          medias.push(prelude)
+          if (isMediaBrowserhack(node.prelude)) {
+            mediaBrowserhacks.push(prelude)
+          }
           break
         }
         if (atRuleName === 'supports') {
@@ -483,9 +487,9 @@ const analyze = (css) => {
       import: imports.count(),
       media: assign(
         medias.count(),
-        // {
-        //   browserhacks: mediaBrowserhacks.count(),
-        // }
+        {
+          browserhacks: mediaBrowserhacks.count(),
+        }
       ),
       charset: charsets.count(),
       supports: assign(

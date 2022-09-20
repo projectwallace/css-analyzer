@@ -1,4 +1,4 @@
-import { strEquals } from '../string-utils.js'
+import { strEquals, startsWith, endsWith } from '../string-utils.js'
 import walk from 'css-tree/walker'
 
 /**
@@ -31,6 +31,57 @@ export function isSupportsBrowserhack(prelude) {
       ) {
         returnValue = true
         return this.break
+      }
+    }
+  })
+
+  return returnValue
+}
+
+/**
+ * Check if a @media atRule is a browserhack
+ * @param {import('css-tree').AtrulePrelude} prelude
+ * @returns true if the atrule is a browserhack
+ */
+export function isMediaBrowserhack(prelude) {
+  let returnValue = false
+
+  walk(prelude, function (node) {
+    if (node.type === 'MediaQuery'
+      && node.children.size === 1
+      && node.children.first.type === 'Identifier'
+    ) {
+      node = node.children.first
+      // Note: CSSTree adds a trailing space to \\9
+      if (startsWith('\\0', node.name) || endsWith('\\9 ', node.name)) {
+        returnValue = true
+        return this.break
+      }
+    }
+    if (node.type === 'MediaFeature') {
+      if (node.value.unit === '\\0') {
+        returnValue = true
+        return this.break
+      }
+      if (node.name === '-moz-images-in-menus'
+        || node.name === 'min--moz-device-pixel-ratio'
+        || node.name === '-ms-high-contrast'
+      ) {
+        returnValue = true
+        return this.break
+      }
+      if (node.name === 'min-resolution'
+        && node.value.value === '.001'
+        && node.value.unit === 'dpcm'
+      ) {
+        returnValue = true
+        return this.break
+      }
+      if (node.name === '-webkit-min-device-pixel-ratio') {
+        if ((node.value.value === '0' || node.value.value === '10000')) {
+          returnValue = true
+          return this.break
+        }
       }
     }
   })

@@ -309,66 +309,72 @@ AtRules('finds @media', () => {
     @media (min-width: 20px) {}
     @media (max-width: 200px) {}
     @media screen or print {}
-    @media \\0 all {}
 
     @supports (-webkit-appearance: none) {
       @media (min-width: 0) {}
     }
   `
   const actual = analyze(fixture).atrules.media
-  const expected = {
-    total: 7,
-    totalUnique: 7,
-    unique: {
-      'screen': 1,
-      'screen and (min-width: 33em)': 1,
-      '(min-width: 20px)': 1,
-      '(max-width: 200px)': 1,
-      'screen or print': 1,
-      '\\0 all': 1,
-      '(min-width: 0)': 1,
-    },
-    uniquenessRatio: 7 / 7
-  }
 
-  assert.equal(actual, expected)
+  assert.is(actual.total, 6)
+  assert.is(actual.totalUnique, 6)
+  assert.equal(actual.unique, {
+    'screen': 1,
+    'screen and (min-width: 33em)': 1,
+    '(min-width: 20px)': 1,
+    '(max-width: 200px)': 1,
+    'screen or print': 1,
+    '(min-width: 0)': 1,
+  })
+  assert.is(actual.uniquenessRatio, 1)
 })
 
-AtRules.skip('finds @media browserhacks', () => {
+AtRules('finds @media browserhacks', () => {
   const fixture = `
-    @media screen and (min-width:0\\0) {}
-    @supports (-webkit-appearance:none) {}
-    @media \\0 screen {}
-    @media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) { .selector {} }
     @media \\0 all {}
-    @media screen and (-moz-images-in-menus:0) {}
-    @media screen and (min--moz-device-pixel-ratio:0) {}
-    @media all and (min--moz-device-pixel-ratio:0) and (min-resolution: .001dpcm) {}
-    @media all and (-moz-images-in-menus:0) and (min-resolution: .001dpcm) {}
-    @media all and (min--moz-device-pixel-ratio:0) { @media (min-width: 0px) {} }
-    @media all and (-moz-images-in-menus:0) { @media (min-width: 0px) {} }
+    @media \\0 screen {}
     @media screen\\9 {}
     @media \\0screen\,screen\\9 {}
     @media \\0screen {}
     @media screen and (min-width:0\\0) {}
+    @media all and (-moz-images-in-menus:0) and (min-resolution: .001dpcm) {}
+    @media all and (-moz-images-in-menus:0) { @media (min-width: 0px) {} }
+    @media screen and (-moz-images-in-menus:0) {}
+    @media screen and (min--moz-device-pixel-ratio:0) {}
+    @media all and (min--moz-device-pixel-ratio:0) and (min-resolution: .001dpcm) {}
+    @media all and (min--moz-device-pixel-ratio:0) { @media (min-width: 0px) {} }
+    @media all and (min--moz-device-pixel-ratio:0) and (min-resolution: 3e1dpcm) {}
     @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {}
-    @media screen { @media (min-width: 0px) {} }
-    @media all and (-webkit-min-device-pixel-ratio:10000), not all and (-webkit-min-device-pixel-ratio:0) {}
     @media (min-resolution: .001dpcm) { _:-o-prefocus, .selector {} }
     @media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) { .selector {} }
-    @media screen and (min-width:0\\0) {}
-    @media screen { @media (min-width: 0px) {} }
-    @media \\0 screen {}
-    @media all and (min--moz-device-pixel-ratio:0) and (min-resolution: 3e1dpcm) {}
+    @media all and (-webkit-min-device-pixel-ratio:10000), not all and (-webkit-min-device-pixel-ratio:0) {}
   `
 
   const result = analyze(fixture)
-  const actual = result.atrules
+  const actual = result.atrules.media.browserhacks
   const expected = {
-    total: 3,
-    totalUnique: 3,
+    total: 17,
+    totalUnique: 17,
     uniquenessRatio: 1,
-    unique: {}
+    unique: {
+      "\\0 all": 1,
+      "\\0 screen": 1,
+      "screen\\9 ": 1,
+      "\\0screen\,screen\\9 ": 1,
+      "\\0screen": 1,
+      "screen and (-moz-images-in-menus:0)": 1,
+      "all and (-moz-images-in-menus:0)": 1,
+      "all and (-moz-images-in-menus:0) and (min-resolution: .001dpcm)": 1,
+      "screen and (min-width:0\\0)": 1,
+      "all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm)": 1,
+      "screen and (min--moz-device-pixel-ratio:0)": 1,
+      "all and (min--moz-device-pixel-ratio:0) and (min-resolution: .001dpcm)": 1,
+      "all and (min--moz-device-pixel-ratio:0)": 1,
+      "screen and (-ms-high-contrast: active), (-ms-high-contrast: none)": 1,
+      "all and (-webkit-min-device-pixel-ratio:10000), not all and (-webkit-min-device-pixel-ratio:0)": 1,
+      "(min-resolution: .001dpcm)": 1,
+      "all and (min--moz-device-pixel-ratio:0) and (min-resolution: 3e1dpcm)": 1,
+    }
   }
 
   assert.equal(actual, expected)
