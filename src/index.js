@@ -206,8 +206,7 @@ const analyze = (css) => {
           const prelude = stringifyNode(node.prelude)
           prelude.trim()
             .split(',')
-            .map(name => name.trim())
-            .forEach(name => layers.push(name))
+            .forEach(name => layers.push(name.trim()))
         }
         break
       }
