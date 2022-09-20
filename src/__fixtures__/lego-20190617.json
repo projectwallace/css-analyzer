@@ -449,7 +449,13 @@
         "screen and (min-width:48em) and (max-width:73.4375em)": 1,
         "screen and (max-width:61.4375em)": 4
       },
-      "uniquenessRatio": 0.07123287671232877
+      "uniquenessRatio": 0.07123287671232877,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "charset": {
       "total": 1,

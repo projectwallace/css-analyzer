@@ -309,6 +309,7 @@ AtRules('finds @media', () => {
     @media (min-width: 20px) {}
     @media (max-width: 200px) {}
     @media screen or print {}
+    @media all and (transform-3d), (-webkit-transform-3d) {}
 
     @supports (-webkit-appearance: none) {
       @media (min-width: 0) {}
@@ -316,14 +317,15 @@ AtRules('finds @media', () => {
   `
   const actual = analyze(fixture).atrules.media
 
-  assert.is(actual.total, 6)
-  assert.is(actual.totalUnique, 6)
+  assert.is(actual.total, 7)
+  assert.is(actual.totalUnique, 7)
   assert.equal(actual.unique, {
     'screen': 1,
     'screen and (min-width: 33em)': 1,
     '(min-width: 20px)': 1,
     '(max-width: 200px)': 1,
     'screen or print': 1,
+    'all and (transform-3d), (-webkit-transform-3d)': 1,
     '(min-width: 0)': 1,
   })
   assert.is(actual.uniquenessRatio, 1)

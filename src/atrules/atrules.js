@@ -59,7 +59,7 @@ export function isMediaBrowserhack(prelude) {
       }
     }
     if (node.type === 'MediaFeature') {
-      if (node.value.unit === '\\0') {
+      if (node.value !== null && node.value.unit === '\\0') {
         returnValue = true
         return this.break
       }

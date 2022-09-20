@@ -57,13 +57,19 @@ Api('handles empty input gracefully', () => {
         "total": 0,
         "totalUnique": 0,
         "unique": {},
-        "uniquenessRatio": 0
+        "uniquenessRatio": 0,
+        "browserhacks": {
+          "total": 0,
+          "totalUnique": 0,
+          "unique": {},
+          "uniquenessRatio": 0,
+        },
       },
       "charset": {
         "total": 0,
         "totalUnique": 0,
         "unique": {},
-        "uniquenessRatio": 0
+        "uniquenessRatio": 0,
       },
       "supports": {
         "total": 0,
@@ -75,7 +81,7 @@ Api('handles empty input gracefully', () => {
           "totalUnique": 0,
           "unique": {},
           "uniquenessRatio": 0,
-        }
+        },
       },
       "keyframes": {
         "total": 0,

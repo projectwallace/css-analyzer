@@ -142,7 +142,13 @@
         "(min-width:112.5em)": 7,
         "(max-width: 56.1875em)": 3
       },
-      "uniquenessRatio": 0.07360406091370558
+      "uniquenessRatio": 0.07360406091370558,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "charset": {
       "total": 1,

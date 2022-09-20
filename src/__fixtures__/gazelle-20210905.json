@@ -163,7 +163,17 @@
         "screen and (device-aspect-ratio: 9 / 16)": 1,
         "screen and (max-width: 380px)": 1
       },
-      "uniquenessRatio": 0.08242424242424243
+      "uniquenessRatio": 0.08242424242424243,
+      "browserhacks": {
+        "total": 4,
+        "totalUnique": 3,
+        "unique": {
+          "screen and (-ms-high-contrast:active), (-ms-high-contrast:none)": 2,
+          "not all and (min-resolution:.001dpcm)": 1,
+          "screen and (-webkit-min-device-pixel-ratio:0)": 1
+        },
+        "uniquenessRatio": 0.75
+      }
     },
     "charset": {
       "total": 0,

@@ -83,7 +83,13 @@
         "(min-width: 1030px)": 2,
         "(min-width: 1155px)": 2
       },
-      "uniquenessRatio": 0.39215686274509803
+      "uniquenessRatio": 0.39215686274509803,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "charset": {
       "total": 0,

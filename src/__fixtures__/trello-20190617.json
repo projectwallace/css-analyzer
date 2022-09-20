@@ -368,7 +368,13 @@
         "(max-width:1199.98px)": 4,
         "print": 3
       },
-      "uniquenessRatio": 0.10309278350515463
+      "uniquenessRatio": 0.10309278350515463,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "charset": {
       "total": 0,

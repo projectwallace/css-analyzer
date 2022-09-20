@@ -72,7 +72,13 @@
         "only screen and (max-width: 320px)": 1,
         "only screen and (max-width: 240px)": 1
       },
-      "uniquenessRatio": 0.16535433070866143
+      "uniquenessRatio": 0.16535433070866143,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "charset": {
       "total": 1,

@@ -968,7 +968,15 @@
         "only screen and (max-width: 896px) and (max-height: 425px) and (orientation: landscape)": 1,
         "only screen and (max-width: 530px)": 1
       },
-      "uniquenessRatio": 0.17367949865711726
+      "uniquenessRatio": 0.17367949865711726,
+      "browserhacks": {
+        "total": 1,
+        "totalUnique": 1,
+        "unique": {
+          "screen and (-ms-high-contrast:active),screen and (-ms-high-contrast:none)": 1
+        },
+        "uniquenessRatio": 1
+      }
     },
     "charset": {
       "total": 1,
