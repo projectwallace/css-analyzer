@@ -2,16 +2,16 @@ import byteSize from './format-filesize.js'
 import { analyze as analyzeCss } from '../dist/analyzer.modern.js'
 import * as fs from 'fs'
 const files = [
-  ['bol-com-20190617', 'Bol.com', 137],
-  ['bootstrap-5.0.0', 'Bootstrap 5.0.0', 55],
-  ['cnn-20220403', 'CNN', 419],
-  ['css-tricks-20190319', 'CSS-Tricks', 58],
-  ['facebook-20190319', 'Facebook.com', 84],
-  ['github-20210501', 'GitHub.com', 105],
-  ['gazelle-20210905', 'Gazelle.nl', 336],
-  ['lego-20190617', 'Lego.com', 64],
-  ['smashing-magazine-20190319', 'Smashing Magazine.com', 329],
-  ['trello-20190617', 'Trello.com', 94],
+  ['bol-com-20190617', 'Bol.com', 145],
+  ['bootstrap-5.0.0', 'Bootstrap 5.0.0', 60],
+  ['cnn-20220403', 'CNN', 481],
+  ['css-tricks-20190319', 'CSS-Tricks', 66],
+  ['facebook-20190319', 'Facebook.com', 90],
+  ['github-20210501', 'GitHub.com', 114],
+  ['gazelle-20210905', 'Gazelle.nl', 381],
+  ['lego-20190617', 'Lego.com', 73],
+  ['smashing-magazine-20190319', 'Smashing Magazine.com', 363],
+  ['trello-20190617', 'Trello.com', 106],
 ]
 
 let maxLen = -1
