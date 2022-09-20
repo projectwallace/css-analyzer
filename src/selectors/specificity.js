@@ -1,6 +1,9 @@
 import walk from 'css-tree/walker'
-import { startsWith } from '../string-utils.js'
+import { startsWith, strEquals } from '../string-utils.js'
 import { hasVendorPrefix } from '../vendor-prefix.js'
+
+const COMPLEXITY = 3
+const IS_A11Y = 4
 
 /**
  * Compare specificity A to Specificity B
@@ -30,23 +33,19 @@ function selectorListSpecificities(selectorListAst) {
   walk(selectorListAst, {
     visit: 'Selector',
     enter(node) {
-      childSelectors.push(analyzeSpecificity(node))
+      childSelectors.push(analyzeSelector(node))
     }
   })
 
-  return childSelectors.sort((a, b) => compareSpecificity(a.specificity, b.specificity))
+  return childSelectors.sort((a, b) => compareSpecificity([a[0], a[1], a[2]], [b[0], b[1], b[2]]))
 }
 
 /**
  * Get the Specificity for the AST of a Selector Node
  * @param {import('css-tree').Selector} ast - AST Node for a Selector
- * @return {Object}
- * @property {[number,number,number]} specificity
- * @property {number} complexity
- * @property {Boolean} isId
- * @property {Boolean} isA11y
+ * @return {[number, number, number, number, number]} - Array with SpecificityA, SpecificityB, SpecificityC, complexity, isA11y
  */
-const analyzeSpecificity = (node) => {
+const analyzeSelector = (node) => {
   let A = 0
   let B = 0
   let C = 0
@@ -74,7 +73,9 @@ const analyzeSpecificity = (node) => {
           complexity++
         }
 
-        isA11y = selector.name.name === 'role' || startsWith('aria-', selector.name.name)
+        if (strEquals('role', selector.name.name) || startsWith('aria-', selector.name.name)) {
+          isA11y = true
+        }
         break
       }
       case 'PseudoElementSelector':
@@ -137,7 +138,7 @@ const analyzeSpecificity = (node) => {
             // The specificity of a :where() pseudo-class is replaced by zero,
             // but it does count towards complexity.
             if (selector.name !== 'where') {
-              const [topA, topB, topC] = selectorList[0].specificity
+              const [topA, topB, topC] = selectorList[0]
               A += topA
               B += topB
               C += topC
@@ -145,10 +146,10 @@ const analyzeSpecificity = (node) => {
 
             for (let i = 0; i < selectorList.length; i++) {
               const listItem = selectorList[i]
-              if (listItem.isA11y) {
+              if (listItem[IS_A11Y] === 1) {
                 isA11y = true
               }
-              complexity += listItem.complexity
+              complexity += listItem[COMPLEXITY]
             }
 
             complexity++
@@ -170,16 +171,14 @@ const analyzeSpecificity = (node) => {
     }
   })
 
-  return {
-    /** @type {[number,number,number]} */
-    specificity: [A, B, C],
+  return [
+    A, B, C,
     complexity,
-    isId: A > 0,
-    isA11y
-  }
+    isA11y ? 1 : 0,
+  ]
 }
 
 export {
-  analyzeSpecificity,
+  analyzeSelector,
   compareSpecificity,
 }

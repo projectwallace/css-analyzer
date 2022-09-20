@@ -25997,8 +25997,8 @@
       "ratio": 0
     },
     "accessibility": {
-      "total": 56,
-      "totalUnique": 55,
+      "total": 57,
+      "totalUnique": 56,
       "unique": {
         ".breadcrumb-item[aria-current]:not([aria-current=false])": 1,
         ".breadcrumb-item[aria-current]:not([aria-current=false]):after": 1,
@@ -26051,13 +26051,14 @@
         ".pagination [aria-disabled=true]": 1,
         ".pagination [aria-disabled=true]:hover": 1,
         "body.intent-mouse [role=button]:focus": 1,
+        "body.intent-mouse [role=tabpanel][tabindex=\"0\"]:focus": 1,
         ".jump-to-suggestions-results-container [aria-selected=true] .jump-to-octicon": 1,
         ".jump-to-suggestions-results-container [aria-selected=true] .jump-to-suggestions-path": 1,
         ".jump-to-suggestions-results-container [aria-selected=true] mark": 1,
         ".jump-to-suggestions-results-container [aria-selected=true] .d-on-nav-focus": 1
       },
-      "uniquenessRatio": 0.9821428571428571,
-      "ratio": 0.018549188473004307
+      "uniquenessRatio": 0.9824561403508771,
+      "ratio": 0.01888042398145081
     },
     "keyframes": {
       "total": 24,

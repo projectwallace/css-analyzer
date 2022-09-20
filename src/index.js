@@ -1,7 +1,7 @@
 import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
-import { analyzeSpecificity, compareSpecificity } from './selectors/specificity.js'
+import { analyzeSelector, compareSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorNames } from './values/colors.js'
 import { isFontFamilyKeyword, getFamilyFromFont } from './values/font-families.js'
 import { isFontSizeKeyword, getSizeFromFont } from './values/font-sizes.js'
@@ -233,13 +233,15 @@ const analyze = (css) => {
           return this.skip
         }
 
-        const { specificity, complexity, isId, isA11y } = analyzeSpecificity(node)
+        const analysis = analyzeSelector(node)
+        const specificity = analysis.splice(0, 3)
+        const [complexity, isA11y] = analysis
 
-        if (isId) {
+        if (specificity[0] > 0) {
           ids.push(selector)
         }
 
-        if (isA11y) {
+        if (isA11y === 1) {
           a11y.push(selector)
         }
 

@@ -232,7 +232,8 @@ Selectors('counts Accessibility selectors', () => {
   const fixture = `
     [aria-hidden],
     img[role="presentation"],
-    .selector:not([role="tablist"]) {}
+    .selector:not([role="tablist"]),
+    body.intent-mouse·[role=tabpanel][tabindex="0"]:focus,
 
     /* false positives */
     img[loading="lazy"],
@@ -240,15 +241,16 @@ Selectors('counts Accessibility selectors', () => {
   `
   const actual = analyze(fixture).selectors.accessibility
   const expected = {
-    total: 3,
-    totalUnique: 3,
+    total: 4,
+    totalUnique: 4,
     unique: {
       '[aria-hidden]': 1,
       'img[role="presentation"]': 1,
       '.selector:not([role="tablist"])': 1,
+      'body.intent-mouse·[role=tabpanel][tabindex="0"]:focus': 1,
     },
     uniquenessRatio: 1 / 1,
-    ratio: 3 / 5
+    ratio: 4 / 6,
   }
 
   assert.equal(actual, expected)
