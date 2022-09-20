@@ -66,7 +66,13 @@
         "(prefers-reduced-motion: reduce)": 24,
         "print": 1
       },
-      "uniquenessRatio": 0.14942528735632185
+      "uniquenessRatio": 0.14942528735632185,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "charset": {
       "total": 1,
@@ -80,7 +86,13 @@
       "total": 0,
       "totalUnique": 0,
       "unique": {},
-      "uniquenessRatio": 0
+      "uniquenessRatio": 0,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "keyframes": {
       "total": 6,
@@ -25222,6 +25234,12 @@
         "-webkit-sticky ": 1
       },
       "uniquenessRatio": 0.5454545454545454
+    },
+    "browserhacks": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0
     },
     "units": {
       "total": 1571,

@@ -72,7 +72,13 @@
         "only screen and (max-width: 320px)": 1,
         "only screen and (max-width: 240px)": 1
       },
-      "uniquenessRatio": 0.16535433070866143
+      "uniquenessRatio": 0.16535433070866143,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "charset": {
       "total": 1,
@@ -89,7 +95,13 @@
         "(-webkit-overflow-scrolling:touch)": 1,
         "((position:-webkit-sticky) or (position:sticky))": 5
       },
-      "uniquenessRatio": 0.3333333333333333
+      "uniquenessRatio": 0.3333333333333333,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "keyframes": {
       "total": 11,
@@ -21564,6 +21576,12 @@
         "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif": 1
       },
       "uniquenessRatio": 0.16666666666666666
+    },
+    "browserhacks": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0
     },
     "units": {
       "total": 1972,

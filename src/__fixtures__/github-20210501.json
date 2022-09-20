@@ -54,7 +54,16 @@
         "(min-width:768px) and (max-width:1011px)": 1,
         "print": 1
       },
-      "uniquenessRatio": 0.10619469026548672
+      "uniquenessRatio": 0.10619469026548672,
+      "browserhacks": {
+        "total": 3,
+        "totalUnique": 2,
+        "unique": {
+          "only screen and (-moz-min-device-pixel-ratio:2), only screen and (-webkit-min-device-pixel-ratio:2), only screen and (min--moz-device-pixel-ratio:2), only screen and (min-device-pixel-ratio:2), only screen and (min-resolution:2dppx), only screen and (min-resolution:192dpi)": 2,
+          "screen and (min-width:0\\0)": 1
+        },
+        "uniquenessRatio": 0.6666666666666666
+      }
     },
     "charset": {
       "total": 0,
@@ -69,7 +78,13 @@
         "(-webkit-touch-callout:none)": 1,
         "((-webkit-clip-path:polygon(50% 0, 100% 50%, 50% 100%)) or (clip-path:polygon(50% 0, 100% 50%, 50% 100%)))": 1
       },
-      "uniquenessRatio": 1
+      "uniquenessRatio": 1,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "keyframes": {
       "total": 13,
@@ -36227,6 +36242,12 @@
         "-moz-fit-content": 1
       },
       "uniquenessRatio": 0.6363636363636364
+    },
+    "browserhacks": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0
     },
     "units": {
       "total": 1977,

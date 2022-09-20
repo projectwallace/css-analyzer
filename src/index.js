@@ -1,5 +1,6 @@
 import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
+import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { analyzeSpecificity, compareSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorNames } from './values/colors.js'
 import { isFontFamilyKeyword, getFamilyFromFont } from './values/font-families.js'
@@ -71,7 +72,6 @@ const analyze = (css) => {
   const startParse = Date.now()
 
   const ast = parse(css, {
-    parseAtrulePrelude: false,
     parseCustomProperty: true, // To find font-families, colors, etc.
     positions: true, // So we can use stringifyNode()
     onComment: function (comment) {
@@ -84,13 +84,15 @@ const analyze = (css) => {
 
   // Atrules
   let totalAtRules = 0
-  /** @type {{[index: string]: string}[]} */
+  /** @type {string}[]} */
   const fontfaces = []
   const layers = new CountableCollection()
   const imports = new CountableCollection()
   const medias = new CountableCollection()
+  const mediaBrowserhacks = new CountableCollection()
   const charsets = new CountableCollection()
   const supports = new CountableCollection()
+  const supportsBrowserhacks = new CountableCollection()
   const keyframes = new CountableCollection()
   const prefixedKeyframes = new CountableCollection()
   const containers = new CountableCollection()
@@ -104,7 +106,6 @@ const analyze = (css) => {
 
   // Selectors
   const keyframeSelectors = new CountableCollection()
-  /** @type number */
   const uniqueSelectors = new OccurrenceCounter()
   /** @type [number,number,number] */
   let maxSpecificity
@@ -135,6 +136,7 @@ const analyze = (css) => {
 
   // Values
   const vendorPrefixedValues = new CountableCollection()
+  const valueBrowserhacks = new CountableCollection()
   const zindex = new CountableCollection()
   const textShadows = new CountableCollection()
   const boxShadows = new CountableCollection()
@@ -163,16 +165,25 @@ const analyze = (css) => {
           fontfaces.push(descriptors)
           break
         }
+
         if (atRuleName === 'media') {
-          medias.push(node.prelude.value)
+          const prelude = stringifyNode(node.prelude)
+          medias.push(prelude)
+          if (isMediaBrowserhack(node.prelude)) {
+            mediaBrowserhacks.push(prelude)
+          }
           break
         }
         if (atRuleName === 'supports') {
-          supports.push(node.prelude.value)
+          const prelude = stringifyNode(node.prelude)
+          supports.push(prelude)
+          if (isSupportsBrowserhack(node.prelude)) {
+            supportsBrowserhacks.push(prelude)
+          }
           break
         }
         if (endsWith('keyframes', atRuleName)) {
-          const name = '@' + atRuleName + ' ' + node.prelude.value
+          const name = '@' + atRuleName + ' ' + stringifyNode(node.prelude)
           if (hasVendorPrefix(atRuleName)) {
             prefixedKeyframes.push(name)
           }
@@ -180,19 +191,20 @@ const analyze = (css) => {
           break
         }
         if (atRuleName === 'import') {
-          imports.push(node.prelude.value)
+          imports.push(stringifyNode(node.prelude))
           break
         }
         if (atRuleName === 'charset') {
-          charsets.push(node.prelude.value)
+          charsets.push(stringifyNode(node.prelude))
           break
         }
         if (atRuleName === 'container') {
-          containers.push(node.prelude.value)
+          containers.push(stringifyNode(node.prelude))
           break
         }
         if (atRuleName === 'layer') {
-          node.prelude.value.trim()
+          const prelude = stringifyNode(node.prelude)
+          prelude.trim()
             .split(',')
             .map(name => name.trim())
             .forEach(name => layers.push(name))
@@ -284,10 +296,21 @@ const analyze = (css) => {
           break
         }
 
-        const property = this.declaration.property
+        const declaration = this.declaration
+        const { property, important } = declaration
 
         if (isAstVendorPrefixed(node)) {
           vendorPrefixedValues.push(stringifyNode(node))
+        }
+
+        // i.e. `property: value !ie`
+        if (typeof important === 'string') {
+          valueBrowserhacks.push(stringifyNode(node) + '!' + important)
+        }
+
+        // i.e. `property: value\9`
+        if (node.children?.last?.type === 'Identifier' && endsWith('\\9', node.children.last.name)) {
+          valueBrowserhacks.push(stringifyNode(node))
         }
 
         // Process properties first that don't have colors,
@@ -381,12 +404,18 @@ const analyze = (css) => {
         break
       }
       case 'Declaration': {
+        // Do not process Declarations in atRule preludes
+        // because we will handle them manually
+        if (this.atrulePrelude !== null) {
+          return this.skip
+        }
+
         totalDeclarations++
 
         const declaration = stringifyNode(node)
         uniqueDeclarations.push(declaration)
 
-        if (node.important) {
+        if (node.important === true) {
           importantDeclarations++
 
           if (this.atrule && endsWith('keyframes', this.atrule.name)) {
@@ -456,9 +485,19 @@ const analyze = (css) => {
         uniquenessRatio: fontfaces.length === 0 ? 0 : 1
       },
       import: imports.count(),
-      media: medias.count(),
+      media: assign(
+        medias.count(),
+        {
+          browserhacks: mediaBrowserhacks.count(),
+        }
+      ),
       charset: charsets.count(),
-      supports: supports.count(),
+      supports: assign(
+        supports.count(),
+        {
+          browserhacks: supportsBrowserhacks.count(),
+        },
+      ),
       keyframes: assign(
         keyframes.count(), {
         prefixed: assign(
@@ -580,6 +619,7 @@ const analyze = (css) => {
         timingFunctions: timingFunctions.count(),
       },
       prefixes: vendorPrefixedValues.count(),
+      browserhacks: valueBrowserhacks.count(),
       units: units.count(),
     },
     __meta__: {

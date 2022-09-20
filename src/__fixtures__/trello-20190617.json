@@ -368,7 +368,13 @@
         "(max-width:1199.98px)": 4,
         "print": 3
       },
-      "uniquenessRatio": 0.10309278350515463
+      "uniquenessRatio": 0.10309278350515463,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "charset": {
       "total": 0,
@@ -382,7 +388,13 @@
       "unique": {
         "((position: -webkit-sticky) or (position: sticky))": 2
       },
-      "uniquenessRatio": 0.5
+      "uniquenessRatio": 0.5,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "keyframes": {
       "total": 0,
@@ -41042,6 +41054,12 @@
         "-webkit-gradient(linear, left top, left bottom, from(#fff), color-stop(46%, #f7ecff), color-stop(74%, #d2ecff), to(#fff))": 2
       },
       "uniquenessRatio": 0.12053571428571429
+    },
+    "browserhacks": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0
     },
     "units": {
       "total": 1937,

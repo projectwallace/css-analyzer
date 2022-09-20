@@ -254,7 +254,16 @@
         "screen and (min-width:900px)": 2,
         "screen and (max-width:1099px)": 2
       },
-      "uniquenessRatio": 0.11646884272997032
+      "uniquenessRatio": 0.11646884272997032,
+      "browserhacks": {
+        "total": 10,
+        "totalUnique": 2,
+        "unique": {
+          "screen and (-ms-high-contrast:active),screen and (-ms-high-contrast:none)": 8,
+          "screen and (-webkit-min-device-pixel-ratio:0)": 2
+        },
+        "uniquenessRatio": 0.2
+      }
     },
     "charset": {
       "total": 3,
@@ -273,7 +282,13 @@
         "(grid-row-gap:0)": 2,
         "(display:grid)": 4
       },
-      "uniquenessRatio": 0.11428571428571428
+      "uniquenessRatio": 0.11428571428571428,
+      "browserhacks": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      }
     },
     "keyframes": {
       "total": 108,
@@ -99605,6 +99620,12 @@
         "-webkit-gradient(linear,left top,left bottom,from(#222),to(#222))": 1
       },
       "uniquenessRatio": 0.11566265060240964
+    },
+    "browserhacks": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0
     },
     "units": {
       "total": 12466,
