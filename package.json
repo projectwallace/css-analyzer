@@ -45,7 +45,7 @@
     "css-tree": "2.2.1"
   },
   "devDependencies": {
-    "microbundle": "^0.15.0",
+    "microbundle": "^0.15.1",
     "uvu": "^0.5.6"
   },
   "mangle": {
