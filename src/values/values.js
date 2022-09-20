@@ -8,7 +8,8 @@ const keywords = {
 }
 
 export function isValueKeyword(node) {
-  const firstChild = node.children?.first
+  if (!node.children) return false
+  const firstChild = node.children.first
   if (!firstChild) return false
 
   if (node.children.size > 1) return false

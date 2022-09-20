@@ -309,7 +309,11 @@ const analyze = (css) => {
         }
 
         // i.e. `property: value\9`
-        if (node.children?.last?.type === 'Identifier' && endsWith('\\9', node.children.last.name)) {
+        if (node.children
+          && node.children.last
+          && node.children.last.type === 'Identifier'
+          && endsWith('\\9', node.children.last.name)
+        ) {
           valueBrowserhacks.push(stringifyNode(node))
         }
 
