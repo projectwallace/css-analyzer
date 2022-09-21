@@ -16,6 +16,11 @@ import { hasVendorPrefix } from './vendor-prefix.js'
 import { isCustom, isHack, isProperty } from './properties/property-utils.js'
 import { OccurrenceCounter } from './occurrence-counter.js'
 
+function ratio(part, total) {
+  if (total === 0) return 0
+  return part / total
+}
+
 /**
  * Analyze CSS
  * @param {string} css
@@ -478,7 +483,7 @@ const analyze = (css) => {
       embeddedContent: assign(embeddedContent, {
         size: {
           total: embedSize,
-          ratio: css.length === 0 ? 0 : embedSize / css.length,
+          ratio: ratio(embedSize, css.length),
         },
       }),
     },
@@ -507,7 +512,7 @@ const analyze = (css) => {
         keyframes.count(), {
         prefixed: assign(
           prefixedKeyframes.count(), {
-          ratio: keyframes.size() === 0 ? 0 : prefixedKeyframes.size() / keyframes.size()
+          ratio: ratio(prefixedKeyframes.size(), keyframes.size())
         }),
       }),
       container: containers.count(),
@@ -517,7 +522,7 @@ const analyze = (css) => {
       total: totalRules,
       empty: {
         total: emptyRules,
-        ratio: totalRules === 0 ? 0 : emptyRules / totalRules
+        ratio: ratio(emptyRules, totalRules)
       },
       sizes: assign(
         ruleSizes.aggregate(),
@@ -550,7 +555,7 @@ const analyze = (css) => {
     selectors: {
       total: totalSelectors,
       totalUnique: totalUniqueSelectors,
-      uniquenessRatio: totalSelectors === 0 ? 0 : totalUniqueSelectors / totalSelectors,
+      uniquenessRatio: ratio(totalUniqueSelectors, totalSelectors),
       specificity: {
         min: minSpecificity === undefined ? [0, 0, 0] : minSpecificity,
         max: maxSpecificity === undefined ? [0, 0, 0] : maxSpecificity,
@@ -570,29 +575,29 @@ const analyze = (css) => {
       }),
       id: assign(
         ids.count(), {
-        ratio: totalSelectors === 0 ? 0 : ids.size() / totalSelectors,
+        ratio: ratio(ids.size(), totalSelectors),
       }),
       accessibility: assign(
         a11y.count(), {
-        ratio: totalSelectors === 0 ? 0 : a11y.size() / totalSelectors,
+        ratio: ratio(a11y.size(), totalSelectors),
       }),
       keyframes: keyframeSelectors.count(),
     },
     declarations: {
       total: totalDeclarations,
       totalUnique: totalUniqueDeclarations,
-      uniquenessRatio: totalDeclarations === 0 ? 0 : totalUniqueDeclarations / totalDeclarations,
+      uniquenessRatio: ratio(totalUniqueDeclarations, totalDeclarations),
       // @TODO: deprecated, remove in next major version
       unique: {
         total: totalUniqueDeclarations,
-        ratio: totalDeclarations === 0 ? 0 : totalUniqueDeclarations / totalDeclarations,
+        ratio: ratio(totalUniqueDeclarations, totalDeclarations),
       },
       importants: {
         total: importantDeclarations,
-        ratio: totalDeclarations === 0 ? 0 : importantDeclarations / totalDeclarations,
+        ratio: ratio(importantDeclarations, totalDeclarations),
         inKeyframes: {
           total: importantsInKeyframes,
-          ratio: importantDeclarations === 0 ? 0 : importantsInKeyframes / importantDeclarations,
+          ratio: ratio(importantsInKeyframes, importantDeclarations),
         },
       },
     },
@@ -600,15 +605,15 @@ const analyze = (css) => {
       properties.count(), {
       prefixed: assign(
         propertyVendorPrefixes.count(), {
-        ratio: properties.size() === 0 ? 0 : propertyVendorPrefixes.size() / properties.size(),
+        ratio: ratio(propertyVendorPrefixes.size(), properties.size()),
       }),
       custom: assign(
         customProperties.count(), {
-        ratio: properties.size() === 0 ? 0 : customProperties.size() / properties.size(),
+        ratio: ratio(customProperties.size(), properties.size()),
       }),
       browserhacks: assign(
         propertyHacks.count(), {
-        ratio: properties.size() === 0 ? 0 : propertyHacks.size() / properties.size(),
+        ratio: ratio(propertyHacks.size(), properties.size()),
       }),
       complexity: propertyComplexities.aggregate(),
     }),
