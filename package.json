@@ -27,7 +27,7 @@
   },
   "scripts": {
     "test": "uvu",
-    "build": "microbundle"
+    "build": "microbundle --define VERSION=5.5.0"
   },
   "keywords": [
     "projectwallace",

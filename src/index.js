@@ -16,7 +16,15 @@ import { hasVendorPrefix } from './vendor-prefix.js'
 import { isCustom, isHack, isProperty } from './properties/property-utils.js'
 import { OccurrenceCounter } from './occurrence-counter.js'
 
-function ratio(part, total) {
+function getVersion() {
+  try {
+    return VERSION
+  } catch (error) {
+    return 'unknown'
+  }
+}
+
+export function ratio(part, total) {
   if (total === 0) return 0
   return part / total
 }
@@ -635,7 +643,8 @@ const analyze = (css) => {
     __meta__: {
       parseTime: startAnalysis - startParse,
       analyzeTime: Date.now() - startAnalysis,
-      total: Date.now() - start
+      total: Date.now() - start,
+      version: getVersion(),
     }
   }
 }

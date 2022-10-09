@@ -57,7 +57,6 @@ Rules('should handle CSS without rules', () => {
       range: 0,
       sum: 0,
       items: [],
-      items: [],
       unique: {},
       totalUnique: 0,
       uniquenessRatio: 0,
