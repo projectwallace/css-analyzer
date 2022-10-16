@@ -23,7 +23,6 @@ class ContextCollection {
   }
 
   count() {
-    /** @type {[index: string]: string} */
     const itemsPerContext = {}
 
     for (let context in this._contexts) {

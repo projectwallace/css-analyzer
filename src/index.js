@@ -557,11 +557,17 @@ const analyze = (css) => {
       totalUnique: totalUniqueSelectors,
       uniquenessRatio: ratio(totalUniqueSelectors, totalSelectors),
       specificity: {
+        /** @type [number, number, number] */
         min: minSpecificity === undefined ? [0, 0, 0] : minSpecificity,
+        /** @type [number, number, number] */
         max: maxSpecificity === undefined ? [0, 0, 0] : maxSpecificity,
+        /** @type [number, number, number] */
         sum: [specificitiesA.sum, specificitiesB.sum, specificitiesC.sum],
+        /** @type [number, number, number] */
         mean: [specificitiesA.mean, specificitiesB.mean, specificitiesC.mean],
+        /** @type [number, number, number] */
         mode: [specificitiesA.mode, specificitiesB.mode, specificitiesC.mode],
+        /** @type [number, number, number] */
         median: [specificitiesA.median, specificitiesB.median, specificitiesC.median],
         items: specificities,
         unique: uniqueSpecificitiesCount.unique,
