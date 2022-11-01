@@ -127,7 +127,7 @@ const analyze = (css) => {
   const a11y = new CountableCollection()
 
   // Declarations
-  const uniqueDeclarations = new OccurrenceCounter()
+  const uniqueDeclarations = new Set()
   let totalDeclarations = 0
   let importantDeclarations = 0
   let importantsInKeyframes = 0
@@ -423,7 +423,7 @@ const analyze = (css) => {
         totalDeclarations++
 
         const declaration = stringifyNode(node)
-        uniqueDeclarations.push(declaration)
+        uniqueDeclarations.add(declaration)
 
         if (node.important === true) {
           importantDeclarations++
@@ -457,7 +457,7 @@ const analyze = (css) => {
   const embeddedContent = embeds.count()
   const embedSize = Object.keys(embeddedContent.unique).join('').length
 
-  const totalUniqueDeclarations = uniqueDeclarations.count()
+  const totalUniqueDeclarations = uniqueDeclarations.size
 
   const totalSelectors = selectorComplexities.size()
   const specificitiesA = specificityA.aggregate()
