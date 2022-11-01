@@ -32,12 +32,12 @@ function selectorListSpecificities(selectorListAst) {
   const childSelectors = []
   walk(selectorListAst, {
     visit: 'Selector',
-    enter(node) {
+    enter: function (node) {
       childSelectors.push(analyzeSelector(node))
     }
   })
 
-  return childSelectors.sort((a, b) => compareSpecificity([a[0], a[1], a[2]], [b[0], b[1], b[2]]))
+  return childSelectors.sort(compareSpecificity)
 }
 
 /**
