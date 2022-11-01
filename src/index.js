@@ -14,7 +14,6 @@ import { AggregateCollection } from './aggregate-collection.js'
 import { strEquals, startsWith, endsWith } from './string-utils.js'
 import { hasVendorPrefix } from './vendor-prefix.js'
 import { isCustom, isHack, isProperty } from './properties/property-utils.js'
-import { OccurrenceCounter } from './occurrence-counter.js'
 
 function ratio(part, total) {
   if (total === 0) return 0
@@ -111,7 +110,7 @@ const analyze = (css) => {
 
   // Selectors
   const keyframeSelectors = new CountableCollection()
-  const uniqueSelectors = new OccurrenceCounter()
+  const uniqueSelectors = new Set()
   /** @type [number,number,number] */
   let maxSpecificity
   /** @type [number,number,number] */
@@ -250,7 +249,7 @@ const analyze = (css) => {
           a11y.push(selector)
         }
 
-        uniqueSelectors.push(selector)
+        uniqueSelectors.add(selector)
         selectorComplexities.push(complexity)
         uniqueSpecificities.push(specificity)
 
@@ -465,7 +464,7 @@ const analyze = (css) => {
   const specificitiesC = specificityC.aggregate()
   const uniqueSpecificitiesCount = uniqueSpecificities.count()
   const complexityCount = new CountableCollection(selectorComplexities.toArray()).count()
-  const totalUniqueSelectors = uniqueSelectors.count()
+  const totalUniqueSelectors = uniqueSelectors.size
   const uniqueRuleSize = new CountableCollection(ruleSizes.toArray()).count()
   const uniqueSelectorsPerRule = new CountableCollection(selectorsPerRule.toArray()).count()
   const uniqueDeclarationsPerRule = new CountableCollection(declarationsPerRule.toArray()).count()
