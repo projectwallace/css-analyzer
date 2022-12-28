@@ -1,12 +1,12 @@
-const timingKeywords = {
-  'linear': 1,
-  'ease': 1,
-  'ease-in': 1,
-  'ease-out': 1,
-  'ease-in-out': 1,
-  'step-start': 1,
-  'step-end': 1,
-}
+const timingKeywords = new Set([
+  'linear',
+  'ease',
+  'ease-in',
+  'ease-out',
+  'ease-in-out',
+  'step-start',
+  'step-end',
+])
 
 export function analyzeAnimation(children, stringifyNode) {
   let durationFound = false
@@ -22,7 +22,7 @@ export function analyzeAnimation(children, stringifyNode) {
       durationFound = true
       return durations.push(stringifyNode(child))
     }
-    if (child.type === 'Identifier' && timingKeywords[child.name]) {
+    if (child.type === 'Identifier' && timingKeywords.has(child.name)) {
       return timingFunctions.push(stringifyNode(child))
     }
     if (child.type === 'Function'
