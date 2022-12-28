@@ -45,6 +45,25 @@ Complexity('calculates complexity', () => {
   assert.equal(actual, expected)
 })
 
+Complexity('calculates complexity with vendor prefixes', () => {
+  const actual = analyze(`
+  no-prefix,
+  fake-webkit,
+  input[type=text]::-webkit-input-placeholder,
+  ::-webkit-scrollbar,
+  .site-header .main-nav:hover>ul>li:nth-child(1) svg,
+  :-moz-any(header, footer) {}
+  `).selectors.complexity
+
+  assert.equal(actual.unique, {
+    '1': 2,
+    '5': 1,
+    '2': 1,
+    '12': 1,
+    '4': 1,
+  })
+})
+
 Complexity('calculates complexity uniqueness', () => {
   const actual = analyze(fixture).selectors.complexity
   const expected = {

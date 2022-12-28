@@ -2,8 +2,8 @@ import walk from 'css-tree/walker'
 import { startsWith, strEquals } from '../string-utils.js'
 import { hasVendorPrefix } from '../vendor-prefix.js'
 
-const COMPLEXITY = 3
-const IS_A11Y = 4
+const COMPLEXITY = 0
+const IS_A11Y = 1
 
 /**
  * Compare specificity A to Specificity B
@@ -28,7 +28,7 @@ function compareSpecificity(a, b) {
  * @param {import('css-tree').SelectorList} selectorListAst
  * @returns {Selector} topSpecificitySelector
  */
-function selectorListSpecificities(selectorListAst) {
+function analyzeList(selectorListAst) {
   const childSelectors = []
   walk(selectorListAst, {
     visit: 'Selector',
@@ -46,133 +46,68 @@ function selectorListSpecificities(selectorListAst) {
  * @return {[number, number, number, number, number]} - Array with SpecificityA, SpecificityB, SpecificityC, complexity, isA11y
  */
 const analyzeSelector = (node) => {
-  let A = 0
-  let B = 0
-  let C = 0
   let complexity = 0
   let isA11y = false
 
   walk(node, function (selector) {
-    switch (selector.type) {
-      case 'IdSelector': {
-        A++
+    if (selector.type == 'Selector' || selector.type == 'Nth') return
+
+    complexity++
+
+    if (selector.type == 'IdSelector'
+      || selector.type == 'ClassSelector'
+      || selector.type == 'PseudoElementSelector'
+      || selector.type == 'TypeSelector'
+      || selector.type == 'PseudoClassSelector'
+    ) {
+      if (hasVendorPrefix(selector.name)) {
         complexity++
-        break
       }
-      case 'ClassSelector': {
-        B++
+    }
+
+    if (selector.type == 'AttributeSelector') {
+      if (Boolean(selector.value)) {
         complexity++
-        break
       }
-      case 'AttributeSelector': {
-        B++
+      if (strEquals('role', selector.name.name) || startsWith('aria-', selector.name.name)) {
+        isA11y = true
+      }
+      if (hasVendorPrefix(selector.name.name)) {
         complexity++
-
-        // Add 1 for [attr=value] (or any variation using *= $= ^= |= )
-        if (Boolean(selector.value)) {
-          complexity++
-        }
-
-        if (strEquals('role', selector.name.name) || startsWith('aria-', selector.name.name)) {
-          isA11y = true
-        }
-        break
       }
-      case 'PseudoElementSelector':
-      case 'TypeSelector': {
-        complexity++
+      return this.skip
+    }
 
-        if (hasVendorPrefix(selector.name)) {
-          complexity++
-        }
+    if (selector.type == 'PseudoClassSelector') {
+      if (strEquals(selector.name, 'where')
+        || strEquals(selector.name, 'is')
+        || strEquals(selector.name, 'has')
+        || strEquals(selector.name, 'matches')
+        || strEquals(selector.name, '-webkit-any')
+        || strEquals(selector.name, '-moz-any')
+        || strEquals(selector.name, 'not')
+        || strEquals(selector.name, 'nth-child')
+        || strEquals(selector.name, 'nth-last-child')
+      ) {
+        const selectorList = analyzeList(selector)
 
-        // 42 === '*'.charCodeAt(0)
-        if (selector.name.charCodeAt(0) === 42 && selector.name.length === 1) {
-          break
-        }
+        // Bail out for empty/non-existent :nth-child() params
+        if (selectorList.length === 0) return
 
-        C++
-        break
-      }
-      case 'PseudoClassSelector': {
-        switch (selector.name) {
-          case 'before':
-          case 'after':
-          case 'first-letter':
-          case 'first-line': {
-            C++
-            complexity++
-            return this.skip
+        for (let i = 0; i < selectorList.length; i++) {
+          const listItem = selectorList[i]
+          if (listItem[IS_A11Y] === 1) {
+            isA11y = true
           }
-
-          // The specificity of an :is(), :not(), or :has() pseudo-class is
-          // replaced by the specificity of the most specific complex
-          // selector in its selector list argument.
-          case 'where':
-          case 'is':
-          case 'has':
-          case 'matches':
-          case '-webkit-any':
-          case '-moz-any':
-          case 'not':
-          case 'nth-child':
-          case 'nth-last-child': {
-            if (hasVendorPrefix(selector.name)) {
-              complexity++
-            }
-
-            // The specificity of an :nth-child() or :nth-last-child() selector
-            // is the specificity of the pseudo class itself (counting as one
-            // pseudo-class selector) plus the specificity of the most
-            // specific complex selector in its selector list argument (if any).
-            if (selector.name === 'nth-child' || selector.name === 'nth-last-child') {
-              // +1 for the pseudo class itself
-              B++
-            }
-
-            const selectorList = selectorListSpecificities(selector)
-
-            // Bail out for empty/non-existent :nth-child() params
-            if (selectorList.length === 0) return
-
-            // The specificity of a :where() pseudo-class is replaced by zero,
-            // but it does count towards complexity.
-            if (selector.name !== 'where') {
-              const [topA, topB, topC] = selectorList[0]
-              A += topA
-              B += topB
-              C += topC
-            }
-
-            for (let i = 0; i < selectorList.length; i++) {
-              const listItem = selectorList[i]
-              if (listItem[IS_A11Y] === 1) {
-                isA11y = true
-              }
-              complexity += listItem[COMPLEXITY]
-            }
-
-            complexity++
-            return this.skip
-          }
-
-          default: {
-            // Regular pseudo classes have specificity [0,1,0]
-            complexity++
-            B++
-            return this.skip
-          }
+          complexity += listItem[COMPLEXITY]
         }
-      }
-      case 'Combinator': {
-        complexity++
-        break
+
+        return this.skip
       }
     }
   })
 
   return [
-    A, B, C,
     complexity,
     isA11y ? 1 : 0,
   ]
