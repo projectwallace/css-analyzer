@@ -15,6 +15,7 @@ import { AggregateCollection } from './aggregate-collection.js'
 import { strEquals, startsWith, endsWith } from './string-utils.js'
 import { hasVendorPrefix } from './vendor-prefix.js'
 import { isCustom, isHack, isProperty } from './properties/property-utils.js'
+import { getEmbedType } from './stylesheet/stylesheet.js'
 
 function ratio(part, total) {
   if (total === 0) return 0
@@ -73,6 +74,12 @@ const analyze = (css) => {
   let totalComments = 0
   let commentsSize = 0
   const embeds = new CountableCollection()
+  const embedTypes = {
+    total: 0,
+    totalUnique: 0,
+    uniquenessRatio: 0,
+    unique: {}
+  }
 
   const startParse = Date.now()
 
@@ -293,7 +300,25 @@ const analyze = (css) => {
       }
       case 'Url': {
         if (startsWith('data:', node.value)) {
-          embeds.push(node.value)
+          var embed = node.value
+          var size = embed.length
+          var type = getEmbedType(embed)
+
+          embedTypes.total++
+
+          if (type in embedTypes.unique) {
+            embedTypes.unique[type].count++
+            embedTypes.unique[type].size += size
+          } else {
+            embedTypes.totalUnique++
+            embedTypes.unique[type] = {
+              count: 1,
+              size,
+            }
+          }
+
+          // @deprecated
+          embeds.push(embed)
         }
         break
       }
@@ -485,6 +510,11 @@ const analyze = (css) => {
           total: embedSize,
           ratio: ratio(embedSize, css.length),
         },
+        types: assign(
+          embedTypes,
+          {
+            uniquenessRatio: ratio(embedTypes.totalUnique, embedTypes.total)
+          })
       }),
     },
     atrules: {

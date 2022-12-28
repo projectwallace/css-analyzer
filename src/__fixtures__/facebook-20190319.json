@@ -18,6 +18,17 @@
       "size": {
         "total": 40056,
         "ratio": 0.14925328643395833
+      },
+      "types": {
+        "total": 2,
+        "totalUnique": 1,
+        "uniquenessRatio": 0.5,
+        "unique": {
+          "font/opentype": {
+            "count": 2,
+            "size": 40056
+          }
+        }
       }
     }
   },

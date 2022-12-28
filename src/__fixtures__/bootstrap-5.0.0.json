@@ -32,6 +32,17 @@
       "size": {
         "total": 3473,
         "ratio": 0.01784136443028871
+      },
+      "types": {
+        "total": 20,
+        "totalUnique": 1,
+        "uniquenessRatio": 0.05,
+        "unique": {
+          "image/svg+xml": {
+            "count": 20,
+            "size": 4439
+          }
+        }
       }
     }
   },
