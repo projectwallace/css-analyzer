@@ -37,6 +37,12 @@ Api('handles empty input gracefully', () => {
         "size": {
           "total": 0,
           "ratio": 0
+        },
+        "types": {
+          "total": 0,
+          "totalUnique": 0,
+          "uniquenessRatio": 0,
+          "unique": {}
         }
       }
     },

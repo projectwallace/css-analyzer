@@ -44,6 +44,21 @@
       "size": {
         "total": 33224,
         "ratio": 0.07099069454386171
+      },
+      "types": {
+        "total": 42,
+        "totalUnique": 2,
+        "uniquenessRatio": 0.047619047619047616,
+        "unique": {
+          "application/font-woff": {
+            "count": 1,
+            "size": 23406
+          },
+          "image/svg+xml": {
+            "count": 41,
+            "size": 14362
+          }
+        }
       }
     }
   },

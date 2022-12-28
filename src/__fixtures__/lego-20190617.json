@@ -17,6 +17,17 @@
       "size": {
         "total": 1798,
         "ratio": 0.007313164509594969
+      },
+      "types": {
+        "total": 1,
+        "totalUnique": 1,
+        "uniquenessRatio": 1,
+        "unique": {
+          "image/gif": {
+            "count": 1,
+            "size": 1798
+          }
+        }
       }
     }
   },

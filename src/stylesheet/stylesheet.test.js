@@ -1,6 +1,7 @@
 import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
 import { analyze } from '../index.js'
+import { getEmbedType } from './stylesheet.js'
 
 const Stylesheet = suite('Stylesheet')
 
@@ -103,7 +104,7 @@ Stylesheet('measures base64 contents', () => {
     }
   `
 
-  const actual = analyze(fixture)
+  const actual = analyze(fixture).stylesheet.embeddedContent
   const expected = {
     total: 3,
     totalUnique: 3,
@@ -117,9 +118,38 @@ Stylesheet('measures base64 contents', () => {
       total: 1203,
       ratio: 0.7930125247198417,
     },
+    types: {
+      total: 3,
+      totalUnique: 2,
+      uniquenessRatio: 2 / 3,
+      unique: {
+        'image/gif': {
+          count: 1,
+          size: 310,
+        },
+        'image/svg+xml': {
+          count: 2,
+          size: 459 + 434,
+        },
+      },
+    }
   }
 
-  assert.equal(actual.stylesheet.embeddedContent, expected)
+  assert.equal(actual, expected)
+})
+
+Stylesheet('correctly extracts embed types', () => {
+  ;[
+    ['test', 'data:test;nothing-to-see-here'],
+    ['image/gif', 'data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVS'],
+    ['image/svg+xml', 'data:image/svg+xml,%3Csvg%20id%3D%22Layer_'],
+    ['image/svg+xml', 'data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5'],
+    ['application/font-woff', 'data:application/font-woff;base64,d09GRgAB'],
+    ['font/opentype', 'data:font/opentype;base64,T1RUTwAJAIAAAw'],
+    ['image/png', 'data:image/png;base64,iVBORw0KGgoAAAANS'],
+  ].forEach(([expected, fixture]) => {
+    assert.is(getEmbedType(fixture), expected)
+  })
 })
 
 Stylesheet.run()
