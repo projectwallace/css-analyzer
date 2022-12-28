@@ -1,5 +1,6 @@
 import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
+import { calculate } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { analyzeSelector, compareSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorNames } from './values/colors.js'
@@ -237,8 +238,9 @@ const analyze = (css) => {
           return this.skip
         }
 
+        const [{ value: specificityObj }] = calculate(node)
         const analysis = analyzeSelector(node)
-        const specificity = analysis.splice(0, 3)
+        const specificity = [specificityObj.a, specificityObj.b, specificityObj.c]
         const [complexity, isA11y] = analysis
 
         if (specificity[0] > 0) {
