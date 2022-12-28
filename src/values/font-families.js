@@ -1,61 +1,61 @@
 import walk from 'css-tree/walker'
 
-const systemKeywords = {
+const systemKeywords = new Set([
   // Global CSS keywords
-  'inherit': 1,
-  'initial': 1,
-  'unset': 1,
-  'revert': 1,
+  'inherit',
+  'initial',
+  'unset',
+  'revert',
 
   // System font keywords
-  'caption': 1,
-  'icon': 1,
-  'menu': 1,
-  'message-box': 1,
-  'small-caption': 1,
-  'status-bar': 1,
-}
+  'caption',
+  'icon',
+  'menu',
+  'message-box',
+  'small-caption',
+  'status-bar',
+])
 
-const keywordDisallowList = {
+const keywordDisallowList = new Set([
   // font-weight, font-stretch, font-style
-  'normal': 1,
+  'normal',
 
   // font-size keywords
-  'xx-small': 1,
-  'x-small': 1,
-  'small': 1,
-  'medium': 1,
-  'large': 1,
-  'x-large': 1,
-  'xx-large': 1,
-  'larger': 1,
-  'smaller': 1,
+  'xx-small',
+  'x-small',
+  'small',
+  'medium',
+  'large',
+  'x-large',
+  'xx-large',
+  'larger',
+  'smaller',
 
   // font-weight keywords
-  'bold': 1,
-  'bolder': 1,
-  'lighter': 1,
+  'bold',
+  'bolder',
+  'lighter',
 
   // font-stretch keywords
-  'ultra-condensed': 1,
-  'extra-condensed': 1,
-  'condensed': 1,
-  'semi-condensed': 1,
-  'semi-expanded': 1,
-  'expanded': 1,
-  'extra-expanded': 1,
-  'ultra-expanded': 1,
+  'ultra-condensed',
+  'extra-condensed',
+  'condensed',
+  'semi-condensed',
+  'semi-expanded',
+  'expanded',
+  'extra-expanded',
+  'ultra-expanded',
 
   // font-style keywords
-  'italic': 1,
-  'oblique': 1,
-}
+  'italic',
+  'oblique',
+])
 
 const COMMA = 44 // ','.charCodeAt(0) === 44
 
 export function isFontFamilyKeyword(node) {
   const firstChild = node.children.first
-  return firstChild.type === 'Identifier' && systemKeywords[firstChild.name]
+  return firstChild.type === 'Identifier' && systemKeywords.has(firstChild.name)
 }
 
 export function getFamilyFromFont(node, stringifyNode) {
@@ -85,7 +85,7 @@ export function getFamilyFromFont(node, stringifyNode) {
         return parts = fontNode.value + parts
       }
       if (fontNode.type === 'Identifier') {
-        if (keywordDisallowList[fontNode.name]) {
+        if (keywordDisallowList.has(fontNode.name)) {
           return this.skip
         }
         return parts = fontNode.name + parts

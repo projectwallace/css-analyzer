@@ -41,9 +41,9 @@ function analyzeList(selectorListAst) {
 }
 
 /**
- * Get the Specificity for the AST of a Selector Node
+ * Get the Complexity for the AST of a Selector Node
  * @param {import('css-tree').Selector} ast - AST Node for a Selector
- * @return {[number, number, number, number, number]} - Array with SpecificityA, SpecificityB, SpecificityC, complexity, isA11y
+ * @return {[number, number]} - Array with complexity, isA11y
  */
 const analyzeSelector = (node) => {
   let complexity = 0

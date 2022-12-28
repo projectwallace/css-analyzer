@@ -418,7 +418,7 @@ const analyze = (css) => {
               if (name.length > 20 || name.length < 3) {
                 return this.skip
               }
-              if (colorNames[name.toLowerCase()]) {
+              if (colorNames.has(name.toLowerCase())) {
                 colors.push(stringifyNode(valueNode), property)
               }
               return this.skip
@@ -428,7 +428,7 @@ const analyze = (css) => {
               if (strEquals('var', valueNode.name)) {
                 return this.skip
               }
-              if (colorFunctions[valueNode.name.toLowerCase()]) {
+              if (colorFunctions.has(valueNode.name.toLowerCase())) {
                 colors.push(stringifyNode(valueNode), property)
               }
               // No this.skip here intentionally,
