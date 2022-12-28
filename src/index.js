@@ -239,9 +239,8 @@ const analyze = (css) => {
         }
 
         const [{ value: specificityObj }] = calculate(node)
-        const analysis = analyzeSelector(node)
         const specificity = [specificityObj.a, specificityObj.b, specificityObj.c]
-        const [complexity, isA11y] = analysis
+        const [complexity, isA11y] = analyzeSelector(node)
 
         if (specificity[0] > 0) {
           ids.push(selector)
