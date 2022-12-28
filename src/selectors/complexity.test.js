@@ -51,6 +51,7 @@ Complexity('calculates complexity with vendor prefixes', () => {
   fake-webkit,
   input[type=text]::-webkit-input-placeholder,
   ::-webkit-scrollbar,
+  .site-header .main-nav:hover>ul>li:nth-child(1) svg,
   :-moz-any(header, footer) {}
   `).selectors.complexity
 
@@ -58,6 +59,7 @@ Complexity('calculates complexity with vendor prefixes', () => {
     '1': 2,
     '5': 1,
     '2': 1,
+    '12': 1,
     '4': 1,
   })
 })

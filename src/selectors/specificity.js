@@ -50,7 +50,7 @@ const analyzeSelector = (node) => {
   let isA11y = false
 
   walk(node, function (selector) {
-    if (selector.type == 'Selector') return
+    if (selector.type == 'Selector' || selector.type == 'Nth') return
 
     complexity++
 
