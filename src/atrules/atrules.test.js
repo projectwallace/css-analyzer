@@ -335,9 +335,9 @@ AtRules('finds @media browserhacks', () => {
   const fixture = `
     @media \\0 all {}
     @media \\0 screen {}
-    @media screen\\9 {}
-    @media \\0screen\,screen\\9 {}
     @media \\0screen {}
+    @media screen\\9 {}
+    @media \\0screen,screen\\9 {}
     @media screen and (min-width:0\\0) {}
     @media all and (-moz-images-in-menus:0) and (min-resolution: .001dpcm) {}
     @media all and (-moz-images-in-menus:0) { @media (min-width: 0px) {} }
@@ -361,21 +361,21 @@ AtRules('finds @media browserhacks', () => {
     unique: {
       "\\0 all": 1,
       "\\0 screen": 1,
-      "screen\\9 ": 1,
-      "\\0screen\,screen\\9 ": 1,
       "\\0screen": 1,
-      "screen and (-moz-images-in-menus:0)": 1,
-      "all and (-moz-images-in-menus:0)": 1,
-      "all and (-moz-images-in-menus:0) and (min-resolution: .001dpcm)": 1,
+      "screen\\9": 1,
+      "\\0screen,screen\\9": 1,
       "screen and (min-width:0\\0)": 1,
-      "all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm)": 1,
+      "all and (-moz-images-in-menus:0) and (min-resolution: .001dpcm)": 1,
+      "all and (-moz-images-in-menus:0)": 1,
+      "screen and (-moz-images-in-menus:0)": 1,
       "screen and (min--moz-device-pixel-ratio:0)": 1,
-      "all and (min--moz-device-pixel-ratio:0) and (min-resolution: .001dpcm)": 1,
       "all and (min--moz-device-pixel-ratio:0)": 1,
-      "screen and (-ms-high-contrast: active), (-ms-high-contrast: none)": 1,
-      "all and (-webkit-min-device-pixel-ratio:10000), not all and (-webkit-min-device-pixel-ratio:0)": 1,
-      "(min-resolution: .001dpcm)": 1,
+      "all and (min--moz-device-pixel-ratio:0) and (min-resolution: .001dpcm)": 1,
       "all and (min--moz-device-pixel-ratio:0) and (min-resolution: 3e1dpcm)": 1,
+      "screen and (-ms-high-contrast: active), (-ms-high-contrast: none)": 1,
+      "(min-resolution: .001dpcm)": 1,
+      "all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm)": 1,
+      "all and (-webkit-min-device-pixel-ratio:10000), not all and (-webkit-min-device-pixel-ratio:0)": 1,
     }
   }
 
