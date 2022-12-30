@@ -9,19 +9,21 @@ Browserhacks('finds hacks', () => {
     value-browserhacks {
       property: value !ie;
       property: value !test;
+      property: value!nospace;
       property: value\\9;
     }
   `
   const actual = analyze(fixture).values.browserhacks
   const expected = {
-    total: 3,
-    totalUnique: 3,
+    total: 4,
+    totalUnique: 4,
     unique: {
       'value !ie': 1,
       'value !test': 1,
-      'value\\9': 1,
+      'value!nospace': 1,
+      "value\\9": 1,
     },
-    uniquenessRatio: 3 / 3
+    uniquenessRatio: 4 / 4
   }
   assert.equal(actual, expected)
 })

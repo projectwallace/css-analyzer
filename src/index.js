@@ -28,10 +28,7 @@ function ratio(part, total) {
  */
 const analyze = (css) => {
   const start = Date.now()
-
-  // We need all lines later on when we need to stringify the AST again
-  // e.g. for Selectors
-  const lines = css.split(/\r?\n/)
+  let lines = css.split(/\r?\n/g)
 
   /**
    * Recreate the authored CSS from a CSSTree node
@@ -39,35 +36,7 @@ const analyze = (css) => {
    * @returns {string} str - The stringified node
    */
   function stringifyNode(node) {
-    const start = node.loc.start
-    const end = node.loc.end
-    const lineCount = end.line - start.line
-
-    // Single-line nodes
-    if (lineCount === 0) {
-      return lines[start.line - 1].substring(start.column - 1, end.column - 1)
-    }
-
-    // Multi-line nodes
-    let value = ''
-
-    for (let i = start.line; i <= end.line; i++) {
-      const line = lines[i - 1]
-      // First line
-      if (i === start.line) {
-        value += line.substring(start.column - 1) + '\n'
-        continue
-      }
-      // Last line
-      if (i === end.line) {
-        value += line.substring(0, end.column - 1)
-        continue
-      }
-      // All lines in between first and last
-      value += line + '\n'
-    }
-
-    return value
+    return css.substring(node.loc.start.offset, node.loc.end.offset)
   }
 
   // Stylesheet
@@ -179,7 +148,7 @@ const analyze = (css) => {
         }
 
         if (atRuleName === 'media') {
-          const prelude = stringifyNode(node.prelude)
+          const prelude = stringifyNode(node.prelude).trim()
           medias.push(prelude)
           if (isMediaBrowserhack(node.prelude)) {
             mediaBrowserhacks.push(prelude)
@@ -447,8 +416,7 @@ const analyze = (css) => {
 
         totalDeclarations++
 
-        const declaration = stringifyNode(node)
-        uniqueDeclarations.add(declaration)
+        uniqueDeclarations.add(stringifyNode(node))
 
         if (node.important === true) {
           importantDeclarations++

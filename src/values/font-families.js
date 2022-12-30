@@ -65,18 +65,12 @@ export function getFamilyFromFont(node, stringifyNode) {
     reverse: true,
     enter: function (fontNode) {
       if (fontNode.type === 'String') {
-        const loc = fontNode.loc.start
+        const offset = fontNode.loc.start.offset
         // Stringify the first character to get the correct quote character
         const quote = stringifyNode({
           loc: {
-            start: {
-              line: loc.line,
-              column: loc.column
-            },
-            end: {
-              line: loc.line,
-              column: loc.column + 1
-            }
+            start: { offset },
+            end: { offset: offset + 1 }
           }
         })
         return parts = quote + fontNode.value + quote + parts
