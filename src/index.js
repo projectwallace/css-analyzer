@@ -2,7 +2,7 @@ import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
 import { calculate } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
-import { analyzeSelector, compareSpecificity } from './selectors/specificity.js'
+import { getComplexity, isAccessibility, compareSpecificity } from './selectors/utils.js'
 import { colorFunctions, colorNames } from './values/colors.js'
 import { isFontFamilyKeyword, getFamilyFromFont } from './values/font-families.js'
 import { isFontSizeKeyword, getSizeFromFont } from './values/font-sizes.js'
@@ -217,18 +217,17 @@ const analyze = (css) => {
 
         const [{ value: specificityObj }] = calculate(node)
         const specificity = [specificityObj.a, specificityObj.b, specificityObj.c]
-        const [complexity, isA11y] = analyzeSelector(node)
 
         if (specificity[0] > 0) {
           ids.push(selector)
         }
 
-        if (isA11y === 1) {
+        if (isAccessibility(node)) {
           a11y.push(selector)
         }
 
         uniqueSelectors.add(selector)
-        selectorComplexities.push(complexity)
+        selectorComplexities.push(getComplexity(node))
         uniqueSpecificities.push(specificity)
 
         if (maxSpecificity === undefined) {
