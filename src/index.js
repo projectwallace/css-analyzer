@@ -107,6 +107,7 @@ const analyze = (css) => {
   let totalDeclarations = 0
   let importantDeclarations = 0
   let importantsInKeyframes = 0
+  let importantCustomProperties = new CountableCollection()
 
   // Properties
   const properties = new CountableCollection()
@@ -439,6 +440,9 @@ const analyze = (css) => {
         } else if (isCustom(property)) {
           customProperties.push(property)
           propertyComplexities.push(2)
+          if (node.important === true) {
+            importantCustomProperties.push(property)
+          }
         } else {
           propertyComplexities.push(1)
         }
@@ -606,21 +610,32 @@ const analyze = (css) => {
       },
     },
     properties: assign(
-      properties.count(), {
-      prefixed: assign(
-        propertyVendorPrefixes.count(), {
-        ratio: ratio(propertyVendorPrefixes.size(), properties.size()),
+      properties.count(),
+      {
+        prefixed: assign(
+          propertyVendorPrefixes.count(),
+          {
+            ratio: ratio(propertyVendorPrefixes.size(), properties.size()),
+          },
+        ),
+        custom: assign(
+          customProperties.count(),
+          {
+            ratio: ratio(customProperties.size(), properties.size()),
+            importants: assign(
+              importantCustomProperties.count(),
+              {
+                ratio: ratio(importantCustomProperties.size(), customProperties.size()),
+              }
+            ),
+          },
+        ),
+        browserhacks: assign(
+          propertyHacks.count(), {
+          ratio: ratio(propertyHacks.size(), properties.size()),
+        }),
+        complexity: propertyComplexities.aggregate(),
       }),
-      custom: assign(
-        customProperties.count(), {
-        ratio: ratio(customProperties.size(), properties.size()),
-      }),
-      browserhacks: assign(
-        propertyHacks.count(), {
-        ratio: ratio(propertyHacks.size(), properties.size()),
-      }),
-      complexity: propertyComplexities.aggregate(),
-    }),
     values: {
       colors: colors.count(),
       fontFamilies: fontFamilies.count(),
