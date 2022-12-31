@@ -20848,8 +20848,8 @@
   },
   "values": {
     "colors": {
-      "total": 854,
-      "totalUnique": 134,
+      "total": 881,
+      "totalUnique": 135,
       "unique": {
         "#333334": 1,
         "#fff": 97,
@@ -20862,6 +20862,7 @@
         "#9c27b0": 3,
         "#ff8a00": 99,
         "#da1b60": 114,
+        "transparent": 27,
         "#92dcfe": 1,
         "#939393": 5,
         "#28242f": 3,
@@ -20986,11 +20987,11 @@
         "rgba(15, 14, 22, 0.75)": 1,
         "rgba(0, 0, 0, 0.75)": 10
       },
-      "uniquenessRatio": 0.15690866510538642,
+      "uniquenessRatio": 0.1532349602724177,
       "itemsPerContext": {
         "background": {
-          "total": 256,
-          "totalUnique": 49,
+          "total": 265,
+          "totalUnique": 50,
           "unique": {
             "#333334": 1,
             "#fff": 18,
@@ -21016,6 +21017,7 @@
             "rgba(0,0,0,.05)": 1,
             "#000": 3,
             "#312d3c": 4,
+            "transparent": 9,
             "#17141d": 12,
             "#c4e4e4": 3,
             "#ffeb3b": 1,
@@ -21042,11 +21044,11 @@
             "#eaeaea": 1,
             "#f9f9f9": 1
           },
-          "uniquenessRatio": 0.19140625
+          "uniquenessRatio": 0.18867924528301888
         },
         "color": {
-          "total": 191,
-          "totalUnique": 56,
+          "total": 193,
+          "totalUnique": 57,
           "unique": {
             "#fff": 52,
             "#2e2f3e": 2,
@@ -21073,6 +21075,7 @@
             "#100e17": 3,
             "#999": 4,
             "#a1a1af": 9,
+            "transparent": 2,
             "#da1b60": 2,
             "#312d3c": 1,
             "#444": 1,
@@ -21105,7 +21108,7 @@
             "#555": 1,
             "#c00": 1
           },
-          "uniquenessRatio": 0.2931937172774869
+          "uniquenessRatio": 0.29533678756476683
         },
         "-webkit-text-decoration-color": {
           "total": 2,
@@ -21124,6 +21127,20 @@
             "#7a7a8c": 1
           },
           "uniquenessRatio": 1
+        },
+        "-webkit-text-fill-color": {
+          "total": 25,
+          "totalUnique": 7,
+          "unique": {
+            "transparent": 9,
+            "#fff": 11,
+            "#201c29": 1,
+            "#c2c2c2": 1,
+            "#000": 1,
+            "#a1a1af": 1,
+            "#03a9f4": 1
+          },
+          "uniquenessRatio": 0.28
         },
         "fill": {
           "total": 19,
@@ -21146,8 +21163,8 @@
           "uniquenessRatio": 0.6842105263157895
         },
         "border": {
-          "total": 40,
-          "totalUnique": 19,
+          "total": 44,
+          "totalUnique": 20,
           "unique": {
             "#28242f": 3,
             "#100e17": 1,
@@ -21156,6 +21173,7 @@
             "#312d3c": 5,
             "#ffeb3b": 1,
             "#7a7a8c": 2,
+            "transparent": 4,
             "#201c29": 2,
             "#ccc": 3,
             "#a4a4a4": 1,
@@ -21169,7 +21187,7 @@
             "#cee1ef": 2,
             "#e6db55": 1
           },
-          "uniquenessRatio": 0.475
+          "uniquenessRatio": 0.45454545454545453
         },
         "background-image": {
           "total": 90,
@@ -21244,10 +21262,11 @@
           "uniquenessRatio": 1
         },
         "background-color": {
-          "total": 46,
-          "totalUnique": 30,
+          "total": 48,
+          "totalUnique": 31,
           "unique": {
             "#dfd": 4,
+            "transparent": 2,
             "#da1b60": 5,
             "#c4e4e4": 3,
             "#32373c": 1,
@@ -21278,11 +21297,11 @@
             "#fffbcc": 1,
             "#ffebe8": 1
           },
-          "uniquenessRatio": 0.6521739130434783
+          "uniquenessRatio": 0.6458333333333334
         },
         "border-color": {
-          "total": 14,
-          "totalUnique": 10,
+          "total": 15,
+          "totalUnique": 11,
           "unique": {
             "#fff": 3,
             "#7a7a8c": 1,
@@ -21290,12 +21309,13 @@
             "#da1b60": 1,
             "#f5f5f5": 1,
             "#eb7d01": 1,
+            "transparent": 1,
             "#7c7": 2,
             "#c88": 2,
             "#e6db55": 1,
             "#c00": 1
           },
-          "uniquenessRatio": 0.7142857142857143
+          "uniquenessRatio": 0.7333333333333333
         },
         "border-bottom": {
           "total": 21,
@@ -21322,19 +21342,6 @@
             "#da1b60": 4
           },
           "uniquenessRatio": 0.25
-        },
-        "-webkit-text-fill-color": {
-          "total": 16,
-          "totalUnique": 6,
-          "unique": {
-            "#fff": 11,
-            "#201c29": 1,
-            "#c2c2c2": 1,
-            "#000": 1,
-            "#a1a1af": 1,
-            "#03a9f4": 1
-          },
-          "uniquenessRatio": 0.375
         },
         "stroke": {
           "total": 24,
@@ -21400,6 +21407,17 @@
           },
           "uniquenessRatio": 1
         }
+      },
+      "formats": {
+        "total": 881,
+        "totalUnique": 4,
+        "unique": {
+          "hex6": 559,
+          "hex3": 208,
+          "transparent": 27,
+          "rgba": 87
+        },
+        "uniquenessRatio": 0.004540295119182747
       }
     },
     "fontFamilies": {

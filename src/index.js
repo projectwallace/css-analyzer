@@ -3,7 +3,7 @@ import walk from 'css-tree/walker'
 import { calculate } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getComplexity, isAccessibility, compareSpecificity } from './selectors/utils.js'
-import { colorFunctions, colorNames } from './values/colors.js'
+import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
 import { isFontFamilyKeyword, getFamilyFromFont } from './values/font-families.js'
 import { isFontSizeKeyword, getSizeFromFont } from './values/font-sizes.js'
 import { isValueKeyword } from './values/values.js'
@@ -127,6 +127,7 @@ const analyze = (css) => {
   const timingFunctions = new CountableCollection()
   const durations = new CountableCollection()
   const colors = new ContextCollection()
+  const colorFormats = new CountableCollection()
   const units = new ContextCollection()
 
   walk(ast, function (node) {
@@ -375,7 +376,9 @@ const analyze = (css) => {
         walk(node, function (valueNode) {
           switch (valueNode.type) {
             case 'Hash': {
+              const hexLength = valueNode.value.length
               colors.push('#' + valueNode.value, property)
+              colorFormats.push(`hex` + hexLength)
 
               return this.skip
             }
@@ -387,8 +390,18 @@ const analyze = (css) => {
               if (name.length > 20 || name.length < 3) {
                 return this.skip
               }
-              if (colorNames.has(name.toLowerCase())) {
-                colors.push(stringifyNode(valueNode), property)
+              const stringified = stringifyNode(valueNode)
+              const lowerCased = name.toLowerCase()
+
+              if (namedColors.has(lowerCased)) {
+                colors.push(stringified, property)
+                colorFormats.push('named')
+              } else if (colorKeywords.has(lowerCased)) {
+                colors.push(stringified, property)
+                colorFormats.push(lowerCased)
+              } else if (systemColors.has(lowerCased)) {
+                colors.push(stringified, property)
+                colorFormats.push('system')
               }
               return this.skip
             }
@@ -397,8 +410,11 @@ const analyze = (css) => {
               if (strEquals('var', valueNode.name)) {
                 return this.skip
               }
-              if (colorFunctions.has(valueNode.name.toLowerCase())) {
-                colors.push(stringifyNode(valueNode), property)
+              const fnName = valueNode.name.toLowerCase()
+              const stringified = stringifyNode(valueNode)
+              if (colorFunctions.has(fnName)) {
+                colors.push(stringified, property)
+                colorFormats.push(fnName)
               }
               // No this.skip here intentionally,
               // otherwise we'll miss colors in linear-gradient() etc.
@@ -636,7 +652,12 @@ const analyze = (css) => {
         complexity: propertyComplexities.aggregate(),
       }),
     values: {
-      colors: colors.count(),
+      colors: assign(
+        colors.count(),
+        {
+          formats: colorFormats.count(),
+        },
+      ),
       fontFamilies: fontFamilies.count(),
       fontSizes: fontSizes.count(),
       zindexes: zindex.count(),

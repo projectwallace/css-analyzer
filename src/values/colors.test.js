@@ -106,6 +106,17 @@ Colors('finds hex colors', () => {
         },
       },
     },
+    formats: {
+      "total": 10,
+      "totalUnique": 4,
+      "unique": {
+        hex3: 6,
+        hex4: 1,
+        hex6: 2,
+        hex8: 1,
+      },
+      "uniquenessRatio": 4 / 10,
+    }
   }
   assert.equal(actual, expected)
 })
@@ -247,7 +258,16 @@ Colors('finds hsl(a) colors', () => {
         },
         uniquenessRatio: 1
       }
-    }
+    },
+    formats: {
+      total: 24,
+      totalUnique: 2,
+      unique: {
+        hsl: 20,
+        hsla: 4,
+      },
+      uniquenessRatio: 2 / 24,
+    },
   }
   assert.equal(actual, expected)
 })
@@ -369,6 +389,15 @@ Colors('finds rgb(a) colors', () => {
         uniquenessRatio: 1,
       },
     },
+    formats: {
+      total: 17,
+      totalUnique: 2,
+      unique: {
+        rgb: 9,
+        rgba: 8
+      },
+      uniquenessRatio: 2 / 17,
+    },
   }
   assert.equal(actual, expected)
 })
@@ -425,7 +454,15 @@ Colors('finds LCH() colors', () => {
         },
         uniquenessRatio: 1,
       },
-    }
+    },
+    formats: {
+      total: 8,
+      totalUnique: 1,
+      unique: {
+        lch: 8,
+      },
+      uniquenessRatio: 1 / 8,
+    },
   }
 
   assert.equal(actual.values.colors, expected)
@@ -492,7 +529,15 @@ Colors('finds LAB() colors', () => {
         },
         uniquenessRatio: 1,
       },
-    }
+    },
+    formats: {
+      total: 11,
+      totalUnique: 1,
+      unique: {
+        lab: 11
+      },
+      uniquenessRatio: 1 / 11,
+    },
   }
 
   assert.equal(actual.values.colors, expected)
@@ -542,7 +587,15 @@ Colors('finds hwb() colors', () => {
         },
         uniquenessRatio: 1,
       }
-    }
+    },
+    formats: {
+      total: 7,
+      totalUnique: 1,
+      unique: {
+        hwb: 7,
+      },
+      uniquenessRatio: 1 / 7,
+    },
   }
 
   assert.equal(actual.values.colors, expected)
@@ -579,6 +632,14 @@ Colors('finds color() colors', () => {
         },
         uniquenessRatio: 1
       },
+    },
+    formats: {
+      total: 4,
+      totalUnique: 1,
+      unique: {
+        color: 4,
+      },
+      uniquenessRatio: 1 / 4,
     },
   }
 
@@ -638,6 +699,14 @@ Colors('finds color keywords', () => {
         uniquenessRatio: 0.5,
       },
     },
+    formats: {
+      total: 5,
+      totalUnique: 1,
+      unique: {
+        named: 5,
+      },
+      uniquenessRatio: 1 / 5,
+    },
   }
   assert.equal(actual, expected)
 })
@@ -671,6 +740,12 @@ Colors('does not report false positives for color keywords', () => {
     unique: {},
     uniquenessRatio: 0,
     itemsPerContext: {},
+    formats: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+    },
   }
 
   assert.equal(actual, expected)
@@ -691,6 +766,12 @@ Colors.skip('ignores color names that are not actual colors', () => {
     unique: {},
     uniquenessRatio: 0,
     itemsPerContext: {},
+    formats: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+    },
   }
 
   assert.equal(actual, expected)
@@ -753,6 +834,15 @@ Colors('finds colors in var() as fallback values', () => {
         uniquenessRatio: 1,
       },
     },
+    formats: {
+      total: 4,
+      totalUnique: 2,
+      unique: {
+        hex3: 3,
+        rgba: 1,
+      },
+      uniquenessRatio: 2 / 4,
+    }
   }
 
   assert.equal(actual, expected)
@@ -776,13 +866,26 @@ Colors('ignores CSS keywords', () => {
   `
   const actual = analyze(fixture).values.colors
   const expected = {
-    total: 1,
-    totalUnique: 1,
+    total: 4,
+    totalUnique: 4,
     unique: {
+      'currentColor': 1,
+      'currentcolor': 1,
+      transparent: 1,
       'rgb(0, 0, 0)': 1,
     },
-    uniquenessRatio: 1,
+    uniquenessRatio: 4 / 4,
     itemsPerContext: {
+      color: {
+        total: 3,
+        totalUnique: 3,
+        unique: {
+          'currentColor': 1,
+          'currentcolor': 1,
+          transparent: 1,
+        },
+        uniquenessRatio: 3 / 3,
+      },
       background: {
         total: 1,
         totalUnique: 1,
@@ -792,6 +895,16 @@ Colors('ignores CSS keywords', () => {
         uniquenessRatio: 1,
       },
     },
+    formats: {
+      "total": 4,
+      "totalUnique": 3,
+      "unique": {
+        currentcolor: 2,
+        transparent: 1,
+        rgb: 1,
+      },
+      "uniquenessRatio": 3 / 4,
+    }
   }
 
   assert.equal(actual, expected)
@@ -875,6 +988,14 @@ Colors('finds System Colors', () => {
         uniquenessRatio: 19 / 19,
       },
     },
+    formats: {
+      total: 17,
+      totalUnique: 1,
+      unique: {
+        system: 17
+      },
+      uniquenessRatio: 1 / 17,
+    }
   }
 
   assert.equal(actual, expected)

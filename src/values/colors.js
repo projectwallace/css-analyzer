@@ -1,4 +1,4 @@
-export const colorNames = new Set([
+export const namedColors = new Set([
   // CSS Named Colors
   // Spec: https://drafts.csswg.org/css-color/#named-colors
   'aliceblue',
@@ -149,7 +149,9 @@ export const colorNames = new Set([
   'whitesmoke',
   'yellow',
   'yellowgreen',
+])
 
+export const systemColors = new Set([
   // CSS System Colors
   // Spec: https://drafts.csswg.org/css-color/#css-system-colors
   'canvas',
@@ -185,4 +187,9 @@ export const colorFunctions = new Set([
   'oklab',
   'oklch',
   'color',
+])
+
+export const colorKeywords = new Set([
+  'currentcolor',
+  'transparent',
 ])
