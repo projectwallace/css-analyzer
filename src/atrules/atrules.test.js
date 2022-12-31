@@ -337,7 +337,7 @@ AtRules('finds @media browserhacks', () => {
     @media \\0 screen {}
     @media \\0screen {}
     @media screen\\9 {}
-    @media \\0screen,screen\\9 {}
+    @media \\0screen\\,screen\\9 {}
     @media screen and (min-width:0\\0) {}
     @media all and (-moz-images-in-menus:0) and (min-resolution: .001dpcm) {}
     @media all and (-moz-images-in-menus:0) { @media (min-width: 0px) {} }
@@ -363,7 +363,7 @@ AtRules('finds @media browserhacks', () => {
       "\\0 screen": 1,
       "\\0screen": 1,
       "screen\\9": 1,
-      "\\0screen,screen\\9": 1,
+      "\\0screen\\,screen\\9": 1,
       "screen and (min-width:0\\0)": 1,
       "all and (-moz-images-in-menus:0) and (min-resolution: .001dpcm)": 1,
       "all and (-moz-images-in-menus:0)": 1,
