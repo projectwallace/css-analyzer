@@ -57151,9 +57151,10 @@
   },
   "values": {
     "colors": {
-      "total": 1011,
-      "totalUnique": 81,
+      "total": 1108,
+      "totalUnique": 83,
       "unique": {
+        "transparent": 84,
         "rgba(0,0,0,.35)": 33,
         "#fff": 143,
         "#00f": 85,
@@ -57180,6 +57181,7 @@
         "#00854f": 1,
         "#f6ab13": 1,
         "#f01616": 1,
+        "currentColor": 13,
         "#ae1c28": 2,
         "#21468b": 2,
         "#ffe936": 1,
@@ -57236,26 +57238,50 @@
         "#e7bf02": 1,
         "#dddbd5": 1
       },
-      "uniquenessRatio": 0.08011869436201781,
+      "uniquenessRatio": 0.07490974729241877,
       "itemsPerContext": {
+        "border": {
+          "total": 79,
+          "totalUnique": 15,
+          "unique": {
+            "transparent": 4,
+            "#e6e6e6": 22,
+            "#828282": 6,
+            "#aaa": 18,
+            "#fff": 4,
+            "#00f": 8,
+            "#01982b": 3,
+            "#333": 5,
+            "#ffe900": 1,
+            "#0000a4": 1,
+            "#bbb": 1,
+            "currentColor": 3,
+            "#33f": 1,
+            "#e5f4e9": 1,
+            "#ddd": 1
+          },
+          "uniquenessRatio": 0.189873417721519
+        },
         "border-bottom": {
-          "total": 105,
-          "totalUnique": 8,
+          "total": 125,
+          "totalUnique": 10,
           "unique": {
             "rgba(0,0,0,.35)": 33,
             "#828282": 1,
             "#e6e6e6": 23,
             "rgba(0,0,0,.25)": 32,
+            "transparent": 19,
             "#aaa": 11,
+            "currentColor": 1,
             "#00f": 1,
             "#333": 2,
             "#f0f6ff": 2
           },
-          "uniquenessRatio": 0.0761904761904762
+          "uniquenessRatio": 0.08
         },
         "color": {
-          "total": 372,
-          "totalUnique": 24,
+          "total": 378,
+          "totalUnique": 26,
           "unique": {
             "#fff": 47,
             "#00f": 46,
@@ -57274,24 +57300,27 @@
             "#01982b": 17,
             "#9b9b9b": 61,
             "#ff4947": 11,
+            "currentColor": 3,
             "#eb0400": 15,
             "#f0f6ff": 1,
             "#ffcd00": 4,
+            "transparent": 3,
             "#ff7775": 1,
             "#d12c2a": 1,
             "#000": 4,
             "#36c": 3
           },
-          "uniquenessRatio": 0.06451612903225806
+          "uniquenessRatio": 0.06878306878306878
         },
         "background-color": {
-          "total": 263,
-          "totalUnique": 50,
+          "total": 288,
+          "totalUnique": 52,
           "unique": {
             "#00f": 10,
             "#33f": 3,
             "#f0f6ff": 20,
             "#f3f8ff": 2,
+            "transparent": 22,
             "#ffe900": 5,
             "#ffed33": 2,
             "#01ac3a": 5,
@@ -57311,6 +57340,7 @@
             "#000": 2,
             "#ff0f21": 1,
             "rgba(255,255,255,.25)": 3,
+            "currentColor": 3,
             "#fffae5": 1,
             "rgba(0,0,0,.5)": 4,
             "rgba(255,255,255,.75)": 2,
@@ -57338,26 +57368,6 @@
             "rgba(255,255,255,.9)": 2,
             "#73a5d4": 1,
             "#e7bf02": 1
-          },
-          "uniquenessRatio": 0.19011406844106463
-        },
-        "border": {
-          "total": 72,
-          "totalUnique": 13,
-          "unique": {
-            "#e6e6e6": 22,
-            "#828282": 6,
-            "#aaa": 18,
-            "#fff": 4,
-            "#00f": 8,
-            "#01982b": 3,
-            "#333": 5,
-            "#ffe900": 1,
-            "#0000a4": 1,
-            "#bbb": 1,
-            "#33f": 1,
-            "#e5f4e9": 1,
-            "#ddd": 1
           },
           "uniquenessRatio": 0.18055555555555555
         },
@@ -57388,9 +57398,10 @@
           "uniquenessRatio": 0.27941176470588236
         },
         "border-color": {
-          "total": 57,
-          "totalUnique": 16,
+          "total": 71,
+          "totalUnique": 17,
           "unique": {
+            "transparent": 14,
             "#aaa": 15,
             "#fff": 4,
             "#01ac3a": 1,
@@ -57408,18 +57419,37 @@
             "#c3c1bc": 1,
             "#dddbd5": 1
           },
-          "uniquenessRatio": 0.2807017543859649
+          "uniquenessRatio": 0.23943661971830985
         },
         "border-top": {
-          "total": 26,
-          "totalUnique": 4,
+          "total": 27,
+          "totalUnique": 5,
           "unique": {
             "#e6e6e6": 21,
             "#0000a4": 1,
             "#aaa": 3,
+            "transparent": 1,
             "#00f": 1
           },
-          "uniquenessRatio": 0.15384615384615385
+          "uniquenessRatio": 0.18518518518518517
+        },
+        "fill": {
+          "total": 5,
+          "totalUnique": 3,
+          "unique": {
+            "currentColor": 2,
+            "transparent": 2,
+            "#ff4947": 1
+          },
+          "uniquenessRatio": 0.6
+        },
+        "stroke": {
+          "total": 1,
+          "totalUnique": 1,
+          "unique": {
+            "currentColor": 1
+          },
+          "uniquenessRatio": 1
         },
         "border-left": {
           "total": 7,
@@ -57432,13 +57462,13 @@
           },
           "uniquenessRatio": 0.5714285714285714
         },
-        "fill": {
-          "total": 1,
+        "-webkit-tap-highlight-color": {
+          "total": 3,
           "totalUnique": 1,
           "unique": {
-            "#ff4947": 1
+            "transparent": 3
           },
-          "uniquenessRatio": 1
+          "uniquenessRatio": 0.3333333333333333
         },
         "box-shadow": {
           "total": 18,
@@ -57455,30 +57485,41 @@
           "uniquenessRatio": 0.3888888888888889
         },
         "border-top-color": {
-          "total": 4,
-          "totalUnique": 3,
+          "total": 11,
+          "totalUnique": 4,
           "unique": {
             "#00f": 1,
             "#e6e6e6": 2,
-            "#fff": 1
+            "#fff": 1,
+            "transparent": 7
           },
-          "uniquenessRatio": 0.75
+          "uniquenessRatio": 0.36363636363636365
         },
         "border-bottom-color": {
-          "total": 3,
-          "totalUnique": 3,
+          "total": 8,
+          "totalUnique": 4,
           "unique": {
             "#e6e6e6": 1,
             "#fff": 1,
+            "transparent": 5,
             "#aaa": 1
           },
-          "uniquenessRatio": 1
+          "uniquenessRatio": 0.5
         },
-        "border-right-color": {
-          "total": 1,
+        "border-left-color": {
+          "total": 3,
           "totalUnique": 1,
           "unique": {
-            "#aaa": 1
+            "transparent": 3
+          },
+          "uniquenessRatio": 0.3333333333333333
+        },
+        "border-right-color": {
+          "total": 2,
+          "totalUnique": 2,
+          "unique": {
+            "#aaa": 1,
+            "transparent": 1
           },
           "uniquenessRatio": 1
         },
@@ -57508,6 +57549,19 @@
           },
           "uniquenessRatio": 1
         }
+      },
+      "formats": {
+        "total": 1108,
+        "totalUnique": 6,
+        "unique": {
+          "transparent": 84,
+          "rgba": 109,
+          "hex3": 403,
+          "hex6": 498,
+          "currentcolor": 13,
+          "named": 1
+        },
+        "uniquenessRatio": 0.005415162454873646
       }
     },
     "fontFamilies": {

@@ -153511,8 +153511,8 @@
   },
   "values": {
     "colors": {
-      "total": 2891,
-      "totalUnique": 305,
+      "total": 2959,
+      "totalUnique": 308,
       "unique": {
         "#c00": 101,
         "#ff0": 2,
@@ -153534,6 +153534,7 @@
         "#595959": 41,
         "#d9d9d9": 64,
         "#3061f3": 1,
+        "transparent": 43,
         "rgba(0,0,0,.25)": 2,
         "#404040": 41,
         "#e6e6e6": 23,
@@ -153562,6 +153563,7 @@
         "#8C8C8C": 7,
         "#FEFEFE": 19,
         "#4D4D4D": 22,
+        "currentColor": 10,
         "rgba(0,0,0,0.25)": 1,
         "#CC0000": 1,
         "#FFFFFF": 3,
@@ -153768,6 +153770,7 @@
         "rgba(202, 8, 19, 0.85)": 2,
         "rgba(112, 112, 112, 0.2)": 1,
         "rgb(180, 180, 180)": 2,
+        "currentcolor": 15,
         "rgba(38, 38, 38, 0.6)": 1,
         "rgba(255, 255, 255, 0.4)": 1,
         "rgb(77, 77, 77)": 25,
@@ -153820,11 +153823,11 @@
         "white": 1,
         "black": 1
       },
-      "uniquenessRatio": 0.10549982704946385,
+      "uniquenessRatio": 0.10408921933085502,
       "itemsPerContext": {
         "color": {
-          "total": 1444,
-          "totalUnique": 106,
+          "total": 1458,
+          "totalUnique": 109,
           "unique": {
             "#c00": 63,
             "#000": 11,
@@ -153850,6 +153853,7 @@
             "#E6E6E6": 21,
             "#FEFEFE": 15,
             "#4D4D4D": 11,
+            "currentColor": 5,
             "#CC0000": 1,
             "#FFFFFF": 3,
             "hsla(0,0%,45.1%,.75)": 1,
@@ -153868,6 +153872,7 @@
             "#fb1b17": 2,
             "#f8f8f8": 8,
             "#f50": 1,
+            "transparent": 2,
             "#a1a1a1": 4,
             "#a0a0a0": 6,
             "#bdbdbd": 1,
@@ -153908,6 +153913,7 @@
             "rgb(102, 102, 102)": 1,
             "rgb(251, 27, 23)": 2,
             "rgb(248, 248, 248)": 8,
+            "currentcolor": 7,
             "rgb(255, 85, 0)": 1,
             "rgb(77, 77, 77)": 11,
             "rgb(31, 150, 219)": 2,
@@ -153933,11 +153939,11 @@
             "white": 1,
             "black": 1
           },
-          "uniquenessRatio": 0.07340720221606649
+          "uniquenessRatio": 0.0747599451303155
         },
         "background": {
-          "total": 516,
-          "totalUnique": 120,
+          "total": 523,
+          "totalUnique": 121,
           "unique": {
             "#ff0": 2,
             "#737373": 4,
@@ -153962,6 +153968,7 @@
             "#0C0C0C": 3,
             "#FEFEFE": 1,
             "#E6E6E6": 1,
+            "transparent": 7,
             "#4D4D4D": 3,
             "hsla(0,0%,99.6%,.75)": 3,
             "rgba(26,26,26,.75)": 3,
@@ -154060,11 +154067,11 @@
             "rgb(39, 69, 92)": 1,
             "rgb(246, 246, 244)": 1
           },
-          "uniquenessRatio": 0.23255813953488372
+          "uniquenessRatio": 0.23135755258126195
         },
         "border": {
-          "total": 83,
-          "totalUnique": 44,
+          "total": 86,
+          "totalUnique": 45,
           "unique": {
             "silver": 3,
             "#fefefe": 1,
@@ -154083,6 +154090,7 @@
             "#a6a6a6": 1,
             "#535353": 2,
             "#000": 1,
+            "transparent": 3,
             "#c4c4c4": 2,
             "#91c7ed": 1,
             "#e9a6a6": 1,
@@ -154111,11 +154119,11 @@
             "rgb(30, 30, 30)": 1,
             "rgb(215, 215, 215)": 1
           },
-          "uniquenessRatio": 0.5301204819277109
+          "uniquenessRatio": 0.5232558139534884
         },
         "background-color": {
-          "total": 446,
-          "totalUnique": 130,
+          "total": 462,
+          "totalUnique": 131,
           "unique": {
             "#000": 16,
             "#f50": 1,
@@ -154131,6 +154139,7 @@
             "hsla(0,0%,100%,.25)": 1,
             "rgba(38,38,38,.5)": 1,
             "rgba(26,26,26,.5)": 1,
+            "transparent": 16,
             "#4D4D4D": 3,
             "#404040": 7,
             "#e30000": 5,
@@ -154248,11 +154257,11 @@
             "rgb(246, 246, 244)": 2,
             "rgb(228, 228, 228)": 1
           },
-          "uniquenessRatio": 0.2914798206278027
+          "uniquenessRatio": 0.28354978354978355
         },
         "border-color": {
-          "total": 68,
-          "totalUnique": 35,
+          "total": 69,
+          "totalUnique": 36,
           "unique": {
             "#737373": 3,
             "#d9d9d9": 4,
@@ -154287,10 +154296,19 @@
             "rgb(229, 188, 115)": 3,
             "rgb(108, 192, 74)": 1,
             "rgb(56, 96, 190)": 1,
+            "transparent": 1,
             "rgb(120, 128, 142)": 1,
             "rgb(30, 30, 30)": 1
           },
-          "uniquenessRatio": 0.5147058823529411
+          "uniquenessRatio": 0.5217391304347826
+        },
+        "-webkit-tap-highlight-color": {
+          "total": 4,
+          "totalUnique": 1,
+          "unique": {
+            "transparent": 4
+          },
+          "uniquenessRatio": 0.25
         },
         "text-shadow": {
           "total": 19,
@@ -154311,8 +154329,8 @@
           "uniquenessRatio": 0.5789473684210527
         },
         "border-bottom": {
-          "total": 73,
-          "totalUnique": 38,
+          "total": 74,
+          "totalUnique": 39,
           "unique": {
             "#f50": 1,
             "#c00": 2,
@@ -154347,17 +154365,18 @@
             "rgb(254, 254, 254)": 2,
             "rgb(77, 77, 77)": 2,
             "rgb(225, 225, 225)": 1,
+            "transparent": 1,
             "rgb(229, 188, 115)": 1,
             "rgb(226, 226, 226)": 3,
             "rgb(216, 216, 216)": 1,
             "rgb(215, 215, 215)": 3,
             "rgb(238, 238, 238)": 1
           },
-          "uniquenessRatio": 0.5205479452054794
+          "uniquenessRatio": 0.527027027027027
         },
         "border-top": {
-          "total": 45,
-          "totalUnique": 20,
+          "total": 46,
+          "totalUnique": 21,
           "unique": {
             "#d9d9d9": 10,
             "#c00": 1,
@@ -154376,11 +154395,12 @@
             "rgb(202, 0, 2)": 1,
             "rgb(230, 230, 230)": 1,
             "rgb(140, 140, 140)": 2,
+            "transparent": 1,
             "rgb(216, 216, 216)": 3,
             "rgb(233, 233, 233)": 2,
             "rgb(226, 226, 226)": 1
           },
-          "uniquenessRatio": 0.4444444444444444
+          "uniquenessRatio": 0.45652173913043476
         },
         "border-top-color": {
           "total": 6,
@@ -154396,10 +154416,11 @@
           "uniquenessRatio": 1
         },
         "border-right": {
-          "total": 14,
-          "totalUnique": 11,
+          "total": 17,
+          "totalUnique": 12,
           "unique": {
             "#bfbfbf": 1,
+            "transparent": 3,
             "#595959": 2,
             "#8c8c8c": 1,
             "#e6e6e6": 1,
@@ -154411,7 +154432,7 @@
             "rgb(226, 226, 226)": 1,
             "rgb(215, 215, 215)": 1
           },
-          "uniquenessRatio": 0.7857142857142857
+          "uniquenessRatio": 0.7058823529411765
         },
         "-webkit-box-shadow": {
           "total": 7,
@@ -154480,9 +154501,10 @@
           "uniquenessRatio": 0.16666666666666666
         },
         "fill": {
-          "total": 19,
-          "totalUnique": 9,
+          "total": 32,
+          "totalUnique": 11,
           "unique": {
+            "currentColor": 5,
             "#FEFEFE": 2,
             "#fff": 5,
             "#000": 2,
@@ -154491,15 +154513,17 @@
             "rgb(255, 255, 255)": 2,
             "rgb(0, 0, 0)": 2,
             "rgb(180, 180, 180)": 1,
+            "currentcolor": 8,
             "rgb(254, 254, 254)": 3
           },
-          "uniquenessRatio": 0.47368421052631576
+          "uniquenessRatio": 0.34375
         },
         "border-left": {
-          "total": 13,
-          "totalUnique": 9,
+          "total": 16,
+          "totalUnique": 10,
           "unique": {
             "#4D4D4D": 2,
+            "transparent": 3,
             "#d9d9d9": 1,
             "#8c8c8c": 1,
             "rgb(217, 217, 217)": 1,
@@ -154509,7 +154533,7 @@
             "rgb(216, 216, 216)": 2,
             "rgb(226, 226, 226)": 1
           },
-          "uniquenessRatio": 0.6923076923076923
+          "uniquenessRatio": 0.625
         },
         "border-bottom-color": {
           "total": 3,
@@ -154522,8 +154546,8 @@
           "uniquenessRatio": 1
         },
         "background-image": {
-          "total": 66,
-          "totalUnique": 34,
+          "total": 68,
+          "totalUnique": 35,
           "unique": {
             "rgba(0,0,0,0)": 3,
             "#d9d9d9": 3,
@@ -154541,6 +154565,7 @@
             "#c00": 3,
             "#f0ae2e": 3,
             "#ff845f": 3,
+            "transparent": 2,
             "#000": 1,
             "rgba(255,255,255,.3)": 1,
             "rgba(0, 0, 0, 0)": 1,
@@ -154560,7 +154585,7 @@
             "rgb(240, 174, 46)": 1,
             "rgb(255, 132, 95)": 1
           },
-          "uniquenessRatio": 0.5151515151515151
+          "uniquenessRatio": 0.5147058823529411
         },
         "font-color": {
           "total": 1,
@@ -154587,6 +154612,21 @@
           },
           "uniquenessRatio": 0.5
         }
+      },
+      "formats": {
+        "total": 2959,
+        "totalUnique": 8,
+        "unique": {
+          "hex3": 265,
+          "named": 21,
+          "hex6": 957,
+          "rgba": 315,
+          "transparent": 43,
+          "hsla": 35,
+          "currentcolor": 25,
+          "rgb": 1298
+        },
+        "uniquenessRatio": 0.0027036160865157146
       }
     },
     "fontFamilies": {

@@ -294,7 +294,13 @@ Api('handles empty input gracefully', () => {
         "totalUnique": 0,
         "unique": {},
         "uniquenessRatio": 0,
-        "itemsPerContext": {}
+        "itemsPerContext": {},
+        "formats": {
+          "total": 0,
+          "totalUnique": 0,
+          "unique": {},
+          "uniquenessRatio": 0,
+        }
       },
       "fontFamilies": {
         "total": 0,
