@@ -155,4 +155,40 @@ Properties('calculates property complexity', () => {
   assert.is(actual.sum, 7)
 })
 
+Properties('counts the amount of !important used on custom properties', () => {
+  const fixture = `
+    .property {
+      color: blue;
+      --color1: red;
+      --color2: yellow !important;
+    }
+
+    @media screen {
+      .property {
+        color: blue;
+        --color1: red;
+        --color2: yellow !important;
+      }
+    }
+
+    @layer test {
+      .property {
+        color: blue;
+        --color1: red;
+        --color3: green !important;
+      }
+    }
+  `
+  const actual = analyze(fixture).properties.custom.importants
+
+  assert.is(actual.total, 3)
+  assert.is(actual.totalUnique, 2)
+  assert.is(actual.uniquenessRatio, 2 / 3)
+  assert.is(actual.ratio, 3 / 6)
+  assert.equal(actual.unique, {
+    '--color2': 2,
+    '--color3': 1,
+  })
+})
+
 Properties.run()
