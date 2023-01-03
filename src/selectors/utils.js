@@ -60,12 +60,11 @@ export function isAccessibility(selector) {
         isA11y = true
         return this.break
       }
-    } else if (node.type == 'PseudoClassSelector') {
+    }
+    // Test for [aria-] or [role] inside :is()/:where() and friends
+    else if (node.type == 'PseudoClassSelector') {
       if (isPseudoFunction(node.name)) {
         const list = analyzeList(node, isAccessibility)
-
-        // Bail out for empty/non-existent :nth-child() params
-        if (list.length === 0) return
 
         if (list.some(b => b == true)) {
           isA11y = true
@@ -116,12 +115,12 @@ export function getComplexity(selector) {
 
     if (node.type == 'PseudoClassSelector') {
       if (isPseudoFunction(node.name)) {
-        const selectorList = analyzeList(node, getComplexity)
+        const list = analyzeList(node, getComplexity)
 
         // Bail out for empty/non-existent :nth-child() params
-        if (selectorList.length === 0) return
+        if (list.length === 0) return
 
-        selectorList.forEach(c => complexity += c)
+        list.forEach(c => complexity += c)
         return this.skip
       }
     }
