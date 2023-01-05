@@ -47,9 +47,7 @@ const analyze = (css) => {
   let embedSize = 0
   const embedTypes = {
     total: 0,
-    totalUnique: 0,
-    uniquenessRatio: 0,
-    unique: {}
+    unique: new Map()
   }
 
   const startParse = Date.now()
@@ -231,7 +229,7 @@ const analyze = (css) => {
 
         uniqueSelectors.add(selector)
         selectorComplexities.push(getComplexity(node))
-        uniqueSpecificities.push(specificity)
+        uniqueSpecificities.push(specificity[0] + ',' + specificity[1] + ',' + specificity[2])
 
         if (maxSpecificity === undefined) {
           maxSpecificity = specificity
@@ -279,15 +277,16 @@ const analyze = (css) => {
           embedTypes.total++
           embedSize += size
 
-          if (type in embedTypes.unique) {
-            embedTypes.unique[type].count++
-            embedTypes.unique[type].size += size
+          if (embedTypes.unique.has(type)) {
+            let item = embedTypes.unique.get(type)
+            item.count++
+            item.size += size
+            embedTypes.unique.set(type, item)
           } else {
-            embedTypes.totalUnique++
-            embedTypes.unique[type] = {
+            embedTypes.unique.set(type, {
               count: 1,
-              size,
-            }
+              size
+            })
           }
 
           // @deprecated
@@ -498,11 +497,12 @@ const analyze = (css) => {
           total: embedSize,
           ratio: ratio(embedSize, css.length),
         },
-        types: assign(
-          embedTypes,
-          {
-            uniquenessRatio: ratio(embedTypes.totalUnique, embedTypes.total)
-          })
+        types: {
+          total: embedTypes.total,
+          totalUnique: embedTypes.unique.size,
+          unique: Object.fromEntries(embedTypes.unique),
+          uniquenessRatio: ratio(embedTypes.unique.size, embedTypes.total),
+        },
       }),
     },
     atrules: {

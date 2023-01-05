@@ -48,7 +48,6 @@
       "types": {
         "total": 42,
         "totalUnique": 2,
-        "uniquenessRatio": 0.047619047619047616,
         "unique": {
           "application/font-woff": {
             "count": 1,
@@ -58,7 +57,8 @@
             "count": 41,
             "size": 14362
           }
-        }
+        },
+        "uniquenessRatio": 0.047619047619047616
       }
     }
   },

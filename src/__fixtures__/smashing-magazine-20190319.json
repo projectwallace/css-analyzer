@@ -42,7 +42,6 @@
       "types": {
         "total": 64,
         "totalUnique": 2,
-        "uniquenessRatio": 0.03125,
         "unique": {
           "image/svg+xml": {
             "count": 58,
@@ -52,7 +51,8 @@
             "count": 6,
             "size": 4940
           }
-        }
+        },
+        "uniquenessRatio": 0.03125
       }
     }
   },

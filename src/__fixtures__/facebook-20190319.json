@@ -22,13 +22,13 @@
       "types": {
         "total": 2,
         "totalUnique": 1,
-        "uniquenessRatio": 0.5,
         "unique": {
           "font/opentype": {
             "count": 2,
             "size": 40056
           }
-        }
+        },
+        "uniquenessRatio": 0.5
       }
     }
   },
