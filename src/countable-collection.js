@@ -4,11 +4,9 @@ class CountableCollection {
    */
   constructor(initial) {
     /** @type [index: string]: string */
-    this._items = {}
+    this._items = new Map()
     /** @type number */
     this._total = 0
-    /** @type number */
-    this._totalUnique = 0
 
     if (initial) {
       for (let i = 0; i < initial.length; i++) {
@@ -25,13 +23,12 @@ class CountableCollection {
   push(item) {
     this._total++
 
-    if (this._items[item]) {
-      this._items[item]++
+    if (this._items.has(item)) {
+      this._items.set(item, this._items.get(item) + 1)
       return
     }
 
-    this._items[item] = 1
-    this._totalUnique++
+    this._items.set(item, 1)
   }
 
   /**
@@ -48,9 +45,9 @@ class CountableCollection {
   count() {
     return {
       total: this._total,
-      totalUnique: this._totalUnique,
-      unique: this._items,
-      uniquenessRatio: this._total === 0 ? 0 : this._totalUnique / this._total,
+      totalUnique: this._items.size,
+      unique: Object.fromEntries(this._items),
+      uniquenessRatio: this._total === 0 ? 0 : this._items.size / this._total,
     }
   }
 }

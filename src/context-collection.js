@@ -4,7 +4,7 @@ class ContextCollection {
   constructor() {
     this._list = new CountableCollection()
     /** @type {[index; string]: CountableCollection} */
-    this._contexts = {}
+    this._contexts = new Map()
   }
 
   /**
@@ -15,22 +15,22 @@ class ContextCollection {
   push(item, context) {
     this._list.push(item)
 
-    if (!this._contexts[context]) {
-      this._contexts[context] = new CountableCollection()
+    if (!this._contexts.has(context)) {
+      this._contexts.set(context, new CountableCollection())
     }
 
-    this._contexts[context].push(item)
+    this._contexts.get(context).push(item)
   }
 
   count() {
-    const itemsPerContext = {}
+    const itemsPerContext = new Map()
 
-    for (let context in this._contexts) {
-      itemsPerContext[context] = this._contexts[context].count()
+    for (let [context, value] of this._contexts.entries()) {
+      itemsPerContext.set(context, value.count())
     }
 
     return Object.assign(this._list.count(), {
-      itemsPerContext
+      itemsPerContext: Object.fromEntries(itemsPerContext)
     })
   }
 }

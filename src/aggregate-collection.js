@@ -53,6 +53,7 @@ class AggregateCollection {
   constructor() {
     /** @type number[] */
     this._items = []
+    this._sum = 0
   }
 
   /**
@@ -61,6 +62,7 @@ class AggregateCollection {
    */
   push(item) {
     this._items.push(item)
+    this._sum += item
   }
 
   size() {
@@ -86,18 +88,17 @@ class AggregateCollection {
     const min = sorted[0]
     const max = sorted[sorted.length - 1]
 
-    const sum = this._items.reduce((total, num) => (total += num))
-    const mode = Mode(this._items)
+    const mode = Mode(sorted)
     const median = Median(sorted)
 
     return {
       min,
       max,
-      mean: sum / this._items.length,
+      mean: this._sum / sorted.length,
       mode,
       median,
       range: max - min,
-      sum,
+      sum: this._sum,
     }
   }
 

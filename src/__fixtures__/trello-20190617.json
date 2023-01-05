@@ -22,13 +22,13 @@
       "types": {
         "total": 4,
         "totalUnique": 1,
-        "uniquenessRatio": 0.25,
         "unique": {
           "image/svg+xml": {
             "count": 4,
             "size": 956
           }
-        }
+        },
+        "uniquenessRatio": 0.25
       }
     }
   },

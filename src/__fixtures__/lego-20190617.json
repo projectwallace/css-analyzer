@@ -21,13 +21,13 @@
       "types": {
         "total": 1,
         "totalUnique": 1,
-        "uniquenessRatio": 1,
         "unique": {
           "image/gif": {
             "count": 1,
             "size": 1798
           }
-        }
+        },
+        "uniquenessRatio": 1
       }
     }
   },
