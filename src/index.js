@@ -43,6 +43,7 @@ const analyze = (css) => {
   let totalComments = 0
   let commentsSize = 0
   const embeds = new CountableCollection()
+  let embedSize = 0
   const embedTypes = {
     total: 0,
     totalUnique: 0,
@@ -275,6 +276,7 @@ const analyze = (css) => {
           var type = getEmbedType(embed)
 
           embedTypes.total++
+          embedSize += size
 
           if (type in embedTypes.unique) {
             embedTypes.unique[type].count++
@@ -467,7 +469,6 @@ const analyze = (css) => {
   })
 
   const embeddedContent = embeds.count()
-  const embedSize = Object.keys(embeddedContent.unique).join('').length
 
   const totalUniqueDeclarations = uniqueDeclarations.size
 
