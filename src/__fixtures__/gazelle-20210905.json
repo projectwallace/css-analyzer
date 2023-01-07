@@ -95805,17 +95805,16 @@
       },
       "formats": {
         "total": 2893,
-        "totalUnique": 7,
+        "totalUnique": 6,
         "unique": {
           "hex6": 1101,
-          "hex3": 751,
+          "hex3": 752,
           "rgba": 395,
           "named": 38,
           "transparent": 231,
-          "rgb": 376,
-          "hex5": 1
+          "rgb": 376
         },
-        "uniquenessRatio": 0.0024196335983408227
+        "uniquenessRatio": 0.002073971655720705
       }
     },
     "fontFamilies": {

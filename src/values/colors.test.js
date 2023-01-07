@@ -121,6 +121,41 @@ Colors('finds hex colors', () => {
   assert.equal(actual, expected)
 })
 
+Colors('Counts hex format correctly when combined with a browserhack', () => {
+  let actual = analyze(`
+    a {
+      color: #000\\9;
+    }
+  `)
+  let expected = {
+    total: 1,
+    totalUnique: 1,
+    unique: {
+      '#000\\9': 1,
+    },
+    uniquenessRatio: 1,
+    itemsPerContext: {
+      color: {
+        total: 1,
+        totalUnique: 1,
+        uniquenessRatio: 1,
+        unique: {
+          '#000\\9': 1,
+        },
+      },
+    },
+    formats: {
+      total: 1,
+      totalUnique: 1,
+      unique: {
+        hex3: 1,
+      },
+      uniquenessRatio: 1,
+    }
+  }
+  assert.equal(actual.values.colors, expected);
+})
+
 Colors('finds hsl(a) colors', () => {
   const actual = analyze(`
     test {

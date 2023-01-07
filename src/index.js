@@ -16,6 +16,7 @@ import { strEquals, startsWith, endsWith } from './string-utils.js'
 import { hasVendorPrefix } from './vendor-prefix.js'
 import { isCustom, isHack, isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
+import { isIe9Hack } from './values/browserhacks.js'
 
 function ratio(part, total) {
   if (total === 0) return 0
@@ -312,11 +313,7 @@ const analyze = (css) => {
         }
 
         // i.e. `property: value\9`
-        if (node.children
-          && node.children.last
-          && node.children.last.type === 'Identifier'
-          && endsWith('\\9', node.children.last.name)
-        ) {
+        if (isIe9Hack(node)) {
           valueBrowserhacks.push(stringifyNode(node))
         }
 
@@ -378,7 +375,10 @@ const analyze = (css) => {
         walk(node, function (valueNode) {
           switch (valueNode.type) {
             case 'Hash': {
-              const hexLength = valueNode.value.length
+              let hexLength = valueNode.value.length
+              if (endsWith('\\9', valueNode.value)) {
+                hexLength = hexLength - 2
+              }
               colors.push('#' + valueNode.value, property)
               colorFormats.push(`hex` + hexLength)
 
