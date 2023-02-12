@@ -70,6 +70,7 @@ const analyze = (css) => {
   /** @type {string}[]} */
   const fontfaces = []
   const layers = new CountableCollection()
+  const resolvedLayers = new CountableCollection()
   const imports = new CountableCollection()
   const medias = new CountableCollection()
   const mediaBrowserhacks = new CountableCollection()
@@ -188,10 +189,31 @@ const analyze = (css) => {
           break
         }
         if (atRuleName === 'layer') {
-          const prelude = stringifyNode(node.prelude)
-          prelude.trim()
+          let names = stringifyNode(node.prelude)
+            .trim()
             .split(',')
-            .forEach(name => layers.push(name.trim()))
+            .map(name => name.trim())
+
+          names.forEach(name => layers.push(name))
+
+          let parent = this.atrule
+
+          console.log('names', names)
+          while (parent) {
+            if (parent.name == 'layer') {
+              let parentPrelude = stringifyNode(parent.prelude).trim()
+              console.log('-', parentPrelude)
+              // let parentNames = parentPrelude.split(',').map(name => name.trim())
+
+              // if (parentNames.length > 1) {
+
+              // }
+              // names = names.map(name => `${parentPrelude}.${name}`)
+            }
+            console.log(parent)
+            parent = parent.atrule
+          }
+          // names.forEach(name => resolvedLayers.push(name))
         }
         break
       }
@@ -534,7 +556,12 @@ const analyze = (css) => {
         }),
       }),
       container: containers.count(),
-      layer: layers.count(),
+      layer: assign(
+        layers.count(),
+        {
+          resolved: resolvedLayers.count(),
+        },
+      ),
     },
     rules: {
       total: totalRules,

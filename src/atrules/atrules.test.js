@@ -109,6 +109,45 @@ AtRules('finds @layer', () => {
   assert.equal(actual, expected)
 })
 
+AtRules.only('reports nested @layers', () => {
+  let fixture = `
+    /*@layer reset, default, components, theme;*/
+
+    @layer default {
+      /*@layer one {
+        a { color: blue; }
+      }*/
+
+      @layer two {
+        @layer three.four {
+          @layer five {
+            a { color: green; }
+          }
+        }
+      }
+
+      /*@layer test, test.one;*/
+    }
+  `
+  const actual = analyze(fixture).atrules.layer.resolved
+
+  console.log(actual)
+  assert.is(actual.total, 11)
+  assert.is(actual.totalUnique, 10)
+  assert.equal(actual.unique, {
+    'reset': 1,
+    'default': 2,
+    'components': 1,
+    'theme': 1,
+    'default.one': 1,
+    'default.two': 1,
+    'default.two.three.four': 1,
+    'default.two.three.four.five': 1,
+    'default.test': 1,
+    'default.test.one': 1,
+  })
+})
+
 AtRules('finds @font-face', () => {
   const fixture = `
     @font-face {
