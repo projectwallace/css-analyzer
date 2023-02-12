@@ -500,8 +500,8 @@ const analyze = (css) => {
         types: {
           total: embedTypes.total,
           totalUnique: embedTypes.unique.size,
-          unique: Object.fromEntries(embedTypes.unique),
           uniquenessRatio: ratio(embedTypes.unique.size, embedTypes.total),
+          unique: Object.fromEntries(embedTypes.unique),
         },
       }),
     },
