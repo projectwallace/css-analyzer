@@ -7,15 +7,15 @@
  * @returns {Number} mode - The `mode` value of `arr`
  */
 function Mode(arr) {
-  const frequencies = Object.create(null)
+  const frequencies = new Map()
   let maxOccurrences = -1
   let maxOccurenceCount = 0
   let sum = 0
 
   for (let i = 0; i < arr.length; i++) {
     const element = arr[i]
-    const updatedCount = (frequencies[element] || 0) + 1
-    frequencies[element] = updatedCount
+    const updatedCount = (frequencies.get(element) || 0) + 1
+    frequencies.set(element, updatedCount)
 
     if (updatedCount > maxOccurrences) {
       maxOccurrences = updatedCount
