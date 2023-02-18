@@ -69,4 +69,20 @@ Units('analyzes length units', () => {
   assert.equal(actual, expected)
 })
 
+Units('should not include browserhacks', () => {
+  let actual = analyze(`
+    a {
+      font-size: 10px\\9;
+      color: 1em!ie;
+    }
+  `).values.units;
+
+  assert.equal(actual.unique, {
+    'px': 1,
+    'em': 1,
+  })
+  assert.is(actual.total, 2)
+  assert.is(actual.totalUnique, 2)
+})
+
 Units.run()

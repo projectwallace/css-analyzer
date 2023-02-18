@@ -264,7 +264,11 @@ const analyze = (css) => {
           break
         }
 
-        units.push(node.unit, this.declaration.property)
+        if (endsWith('\\9', node.unit)) {
+          units.push(node.unit.substring(0, node.unit.length - 2), this.declaration.property)
+        } else {
+          units.push(node.unit, this.declaration.property)
+        }
 
         return this.skip
       }
