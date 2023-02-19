@@ -128,6 +128,7 @@ const analyze = (css) => {
   const boxShadows = new CountableCollection()
   const fontFamilies = new CountableCollection()
   const fontSizes = new CountableCollection()
+  const lineHeights = new CountableCollection()
   const timingFunctions = new CountableCollection()
   const durations = new CountableCollection()
   const colors = new ContextCollection()
@@ -352,6 +353,8 @@ const analyze = (css) => {
             fontFamilies.push(stringifyNode(node))
           }
           break
+        } else if (isProperty('line-height', property)) {
+          lineHeights.push((stringifyNode(node)))
         } else if (isProperty('transition', property) || isProperty('animation', property)) {
           const [times, fns] = analyzeAnimation(node.children, stringifyNode)
           for (let i = 0; i < times.length; i++) {
@@ -669,6 +672,7 @@ const analyze = (css) => {
       ),
       fontFamilies: fontFamilies.count(),
       fontSizes: fontSizes.count(),
+      lineHeights: lineHeights.count(),
       zindexes: zindex.count(),
       textShadows: textShadows.count(),
       boxShadows: boxShadows.count(),

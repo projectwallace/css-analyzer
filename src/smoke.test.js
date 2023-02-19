@@ -12,6 +12,7 @@ Object.entries({
   'CSS Tricks': 'css-tricks-20190319',
   'Facebook': 'facebook-20190319',
   'GitHub': 'github-20210501',
+  'India Times': 'indiatimes-20230219',
   'Lego.com': 'lego-20190617',
   'Trello': 'trello-20190617',
   'Gazelle': 'gazelle-20210905',

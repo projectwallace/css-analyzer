@@ -314,6 +314,12 @@ Api('handles empty input gracefully', () => {
         "unique": {},
         "uniquenessRatio": 0
       },
+      "lineHeights": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      },
       "zindexes": {
         "total": 0,
         "totalUnique": 0,
