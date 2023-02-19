@@ -41223,7 +41223,7 @@
     },
     "fontFamilies": {
       "total": 37,
-      "totalUnique": 17,
+      "totalUnique": 15,
       "unique": {
         "Helvetica, Arial, sans-serif": 18,
         "Helvetica Neue, Helvetica, Arial, sans-serif": 1,
@@ -41235,25 +41235,23 @@
         "Georgia, serif": 1,
         "'Open Dyslexic'": 1,
         "Helvetica,Arial,sans-serif": 1,
-        "'Freight Sans Bold', Helvetica, Arial, sans-serif": 1,
-        "'Freight Sans', Helvetica, Arial, sans-serif": 1,
+        "'Freight Sans Bold', Helvetica, Arial, sans-serif": 2,
+        "'Freight Sans', Helvetica, Arial, sans-serif": 2,
         "'Freight Sans'": 1,
         "'Freight Sans Bold'": 1,
-        "'Freight Sans', Helvetica, Arial, sans-serif ": 1,
-        "'Freight Sans Bold', Helvetica, Arial, sans-serif ": 1,
         "Georgia, Lucida Grande, Tahoma, Verdana, Arial, sans-serif": 3
       },
-      "uniquenessRatio": 0.4594594594594595
+      "uniquenessRatio": 0.40540540540540543
     },
     "fontSizes": {
       "total": 171,
-      "totalUnique": 40,
+      "totalUnique": 38,
       "unique": {
-        "0": 4,
+        "0": 5,
         "12px": 34,
         "13px": 18,
         "14px": 23,
-        "11px": 16,
+        "11px": 17,
         "1px": 1,
         "16px": 9,
         "18px": 9,
@@ -41264,8 +41262,6 @@
         "20px": 4,
         "40px": 2,
         "24px": 3,
-        "0 ": 1,
-        "11px ": 1,
         "15px": 5,
         "17px": 3,
         "19px": 4,
@@ -41290,7 +41286,7 @@
         "1.5rem": 1,
         "1.375rem": 1
       },
-      "uniquenessRatio": 0.23391812865497075
+      "uniquenessRatio": 0.2222222222222222
     },
     "zindexes": {
       "total": 52,

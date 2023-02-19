@@ -20544,11 +20544,11 @@
   },
   "declarations": {
     "total": 4646,
-    "totalUnique": 1797,
-    "uniquenessRatio": 0.38678433060697376,
+    "totalUnique": 1796,
+    "uniquenessRatio": 0.3865690916917779,
     "unique": {
-      "total": 1797,
-      "ratio": 0.38678433060697376
+      "total": 1796,
+      "ratio": 0.3865690916917779
     },
     "importants": {
       "total": 71,

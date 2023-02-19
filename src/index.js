@@ -37,7 +37,7 @@ const analyze = (css) => {
    * @returns {string} str - The stringified node
    */
   function stringifyNode(node) {
-    return css.substring(node.loc.start.offset, node.loc.end.offset)
+    return css.substring(node.loc.start.offset, node.loc.end.offset).trim()
   }
 
   // Stylesheet
@@ -150,7 +150,7 @@ const analyze = (css) => {
         }
 
         if (atRuleName === 'media') {
-          const prelude = stringifyNode(node.prelude).trim()
+          const prelude = stringifyNode(node.prelude)
           medias.push(prelude)
           if (isMediaBrowserhack(node.prelude)) {
             mediaBrowserhacks.push(prelude)
@@ -187,7 +187,7 @@ const analyze = (css) => {
         }
         if (atRuleName === 'layer') {
           const prelude = stringifyNode(node.prelude)
-          prelude.trim()
+          prelude
             .split(',')
             .forEach(name => layers.push(name.trim()))
         }

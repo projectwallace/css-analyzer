@@ -24037,11 +24037,11 @@
   },
   "declarations": {
     "total": 4091,
-    "totalUnique": 1209,
-    "uniquenessRatio": 0.29552676607186507,
+    "totalUnique": 1205,
+    "uniquenessRatio": 0.2945490100219995,
     "unique": {
-      "total": 1209,
-      "ratio": 0.29552676607186507
+      "total": 1205,
+      "ratio": 0.2945490100219995
     },
     "importants": {
       "total": 1279,
@@ -25143,28 +25143,27 @@
     },
     "fontFamilies": {
       "total": 5,
-      "totalUnique": 3,
+      "totalUnique": 2,
       "unique": {
         "var(--bs-font-sans-serif)": 3,
-        "var(--bs-font-monospace)": 1,
-        "var(--bs-font-monospace) ": 1
+        "var(--bs-font-monospace)": 2
       },
-      "uniquenessRatio": 0.6
+      "uniquenessRatio": 0.4
     },
     "fontSizes": {
       "total": 79,
-      "totalUnique": 35,
+      "totalUnique": 25,
       "unique": {
-        "1rem": 9,
-        "calc(1.375rem + 1.5vw)": 2,
-        "2.5rem": 2,
-        "calc(1.325rem + 0.9vw)": 1,
-        "2rem": 1,
-        "calc(1.3rem + 0.6vw)": 1,
-        "1.75rem": 1,
-        "calc(1.275rem + 0.3vw)": 2,
-        "1.5rem": 2,
-        "1.25rem": 11,
+        "1rem": 10,
+        "calc(1.375rem + 1.5vw)": 3,
+        "2.5rem": 3,
+        "calc(1.325rem + 0.9vw)": 2,
+        "2rem": 2,
+        "calc(1.3rem + 0.6vw)": 2,
+        "1.75rem": 2,
+        "calc(1.275rem + 0.3vw)": 3,
+        "1.5rem": 3,
+        "1.25rem": 12,
         "0.875em": 10,
         "0.75em": 2,
         "1em": 2,
@@ -25179,19 +25178,9 @@
         "calc(1.425rem + 2.1vw)": 1,
         "3rem": 1,
         "0.875rem": 12,
-        "0.75rem": 1,
-        "calc(1.375rem + 1.5vw) ": 1,
-        "calc(1.325rem + 0.9vw) ": 1,
-        "calc(1.3rem + 0.6vw) ": 1,
-        "calc(1.275rem + 0.3vw) ": 1,
-        "1.25rem ": 1,
-        "1rem ": 1,
-        "2.5rem ": 1,
-        "2rem ": 1,
-        "1.75rem ": 1,
-        "1.5rem ": 1
+        "0.75rem": 1
       },
-      "uniquenessRatio": 0.4430379746835443
+      "uniquenessRatio": 0.31645569620253167
     },
     "zindexes": {
       "total": 37,
@@ -25223,7 +25212,7 @@
     },
     "boxShadows": {
       "total": 54,
-      "totalUnique": 27,
+      "totalUnique": 26,
       "unique": {
         "inset 0 0 0 9999px var(--bs-table-accent-bg)": 1,
         "0 0 0 0.25rem rgba(13, 110, 253, 0.25)": 7,
@@ -25248,12 +25237,11 @@
         "0 0 0 0.25rem rgba(33, 37, 41, 0.5)": 2,
         "0 0 0 0.25rem": 1,
         "inset 0 -1px 0 rgba(0, 0, 0, 0.125)": 1,
-        "0 0.5rem 1rem rgba(0, 0, 0, 0.15)": 1,
-        "0 0.5rem 1rem rgba(0, 0, 0, 0.15) ": 1,
-        "0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) ": 1,
-        "0 1rem 3rem rgba(0, 0, 0, 0.175) ": 1
+        "0 0.5rem 1rem rgba(0, 0, 0, 0.15)": 2,
+        "0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)": 1,
+        "0 1rem 3rem rgba(0, 0, 0, 0.175)": 1
       },
-      "uniquenessRatio": 0.5
+      "uniquenessRatio": 0.48148148148148145
     },
     "animations": {
       "durations": {
@@ -25287,16 +25275,15 @@
     },
     "prefixes": {
       "total": 11,
-      "totalUnique": 6,
+      "totalUnique": 5,
       "unique": {
-        " system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, \"Noto Sans\", \"Liberation Sans\", sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"": 1,
+        "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, \"Noto Sans\", \"Liberation Sans\", sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"": 1,
         "-webkit-match-parent": 1,
         "-webkit-max-content": 1,
         "-moz-max-content": 1,
-        "-webkit-sticky": 6,
-        "-webkit-sticky ": 1
+        "-webkit-sticky": 7
       },
-      "uniquenessRatio": 0.5454545454545454
+      "uniquenessRatio": 0.45454545454545453
     },
     "browserhacks": {
       "total": 0,
