@@ -40984,6 +40984,22 @@
       },
       "uniquenessRatio": 0.25471698113207547
     },
+    "lineHeights": {
+      "total": 54,
+      "totalUnique": 9,
+      "unique": {
+        "0": 2,
+        "1": 6,
+        "1.5": 28,
+        "1.15": 2,
+        "1.2": 10,
+        "42px": 2,
+        "80px": 2,
+        "22px": 1,
+        "18px": 1
+      },
+      "uniquenessRatio": 0.16666666666666666
+    },
     "zindexes": {
       "total": 22,
       "totalUnique": 9,

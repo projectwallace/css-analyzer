@@ -23110,6 +23110,30 @@
       },
       "uniquenessRatio": 0.24561403508771928
     },
+    "lineHeights": {
+      "total": 75,
+      "totalUnique": 17,
+      "unique": {
+        "0": 1,
+        "1": 2,
+        "19px": 1,
+        "normal": 13,
+        "24px": 11,
+        "26px": 13,
+        "17px": 1,
+        "14px": 1,
+        "12px": 2,
+        "22px": 1,
+        "1.5": 2,
+        "34px": 3,
+        "14.78px": 1,
+        "1.15": 2,
+        "28px": 18,
+        "1.2": 2,
+        "39px": 1
+      },
+      "uniquenessRatio": 0.22666666666666666
+    },
     "zindexes": {
       "total": 30,
       "totalUnique": 15,
