@@ -37,7 +37,11 @@ const analyze = (css) => {
    * @returns {string} str - The stringified node
    */
   function stringifyNode(node) {
-    return css.substring(node.loc.start.offset, node.loc.end.offset).trim()
+    return stringifyNodePlain(node).trim()
+  }
+
+  function stringifyNodePlain(node) {
+    return css.substring(node.loc.start.offset, node.loc.end.offset)
   }
 
   // Stylesheet
@@ -312,7 +316,7 @@ const analyze = (css) => {
 
         // i.e. `property: value !ie`
         if (typeof important === 'string') {
-          valueBrowserhacks.push(stringifyNode(node) + '!' + important)
+          valueBrowserhacks.push(stringifyNodePlain(node) + '!' + important)
         }
 
         // i.e. `property: value\9`
