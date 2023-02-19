@@ -23045,11 +23045,10 @@
     },
     "fontFamilies": {
       "total": 105,
-      "totalUnique": 12,
+      "totalUnique": 11,
       "unique": {
         "'Lato'": 18,
-        "'Lato',Arial,sans-serif": 4,
-        "'Lato',Arial,sans-serif ": 1,
+        "'Lato',Arial,sans-serif": 5,
         "Verdana,Geneva,Tahoma,sans-serif": 1,
         "\"Helvetica Neue\",Helvetica,sans-serif": 1,
         "Lato": 18,
@@ -23060,23 +23059,20 @@
         "FuturaPTBold": 12,
         "FuturaPTBold,Arial,sans-serif": 3
       },
-      "uniquenessRatio": 0.11428571428571428
+      "uniquenessRatio": 0.10476190476190476
     },
     "fontSizes": {
       "total": 171,
-      "totalUnique": 45,
+      "totalUnique": 42,
       "unique": {
         "0": 1,
-        "16px": 2,
-        "14px": 5,
-        "18px": 2,
+        "16px": 3,
+        "14px": 6,
+        "18px": 3,
         "12px": 4,
         "10px": 1,
         "20px": 1,
-        "16px ": 1,
-        "18px ": 1,
-        "14px ": 1,
-        "28px ": 3,
+        "28px": 3,
         "15.45454502px": 1,
         "24px": 3,
         ".8em": 1,
@@ -23112,7 +23108,7 @@
         "2.125rem": 1,
         "3.125rem": 1
       },
-      "uniquenessRatio": 0.2631578947368421
+      "uniquenessRatio": 0.24561403508771928
     },
     "zindexes": {
       "total": 30,
@@ -23197,23 +23193,21 @@
     },
     "prefixes": {
       "total": 309,
-      "totalUnique": 13,
+      "totalUnique": 11,
       "unique": {
-        "-webkit-inline-flex": 15,
-        "-ms-inline-flexbox": 15,
+        "-webkit-inline-flex": 16,
+        "-ms-inline-flexbox": 16,
         "-webkit-flex": 98,
         "-ms-flexbox": 98,
         "-webkit-transform 150ms ease-in-out": 1,
         "-moz-scrollbars-none": 3,
-        "-webkit-inline-flex ": 1,
-        "-ms-inline-flexbox ": 1,
         "-webkit-sticky": 2,
         "visibility 0s linear 150ms,opacity 150ms ease-in-out,-webkit-transform 150ms ease-in-out": 1,
         "visibility 0s linear,opacity 300ms ease-out,-webkit-transform 300ms ease-out": 1,
         "-webkit-box": 60,
         "-webkit-inline-box": 13
       },
-      "uniquenessRatio": 0.042071197411003236
+      "uniquenessRatio": 0.03559870550161812
     },
     "browserhacks": {
       "total": 0,

@@ -56883,11 +56883,11 @@
   },
   "declarations": {
     "total": 8228,
-    "totalUnique": 1987,
-    "uniquenessRatio": 0.24149246475449684,
+    "totalUnique": 1986,
+    "uniquenessRatio": 0.24137092853670394,
     "unique": {
-      "total": 1987,
-      "ratio": 0.24149246475449684
+      "total": 1986,
+      "ratio": 0.24137092853670394
     },
     "importants": {
       "total": 534,
