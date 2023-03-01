@@ -36220,19 +36220,17 @@
     },
     "fontFamilies": {
       "total": 13,
-      "totalUnique": 9,
+      "totalUnique": 7,
       "unique": {
         "sans-serif": 1,
         "monospace, monospace": 1,
-        "-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji": 1,
-        "SFMono-Regular,Consolas,LiberationMono,Menlo,monospace": 2,
-        "SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace": 3,
-        "-apple-system,BlinkMacSystemFont,SegoeUI,Helvetica,Arial,sans-serif,AppleColorEmoji,SegoeUIEmoji": 1,
+        "-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji": 2,
+        "SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace": 5,
         "monospace": 2,
         "SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace": 1,
         "Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol": 1
       },
-      "uniquenessRatio": 0.6923076923076923
+      "uniquenessRatio": 0.5384615384615384
     },
     "fontSizes": {
       "total": 87,
@@ -36262,12 +36260,12 @@
       "uniquenessRatio": 0.22988505747126436
     },
     "lineHeights": {
-      "total": 53,
+      "total": 54,
       "totalUnique": 13,
       "unique": {
         "0": 7,
         "1": 9,
-        "1.5": 11,
+        "1.5": 12,
         "10px": 1,
         "1.25": 8,
         "20px": 8,
@@ -36279,7 +36277,7 @@
         "30px": 2,
         "28px": 1
       },
-      "uniquenessRatio": 0.24528301886792453
+      "uniquenessRatio": 0.24074074074074073
     },
     "zindexes": {
       "total": 39,
