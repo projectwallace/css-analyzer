@@ -95819,15 +95819,14 @@
     },
     "fontFamilies": {
       "total": 55,
-      "totalUnique": 23,
+      "totalUnique": 22,
       "unique": {
-        "Arial, Helvetica, sans-serif": 4,
+        "Arial, Helvetica, sans-serif": 6,
         "'ProximaNova'": 3,
         "'Gazelle'": 9,
         "'ga-icon'": 2,
         "'ProximaNova', Helvetica, Arial, sans-serif": 4,
         "'luma-icons'": 2,
-        "Arial,Helvetica,sans-serif": 2,
         "'bluefoot-icons'": 6,
         "Consolas, \"Liberation Mono\", Menlo, Courier, monospace": 1,
         "sans-serif": 1,
@@ -95845,7 +95844,7 @@
         "proximaNova-regular, Arial, sans-serif": 1,
         "proximaNova-bold, Arial, sans-serif": 3
       },
-      "uniquenessRatio": 0.41818181818181815
+      "uniquenessRatio": 0.4
     },
     "fontSizes": {
       "total": 837,
@@ -95937,10 +95936,10 @@
       "uniquenessRatio": 0.0979689366786141
     },
     "lineHeights": {
-      "total": 284,
+      "total": 287,
       "totalUnique": 73,
       "unique": {
-        "0": 7,
+        "0": 8,
         "1": 32,
         "20px": 15,
         "22px": 6,
@@ -95959,7 +95958,7 @@
         "1.5": 13,
         "18px": 14,
         "14px": 6,
-        "16px": 3,
+        "16px": 5,
         "11px": 4,
         "60px": 4,
         "32px": 7,
@@ -96014,7 +96013,7 @@
         "35px": 1,
         "27px": 1
       },
-      "uniquenessRatio": 0.25704225352112675
+      "uniquenessRatio": 0.25435540069686413
     },
     "zindexes": {
       "total": 180,

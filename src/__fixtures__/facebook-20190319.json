@@ -41223,9 +41223,9 @@
     },
     "fontFamilies": {
       "total": 37,
-      "totalUnique": 15,
+      "totalUnique": 14,
       "unique": {
-        "Helvetica, Arial, sans-serif": 18,
+        "Helvetica, Arial, sans-serif": 19,
         "Helvetica Neue, Helvetica, Arial, sans-serif": 1,
         "system-ui, -apple-system, BlinkMacSystemFont, '.SFNSText-Regular', sans-serif": 1,
         "'Segoe UI Historic'": 2,
@@ -41234,14 +41234,13 @@
         "Menlo, Consolas, Monaco, monospace": 1,
         "Georgia, serif": 1,
         "'Open Dyslexic'": 1,
-        "Helvetica,Arial,sans-serif": 1,
         "'Freight Sans Bold', Helvetica, Arial, sans-serif": 2,
         "'Freight Sans', Helvetica, Arial, sans-serif": 2,
         "'Freight Sans'": 1,
         "'Freight Sans Bold'": 1,
         "Georgia, Lucida Grande, Tahoma, Verdana, Arial, sans-serif": 3
       },
-      "uniquenessRatio": 0.40540540540540543
+      "uniquenessRatio": 0.3783783783783784
     },
     "fontSizes": {
       "total": 171,

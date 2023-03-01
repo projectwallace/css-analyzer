@@ -4,8 +4,7 @@ import { calculate } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getComplexity, isAccessibility, compareSpecificity } from './selectors/utils.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
-import { isFontFamilyKeyword, getFamilyFromFont } from './values/font-families.js'
-import { isFontSizeKeyword, getSizeFromFont } from './values/font-sizes.js'
+import { destructure, isFontKeyword } from './values/destructure-font-shorthand.js'
 import { isValueKeyword } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isAstVendorPrefixed } from './values/vendor-prefix.js'
@@ -333,23 +332,28 @@ const analyze = (css) => {
           }
           return this.skip
         } else if (isProperty('font', property)) {
-          if (!isFontFamilyKeyword(node)) {
-            fontFamilies.push(getFamilyFromFont(node, stringifyNode))
+          if (isFontKeyword(node)) return
+
+          let { font_size, line_height, font_family } = destructure(node, stringifyNode)
+
+          if (font_family) {
+            fontFamilies.push(font_family)
           }
-          if (!isFontSizeKeyword(node)) {
-            const size = getSizeFromFont(node)
-            if (size) {
-              fontSizes.push(size)
-            }
+          if (font_size) {
+            fontSizes.push(font_size)
           }
+          if (line_height) {
+            lineHeights.push(line_height)
+          }
+
           break
         } else if (isProperty('font-size', property)) {
-          if (!isFontSizeKeyword(node)) {
+          if (!isFontKeyword(node)) {
             fontSizes.push(stringifyNode(node))
           }
           break
         } else if (isProperty('font-family', property)) {
-          if (!isFontFamilyKeyword(node)) {
+          if (!isFontKeyword(node)) {
             fontFamilies.push(stringifyNode(node))
           }
           break

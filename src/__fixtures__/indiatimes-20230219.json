@@ -55475,7 +55475,7 @@
     },
     "fontFamilies": {
       "total": 70,
-      "totalUnique": 10,
+      "totalUnique": 9,
       "unique": {
         "montserrat-light": 2,
         "montserrat-regular": 17,
@@ -55485,10 +55485,9 @@
         "georgia-regular": 4,
         "montserrat-regular, Helvetica, Arial, sans-serif": 1,
         "Georgia": 1,
-        "Arial, Helvetica, sans-serif": 1,
-        "Arial,Helvetica,sans-serif": 1
+        "Arial, Helvetica, sans-serif": 2
       },
-      "uniquenessRatio": 0.14285714285714285
+      "uniquenessRatio": 0.12857142857142856
     },
     "fontSizes": {
       "total": 176,
@@ -55540,13 +55539,13 @@
       "uniquenessRatio": 0.23863636363636365
     },
     "lineHeights": {
-      "total": 114,
-      "totalUnique": 42,
+      "total": 119,
+      "totalUnique": 43,
       "unique": {
         "0": 20,
-        "1": 8,
+        "1": 10,
         "2": 1,
-        "1.5": 21,
+        "1.5": 22,
         ".9375rem": 2,
         ".75": 1,
         "1.5rem": 2,
@@ -55567,15 +55566,16 @@
         "1.6": 2,
         "19px": 1,
         "1.3": 2,
+        "1.2em": 1,
         "Infinity": 1,
         "1.6875": 1,
         "1.75": 1,
+        "1.4": 3,
         "1rem": 1,
         "1.7rem": 1,
         "16px": 3,
         "23px": 1,
         "1.7": 1,
-        "1.4": 2,
         "1.2": 3,
         "1.214": 1,
         "1.3125rem": 1,
@@ -55586,7 +55586,7 @@
         "1.88": 1,
         "1.7em": 1
       },
-      "uniquenessRatio": 0.3684210526315789
+      "uniquenessRatio": 0.36134453781512604
     },
     "zindexes": {
       "total": 99,
