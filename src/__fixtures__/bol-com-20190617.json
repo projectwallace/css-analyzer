@@ -56879,6 +56879,13 @@
         "to": 9
       },
       "uniquenessRatio": 0.1111111111111111
+    },
+    "prefixed": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0,
+      "ratio": 0
     }
   },
   "declarations": {

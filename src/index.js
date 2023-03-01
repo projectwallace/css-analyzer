@@ -91,6 +91,7 @@ const analyze = (css) => {
   // Selectors
   const keyframeSelectors = new CountableCollection()
   const uniqueSelectors = new Set()
+  const prefixedSelectors = new CountableCollection()
   /** @type [number,number,number] */
   let maxSpecificity
   /** @type [number,number,number] */
@@ -229,6 +230,10 @@ const analyze = (css) => {
 
         if (isAccessibility(node)) {
           a11y.push(selector)
+        }
+
+        if (hasVendorPrefix(selector)) {
+          prefixedSelectors.push(selector)
         }
 
         uniqueSelectors.add(selector)
@@ -621,6 +626,12 @@ const analyze = (css) => {
         ratio: ratio(a11y.size(), totalSelectors),
       }),
       keyframes: keyframeSelectors.count(),
+      prefixed: assign(
+        prefixedSelectors.count(),
+        {
+          ratio: ratio(prefixedSelectors.size(), totalSelectors),
+        },
+      )
     },
     declarations: {
       total: totalDeclarations,

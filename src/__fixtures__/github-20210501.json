@@ -26089,6 +26089,13 @@
         "50%": 2
       },
       "uniquenessRatio": 0.16666666666666666
+    },
+    "prefixed": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0,
+      "ratio": 0
     }
   },
   "declarations": {

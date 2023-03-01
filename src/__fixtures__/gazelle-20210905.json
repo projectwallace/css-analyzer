@@ -94226,6 +94226,13 @@
         "30%": 4
       },
       "uniquenessRatio": 0.1
+    },
+    "prefixed": {
+      "total": 0,
+      "totalUnique": 0,
+      "unique": {},
+      "uniquenessRatio": 0,
+      "ratio": 0
     }
   },
   "declarations": {

@@ -84,6 +84,13 @@ Selectors('handles CSS without selectors', () => {
       unique: {},
       uniquenessRatio: 0,
     },
+    prefixed: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+      ratio: 0,
+    },
   }
   assert.equal(actual, expected)
 })
@@ -314,6 +321,13 @@ Selectors('handles emoji selectors', () => {
       totalUnique: 0,
       unique: {},
       uniquenessRatio: 0,
+    },
+    prefixed: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+      ratio: 0,
     },
   }
   assert.equal(actual, expected)
