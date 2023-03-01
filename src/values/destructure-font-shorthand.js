@@ -56,7 +56,6 @@ const VARIANT_KEYWORDS = new Set([
 ])
 
 const COMMA = 44 // ','.charCodeAt(0) === 44
-const ZERO = 48 // '0'.charCodeAt(0) === 48
 const SLASH = 47 // '/'.charCodeAt(0) === 47
 
 export function destructure(value, stringifyNode) {
@@ -73,7 +72,7 @@ export function destructure(value, stringifyNode) {
 		if (
 			item.next &&
 			item.next.data.type == 'Operator' &&
-			item.next.data.value == '/'
+			item.next.data.value.charCodeAt(0) == SLASH
 		) {
 			font_size = stringifyNode(node)
 			return
@@ -83,7 +82,7 @@ export function destructure(value, stringifyNode) {
 		if (
 			item.prev &&
 			item.prev.data.type == 'Operator' &&
-			item.prev.data.value == '/'
+			item.prev.data.value.charCodeAt(0) == SLASH
 		) {
 			line_height = stringifyNode(node)
 			return
@@ -93,7 +92,7 @@ export function destructure(value, stringifyNode) {
 		if (
 			item.next &&
 			item.next.data.type == 'Operator' &&
-			item.next.data.value == ',' &&
+			item.next.data.value.charCodeAt(0) == COMMA &&
 			!font_family[0]
 		) {
 			font_family[0] = node
