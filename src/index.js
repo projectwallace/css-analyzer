@@ -91,6 +91,7 @@ const analyze = (css) => {
   // Selectors
   const keyframeSelectors = new CountableCollection()
   const uniqueSelectors = new Set()
+  const prefixedSelectors = new CountableCollection()
   /** @type [number,number,number] */
   let maxSpecificity
   /** @type [number,number,number] */
@@ -231,8 +232,14 @@ const analyze = (css) => {
           a11y.push(selector)
         }
 
+        const [complexity, isPrefixed] = getComplexity(node)
+
+        if (isPrefixed) {
+          prefixedSelectors.push(selector)
+        }
+
         uniqueSelectors.add(selector)
-        selectorComplexities.push(getComplexity(node))
+        selectorComplexities.push(complexity)
         uniqueSpecificities.push(specificity[0] + ',' + specificity[1] + ',' + specificity[2])
 
         if (maxSpecificity === undefined) {
@@ -621,6 +628,12 @@ const analyze = (css) => {
         ratio: ratio(a11y.size(), totalSelectors),
       }),
       keyframes: keyframeSelectors.count(),
+      prefixed: assign(
+        prefixedSelectors.count(),
+        {
+          ratio: ratio(prefixedSelectors.size(), totalSelectors),
+        },
+      )
     },
     declarations: {
       total: totalDeclarations,

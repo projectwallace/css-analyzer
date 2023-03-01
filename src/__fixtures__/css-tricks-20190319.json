@@ -20540,6 +20540,46 @@
         "to": 5
       },
       "uniquenessRatio": 0.2777777777777778
+    },
+    "prefixed": {
+      "total": 32,
+      "totalUnique": 32,
+      "unique": {
+        "input[type=search]::-webkit-search-cancel-button": 1,
+        "input[type=search]::-webkit-search-decoration": 1,
+        "button::-moz-focus-inner": 1,
+        "input::-moz-focus-inner": 1,
+        "pre code::-webkit-scrollbar": 1,
+        "pre code::-webkit-scrollbar-thumb": 1,
+        "pre code::-webkit-scrollbar-track": 1,
+        ".custom-select::-ms-expand": 1,
+        "html::-webkit-scrollbar": 1,
+        "html::-webkit-scrollbar-thumb": 1,
+        "html::-webkit-scrollbar-track": 1,
+        ".site-header .main-nav::-webkit-scrollbar": 1,
+        ".site-header .main-nav::-webkit-scrollbar-thumb": 1,
+        ".site-header .main-nav::-webkit-scrollbar-track": 1,
+        ".footer-jobs::-webkit-scrollbar": 1,
+        ".footer-jobs::-webkit-scrollbar-thumb": 1,
+        ".footer-jobs::-webkit-scrollbar-track": 1,
+        ".popular-articles::-webkit-scrollbar": 1,
+        ".popular-articles::-webkit-scrollbar-thumb": 1,
+        ".popular-articles::-webkit-scrollbar-track": 1,
+        ".mini-card-grid::-webkit-scrollbar": 1,
+        ".mini-card-grid::-webkit-scrollbar-thumb": 1,
+        ".mini-card-grid::-webkit-scrollbar-track": 1,
+        ".monthly-mixup::-webkit-scrollbar": 1,
+        ".monthly-mixup::-webkit-scrollbar-thumb": 1,
+        ".monthly-mixup::-webkit-scrollbar-track": 1,
+        ".all-ads::-webkit-scrollbar": 1,
+        ".all-ads::-webkit-scrollbar-thumb": 1,
+        ".all-ads::-webkit-scrollbar-track": 1,
+        ".page-header-top-nav-inside::-webkit-scrollbar": 1,
+        ".page-header-top-nav-inside::-webkit-scrollbar-thumb": 1,
+        ".page-header-top-nav-inside::-webkit-scrollbar-track": 1
+      },
+      "uniquenessRatio": 1,
+      "ratio": 0.012743926722421346
     }
   },
   "declarations": {

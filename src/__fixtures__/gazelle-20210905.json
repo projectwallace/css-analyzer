@@ -94226,6 +94226,38 @@
         "30%": 4
       },
       "uniquenessRatio": 0.1
+    },
+    "prefixed": {
+      "total": 25,
+      "totalUnique": 24,
+      "unique": {
+        ".select2-container .select2-search--inline .select2-search__field::-webkit-search-cancel-button": 1,
+        ".select2-search--dropdown .select2-search__field::-webkit-search-cancel-button": 1,
+        ".qty.field .control .input-text::-webkit-inner-spin-button": 1,
+        ".qty.field .control .input-text::-webkit-outer-spin-button": 1,
+        ".store__sort-dealers::-ms-expand": 1,
+        "button::-moz-focus-inner": 2,
+        "input::-moz-focus-inner": 1,
+        "input[type=number]::-webkit-inner-spin-button": 1,
+        "input[type=number]::-webkit-outer-spin-button": 1,
+        "input[type=search]::-webkit-search-cancel-button": 1,
+        "input[type=search]::-webkit-search-decoration": 1,
+        ".form-control::-moz-placeholder": 1,
+        ".form-control:-ms-input-placeholder": 1,
+        ".form-control::-webkit-input-placeholder": 1,
+        ".form-control::-ms-expand": 1,
+        ".mopinion-survey-content input[type=\"search\"]::-webkit-search-decoration": 1,
+        ".mopinion-survey-content input[type=\"search\"]::-webkit-search-cancel-button": 1,
+        ".mopinion-survey-content input::-webkit-input-placeholder": 1,
+        ".mopinion-survey-content textarea::-webkit-input-placeholder": 1,
+        ".mopinion-survey-content.wcag input::-webkit-input-placeholder": 1,
+        ".mopinion-survey-content.wcag textarea::-webkit-input-placeholder": 1,
+        ".mopinion-survey-content.squared::-webkit-resizer": 1,
+        ".mopinion-survey-content.rounded::-webkit-resizer": 1,
+        ".mopinion-survey-content.round::-webkit-resizer": 1
+      },
+      "uniquenessRatio": 0.96,
+      "ratio": 0.002123502930434044
     }
   },
   "declarations": {

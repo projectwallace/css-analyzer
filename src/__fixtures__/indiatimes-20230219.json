@@ -54652,6 +54652,19 @@
         "50%": 1
       },
       "uniquenessRatio": 0.3333333333333333
+    },
+    "prefixed": {
+      "total": 5,
+      "totalUnique": 5,
+      "unique": {
+        ".facebook-live::-webkit-scrollbar-track": 1,
+        ".facebook-live::-webkit-scrollbar": 1,
+        ".facebook-live::-webkit-scrollbar-thumb": 1,
+        "::-moz-selection": 1,
+        ".slider::-webkit-scrollbar": 1
+      },
+      "uniquenessRatio": 1,
+      "ratio": 0.0006275100401606426
     }
   },
   "declarations": {

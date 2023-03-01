@@ -40221,6 +40221,44 @@
         "55%": 1
       },
       "uniquenessRatio": 0.6043956043956044
+    },
+    "prefixed": {
+      "total": 30,
+      "totalUnique": 30,
+      "unique": {
+        "*::-webkit-input-placeholder": 1,
+        "*:focus::-webkit-input-placeholder": 1,
+        ".no_js *::-webkit-input-placeholder": 1,
+        "._55r1::-webkit-input-placeholder": 1,
+        "._55r1 ._58al::-webkit-input-placeholder": 1,
+        "._55r1:focus::-webkit-input-placeholder": 1,
+        "._55r1 ._58al:focus::-webkit-input-placeholder": 1,
+        "#facebook ._31nj::-webkit-input-placeholder": 1,
+        ".c-478d9::-webkit-input-placeholder": 1,
+        ".c-4b70a::-webkit-input-placeholder": 1,
+        ".b-f145b::-webkit-slider-thumb": 1,
+        ".a-a625e::-webkit-slider-thumb": 1,
+        ".bc-16e49::-webkit-slider-thumb": 1,
+        ".br-ec850::-webkit-slider-thumb": 1,
+        ".bs-1566e::-webkit-slider-thumb": 1,
+        ".h-30519::-webkit-slider-thumb": 1,
+        ".p-4043a::-webkit-slider-thumb": 1,
+        ".w-524cb::-webkit-slider-thumb": 1,
+        ".zi-4a906::-webkit-slider-thumb": 1,
+        ".b-ef683::-ms-thumb": 1,
+        ".a-97926::-ms-thumb": 1,
+        ".bc-725f8::-ms-thumb": 1,
+        ".br-8e974::-ms-thumb": 1,
+        ".bs-f035a::-ms-thumb": 1,
+        ".h-b0076::-ms-thumb": 1,
+        ".p-9bbb8::-ms-thumb": 1,
+        ".w-9b12e::-ms-thumb": 1,
+        ".zi-83296::-ms-thumb": 1,
+        ".ie10 ._4ehf input[type=\"text\"]::-ms-clear": 1,
+        ".ie11 ._4ehf input[type=\"text\"]::-ms-clear": 1
+      },
+      "uniquenessRatio": 1,
+      "ratio": 0.0066725978647686835
     }
   },
   "declarations": {

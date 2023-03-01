@@ -86,6 +86,7 @@ export function isAccessibility(selector) {
  */
 export function getComplexity(selector) {
   let complexity = 0
+  let isPrefixed = false
 
   walk(selector, function (node) {
     if (node.type == 'Selector' || node.type == 'Nth') return
@@ -99,6 +100,7 @@ export function getComplexity(selector) {
       || node.type == 'PseudoClassSelector'
     ) {
       if (hasVendorPrefix(node.name)) {
+        isPrefixed = true
         complexity++
       }
     }
@@ -108,6 +110,7 @@ export function getComplexity(selector) {
         complexity++
       }
       if (hasVendorPrefix(node.name.name)) {
+        isPrefixed = true
         complexity++
       }
       return this.skip
@@ -120,11 +123,14 @@ export function getComplexity(selector) {
         // Bail out for empty/non-existent :nth-child() params
         if (list.length === 0) return
 
-        list.forEach(c => complexity += c)
+        list.forEach(([c, p]) => {
+          complexity += c
+          if (p == true) isPrefixed = true
+        })
         return this.skip
       }
     }
   })
 
-  return complexity
+  return [complexity, isPrefixed]
 }
