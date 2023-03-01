@@ -40171,11 +40171,26 @@
       "uniquenessRatio": 0
     },
     "prefixed": {
-      "total": 0,
-      "totalUnique": 0,
-      "unique": {},
-      "uniquenessRatio": 0,
-      "ratio": 0
+      "total": 28,
+      "totalUnique": 14,
+      "unique": {
+        ".form-control::-ms-expand": 2,
+        ".form-control::-webkit-input-placeholder": 2,
+        ".form-control::-moz-placeholder": 2,
+        "select.form-control:focus::-ms-value": 2,
+        "button::-moz-focus-inner": 2,
+        "[type=\"button\"]::-moz-focus-inner": 2,
+        "[type=\"reset\"]::-moz-focus-inner": 2,
+        "[type=\"submit\"]::-moz-focus-inner": 2,
+        "[type=\"number\"]::-webkit-inner-spin-button": 2,
+        "[type=\"number\"]::-webkit-outer-spin-button": 2,
+        "[type=\"search\"]::-webkit-search-cancel-button": 2,
+        "[type=\"search\"]::-webkit-search-decoration": 2,
+        "::-webkit-file-upload-button": 2,
+        "footer div#language-picker-container select#language-picker::-ms-expand": 2
+      },
+      "uniquenessRatio": 0.5,
+      "ratio": 0.0057107893126657145
     }
   },
   "declarations": {

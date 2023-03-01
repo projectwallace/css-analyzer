@@ -232,12 +232,14 @@ const analyze = (css) => {
           a11y.push(selector)
         }
 
-        if (hasVendorPrefix(selector)) {
+        const [complexity, isPrefixed] = getComplexity(node)
+
+        if (isPrefixed) {
           prefixedSelectors.push(selector)
         }
 
         uniqueSelectors.add(selector)
-        selectorComplexities.push(getComplexity(node))
+        selectorComplexities.push(complexity)
         uniqueSpecificities.push(specificity[0] + ',' + specificity[1] + ',' + specificity[2])
 
         if (maxSpecificity === undefined) {

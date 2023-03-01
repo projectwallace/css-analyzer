@@ -333,4 +333,38 @@ Selectors('handles emoji selectors', () => {
   assert.equal(actual, expected)
 })
 
+Selectors('analyzes vendor prefixed selectors', () => {
+  let actual = analyze(`
+    input[type=text]::-webkit-input-placeholder {
+        color: green;
+    }
+    input[type=text]::-moz-placeholder {
+        color: green;
+    }
+    input[type=text]:-ms-input-placeholder {
+        color: green;
+    }
+    input[type=text]:-moz-placeholder {
+      color: green;
+    }
+
+    no-prefix,
+    fake-webkit,
+    ::-webkit-scrollbar,
+    .site-header .main-nav:hover>ul>li:nth-child(1) svg,
+    :-moz-any(header, footer) {}
+  `).selectors.prefixed
+
+  assert.is(actual.total, 6)
+  assert.is(actual.totalUnique, 6)
+  assert.equal(actual.unique, {
+    'input[type=text]::-webkit-input-placeholder': 1,
+    'input[type=text]:-ms-input-placeholder': 1,
+    '::-webkit-scrollbar': 1,
+    ':-moz-any(header, footer)': 1,
+    'input[type=text]::-moz-placeholder': 1,
+    'input[type=text]:-moz-placeholder': 1,
+  })
+})
+
 Selectors.run()

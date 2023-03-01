@@ -54654,11 +54654,17 @@
       "uniquenessRatio": 0.3333333333333333
     },
     "prefixed": {
-      "total": 0,
-      "totalUnique": 0,
-      "unique": {},
-      "uniquenessRatio": 0,
-      "ratio": 0
+      "total": 5,
+      "totalUnique": 5,
+      "unique": {
+        ".facebook-live::-webkit-scrollbar-track": 1,
+        ".facebook-live::-webkit-scrollbar": 1,
+        ".facebook-live::-webkit-scrollbar-thumb": 1,
+        "::-moz-selection": 1,
+        ".slider::-webkit-scrollbar": 1
+      },
+      "uniquenessRatio": 1,
+      "ratio": 0.0006275100401606426
     }
   },
   "declarations": {
