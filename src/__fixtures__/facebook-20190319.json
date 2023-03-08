@@ -41260,10 +41260,10 @@
       }
     },
     "fontFamilies": {
-      "total": 37,
+      "total": 36,
       "totalUnique": 14,
       "unique": {
-        "Helvetica, Arial, sans-serif": 19,
+        "Helvetica, Arial, sans-serif": 18,
         "Helvetica Neue, Helvetica, Arial, sans-serif": 1,
         "system-ui, -apple-system, BlinkMacSystemFont, '.SFNSText-Regular', sans-serif": 1,
         "'Segoe UI Historic'": 2,
@@ -41278,7 +41278,7 @@
         "'Freight Sans Bold'": 1,
         "Georgia, Lucida Grande, Tahoma, Verdana, Arial, sans-serif": 3
       },
-      "uniquenessRatio": 0.3783783783783784
+      "uniquenessRatio": 0.3888888888888889
     },
     "fontSizes": {
       "total": 171,
