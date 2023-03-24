@@ -188,6 +188,45 @@ AtRules('finds @font-face', () => {
   assert.equal(actual, expected)
 })
 
+AtRules('handles @font-face encoding issues (GH-307)', () => {
+  // Actual CSS once found in a <style> tag on vistaprint.nl
+  // CSSTree parses it without errors, but analyzer failed on it;
+  let css = `
+    @font-face {
+      font-family: &#x27;Graphik&#x27;;
+      font-stretch: normal;
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url(&#x27;https://www.vistaprint.nl/swan/v1/fonts/graphic_regular2.7c96db81b23a97fd67cbeb7e7efad583.woff2&#x27;) format(&#x27;woff2&#x27;),
+        url(&#x27;https://www.vistaprint.nl/swan/v1/fonts/graphic_regular.e694f50e9c3a4ee999da756a90b0e872.woff&#x27;) format(&#x27;woff&#x27;);
+    }
+
+    @font-face {
+      font-family: &#x27;Graphik&#x27;;
+      font-stretch: normal;
+      font-style: normal;
+      font-weight: 700;
+      font-display: swap;
+      src: url(&#x27;https://www.vistaprint.nl/swan/v1/fonts/graphic_medium2.3829398551b96ac319a48122465462c2.woff2&#x27;) format(&#x27;woff2&#x27;),
+        url(&#x27;https://www.vistaprint.nl/swan/v1/fonts/graphic_medium.1e5761591bb4bdd7e1d6ef96bb7cef90.woff&#x27;) format(&#x27;woff&#x27;);
+    }
+  `
+  assert.not.throws(() => analyze(css))
+
+  let actual = analyze(css).atrules.fontface
+  assert.is(actual.total, 2)
+  assert.equal(actual.unique.at(0), {
+    'font-family': `&#x27`,
+    'font-stretch': `normal`,
+    'font-style': `normal`,
+    'font-weight': `400`,
+    'font-display': `swap`,
+    'src': `url(&#x27;https://www.vistaprint.nl/swan/v1/fonts/graphic_regular2.7c96db81b23a97fd67cbeb7e7efad583.woff2&#x27;) format(&#x27;woff2&#x27;),
+        url(&#x27;https://www.vistaprint.nl/swan/v1/fonts/graphic_regular.e694f50e9c3a4ee999da756a90b0e872.woff&#x27;) format(&#x27;woff&#x27;)`
+  })
+})
+
 AtRules('finds @imports', () => {
   const fixture = `
     @import "https://example.com/without-url";
