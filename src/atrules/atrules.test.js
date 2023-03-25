@@ -216,7 +216,7 @@ AtRules('handles @font-face encoding issues (GH-307)', () => {
 
   let actual = analyze(css).atrules.fontface
   assert.is(actual.total, 2)
-  assert.equal(actual.unique.at(0), {
+  assert.equal(actual.unique[0], {
     'font-family': `&#x27`,
     'font-stretch': `normal`,
     'font-style': `normal`,
