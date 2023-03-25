@@ -145,10 +145,12 @@ const analyze = (css) => {
           /** @type {[index: string]: string} */
           const descriptors = {}
 
-          node.block.children.forEach(
-            /** @param {import('css-tree').Declaration} descriptor */
-            descriptor => (descriptors[descriptor.property] = stringifyNode(descriptor.value))
-          )
+          node.block.children.forEach(descriptor => {
+            // Ignore 'Raw' nodes in case of CSS syntax errors
+            if (descriptor.type == 'Declaration') {
+              descriptors[descriptor.property] = stringifyNode(descriptor.value)
+            }
+          })
 
           fontfaces.push(descriptors)
           break
