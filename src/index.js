@@ -28,7 +28,6 @@ function ratio(part, total) {
  */
 const analyze = (css) => {
   const start = Date.now()
-  let lines = css.split(/\r?\n/g)
 
   /**
    * Recreate the authored CSS from a CSSTree node
@@ -55,9 +54,11 @@ const analyze = (css) => {
 
   const startParse = Date.now()
 
+  /** @type import('css-tree').CssNode */
   const ast = parse(css, {
     parseCustomProperty: true, // To find font-families, colors, etc.
     positions: true, // So we can use stringifyNode()
+    /** @param {string} comment */
     onComment: function (comment) {
       totalComments++
       commentsSize += comment.length
@@ -65,6 +66,7 @@ const analyze = (css) => {
   })
 
   const startAnalysis = Date.now()
+  let linesOfCode = ast.loc.end.line - ast.loc.start.line + 1
 
   // Atrules
   let totalAtRules = 0
@@ -510,7 +512,7 @@ const analyze = (css) => {
   return {
     stylesheet: {
       sourceLinesOfCode: totalAtRules + totalSelectors + totalDeclarations + keyframeSelectors.size(),
-      linesOfCode: lines.length,
+      linesOfCode,
       size: css.length,
       comments: {
         total: totalComments,
