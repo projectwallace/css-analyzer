@@ -19,7 +19,6 @@ Api('does not break on CSS Syntax Errors', () => {
 
 Api('handles empty input gracefully', () => {
   const actual = analyze('')
-  delete actual.__meta__
   const expected = {
     "stylesheet": {
       "sourceLinesOfCode": 0,
@@ -375,36 +374,6 @@ Api('handles empty input gracefully', () => {
   }
 
   assert.equal(actual, expected)
-})
-
-Api('has metadata', () => {
-  const fixture = Array.from({ length: 10 }).map(_ => `
-    html {
-      font: 1em/1 sans-serif;
-      color: rgb(0 0 0 / 0.5);
-    }
-
-    @media screen {
-      @supports (display: grid) {
-        test::after :where(test) :is(done) {
-          display: grid;
-          color: #f00;
-        }
-      }
-    }
-  `).join('')
-
-  const result = analyze(fixture)
-  const actual = result.__meta__
-
-  assert.type(actual.parseTime, 'number')
-  assert.ok(actual.parseTime > 0, `expected parseTime to be bigger than 0, got ${actual.parseTime}`)
-
-  assert.type(actual.analyzeTime, 'number')
-  assert.ok(actual.analyzeTime > 0, `expected analyzeTime to be bigger than 0, got ${actual.parseTime}`)
-
-  assert.type(actual.total, 'number')
-  assert.ok(actual.total > 0, `expected total time to be bigger than 0, got ${actual.parseTime}`)
 })
 
 Api.run()

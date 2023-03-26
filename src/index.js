@@ -28,9 +28,6 @@ function ratio(part, total) {
  * @param {string} css
  */
 const analyze = (css) => {
-  const start = Date.now()
-  let lines = css.split(/\r?\n/g)
-
   /**
    * Recreate the authored CSS from a CSSTree node
    * @param {import('css-tree').CssNode} node - Node from CSSTree AST to stringify
@@ -40,6 +37,7 @@ const analyze = (css) => {
     return stringifyNodePlain(node).trim()
   }
 
+  /** @param {import('css-tree').CssNode} node */
   function stringifyNodePlain(node) {
     return css.substring(node.loc.start.offset, node.loc.end.offset)
   }
@@ -54,18 +52,16 @@ const analyze = (css) => {
     unique: new Map()
   }
 
-  const startParse = Date.now()
-
+  /** @type import('css-tree').CssNode */
   const ast = parse(css, {
     parseCustomProperty: true, // To find font-families, colors, etc.
     positions: true, // So we can use stringifyNode()
+    /** @param {string} comment */
     onComment: function (comment) {
       totalComments++
       commentsSize += comment.length
     },
   })
-
-  const startAnalysis = Date.now()
 
   // Atrules
   let totalAtRules = 0
@@ -497,7 +493,7 @@ const analyze = (css) => {
   return {
     stylesheet: {
       sourceLinesOfCode: totalAtRules + totalSelectors + totalDeclarations + keyframeSelectors.size(),
-      linesOfCode: lines.length,
+      linesOfCode: lines,
       size: css.length,
       comments: {
         total: totalComments,
@@ -683,11 +679,6 @@ const analyze = (css) => {
       prefixes: vendorPrefixedValues.count(),
       browserhacks: valueBrowserhacks.count(),
       units: units.count(),
-    },
-    __meta__: {
-      parseTime: startAnalysis - startParse,
-      analyzeTime: Date.now() - startAnalysis,
-      total: Date.now() - start
     }
   }
 }
