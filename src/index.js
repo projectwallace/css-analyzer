@@ -18,6 +18,10 @@ import { isCustom, isHack, isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
 
+/**
+ * @param {number} part
+ * @param {number} total
+ */
 function ratio(part, total) {
   if (total === 0) return 0
   return part / total
@@ -62,6 +66,9 @@ const analyze = (css) => {
       commentsSize += comment.length
     },
   })
+  /** @type import('css-tree').CssLocation */
+  let stylesheet = ast.loc
+  let linesOfCode = stylesheet.end.line - stylesheet.start.line + 1
 
   // Atrules
   let totalAtRules = 0
@@ -493,7 +500,7 @@ const analyze = (css) => {
   return {
     stylesheet: {
       sourceLinesOfCode: totalAtRules + totalSelectors + totalDeclarations + keyframeSelectors.size(),
-      linesOfCode: lines,
+      linesOfCode,
       size: css.length,
       comments: {
         total: totalComments,
