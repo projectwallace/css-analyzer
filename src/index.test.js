@@ -30,9 +30,6 @@ Api('handles empty input gracefully', () => {
       },
       "embeddedContent": {
         "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0,
         "size": {
           "total": 0,
           "ratio": 0

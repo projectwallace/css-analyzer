@@ -49,15 +49,14 @@ const analyze = (css) => {
   // Stylesheet
   let totalComments = 0
   let commentsSize = 0
-  const embeds = new CountableCollection()
   let embedSize = 0
-  const embedTypes = {
+  let embedTypes = {
     total: 0,
     unique: new Map()
   }
 
   /** @type import('css-tree').CssNode */
-  const ast = parse(css, {
+  let ast = parse(css, {
     parseCustomProperty: true, // To find font-families, colors, etc.
     positions: true, // So we can use stringifyNode()
     /** @param {string} comment */
@@ -300,9 +299,6 @@ const analyze = (css) => {
               size
             })
           }
-
-          // @deprecated
-          embeds.push(embed)
         }
         break
       }
@@ -481,8 +477,6 @@ const analyze = (css) => {
     }
   })
 
-  const embeddedContent = embeds.count()
-
   const totalUniqueDeclarations = uniqueDeclarations.size
 
   const totalSelectors = selectorComplexities.size()
@@ -506,7 +500,8 @@ const analyze = (css) => {
         total: totalComments,
         size: commentsSize,
       },
-      embeddedContent: assign(embeddedContent, {
+      embeddedContent: {
+        total: embedTypes.total,
         size: {
           total: embedSize,
           ratio: ratio(embedSize, css.length),
@@ -517,7 +512,7 @@ const analyze = (css) => {
           uniquenessRatio: ratio(embedTypes.unique.size, embedTypes.total),
           unique: Object.fromEntries(embedTypes.unique),
         },
-      }),
+      },
     },
     atrules: {
       fontface: {
