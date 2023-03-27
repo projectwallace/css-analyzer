@@ -1,3 +1,5 @@
+import { is_identifier } from '../css-node.js'
+
 const keywords = new Set([
   'auto',
   'inherit',
@@ -7,11 +9,12 @@ const keywords = new Set([
   'none', // for `text-shadow`, `box-shadow` and `background`
 ])
 
+/** @param {import('css-tree').CssNode} node */
 export function isValueKeyword(node) {
   if (!node.children) return false
   const firstChild = node.children.first
   if (!firstChild) return false
 
   if (node.children.size > 1) return false
-  return firstChild.type === 'Identifier' && keywords.has(firstChild.name)
+  return is_identifier(firstChild.type) && keywords.has(firstChild.name)
 }

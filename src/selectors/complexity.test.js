@@ -19,7 +19,8 @@ const fixture = `
   main > :is(h1, h2),
   input[type=text]::-webkit-input-placeholder,
   ::-webkit-scrollbar,
-  :-moz-any(header, footer) {}
+  :-moz-any(header, footer),
+  .site-header .main-nav:hover>ul>li:nth-child(1) svg {}
 `
 
 Complexity('calculates complexity', () => {
@@ -40,6 +41,7 @@ Complexity('calculates complexity', () => {
     5,
     2,
     4,
+    12,
   ]
 
   assert.equal(actual, expected)
@@ -51,7 +53,6 @@ Complexity('calculates complexity with vendor prefixes', () => {
   fake-webkit,
   input[type=text]::-webkit-input-placeholder,
   ::-webkit-scrollbar,
-  .site-header .main-nav:hover>ul>li:nth-child(1) svg,
   :-moz-any(header, footer) {}
   `).selectors.complexity
 
@@ -59,7 +60,6 @@ Complexity('calculates complexity with vendor prefixes', () => {
     '1': 2,
     '5': 1,
     '2': 1,
-    '12': 1,
     '4': 1,
   })
 })
@@ -72,10 +72,11 @@ Complexity('calculates complexity uniqueness', () => {
     '3': 5,
     '4': 1,
     '5': 2,
+    12: 1,
   }
 
-  assert.is(actual.totalUnique, 5)
-  assert.is(actual.uniquenessRatio, 5 / 15)
+  assert.is(actual.totalUnique, 6)
+  assert.is(actual.uniquenessRatio, 6 / 16)
   assert.equal(actual.unique, expected)
 })
 

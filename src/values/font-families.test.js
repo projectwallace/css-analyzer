@@ -64,10 +64,10 @@ FontFamilies('extracts the `font` shorthand', () => {
     totalUnique: 6,
     unique: {
       [`'Noto Sans'`]: 1,
-      '"Source Sans Pro",serif': 1,
+      '"Source Sans Pro", serif': 1,
       'serif': 5,
-      '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"': 1,
-      'Consolas,"Liberation Mono",Menlo,Courier,monospace': 1,
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"': 1,
+      'Consolas, "Liberation Mono", Menlo, Courier, monospace': 1,
       'a': 1,
     },
     uniquenessRatio: 6 / 10

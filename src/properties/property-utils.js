@@ -19,12 +19,17 @@ export function isHack(property) {
     || code === 35 // #
 }
 
+/** @param {string} property */
 export function isCustom(property) {
   if (property.length < 3) return false
   // 45 === '-'.charCodeAt(0)
   return property.charCodeAt(0) === 45 && property.charCodeAt(1) === 45
 }
 
+/**
+ * @param {string} basename - e.g. `animation` (no prefix)
+ * @param {string} property - e.g. `-webkit-animation` (potential prefix)
+ */
 export function isProperty(basename, property) {
   if (isCustom(property)) return false
   return endsWith(basename, property)

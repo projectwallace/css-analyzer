@@ -4,8 +4,9 @@ import { calculate } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getComplexity, isAccessibility, compareSpecificity } from './selectors/utils.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
-import { isFontFamilyKeyword, getFamilyFromFont } from './values/font-families.js'
-import { isFontSizeKeyword, getSizeFromFont } from './values/font-sizes.js'
+// import { isFontFamilyKeyword, getFamilyFromFont } from './values/font-families.js'
+import { destructure, isFontKeyword } from './values/destructure-font-shorthand.js'
+// import { isFontSizeKeyword, getSizeFromFont } from './values/font-sizes.js'
 import { isValueKeyword } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isAstVendorPrefixed } from './values/vendor-prefix.js'
@@ -17,6 +18,18 @@ import { hasVendorPrefix } from './vendor-prefix.js'
 import { isCustom, isHack, isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
+import {
+  is_atrule,
+  is_declaration,
+  is_dimension,
+  is_function,
+  is_hash,
+  is_identifier,
+  is_rule,
+  is_selector,
+  is_url,
+  is_value,
+} from './css-node.js'
 
 /**
  * @param {number} part
@@ -94,6 +107,7 @@ const analyze = (css) => {
   // Selectors
   const keyframeSelectors = new CountableCollection()
   const uniqueSelectors = new Set()
+  const prefixedSelectors = new CountableCollection()
   /** @type [number,number,number] */
   let maxSpecificity
   /** @type [number,number,number] */
@@ -137,40 +151,46 @@ const analyze = (css) => {
   const colorFormats = new CountableCollection()
   const units = new ContextCollection()
 
-  walk(ast, function (node) {
-    switch (node.type) {
-      case 'Atrule': {
+  walk(
+    ast,
+    /** @param {import('css-tree').CssNode} node */
+    function (node) {
+      let node_type = node.type
+
+      if (is_atrule(node_type)) {
         totalAtRules++
         const atRuleName = node.name
 
-        if (atRuleName === 'font-face') {
+        if (strEquals('font-face', atRuleName)) {
           /** @type {[index: string]: string} */
           const descriptors = {}
 
-          node.block.children.forEach(
-            /** @param {import('css-tree').Declaration} descriptor */
-            descriptor => (descriptors[descriptor.property] = stringifyNode(descriptor.value))
-          )
+          node.block.children.forEach(descriptor => {
+            // Ignore 'Raw' nodes in case of CSS syntax errors
+            if (is_declaration(descriptor.type)) {
+              descriptors[descriptor.property] = stringifyNode(descriptor.value)
+            }
+          })
 
           fontfaces.push(descriptors)
-          break
+          return
         }
 
-        if (atRuleName === 'media') {
+        if (strEquals('media', atRuleName)) {
           const prelude = stringifyNode(node.prelude)
           medias.push(prelude)
           if (isMediaBrowserhack(node.prelude)) {
             mediaBrowserhacks.push(prelude)
           }
-          break
+          return
         }
-        if (atRuleName === 'supports') {
+        if (strEquals('supports', atRuleName)) {
           const prelude = stringifyNode(node.prelude)
           supports.push(prelude)
           if (isSupportsBrowserhack(node.prelude)) {
             supportsBrowserhacks.push(prelude)
           }
-          break
+          return
         }
         if (endsWith('keyframes', atRuleName)) {
           const name = '@' + atRuleName + ' ' + stringifyNode(node.prelude)
@@ -178,29 +198,30 @@ const analyze = (css) => {
             prefixedKeyframes.push(name)
           }
           keyframes.push(name)
-          break
+          return
         }
-        if (atRuleName === 'import') {
+        if (strEquals('import', atRuleName)) {
           imports.push(stringifyNode(node.prelude))
-          break
+          return
         }
-        if (atRuleName === 'charset') {
+        if (strEquals('charset', atRuleName)) {
           charsets.push(stringifyNode(node.prelude))
-          break
+          return
         }
-        if (atRuleName === 'container') {
+        if (strEquals('container', atRuleName)) {
           containers.push(stringifyNode(node.prelude))
-          break
+          return
         }
-        if (atRuleName === 'layer') {
+        if (strEquals('layer', atRuleName)) {
           const prelude = stringifyNode(node.prelude)
           prelude
             .split(',')
             .forEach(name => layers.push(name.trim()))
         }
-        break
+        return
       }
-      case 'Rule': {
+
+      if (is_rule(node_type)) {
         const numSelectors = node.prelude.children ? node.prelude.children.size : 0
         const numDeclarations = node.block.children ? node.block.children.size : 0
 
@@ -213,9 +234,11 @@ const analyze = (css) => {
         if (numDeclarations === 0) {
           emptyRules++
         }
-        break
+
+        return
       }
-      case 'Selector': {
+
+      if (is_selector(node_type)) {
         const selector = stringifyNode(node)
 
         if (this.atrule && endsWith('keyframes', this.atrule.name)) {
@@ -234,8 +257,14 @@ const analyze = (css) => {
           a11y.push(selector)
         }
 
+        let [complexity, isPrefixed] = getComplexity(node)
+
+        if (isPrefixed) {
+          prefixedSelectors.push(selector)
+        }
+
         uniqueSelectors.add(selector)
-        selectorComplexities.push(getComplexity(node))
+        selectorComplexities.push(complexity)
         uniqueSpecificities.push(specificity[0] + ',' + specificity[1] + ',' + specificity[2])
 
         if (maxSpecificity === undefined) {
@@ -266,9 +295,10 @@ const analyze = (css) => {
         // as children
         return this.skip
       }
-      case 'Dimension': {
+
+      if (is_dimension(node_type)) {
         if (!this.declaration) {
-          break
+          return
         }
 
         if (endsWith('\\9', node.unit)) {
@@ -279,7 +309,8 @@ const analyze = (css) => {
 
         return this.skip
       }
-      case 'Url': {
+
+      if (is_url(node_type)) {
         if (startsWith('data:', node.value)) {
           var embed = node.value
           var size = embed.length
@@ -300,11 +331,12 @@ const analyze = (css) => {
             })
           }
         }
-        break
+        return
       }
-      case 'Value': {
+
+      if (is_value(node_type)) {
         if (isValueKeyword(node)) {
-          break
+          return
         }
 
         const declaration = this.declaration
@@ -330,30 +362,35 @@ const analyze = (css) => {
           if (!isValueKeyword(node)) {
             zindex.push(stringifyNode(node))
           }
-          return this.skip
+          return
         } else if (isProperty('font', property)) {
-          if (!isFontFamilyKeyword(node)) {
-            fontFamilies.push(getFamilyFromFont(node, stringifyNode))
+          if (isFontKeyword(node)) return
+
+          let { font_size, line_height, font_family } = destructure(node, stringifyNode)
+
+          if (font_family) {
+            fontFamilies.push(font_family)
           }
-          if (!isFontSizeKeyword(node)) {
-            const size = getSizeFromFont(node)
-            if (size) {
-              fontSizes.push(size)
-            }
+          if (font_size) {
+            fontSizes.push(font_size)
           }
-          break
+          if (line_height) {
+            lineHeights.push(line_height)
+          }
+          return
         } else if (isProperty('font-size', property)) {
-          if (!isFontSizeKeyword(node)) {
+          if (!isFontKeyword(node)) {
             fontSizes.push(stringifyNode(node))
           }
-          break
+          return
         } else if (isProperty('font-family', property)) {
-          if (!isFontFamilyKeyword(node)) {
+          if (!isFontKeyword(node)) {
             fontFamilies.push(stringifyNode(node))
           }
-          break
+          return
         } else if (isProperty('line-height', property)) {
           lineHeights.push((stringifyNode(node)))
+          return
         } else if (isProperty('transition', property) || isProperty('animation', property)) {
           const [times, fns] = analyzeAnimation(node.children, stringifyNode)
           for (let i = 0; i < times.length; i++) {
@@ -362,79 +399,85 @@ const analyze = (css) => {
           for (let i = 0; i < fns.length; i++) {
             timingFunctions.push(fns[i])
           }
-          break
+          return
         } else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
           durations.push(stringifyNode(node))
-          break
+          return
         } else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
           timingFunctions.push(stringifyNode(node))
-          break
+          return
         } else if (isProperty('text-shadow', property)) {
           if (!isValueKeyword(node)) {
             textShadows.push(stringifyNode(node))
           }
-          // no break here: potentially contains colors
+          // no return here: potentially contains colors
         } else if (isProperty('box-shadow', property)) {
           if (!isValueKeyword(node)) {
             boxShadows.push(stringifyNode(node))
           }
-          // no break here: potentially contains colors
+          // no return here: potentially contains colors
         }
 
         walk(node, function (valueNode) {
-          switch (valueNode.type) {
-            case 'Hash': {
-              let hexLength = valueNode.value.length
-              if (endsWith('\\9', valueNode.value)) {
-                hexLength = hexLength - 2
-              }
-              colors.push('#' + valueNode.value, property)
-              colorFormats.push(`hex` + hexLength)
+          if (is_hash(valueNode.type)) {
+            let hexLength = valueNode.value.length
+            if (endsWith('\\9', valueNode.value)) {
+              hexLength = hexLength - 2
+            }
+            colors.push('#' + valueNode.value, property)
+            colorFormats.push(`hex` + hexLength)
 
+            return this.skip
+          }
+
+          if (is_identifier(valueNode.type)) {
+            const { name } = valueNode
+            // Bail out if it can't be a color name
+            // 20 === 'lightgoldenrodyellow'.length
+            // 3 === 'red'.length
+            if (name.length > 20 || name.length < 3) {
               return this.skip
             }
-            case 'Identifier': {
-              const { name } = valueNode
-              // Bail out if it can't be a color name
-              // 20 === 'lightgoldenrodyellow'.length
-              // 3 === 'red'.length
-              if (name.length > 20 || name.length < 3) {
-                return this.skip
-              }
-              const stringified = stringifyNode(valueNode)
-              const lowerCased = name.toLowerCase()
+            const stringified = stringifyNode(valueNode)
+            const lowerCased = name.toLowerCase()
 
-              if (namedColors.has(lowerCased)) {
-                colors.push(stringified, property)
-                colorFormats.push('named')
-              } else if (colorKeywords.has(lowerCased)) {
-                colors.push(stringified, property)
-                colorFormats.push(lowerCased)
-              } else if (systemColors.has(lowerCased)) {
-                colors.push(stringified, property)
-                colorFormats.push('system')
-              }
+            if (namedColors.has(lowerCased)) {
+              colors.push(stringified, property)
+              colorFormats.push('named')
+              return
+            }
+            if (colorKeywords.has(lowerCased)) {
+              colors.push(stringified, property)
+              colorFormats.push(lowerCased)
+              return
+            }
+            if (systemColors.has(lowerCased)) {
+              colors.push(stringified, property)
+              colorFormats.push('system')
+              return
+            }
+            return this.skip
+          }
+
+          if (is_function(valueNode.type)) {
+            // Don't walk var() multiple times
+            if (strEquals('var', valueNode.name)) {
               return this.skip
             }
-            case 'Function': {
-              // Don't walk var() multiple times
-              if (strEquals('var', valueNode.name)) {
-                return this.skip
-              }
-              const fnName = valueNode.name.toLowerCase()
-              const stringified = stringifyNode(valueNode)
-              if (colorFunctions.has(fnName)) {
-                colors.push(stringified, property)
-                colorFormats.push(fnName)
-              }
-              // No this.skip here intentionally,
-              // otherwise we'll miss colors in linear-gradient() etc.
+            const fnName = valueNode.name.toLowerCase()
+            const stringified = stringifyNode(valueNode)
+            if (colorFunctions.has(fnName)) {
+              colors.push(stringified, property)
+              colorFormats.push(fnName)
             }
+            // No this.skip here intentionally,
+            // otherwise we'll miss colors in linear-gradient() etc.
           }
         })
-        break
+        return
       }
-      case 'Declaration': {
+
+      if (is_declaration(node_type)) {
         // Do not process Declarations in atRule preludes
         // because we will handle them manually
         if (this.atrulePrelude !== null) {
@@ -460,22 +503,26 @@ const analyze = (css) => {
         if (hasVendorPrefix(property)) {
           propertyVendorPrefixes.push(property)
           propertyComplexities.push(2)
-        } else if (isHack(property)) {
+          return
+        }
+        if (isHack(property)) {
           propertyHacks.push(property)
           propertyComplexities.push(2)
-        } else if (isCustom(property)) {
+          return
+        }
+        if (isCustom(property)) {
           customProperties.push(property)
           propertyComplexities.push(2)
           if (node.important === true) {
             importantCustomProperties.push(property)
           }
-        } else {
-          propertyComplexities.push(1)
+          return
         }
-        break
+
+        propertyComplexities.push(1)
+        return
       }
-    }
-  })
+    })
 
   const totalUniqueDeclarations = uniqueDeclarations.size
 
@@ -615,6 +662,12 @@ const analyze = (css) => {
         ratio: ratio(a11y.size(), totalSelectors),
       }),
       keyframes: keyframeSelectors.count(),
+      prefixed: assign(
+        prefixedSelectors.count(),
+        {
+          ratio: ratio(prefixedSelectors.size(), totalSelectors),
+        },
+      )
     },
     declarations: {
       total: totalDeclarations,

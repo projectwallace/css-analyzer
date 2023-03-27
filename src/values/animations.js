@@ -1,3 +1,10 @@
+import {
+  is_dimension,
+  is_function,
+  is_identifier,
+  is_operator
+} from '../css-node.js'
+
 const timingKeywords = new Set([
   'linear',
   'ease',
@@ -14,22 +21,19 @@ export function analyzeAnimation(children, stringifyNode) {
   const timingFunctions = []
 
   children.forEach(child => {
+    let type = child.type
     // Right after a ',' we start over again
-    if (child.type === 'Operator') {
+    if (is_operator(type)) {
       return durationFound = false
     }
-    if (child.type === 'Dimension' && durationFound === false) {
+    if (is_dimension(type) && durationFound === false) {
       durationFound = true
       return durations.push(stringifyNode(child))
     }
-    if (child.type === 'Identifier' && timingKeywords.has(child.name)) {
+    if (is_identifier(type) && timingKeywords.has(child.name)) {
       return timingFunctions.push(stringifyNode(child))
     }
-    if (child.type === 'Function'
-      && (
-        child.name === 'cubic-bezier' || child.name === 'steps'
-      )
-    ) {
+    if (is_function(type) && (child.name === 'cubic-bezier' || child.name === 'steps')) {
       return timingFunctions.push(stringifyNode(child))
     }
   })

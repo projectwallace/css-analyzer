@@ -1,5 +1,11 @@
 import { strEquals, startsWith, endsWith } from '../string-utils.js'
 import walk from 'css-tree/walker'
+import {
+  is_declaration,
+  is_identifier,
+  is_media_feature,
+  is_media_query
+} from '../css-node.js'
 
 /**
  * Check whether node.property === property and node.value === value,
@@ -11,7 +17,7 @@ import walk from 'css-tree/walker'
  */
 function isPropertyValue(node, property, value) {
   return strEquals(property, node.property)
-    && node.value.children.first.type === 'Identifier'
+    && is_identifier(node.value.children.first.type)
     && strEquals(value, node.value.children.first.name)
 }
 
@@ -24,7 +30,7 @@ export function isSupportsBrowserhack(prelude) {
   let returnValue = false
 
   walk(prelude, function (node) {
-    if (node.type === 'Declaration') {
+    if (is_declaration(node.type)) {
       if (
         isPropertyValue(node, '-webkit-appearance', 'none')
         || isPropertyValue(node, '-moz-appearance', 'meterbar')
@@ -47,9 +53,9 @@ export function isMediaBrowserhack(prelude) {
   let returnValue = false
 
   walk(prelude, function (node) {
-    if (node.type === 'MediaQuery'
+    if (is_media_query(node.type)
       && node.children.size === 1
-      && node.children.first.type === 'Identifier'
+      && is_identifier(node.children.first.type)
     ) {
       node = node.children.first
       // Note: CSSTree adds a trailing space to \\9
@@ -58,7 +64,7 @@ export function isMediaBrowserhack(prelude) {
         return this.break
       }
     }
-    if (node.type === 'MediaFeature') {
+    if (is_media_feature(node.type)) {
       if (node.value !== null && node.value.unit === '\\0') {
         returnValue = true
         return this.break

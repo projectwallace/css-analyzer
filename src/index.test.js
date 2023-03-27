@@ -222,6 +222,13 @@ Api('handles empty input gracefully', () => {
         "totalUnique": 0,
         "unique": {},
         "uniquenessRatio": 0
+      },
+      "prefixed": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0,
+        ratio: 0,
       }
     },
     "declarations": {
