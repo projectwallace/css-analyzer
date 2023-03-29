@@ -54846,14 +54846,7 @@
         "--fifa-blue": 1
       },
       "uniquenessRatio": 1,
-      "ratio": 0.0024163568773234202,
-      "importants": {
-        "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0,
-        "ratio": 0
-      }
+      "ratio": 0.0024163568773234202
     },
     "browserhacks": {
       "total": 0,

@@ -1,17 +1,17 @@
 import { AutoGrowBuffer } from '../auto-grow-buffer.js'
 
-/** @param tokenArray {Uint16Array} */
-function is_prefixed(tokenArray) {
-	if (tokenArray.length < 3) return false
-	if (tokenArray[0] == 45 && tokenArray[1] != 45) {
-		return tokenArray.indexOf(45, 2) !== -1
+/** @param property {string} */
+function is_prefixed(property) {
+	if (property.length < 3) return false
+	if (property.charCodeAt(0) == 45 && property.charCodeAt(1) != 45) {
+		return property.indexOf('-', 2) !== -1
 	}
 	return false
 }
 
-/** @param tokenArray {Uint16Array} */
-function is_browserhack(tokenArray) {
-	let code = tokenArray[0]
+/** @param property {string} */
+function is_browserhack(property) {
+	let code = property.charCodeAt(0)
 
 	return code === 47 // /
 		|| code === 95 // _
@@ -22,10 +22,10 @@ function is_browserhack(tokenArray) {
 		|| code === 35 // #
 }
 
-/** @param tokenArray {Uint16Array} */
-function is_custom(tokenArray) {
-	if (tokenArray.length < 3) return false
-	return tokenArray[0] == 45 && tokenArray[1] == 45
+/** @param property {string} */
+function is_custom(property) {
+	if (property.length < 3) return false
+	return property.charCodeAt(0) == 45 && property.charCodeAt(1) == 45
 }
 
 export class PropertiesCollection {
@@ -45,14 +45,15 @@ export class PropertiesCollection {
 	/**
 	 *
 	 * @param {number} hash
-	 * @param {Uint16Array} tokenArray
+	 * @param {string} property
 	 * @param {number} nodeIndex
 	 */
-	add(hash, tokenArray, nodeIndex) {
-		let list = this.unique.get(hash)
-		let custom = is_custom(tokenArray)
-		let prefix = is_prefixed(tokenArray)
-		let hack = !custom && !prefix && is_browserhack(tokenArray)
+	add(hash, property, nodeIndex) {
+		this.total++
+
+		let custom = is_custom(property)
+		let prefix = is_prefixed(property)
+		let hack = !custom && !prefix && is_browserhack(property)
 		let value = 0
 
 		if (custom) {
@@ -68,6 +69,8 @@ export class PropertiesCollection {
 			this.total_prefixed++
 		}
 
+		let list = this.unique.get(hash)
+
 		if (list) {
 			list.push(nodeIndex)
 		} else {
@@ -81,7 +84,6 @@ export class PropertiesCollection {
 		}
 
 		this.unique.set(hash, list)
-		this.total++
 	}
 
 	/**

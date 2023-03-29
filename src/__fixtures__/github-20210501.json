@@ -27846,14 +27846,7 @@
         "--color-ansi-cyan-bright": 9
       },
       "uniquenessRatio": 0.1117587061052018,
-      "ratio": 0.6308484235683427,
-      "importants": {
-        "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0,
-        "ratio": 0
-      }
+      "ratio": 0.6308484235683427
     },
     "browserhacks": {
       "total": 0,

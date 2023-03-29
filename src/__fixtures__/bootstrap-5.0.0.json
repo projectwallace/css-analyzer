@@ -24328,14 +24328,7 @@
         "--bs-aspect-ratio": 4
       },
       "uniquenessRatio": 0.19889502762430938,
-      "ratio": 0.044243461256416525,
-      "importants": {
-        "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0,
-        "ratio": 0
-      }
+      "ratio": 0.044243461256416525
     },
     "browserhacks": {
       "total": 0,

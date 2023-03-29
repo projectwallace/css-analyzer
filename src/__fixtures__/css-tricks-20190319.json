@@ -20855,14 +20855,7 @@
         "--borderWidth": 1
       },
       "uniquenessRatio": 0.42857142857142855,
-      "ratio": 0.001506672406371072,
-      "importants": {
-        "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0,
-        "ratio": 0
-      }
+      "ratio": 0.001506672406371072
     },
     "browserhacks": {
       "total": 0,

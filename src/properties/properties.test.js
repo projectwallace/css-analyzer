@@ -155,7 +155,8 @@ Properties('calculates property complexity', () => {
   assert.is(actual.sum, 7)
 })
 
-Properties('counts the amount of !important used on custom properties', () => {
+/** @TODO: move to Declarations */
+Properties.skip('counts the amount of !important used on custom properties', () => {
   const fixture = `
     .property {
       color: blue;

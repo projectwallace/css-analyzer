@@ -266,13 +266,6 @@ Api('handles empty input gracefully', () => {
         "unique": {},
         "uniquenessRatio": 0,
         "ratio": 0,
-        "importants": {
-          total: 0,
-          totalUnique: 0,
-          unique: {},
-          uniquenessRatio: 0,
-          ratio: 0,
-        },
       },
       "browserhacks": {
         "total": 0,

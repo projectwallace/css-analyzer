@@ -156,15 +156,10 @@ const analyze = (css) => {
   let totalDeclarations = 0
   let importantDeclarations = 0
   let importantsInKeyframes = 0
-  let importantCustomProperties = new CountableCollection()
+  // let importantCustomProperties = new CountableCollection()
 
   // Properties
-  let props = new PropertiesCollection()
-  const properties = new CountableCollection()
-  const propertyHacks = new CountableCollection()
-  const propertyVendorPrefixes = new CountableCollection()
-  const customProperties = new CountableCollection()
-  const propertyComplexities = new AggregateCollection()
+  let properties = new PropertiesCollection()
 
   // Values
   const vendorPrefixedValues = new CountableCollection()
@@ -527,41 +522,14 @@ const analyze = (css) => {
           }
         }
 
-        const { property } = node
-
-        // properties.push(property)
-
-        // NEW NEW NEW NEW NEW NEW
         // replace end to only include the property, not the whole Declaration node
         node.loc.end.offset = node.loc.start.offset + node.property.length
         let tokens = createTokenArray(node)
-        props.add(
+        properties.add(
           hashArray(tokens),
-          tokens,
+          node.property,
           interesting_nodes.add(node)
         )
-        // END NEW END NEW END NEW
-
-        if (hasVendorPrefix(property)) {
-          propertyVendorPrefixes.push(property)
-          propertyComplexities.push(2)
-          return
-        }
-        if (isHack(property)) {
-          propertyHacks.push(property)
-          propertyComplexities.push(2)
-          return
-        }
-        if (isCustom(property)) {
-          customProperties.push(property)
-          propertyComplexities.push(2)
-          if (node.important === true) {
-            importantCustomProperties.push(property)
-          }
-          return
-        }
-
-        propertyComplexities.push(1)
         return
       }
     })
@@ -730,25 +698,25 @@ const analyze = (css) => {
       },
     },
     properties: {
-      total: props.total,
-      totalUnique: props.total_unique,
+      total: properties.total,
+      totalUnique: properties.total_unique,
       unique: ((function () {
         /** @type Map<string, Object> */
         let all = new Map()
-        props.forEach((property) => {
+        properties.forEach((property) => {
           let p = stringify_index(property.items[0])
           all.set(p, property.count)
         })
         return Object.fromEntries(all)
       }))(),
-      uniquenessRatio: ratio(props.total_unique, props.total),
+      uniquenessRatio: ratio(properties.total_unique, properties.total),
       prefixed: {
-        total: props.total_prefixed,
-        totalUnique: props.total_unique_prefixed,
+        total: properties.total_prefixed,
+        totalUnique: properties.total_unique_prefixed,
         unique: ((function () {
           /** @type Map<string, Object> */
           let all = new Map()
-          props.forEach((property) => {
+          properties.forEach((property) => {
             if (property.is_prefixed) {
               let p = stringify_index(property.items[0])
               all.set(p, property.count)
@@ -756,28 +724,53 @@ const analyze = (css) => {
           })
           return Object.fromEntries(all)
         }))(),
-        uniquenessRatio: ratio(props.total_unique_prefixed, props.total_prefixed),
-        ratio: ratio(props.total_prefixed, props.total),
+        uniquenessRatio: ratio(properties.total_unique_prefixed, properties.total_prefixed),
+        ratio: ratio(properties.total_prefixed, properties.total),
       },
-      custom: assign(
-        customProperties.count(),
-        {
-          ratio: ratio(customProperties.size(), props.total),
-          importants: assign(
-            importantCustomProperties.count(),
-            {
-              ratio: ratio(importantCustomProperties.size(), customProperties.size()),
+      custom: {
+        total: properties.total_custom,
+        totalUnique: properties.total_unique_custom,
+        unique: ((function () {
+          /** @type Map<string, Object> */
+          let all = new Map()
+          properties.forEach((property) => {
+            if (property.is_custom) {
+              let p = stringify_index(property.items[0])
+              all.set(p, property.count)
             }
-          ),
-        },
-      ),
-      browserhacks: assign(
-        propertyHacks.count(),
-        {
-          ratio: ratio(propertyHacks.size(), props.total),
-        }
-      ),
-      complexity: propertyComplexities.aggregate(),
+          })
+          return Object.fromEntries(all)
+        }))(),
+        uniquenessRatio: ratio(properties.total_unique_custom, properties.total_custom),
+        ratio: ratio(properties.total_custom, properties.total),
+      },
+      browserhacks: {
+        total: properties.total_browserhacks,
+        totalUnique: properties.total_unique_browserhacks,
+        unique: ((function () {
+          /** @type Map<string, Object> */
+          let all = new Map()
+          properties.forEach((property) => {
+            if (property.is_browserhack) {
+              let p = stringify_index(property.items[0])
+              all.set(p, property.count)
+            }
+          })
+          return Object.fromEntries(all)
+        }))(),
+        uniquenessRatio: ratio(properties.total_unique_browserhacks, properties.total_browserhacks),
+        ratio: ratio(properties.total_browserhacks, properties.total),
+      },
+      complexity: ((function () {
+        let complexities = new AggregateCollection()
+        properties.forEach(property => {
+          let len = property.items.length
+          while (len--) {
+            complexities.push(property.complexity)
+          }
+        })
+        return complexities.aggregate()
+      }))(),
     },
     values: {
       colors: assign(

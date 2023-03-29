@@ -98652,14 +98652,7 @@
         "--text-color": 4
       },
       "uniquenessRatio": 0.2916666666666667,
-      "ratio": 0.0008518492226875843,
-      "importants": {
-        "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0,
-        "ratio": 0
-      }
+      "ratio": 0.0008518492226875843
     },
     "browserhacks": {
       "total": 0,
