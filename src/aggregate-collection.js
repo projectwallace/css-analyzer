@@ -11,9 +11,10 @@ function Mode(arr) {
   let maxOccurrences = -1
   let maxOccurenceCount = 0
   let sum = 0
+  let len = arr.length
 
-  for (let i = 0; i < arr.length; i++) {
-    const element = arr[i]
+  while (len--) {
+    const element = arr[len]
     const updatedCount = (frequencies.get(element) || 0) + 1
     frequencies.set(element, updatedCount)
 

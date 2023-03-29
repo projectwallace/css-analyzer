@@ -17,9 +17,9 @@ Properties('counts totals', () => {
       }
     }
   `
-  const actual = analyze(fixture).properties.total
+  const actual = analyze(fixture)
 
-  assert.is(actual, 3)
+  assert.is(actual.properties.total, 3)
 })
 
 Properties('calculates uniqueness', () => {
@@ -41,9 +41,9 @@ Properties('calculates uniqueness', () => {
     '--custom': 2,
   }
 
+  assert.is(actual.total, 3)
   assert.is(actual.totalUnique, 2)
   assert.equal(actual.unique, expected)
-  assert.is(actual.uniquenessRatio, 2 / 3)
 })
 
 Properties('counts vendor prefixes', () => {

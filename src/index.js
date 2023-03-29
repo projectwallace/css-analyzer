@@ -18,6 +18,10 @@ import { hasVendorPrefix } from './vendor-prefix.js'
 import { isCustom, isHack, isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
+import { PropertiesCollection } from './properties/properties-collection.js'
+import { hashArray } from './murmurhash.js'
+import { NodeList } from './node-list.js'
+
 import {
   is_atrule,
   is_declaration,
@@ -57,6 +61,31 @@ const analyze = (css) => {
   /** @param {import('css-tree').CssNode} node */
   function stringifyNodePlain(node) {
     return css.substring(node.loc.start.offset, node.loc.end.offset)
+  }
+
+  /** @param {import('css-tree').CssNode} node */
+  function createTokenArray(node) {
+    if (!node.loc) {
+      return new Uint16Array(0)
+    }
+    let start = node.loc.start.offset
+    let end = node.loc.end.offset
+    let length = end - start
+    let tokens = new Uint16Array(length)
+
+    let index = length
+    while (index--) {
+      tokens[index] = css.charCodeAt(index + start)
+    }
+    return tokens
+  }
+
+  let interesting_nodes = new NodeList()
+
+  /** @param {number} index */
+  function stringify_index(index) {
+    let node = interesting_nodes.at(index)
+    return css.substring(node.offset, node.offset + node.length)
   }
 
   // Stylesheet
@@ -130,6 +159,7 @@ const analyze = (css) => {
   let importantCustomProperties = new CountableCollection()
 
   // Properties
+  let props = new PropertiesCollection()
   const properties = new CountableCollection()
   const propertyHacks = new CountableCollection()
   const propertyVendorPrefixes = new CountableCollection()
@@ -247,6 +277,7 @@ const analyze = (css) => {
         }
 
         const [{ value: specificityObj }] = calculate(node)
+        /** @type [number, number, number] */
         const specificity = [specificityObj.a, specificityObj.b, specificityObj.c]
 
         if (specificity[0] > 0) {
@@ -498,7 +529,18 @@ const analyze = (css) => {
 
         const { property } = node
 
-        properties.push(property)
+        // properties.push(property)
+
+        // NEW NEW NEW NEW NEW NEW
+        // replace end to only include the property, not the whole Declaration node
+        node.loc.end.offset = node.loc.start.offset + node.property.length
+        let tokens = createTokenArray(node)
+        props.add(
+          hashArray(tokens),
+          tokens,
+          interesting_nodes.add(node)
+        )
+        // END NEW END NEW END NEW
 
         if (hasVendorPrefix(property)) {
           propertyVendorPrefixes.push(property)
@@ -687,33 +729,56 @@ const analyze = (css) => {
         },
       },
     },
-    properties: assign(
-      properties.count(),
-      {
-        prefixed: assign(
-          propertyVendorPrefixes.count(),
-          {
-            ratio: ratio(propertyVendorPrefixes.size(), properties.size()),
-          },
-        ),
-        custom: assign(
-          customProperties.count(),
-          {
-            ratio: ratio(customProperties.size(), properties.size()),
-            importants: assign(
-              importantCustomProperties.count(),
-              {
-                ratio: ratio(importantCustomProperties.size(), customProperties.size()),
-              }
-            ),
-          },
-        ),
-        browserhacks: assign(
-          propertyHacks.count(), {
-          ratio: ratio(propertyHacks.size(), properties.size()),
-        }),
-        complexity: propertyComplexities.aggregate(),
-      }),
+    properties: {
+      total: props.total,
+      totalUnique: props.total_unique,
+      unique: ((function () {
+        /** @type Map<string, Object> */
+        let all = new Map()
+        props.forEach((property) => {
+          let p = stringify_index(property.items[0])
+          all.set(p, property.count)
+        })
+        return Object.fromEntries(all)
+      }))(),
+      uniquenessRatio: ratio(props.total_unique, props.total),
+      prefixed: {
+        total: props.total_prefixed,
+        totalUnique: props.total_unique_prefixed,
+        unique: ((function () {
+          /** @type Map<string, Object> */
+          let all = new Map()
+          props.forEach((property) => {
+            if (property.is_prefixed) {
+              let p = stringify_index(property.items[0])
+              all.set(p, property.count)
+            }
+          })
+          return Object.fromEntries(all)
+        }))(),
+        uniquenessRatio: ratio(props.total_unique_prefixed, props.total_prefixed),
+        ratio: ratio(props.total_prefixed, props.total),
+      },
+      custom: assign(
+        customProperties.count(),
+        {
+          ratio: ratio(customProperties.size(), props.total),
+          importants: assign(
+            importantCustomProperties.count(),
+            {
+              ratio: ratio(importantCustomProperties.size(), customProperties.size()),
+            }
+          ),
+        },
+      ),
+      browserhacks: assign(
+        propertyHacks.count(),
+        {
+          ratio: ratio(propertyHacks.size(), props.total),
+        }
+      ),
+      complexity: propertyComplexities.aggregate(),
+    },
     values: {
       colors: assign(
         colors.count(),

@@ -47,6 +47,7 @@ function analyzeList(selectorListAst, cb) {
   return childSelectors
 }
 
+/** @param {string} name */
 function isPseudoFunction(name) {
   return (
     strEquals(name, 'not')
@@ -64,90 +65,93 @@ function isPseudoFunction(name) {
 export function isAccessibility(selector) {
   let isA11y = false
 
-  walk(selector, function (node) {
-    let node_type = node.type
-    if (is_attribute_selector(node_type)) {
-      if (strEquals('role', node.name.name) || startsWith('aria-', node.name.name)) {
-        isA11y = true
-        return this.break
-      }
-      return
-    }
-    // Test for [aria-] or [role] inside :is()/:where() and friends
-    if (is_pseudo_class_selector(node_type)) {
-      if (isPseudoFunction(node.name)) {
-        const list = analyzeList(node, isAccessibility)
-
-        if (list.some(b => b === true)) {
+  walk(selector,
+    /** @param {import('css-tree').CssNode} node */
+    function (node) {
+      let node_type = node.type
+      if (is_attribute_selector(node_type)) {
+        if (strEquals('role', node.name.name) || startsWith('aria-', node.name.name)) {
           isA11y = true
+          return this.break
+        }
+        return
+      }
+      // Test for [aria-] or [role] inside :is()/:where() and friends
+      if (is_pseudo_class_selector(node_type)) {
+        if (isPseudoFunction(node.name)) {
+          const list = analyzeList(node, isAccessibility)
+
+          if (list.some(b => b === true)) {
+            isA11y = true
+            return this.skip
+          }
+
           return this.skip
         }
-
-        return this.skip
       }
-    }
-  })
+    })
 
   return isA11y;
 }
 
 /**
  * Get the Complexity for the AST of a Selector Node
- * @param {import('css-tree').Selector} selector - AST Node for a Selector
- * @return {number} - The numeric complexity of the Selector
+ * @param {import('css-tree').CssNode} selector - AST Node for a Selector
  */
 export function getComplexity(selector) {
   let complexity = 0
   let is_prefixed = false
 
-  walk(selector, function (node) {
-    let type = node.type
+  walk(selector,
+    /** @param {import('css-tree').CssNode} node */
+    function (node) {
+      let type = node.type
 
-    if (is_selector(type) || is_nth(type)) return
+      if (is_selector(type) || is_nth(type)) return
 
-    complexity++
+      complexity++
 
-    if (is_id_selector(type)
-      || is_class_selector(type)
-      || is_type_selector(type)
-      || is_pseudo_element_selector(type)
-      || is_pseudo_class_selector(type)
-    ) {
-      if (hasVendorPrefix(node.name)) {
-        complexity++
-        is_prefixed = true
+      if (is_id_selector(type)
+        || is_class_selector(type)
+        || is_type_selector(type)
+        || is_pseudo_element_selector(type)
+        || is_pseudo_class_selector(type)
+      ) {
+        if (hasVendorPrefix(node.name)) {
+          complexity++
+          is_prefixed = true
+        }
       }
-    }
 
-    if (is_attribute_selector(type)) {
-      if (Boolean(node.value)) {
-        complexity++
-      }
-      if (hasVendorPrefix(node.name.name)) {
-        complexity++
-        is_prefixed = true
-      }
-      return this.skip
-    }
-
-    if (is_pseudo_class_selector(type)) {
-      if (isPseudoFunction(node.name)) {
-        const list = analyzeList(node, getComplexity)
-
-        // Bail out for empty/non-existent :nth-child() params
-        if (list.length === 0) return
-
-        list.forEach(([comp, is_pref]) => {
-          complexity += comp
-          if (is_pref) {
-            is_prefixed = true
-          }
-        })
+      if (is_attribute_selector(type)) {
+        if (Boolean(node.value)) {
+          complexity++
+        }
+        if (hasVendorPrefix(node.name.name)) {
+          complexity++
+          is_prefixed = true
+        }
         return this.skip
       }
-      return
-    }
-  })
+
+      if (is_pseudo_class_selector(type)) {
+        if (isPseudoFunction(node.name)) {
+          const list = analyzeList(node, getComplexity)
+
+          // Bail out for empty/non-existent :nth-child() params
+          if (list.length === 0) return
+
+          list.forEach(([comp, is_pref]) => {
+            complexity += comp
+            if (is_pref) {
+              is_prefixed = true
+            }
+          })
+          return this.skip
+        }
+        return
+      }
+    })
 
   return [complexity, is_prefixed]
 }
