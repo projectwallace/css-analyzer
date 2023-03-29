@@ -3,7 +3,7 @@
  * Takes the mean/average of multiple values if multiple values occur the same amount of times.
  *
  * @see https://github.com/angus-c/just/blob/684af9ca0c7808bc78543ec89379b1fdfce502b1/packages/array-mode/index.js
- * @param {Array} arr - Array to find the mode value for
+ * @param {Uint16Array} arr - Array to find the mode value for
  * @returns {Number} mode - The `mode` value of `arr`
  */
 function Mode(arr) {
@@ -37,7 +37,7 @@ function Mode(arr) {
  * Find the middle number in an Array of Numbers
  * Returns the average of 2 numbers if the Array length is an even number
  * @see https://github.com/angus-c/just/blob/684af9ca0c7808bc78543ec89379b1fdfce502b1/packages/array-median/index.js
- * @param {Array} arr - A sorted Array
+ * @param {Uint16Array} arr - A sorted Array
  * @returns {Number} - The array's Median
  */
 function Median(arr) {
@@ -51,10 +51,10 @@ function Median(arr) {
 }
 
 class AggregateCollection {
-  constructor() {
-    /** @type number[] */
-    this._items = []
+  constructor(size = 1024) {
+    this._items = new Uint16Array(size)
     this._sum = 0
+    this.cursor = 0
   }
 
   /**
@@ -62,16 +62,17 @@ class AggregateCollection {
    * @param {number} item - The item to add
    */
   push(item) {
-    this._items.push(item)
+    this._items[this.cursor] = item
     this._sum += item
+    this.cursor++
   }
 
   size() {
-    return this._items.length
+    return this.cursor
   }
 
   aggregate() {
-    if (this._items.length === 0) {
+    if (this.cursor === 0) {
       return {
         min: 0,
         max: 0,
@@ -84,8 +85,7 @@ class AggregateCollection {
     }
 
     // TODO: can we avoid this sort()? It's slow
-    /** @type Number[] */
-    const sorted = this._items.slice().sort((a, b) => a - b)
+    const sorted = this._items.slice(0, this.cursor).sort((a, b) => a - b)
     const min = sorted[0]
     const max = sorted[sorted.length - 1]
 
@@ -103,11 +103,8 @@ class AggregateCollection {
     }
   }
 
-  /**
-   * @returns {number[]} All _items in this collection
-   */
   toArray() {
-    return this._items
+    return Array.from(this._items.slice(0, this.cursor))
   }
 }
 

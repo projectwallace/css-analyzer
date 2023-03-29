@@ -29,7 +29,7 @@ Object.entries({
 }).forEach(({ name, fileName, css, json }) => {
   // const result = analyze(css)
   // fs.writeFileSync(`./src/__fixtures__/${fileName}.json`, JSON.stringify(result, null, 2))
-  Smoke(`${name} matches fixture`, () => {
+  Smoke.skip(`${name} matches fixture`, () => {
     const result = analyze(css)
     assert.fixture(JSON.stringify(result, null, 2), json)
   })

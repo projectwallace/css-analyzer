@@ -19,6 +19,7 @@ import { isIe9Hack } from './values/browserhacks.js'
 import { PropertiesCollection } from './properties/properties-collection.js'
 import { hashArray } from './murmurhash.js'
 import { NodeList } from './node-list.js'
+import { RulesCollection } from './rules/rules-collection.js'
 
 import {
   is_atrule,
@@ -130,11 +131,10 @@ const analyze = (css) => {
   const containers = new CountableCollection()
 
   // Rules
-  let totalRules = 0
-  let emptyRules = 0
-  const ruleSizes = new AggregateCollection()
-  const selectorsPerRule = new AggregateCollection()
-  const declarationsPerRule = new AggregateCollection()
+  let rules = new RulesCollection()
+  // const ruleSizes = new AggregateCollection()
+  // const selectorsPerRule = new AggregateCollection()
+  // const declarationsPerRule = new AggregateCollection()
 
   // Selectors
   const keyframeSelectors = new CountableCollection()
@@ -185,11 +185,11 @@ const analyze = (css) => {
     function (node) {
       let node_type = node.type
 
-      if (is_atrule(node_type)) {
+      if (node.type === 'Atrule') {
         totalAtRules++
         const atRuleName = node.name
 
-        if (strEquals('font-face', atRuleName)) {
+        if (strEquals('font-face', atRuleName) && node.block) {
           /** @type {[index: string]: string} */
           const descriptors = {}
 
@@ -249,20 +249,11 @@ const analyze = (css) => {
         return
       }
 
-      if (is_rule(node_type)) {
+      if (node.type === 'Rule') {
         const numSelectors = node.prelude.children ? node.prelude.children.size : 0
         const numDeclarations = node.block.children ? node.block.children.size : 0
 
-        ruleSizes.push(numSelectors + numDeclarations)
-        selectorsPerRule.push(numSelectors)
-        declarationsPerRule.push(numDeclarations)
-
-        totalRules++
-
-        if (numDeclarations === 0) {
-          emptyRules++
-        }
-
+        rules.add(numSelectors, numDeclarations)
         return
       }
 
@@ -506,7 +497,7 @@ const analyze = (css) => {
         return
       }
 
-      if (is_declaration(node_type)) {
+      if (node.type === 'Declaration') {
         // Do not process Declarations in atRule preludes
         // because we will handle them manually
         if (this.atrulePrelude !== null) {
@@ -546,9 +537,9 @@ const analyze = (css) => {
   const uniqueSpecificitiesCount = uniqueSpecificities.count()
   const complexityCount = new CountableCollection(selectorComplexities.toArray()).count()
   const totalUniqueSelectors = uniqueSelectors.size
-  const uniqueRuleSize = new CountableCollection(ruleSizes.toArray()).count()
-  const uniqueSelectorsPerRule = new CountableCollection(selectorsPerRule.toArray()).count()
-  const uniqueDeclarationsPerRule = new CountableCollection(declarationsPerRule.toArray()).count()
+  // const uniqueRuleSize = new CountableCollection(ruleSizes.toArray()).count()
+  // const uniqueSelectorsPerRule = new CountableCollection(selectorsPerRule.toArray()).count()
+  // const uniqueDeclarationsPerRule = new CountableCollection(declarationsPerRule.toArray()).count()
   const assign = Object.assign
 
   return {
@@ -606,38 +597,44 @@ const analyze = (css) => {
       layer: layers.count(),
     },
     rules: {
-      total: totalRules,
+      total: rules.total,
       empty: {
-        total: emptyRules,
-        ratio: ratio(emptyRules, totalRules)
+        total: rules.total_empty,
+        ratio: ratio(rules.total_empty, rules.total)
       },
-      sizes: assign(
-        ruleSizes.aggregate(),
-        {
-          items: ruleSizes.toArray(),
-          unique: uniqueRuleSize.unique,
-          totalUnique: uniqueRuleSize.totalUnique,
-          uniquenessRatio: uniqueRuleSize.uniquenessRatio
-        },
-      ),
-      selectors: assign(
-        selectorsPerRule.aggregate(),
-        {
-          items: selectorsPerRule.toArray(),
-          unique: uniqueSelectorsPerRule.unique,
-          totalUnique: uniqueSelectorsPerRule.totalUnique,
-          uniquenessRatio: uniqueSelectorsPerRule.uniquenessRatio
-        },
-      ),
-      declarations: assign(
-        declarationsPerRule.aggregate(),
-        {
-          items: declarationsPerRule.toArray(),
-          unique: uniqueDeclarationsPerRule.unique,
-          totalUnique: uniqueDeclarationsPerRule.totalUnique,
-          uniquenessRatio: uniqueDeclarationsPerRule.uniquenessRatio,
-        },
-      ),
+      sizes: (function () {
+        let aggregate = new AggregateCollection(rules.total)
+        rules.forEach(rule => aggregate.push(rule.size))
+        return assign(
+          aggregate.aggregate(),
+          {
+            totalUnique: rules.unique_sizes.total,
+            uniquenessRatio: ratio(rules.unique_sizes.total_unique, rules.unique_sizes.total)
+          },
+        )
+      })(),
+      selectors: (function () {
+        let aggregate = new AggregateCollection(rules.total)
+        rules.forEach(rule => aggregate.push(rule.selector_count))
+        return assign(
+          aggregate.aggregate(),
+          {
+            totalUnique: rules.unique_selector_sizes.total_unique,
+            uniquenessRatio: ratio(rules.unique_selector_sizes.total_unique, rules.unique_selector_sizes.total),
+          },
+        )
+      })(),
+      declarations: (function () {
+        let aggregate = new AggregateCollection(rules.total)
+        rules.forEach(rule => aggregate.push(rule.declaration_count))
+        return assign(
+          aggregate.aggregate(),
+          {
+            totalUnique: rules.unique_selector_sizes.total_unique,
+            uniquenessRatio: ratio(rules.unique_selector_sizes.total_unique, rules.unique_selector_sizes.total),
+          },
+        )
+      })(),
     },
     selectors: {
       total: totalSelectors,
@@ -703,67 +700,67 @@ const analyze = (css) => {
     properties: {
       total: properties.total,
       totalUnique: properties.total_unique,
-      unique: ((function () {
-        /** @type Map<string, Object> */
-        let all = new Map()
-        properties.forEach((property) => {
-          let p = stringify_index(property.items[0])
-          all.set(p, property.count)
-        })
-        return Object.fromEntries(all)
-      }))(),
+      // unique: ((function () {
+      //   /** @type Map<string, Object> */
+      //   let all = new Map()
+      //   properties.forEach((property) => {
+      //     let p = stringify_index(property.items[0])
+      //     all.set(p, property.count)
+      //   })
+      //   return Object.fromEntries(all)
+      // }))(),
       uniquenessRatio: ratio(properties.total_unique, properties.total),
       prefixed: {
         total: properties.total_prefixed,
         totalUnique: properties.total_unique_prefixed,
-        unique: ((function () {
-          /** @type Map<string, Object> */
-          let all = new Map()
-          if (properties.total_prefixed > 0) {
-            properties.forEach(property => {
-              if (property.is_prefixed) {
-                all.set(stringify_index(property.items[0]), property.count)
-              }
-            })
-          }
-          return Object.fromEntries(all)
-        }))(),
+        // unique: ((function () {
+        //   /** @type Map<string, Object> */
+        //   let all = new Map()
+        //   if (properties.total_prefixed > 0) {
+        //     properties.forEach(property => {
+        //       if (property.is_prefixed) {
+        //         all.set(stringify_index(property.items[0]), property.count)
+        //       }
+        //     })
+        //   }
+        //   return Object.fromEntries(all)
+        // }))(),
         uniquenessRatio: ratio(properties.total_unique_prefixed, properties.total_prefixed),
         ratio: ratio(properties.total_prefixed, properties.total),
       },
       custom: {
         total: properties.total_custom,
         totalUnique: properties.total_unique_custom,
-        unique: ((function () {
-          /** @type Map<string, number> */
-          let all = new Map()
-          if (properties.total_custom > 0) {
-            properties.forEach(property => {
-              if (property.is_custom) {
-                all.set(stringify_index(property.items[0]), property.count)
-              }
-            })
-          }
-          return Object.fromEntries(all)
-        }))(),
+        // unique: ((function () {
+        //   /** @type Map<string, number> */
+        //   let all = new Map()
+        //   if (properties.total_custom > 0) {
+        //     properties.forEach(property => {
+        //       if (property.is_custom) {
+        //         all.set(stringify_index(property.items[0]), property.count)
+        //       }
+        //     })
+        //   }
+        //   return Object.fromEntries(all)
+        // }))(),
         uniquenessRatio: ratio(properties.total_unique_custom, properties.total_custom),
         ratio: ratio(properties.total_custom, properties.total),
       },
       browserhacks: {
         total: properties.total_browserhacks,
         totalUnique: properties.total_unique_browserhacks,
-        unique: ((function () {
-          /** @type Map<string, Object> */
-          let all = new Map()
-          if (properties.total_browserhacks > 0) {
-            properties.forEach(property => {
-              if (property.is_browserhack) {
-                all.set(stringify_index(property.items[0]), property.count)
-              }
-            })
-          }
-          return Object.fromEntries(all)
-        }))(),
+        // unique: ((function () {
+        //   /** @type Map<string, Object> */
+        //   let all = new Map()
+        //   if (properties.total_browserhacks > 0) {
+        //     properties.forEach(property => {
+        //       if (property.is_browserhack) {
+        //         all.set(stringify_index(property.items[0]), property.count)
+        //       }
+        //     })
+        //   }
+        //   return Object.fromEntries(all)
+        // }))(),
         uniquenessRatio: ratio(properties.total_unique_browserhacks, properties.total_browserhacks),
         ratio: ratio(properties.total_browserhacks, properties.total),
       },
