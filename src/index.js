@@ -4,9 +4,7 @@ import { calculate } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getComplexity, isAccessibility, compareSpecificity } from './selectors/utils.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
-// import { isFontFamilyKeyword, getFamilyFromFont } from './values/font-families.js'
 import { destructure, isFontKeyword } from './values/destructure-font-shorthand.js'
-// import { isFontSizeKeyword, getSizeFromFont } from './values/font-sizes.js'
 import { isValueKeyword } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isAstVendorPrefixed } from './values/vendor-prefix.js'
@@ -15,7 +13,7 @@ import { CountableCollection } from './countable-collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
 import { strEquals, startsWith, endsWith } from './string-utils.js'
 import { hasVendorPrefix } from './vendor-prefix.js'
-import { isCustom, isHack, isProperty } from './properties/property-utils.js'
+import { isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
 import { PropertiesCollection } from './properties/properties-collection.js'
@@ -60,7 +58,10 @@ const analyze = (css) => {
 
   /** @param {import('css-tree').CssNode} node */
   function stringifyNodePlain(node) {
-    return css.substring(node.loc.start.offset, node.loc.end.offset)
+    if (node.loc) {
+      return css.substring(node.loc.start.offset, node.loc.end.offset)
+    }
+    return ''
   }
 
   /** @param {import('css-tree').CssNode} node */
@@ -80,6 +81,8 @@ const analyze = (css) => {
     return tokens
   }
 
+  // We want to store this list here, not in the separate collections,
+  // so all collections can use the same underlying TypedArrays
   let interesting_nodes = new NodeList()
 
   /** @param {number} index */
@@ -107,9 +110,9 @@ const analyze = (css) => {
       commentsSize += comment.length
     },
   })
-  /** @type import('css-tree').CssLocation */
+  /** @type import('css-tree').CssLocation | undefined */
   let stylesheet = ast.loc
-  let linesOfCode = stylesheet.end.line - stylesheet.start.line + 1
+  let linesOfCode = stylesheet ? stylesheet.end.line - stylesheet.start.line + 1 : 0
 
   // Atrules
   let totalAtRules = 0
@@ -716,12 +719,13 @@ const analyze = (css) => {
         unique: ((function () {
           /** @type Map<string, Object> */
           let all = new Map()
-          properties.forEach((property) => {
-            if (property.is_prefixed) {
-              let p = stringify_index(property.items[0])
-              all.set(p, property.count)
-            }
-          })
+          if (properties.total_prefixed > 0) {
+            properties.forEach(property => {
+              if (property.is_prefixed) {
+                all.set(stringify_index(property.items[0]), property.count)
+              }
+            })
+          }
           return Object.fromEntries(all)
         }))(),
         uniquenessRatio: ratio(properties.total_unique_prefixed, properties.total_prefixed),
@@ -731,14 +735,15 @@ const analyze = (css) => {
         total: properties.total_custom,
         totalUnique: properties.total_unique_custom,
         unique: ((function () {
-          /** @type Map<string, Object> */
+          /** @type Map<string, number> */
           let all = new Map()
-          properties.forEach((property) => {
-            if (property.is_custom) {
-              let p = stringify_index(property.items[0])
-              all.set(p, property.count)
-            }
-          })
+          if (properties.total_custom > 0) {
+            properties.forEach(property => {
+              if (property.is_custom) {
+                all.set(stringify_index(property.items[0]), property.count)
+              }
+            })
+          }
           return Object.fromEntries(all)
         }))(),
         uniquenessRatio: ratio(properties.total_unique_custom, properties.total_custom),
@@ -750,27 +755,28 @@ const analyze = (css) => {
         unique: ((function () {
           /** @type Map<string, Object> */
           let all = new Map()
-          properties.forEach((property) => {
-            if (property.is_browserhack) {
-              let p = stringify_index(property.items[0])
-              all.set(p, property.count)
-            }
-          })
+          if (properties.total_browserhacks > 0) {
+            properties.forEach(property => {
+              if (property.is_browserhack) {
+                all.set(stringify_index(property.items[0]), property.count)
+              }
+            })
+          }
           return Object.fromEntries(all)
         }))(),
         uniquenessRatio: ratio(properties.total_unique_browserhacks, properties.total_browserhacks),
         ratio: ratio(properties.total_browserhacks, properties.total),
       },
-      complexity: ((function () {
+      complexity: (function () {
         let complexities = new AggregateCollection()
         properties.forEach(property => {
-          let len = property.items.length
+          let len = property.count
           while (len--) {
             complexities.push(property.complexity)
           }
         })
         return complexities.aggregate()
-      }))(),
+      })(),
     },
     values: {
       colors: assign(

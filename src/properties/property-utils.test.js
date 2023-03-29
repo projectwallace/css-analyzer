@@ -1,34 +1,33 @@
 import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
-import { analyze } from '../index.js'
-import { isHack, isCustom, isProperty } from './property-utils.js'
+import { is_browserhack, is_custom, isProperty } from './property-utils.js'
 
 const PropertyUtils = suite('Property Utils')
 
-PropertyUtils('isHack', () => {
-  assert.ok(isHack('/property'))
-  assert.ok(isHack('//property'))
-  assert.ok(isHack('_property'))
-  assert.ok(isHack('+property'))
-  assert.ok(isHack('*property'))
-  assert.ok(isHack('&property'))
-  assert.ok(isHack('#property'))
-  assert.ok(isHack('$property'))
+PropertyUtils('is_browserhack', () => {
+  assert.ok(is_browserhack('/property'))
+  assert.ok(is_browserhack('//property'))
+  assert.ok(is_browserhack('_property'))
+  assert.ok(is_browserhack('+property'))
+  assert.ok(is_browserhack('*property'))
+  assert.ok(is_browserhack('&property'))
+  assert.ok(is_browserhack('#property'))
+  assert.ok(is_browserhack('$property'))
 
-  assert.not.ok(isHack('property'))
-  assert.not.ok(isHack('-property'))
-  assert.not.ok(isHack('--property'))
+  assert.not.ok(is_browserhack('property'))
+  assert.not.ok(is_browserhack('-property'))
+  assert.not.ok(is_browserhack('--property'))
 })
 
-PropertyUtils('isCustom', () => {
-  assert.ok(isCustom('--property'))
-  assert.ok(isCustom('--MY-PROPERTY'))
-  assert.ok(isCustom('--x'))
+PropertyUtils('is_custom', () => {
+  assert.ok(is_custom('--property'))
+  assert.ok(is_custom('--MY-PROPERTY'))
+  assert.ok(is_custom('--x'))
 
-  assert.not.ok(isCustom('property'))
-  assert.not.ok(isCustom('-property'))
-  assert.not.ok(isCustom('-webkit-property'))
-  assert.not.ok(isCustom('-moz-property'))
+  assert.not.ok(is_custom('property'))
+  assert.not.ok(is_custom('-property'))
+  assert.not.ok(is_custom('-webkit-property'))
+  assert.not.ok(is_custom('-moz-property'))
 })
 
 PropertyUtils('isProperty', () => {

@@ -5,8 +5,8 @@ import { endsWith } from '../string-utils.js'
  * @param {string} property
  * @see https://github.com/csstree/csstree/blob/master/lib/utils/names.js#L69
  */
-export function isHack(property) {
-  if (isCustom(property) || hasVendorPrefix(property)) return false
+export function is_browserhack(property) {
+  if (is_custom(property) || hasVendorPrefix(property)) return false
 
   let code = property.charCodeAt(0)
 
@@ -20,7 +20,7 @@ export function isHack(property) {
 }
 
 /** @param {string} property */
-export function isCustom(property) {
+export function is_custom(property) {
   if (property.length < 3) return false
   // 45 === '-'.charCodeAt(0)
   return property.charCodeAt(0) === 45 && property.charCodeAt(1) === 45
@@ -31,6 +31,6 @@ export function isCustom(property) {
  * @param {string} property - e.g. `-webkit-animation` (potential prefix)
  */
 export function isProperty(basename, property) {
-  if (isCustom(property)) return false
+  if (is_custom(property)) return false
   return endsWith(basename, property)
 }

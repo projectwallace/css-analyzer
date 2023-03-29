@@ -1,32 +1,6 @@
 import { AutoGrowBuffer } from '../auto-grow-buffer.js'
-
-/** @param property {string} */
-function is_prefixed(property) {
-	if (property.length < 3) return false
-	if (property.charCodeAt(0) == 45 && property.charCodeAt(1) != 45) {
-		return property.indexOf('-', 2) !== -1
-	}
-	return false
-}
-
-/** @param property {string} */
-function is_browserhack(property) {
-	let code = property.charCodeAt(0)
-
-	return code === 47 // /
-		|| code === 95 // _
-		|| code === 43 // +
-		|| code === 42 // *
-		|| code === 38 // &
-		|| code === 36 // $
-		|| code === 35 // #
-}
-
-/** @param property {string} */
-function is_custom(property) {
-	if (property.length < 3) return false
-	return property.charCodeAt(0) == 45 && property.charCodeAt(1) == 45
-}
+import { is_browserhack, is_custom } from './property-utils.js'
+import { hasVendorPrefix } from '../vendor-prefix.js'
 
 export class PropertiesCollection {
 	constructor() {
@@ -52,7 +26,7 @@ export class PropertiesCollection {
 		this.total++
 
 		let custom = is_custom(property)
-		let prefix = is_prefixed(property)
+		let prefix = hasVendorPrefix(property)
 		let hack = !custom && !prefix && is_browserhack(property)
 		let value = 0
 
@@ -98,6 +72,7 @@ export class PropertiesCollection {
 	 * @callback forEachCb
 	 * @param {Property} property
 	 */
+
 	/** @param {forEachCb} callback */
 	forEach(callback) {
 		this.unique.forEach((list) => {
