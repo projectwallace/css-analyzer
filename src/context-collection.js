@@ -3,7 +3,7 @@ import { CountableCollection } from './countable-collection.js'
 class ContextCollection {
   constructor() {
     this._list = new CountableCollection()
-    /** @type {[index; string]: CountableCollection} */
+    /** @type {Map<string, CountableCollection>} */
     this._contexts = new Map()
   }
 
@@ -23,6 +23,14 @@ class ContextCollection {
   }
 
   count() {
+    /**
+     * @type {Map<string, {
+     * total: number,
+     * totalUnique: number,
+     * unique: {[string]: number},
+     * uniquenessRatio: number
+     * }>}
+     */
     const itemsPerContext = new Map()
 
     for (let [context, value] of this._contexts.entries()) {

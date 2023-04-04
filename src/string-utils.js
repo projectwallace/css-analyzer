@@ -34,7 +34,7 @@ export function strEquals(base, test) {
 /**
  * Case-insensitive testing whether a string ends with a given substring
  * @param {string} base e.g. '-webkit-transform'
- * @param {string} cmp e.g. 'transform'
+ * @param {string} test e.g. 'transform'
  * @returns {boolean} true if `test` ends with `base`, false otherwise
  */
 export function endsWith(base, test) {

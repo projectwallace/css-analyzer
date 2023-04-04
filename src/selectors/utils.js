@@ -51,6 +51,7 @@ function isPseudoFunction(name) {
   )
 }
 
+/** @param {import('css-tree').Selector} selector */
 export function isAccessibility(selector) {
   let isA11y = false
 
@@ -82,7 +83,7 @@ export function isAccessibility(selector) {
 /**
  * Get the Complexity for the AST of a Selector Node
  * @param {import('css-tree').Selector} ast - AST Node for a Selector
- * @return {number} - The numeric complexity of the Selector
+ * @return {[number, boolean]} - The numeric complexity of the Selector and whether it's prefixed or not
  */
 export function getComplexity(selector) {
   let complexity = 0
