@@ -17,6 +17,8 @@ import { isCustom, isHack, isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
 
+/** @typedef {[number, number, number]} Specificity */
+
 function ratio(part, total) {
   if (total === 0) return 0
   return part / total
@@ -49,12 +51,12 @@ const analyze = (css) => {
   let embedSize = 0
   const embedTypes = {
     total: 0,
+    /** @type {Map<string, {size: number, count: number}>} */
     unique: new Map()
   }
 
   const startParse = Date.now()
 
-  /** @type import('css-tree').CssNode */
   const ast = parse(css, {
     parseCustomProperty: true, // To find font-families, colors, etc.
     positions: true, // So we can use stringifyNode()
@@ -70,7 +72,7 @@ const analyze = (css) => {
 
   // Atrules
   let totalAtRules = 0
-  /** @type {string}[]} */
+  /** @type {{[property: string]: string}[]} */
   const fontfaces = []
   const layers = new CountableCollection()
   const imports = new CountableCollection()
@@ -94,16 +96,16 @@ const analyze = (css) => {
   const keyframeSelectors = new CountableCollection()
   const uniqueSelectors = new Set()
   const prefixedSelectors = new CountableCollection()
-  /** @type [number,number,number] */
+  /** @type {Specificity} */
   let maxSpecificity
-  /** @type [number,number,number] */
+  /** @type {Specificity} */
   let minSpecificity
   const specificityA = new AggregateCollection()
   const specificityB = new AggregateCollection()
   const specificityC = new AggregateCollection()
   const uniqueSpecificities = new CountableCollection()
   const selectorComplexities = new AggregateCollection()
-  /** @type [number,number,number][] */
+  /** @type {Specificity[]} */
   const specificities = []
   const ids = new CountableCollection()
   const a11y = new CountableCollection()
@@ -144,7 +146,6 @@ const analyze = (css) => {
         const atRuleName = node.name
 
         if (atRuleName === 'font-face') {
-          /** @type {[index: string]: string} */
           const descriptors = {}
 
           node.block.children.forEach(descriptor => {
@@ -226,6 +227,7 @@ const analyze = (css) => {
         }
 
         const [{ value: specificityObj }] = calculate(node)
+        /** @type {Specificity} */
         const specificity = [specificityObj.a, specificityObj.b, specificityObj.c]
 
         if (specificity[0] > 0) {
@@ -601,17 +603,17 @@ const analyze = (css) => {
       totalUnique: totalUniqueSelectors,
       uniquenessRatio: ratio(totalUniqueSelectors, totalSelectors),
       specificity: {
-        /** @type [number, number, number] */
+        /** @type Specificity */
         min: minSpecificity === undefined ? [0, 0, 0] : minSpecificity,
-        /** @type [number, number, number] */
+        /** @type Specificity */
         max: maxSpecificity === undefined ? [0, 0, 0] : maxSpecificity,
-        /** @type [number, number, number] */
+        /** @type Specificity */
         sum: [specificitiesA.sum, specificitiesB.sum, specificitiesC.sum],
-        /** @type [number, number, number] */
+        /** @type Specificity */
         mean: [specificitiesA.mean, specificitiesB.mean, specificitiesC.mean],
-        /** @type [number, number, number] */
+        /** @type Specificity */
         mode: [specificitiesA.mode, specificitiesB.mode, specificitiesC.mode],
-        /** @type [number, number, number] */
+        /** @type Specificity */
         median: [specificitiesA.median, specificitiesB.median, specificitiesC.median],
         items: specificities,
         unique: uniqueSpecificitiesCount.unique,
