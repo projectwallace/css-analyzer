@@ -36,7 +36,7 @@ class CountableCollection {
       total: this._total,
       totalUnique: this._items.size,
       /** @type Object */
-      unique: Object.fromEntries(this._items),
+      // unique: Object.fromEntries(this._items),
       uniquenessRatio: this._total === 0 ? 0 : this._items.size / this._total,
     }
   }

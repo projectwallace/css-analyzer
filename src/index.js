@@ -33,6 +33,7 @@ import {
   is_url,
   is_value,
 } from './css-node.js'
+import { SelectorsCollection } from './selectors/selectors-collection.js'
 
 /**
  * @param {number} part
@@ -132,13 +133,10 @@ const analyze = (css) => {
 
   // Rules
   let rules = new RulesCollection()
-  // const ruleSizes = new AggregateCollection()
-  // const selectorsPerRule = new AggregateCollection()
-  // const declarationsPerRule = new AggregateCollection()
 
   // Selectors
+  const selectors = new SelectorsCollection()
   const keyframeSelectors = new CountableCollection()
-  const uniqueSelectors = new Set()
   const prefixedSelectors = new CountableCollection()
   /** @type [number,number,number] */
   let maxSpecificity
@@ -257,13 +255,19 @@ const analyze = (css) => {
         return
       }
 
-      if (is_selector(node_type)) {
+      if (node.type === 'Selector') {
         const selector = stringifyNode(node)
 
         if (this.atrule && endsWith('keyframes', this.atrule.name)) {
           keyframeSelectors.push(selector)
           return this.skip
         }
+
+        selectors.add(
+          node,
+          hashArray(createTokenArray(node)),
+          interesting_nodes.add(node)
+        )
 
         const [{ value: specificityObj }] = calculate(node)
         /** @type [number, number, number] */
@@ -283,7 +287,6 @@ const analyze = (css) => {
           prefixedSelectors.push(selector)
         }
 
-        uniqueSelectors.add(selector)
         selectorComplexities.push(complexity)
         uniqueSpecificities.push(specificity[0] + ',' + specificity[1] + ',' + specificity[2])
 
@@ -536,7 +539,6 @@ const analyze = (css) => {
   const specificitiesC = specificityC.aggregate()
   const uniqueSpecificitiesCount = uniqueSpecificities.count()
   const complexityCount = new CountableCollection(selectorComplexities.toArray()).count()
-  const totalUniqueSelectors = uniqueSelectors.size
   // const uniqueRuleSize = new CountableCollection(ruleSizes.toArray()).count()
   // const uniqueSelectorsPerRule = new CountableCollection(selectorsPerRule.toArray()).count()
   // const uniqueDeclarationsPerRule = new CountableCollection(declarationsPerRule.toArray()).count()
@@ -637,9 +639,9 @@ const analyze = (css) => {
       })(),
     },
     selectors: {
-      total: totalSelectors,
-      totalUnique: totalUniqueSelectors,
-      uniquenessRatio: ratio(totalUniqueSelectors, totalSelectors),
+      total: selectors.total,
+      totalUnique: selectors.total_unique,
+      uniquenessRatio: ratio(selectors.total_unique, selectors.total),
       specificity: {
         /** @type [number, number, number] */
         min: minSpecificity === undefined ? [0, 0, 0] : minSpecificity,
@@ -653,15 +655,15 @@ const analyze = (css) => {
         mode: [specificitiesA.mode, specificitiesB.mode, specificitiesC.mode],
         /** @type [number, number, number] */
         median: [specificitiesA.median, specificitiesB.median, specificitiesC.median],
-        items: specificities,
-        unique: uniqueSpecificitiesCount.unique,
+        // items: specificities,
+        // unique: uniqueSpecificitiesCount.unique,
         totalUnique: uniqueSpecificitiesCount.totalUnique,
         uniquenessRatio: uniqueSpecificitiesCount.uniquenessRatio,
       },
       complexity: assign(
         selectorComplexities.aggregate(),
         complexityCount, {
-        items: selectorComplexities.toArray(),
+        // items: selectorComplexities.toArray(),
       }),
       id: assign(
         ids.count(), {
