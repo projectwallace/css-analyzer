@@ -56,18 +56,18 @@ export function isAccessibility(selector) {
   let isA11y = false
 
   walk(selector, function (node) {
-    if (node.type == 'AttributeSelector') {
+    if (node.type === 'AttributeSelector') {
       if (strEquals('role', node.name.name) || startsWith('aria-', node.name.name)) {
         isA11y = true
         return this.break
       }
     }
     // Test for [aria-] or [role] inside :is()/:where() and friends
-    else if (node.type == 'PseudoClassSelector') {
+    else if (node.type === 'PseudoClassSelector') {
       if (isPseudoFunction(node.name)) {
         const list = analyzeList(node, isAccessibility)
 
-        if (list.some(b => b == true)) {
+        if (list.some(b => b === true)) {
           isA11y = true
           return this.skip
         }
@@ -90,15 +90,15 @@ export function getComplexity(selector) {
   let isPrefixed = false
 
   walk(selector, function (node) {
-    if (node.type == 'Selector' || node.type == 'Nth') return
+    if (node.type === 'Selector' || node.type === 'Nth') return
 
     complexity++
 
-    if (node.type == 'IdSelector'
-      || node.type == 'ClassSelector'
-      || node.type == 'PseudoElementSelector'
-      || node.type == 'TypeSelector'
-      || node.type == 'PseudoClassSelector'
+    if (node.type === 'IdSelector'
+      || node.type === 'ClassSelector'
+      || node.type === 'PseudoElementSelector'
+      || node.type === 'TypeSelector'
+      || node.type === 'PseudoClassSelector'
     ) {
       if (hasVendorPrefix(node.name)) {
         isPrefixed = true
@@ -106,7 +106,7 @@ export function getComplexity(selector) {
       }
     }
 
-    if (node.type == 'AttributeSelector') {
+    if (node.type === 'AttributeSelector') {
       if (Boolean(node.value)) {
         complexity++
       }
@@ -117,7 +117,7 @@ export function getComplexity(selector) {
       return this.skip
     }
 
-    if (node.type == 'PseudoClassSelector') {
+    if (node.type === 'PseudoClassSelector') {
       if (isPseudoFunction(node.name)) {
         const list = analyzeList(node, getComplexity)
 
@@ -126,7 +126,7 @@ export function getComplexity(selector) {
 
         list.forEach(([c, p]) => {
           complexity += c
-          if (p == true) isPrefixed = true
+          if (p === true) isPrefixed = true
         })
         return this.skip
       }

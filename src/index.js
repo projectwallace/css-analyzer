@@ -150,7 +150,7 @@ const analyze = (css) => {
 
           node.block.children.forEach(descriptor => {
             // Ignore 'Raw' nodes in case of CSS syntax errors
-            if (descriptor.type == 'Declaration') {
+            if (descriptor.type === 'Declaration') {
               descriptors[descriptor.property] = stringifyNode(descriptor.value)
             }
           })
