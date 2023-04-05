@@ -20,9 +20,10 @@ function compareChar(referenceCode, testCode) {
  * @returns {boolean} true if the two strings are the same, false otherwise
  */
 export function strEquals(base, test) {
-  if (base.length !== test.length) return false
+  let len = base.length;
+  if (len !== test.length) return false
 
-  for (let i = 0; i < base.length; i++) {
+  for (let i = 0; i < len; i++) {
     if (compareChar(base.charCodeAt(i), test.charCodeAt(i)) === false) {
       return false
     }
@@ -38,13 +39,14 @@ export function strEquals(base, test) {
  * @returns {boolean} true if `test` ends with `base`, false otherwise
  */
 export function endsWith(base, test) {
-  const offset = test.length - base.length
+  let len = test.length
+  const offset = len - base.length
 
   if (offset < 0) {
     return false
   }
 
-  for (let i = test.length - 1; i >= offset; i--) {
+  for (let i = len - 1; i >= offset; i--) {
     if (compareChar(base.charCodeAt(i - offset), test.charCodeAt(i)) === false) {
       return false
     }
@@ -60,7 +62,8 @@ export function endsWith(base, test) {
  * @returns {boolean} true if `test` starts with `base`, false otherwise
  */
 export function startsWith(base, test) {
-  if (test.length < base.length) return false
+  let len = base.length
+  if (test.length < len) return false
 
   for (let i = 0; i < base.length; i++) {
     if (compareChar(base.charCodeAt(i), test.charCodeAt(i)) === false) {

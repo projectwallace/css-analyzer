@@ -34,27 +34,6 @@ const SIZE_KEYWORDS = new Set([
 	'larger',
 ])
 
-const STRETCH_KEYWORDS = new Set([
-	'ultra-condensed',
-	'extra-condensed',
-	'condensed',
-	'semi-condensed',
-	'semi-expanded',
-	'expanded',
-	'extra-expanded',
-	'ultra-expanded',
-])
-const STYLE_KEYWORDS = new Set(['italic', 'oblique'])
-const WEIGHT_KEYWORDS = new Set(['light', 'bold', 'bolder'])
-const VARIANT_KEYWORDS = new Set([
-	'small-caps',
-	'all-small-caps',
-	'petite-caps',
-	'all-petite-caps',
-	'unicase',
-	'titling-caps',
-])
-
 const COMMA = 44 // ','.charCodeAt(0) === 44
 const SLASH = 47 // '/'.charCodeAt(0) === 47
 
@@ -62,10 +41,6 @@ export function destructure(value, stringifyNode) {
 	let font_family = []
 	let font_size
 	let line_height
-	let font_weight
-	let font_style
-	let font_variant
-	let font_stretch
 
 	value.children.forEach(function (node, item) {
 		// any node that comes before the '/' is the font-size
@@ -121,7 +96,6 @@ export function destructure(value, stringifyNode) {
 		// any node that's a number and not previously caught by line-height or font-size is the font-weight
 		// (oblique <angle> will not be caught here, because that's a Dimension, not a Number)
 		if (node.type == 'Number') {
-			font_weight = stringifyNode(node)
 			return
 		}
 
@@ -144,30 +118,10 @@ export function destructure(value, stringifyNode) {
 				font_size = node.name
 				return
 			}
-			if (STRETCH_KEYWORDS.has(node.name)) {
-				font_stretch = node.name
-				return
-			}
-			if (WEIGHT_KEYWORDS.has(node.name)) {
-				font_weight = node.name
-				return
-			}
-			if (STYLE_KEYWORDS.has(node.name)) {
-				font_style = node.name
-				return
-			}
-			if (VARIANT_KEYWORDS.has(node.name)) {
-				font_variant = node.name
-				return
-			}
 		}
 	})
 
 	return {
-		font_style,
-		font_variant,
-		font_weight,
-		font_stretch,
 		font_size,
 		line_height,
 		font_family: stringifyNode({
