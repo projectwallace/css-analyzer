@@ -46,8 +46,8 @@ export function destructure(value, stringifyNode) {
 		// any node that comes before the '/' is the font-size
 		if (
 			item.next &&
-			item.next.data.type == 'Operator' &&
-			item.next.data.value.charCodeAt(0) == SLASH
+			item.next.data.type === 'Operator' &&
+			item.next.data.value.charCodeAt(0) === SLASH
 		) {
 			font_size = stringifyNode(node)
 			return
@@ -56,8 +56,8 @@ export function destructure(value, stringifyNode) {
 		// any node that comes after '/' is the line-height
 		if (
 			item.prev &&
-			item.prev.data.type == 'Operator' &&
-			item.prev.data.value.charCodeAt(0) == SLASH
+			item.prev.data.type === 'Operator' &&
+			item.prev.data.value.charCodeAt(0) === SLASH
 		) {
 			line_height = stringifyNode(node)
 			return
@@ -66,8 +66,8 @@ export function destructure(value, stringifyNode) {
 		// any node that's followed by ',' is a font-family
 		if (
 			item.next &&
-			item.next.data.type == 'Operator' &&
-			item.next.data.value.charCodeAt(0) == COMMA &&
+			item.next.data.type === 'Operator' &&
+			item.next.data.value.charCodeAt(0) === COMMA &&
 			!font_family[0]
 		) {
 			font_family[0] = node
@@ -84,7 +84,7 @@ export function destructure(value, stringifyNode) {
 			node.type === 'Dimension' &&
 			item.prev &&
 			item.prev.data.type === 'Identifier' &&
-			item.prev.data.name == 'oblique'
+			item.prev.data.name === 'oblique'
 		) {
 			// put in the correct amount of whitespace between `oblique` and `<angle>`
 			font_style +=
@@ -95,12 +95,12 @@ export function destructure(value, stringifyNode) {
 
 		// any node that's a number and not previously caught by line-height or font-size is the font-weight
 		// (oblique <angle> will not be caught here, because that's a Dimension, not a Number)
-		if (node.type == 'Number') {
+		if (node.type === 'Number') {
 			return
 		}
 
 		// last node always ends the font-family
-		if (item.next == null) {
+		if (item.next === null) {
 			font_family[1] = node
 
 			// if, at the last node, we don;t have a size yet, it *must* be the previous node
@@ -113,7 +113,7 @@ export function destructure(value, stringifyNode) {
 		}
 
 		// Any remaining identifiers can be font-size, font-style, font-stretch, font-variant or font-weight
-		if (node.type == 'Identifier') {
+		if (node.type === 'Identifier') {
 			if (SIZE_KEYWORDS.has(node.name)) {
 				font_size = node.name
 				return
