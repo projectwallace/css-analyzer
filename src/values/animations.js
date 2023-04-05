@@ -10,22 +10,24 @@ const timingKeywords = new Set([
 
 export function analyzeAnimation(children, stringifyNode) {
   let durationFound = false
-  const durations = []
-  const timingFunctions = []
+  let durations = []
+  let timingFunctions = []
 
   children.forEach(child => {
+    let type = child.type
+
     // Right after a ',' we start over again
-    if (child.type === 'Operator') {
+    if (type === 'Operator') {
       return durationFound = false
     }
-    if (child.type === 'Dimension' && durationFound === false) {
+    if (type === 'Dimension' && durationFound === false) {
       durationFound = true
       return durations.push(stringifyNode(child))
     }
-    if (child.type === 'Identifier' && timingKeywords.has(child.name)) {
+    if (type === 'Identifier' && timingKeywords.has(child.name)) {
       return timingFunctions.push(stringifyNode(child))
     }
-    if (child.type === 'Function'
+    if (type === 'Function'
       && (
         child.name === 'cubic-bezier' || child.name === 'steps'
       )

@@ -40,7 +40,7 @@ export function strEquals(base, test) {
  */
 export function endsWith(base, test) {
   let len = test.length
-  const offset = len - base.length
+  let offset = len - base.length
 
   if (offset < 0) {
     return false

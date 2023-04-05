@@ -31,7 +31,7 @@ class ContextCollection {
      * uniquenessRatio: number
      * }>}
      */
-    const itemsPerContext = new Map()
+    let itemsPerContext = new Map()
 
     for (let [context, value] of this._contexts.entries()) {
       itemsPerContext.set(context, value.count())

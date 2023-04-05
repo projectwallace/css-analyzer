@@ -14,11 +14,6 @@ const FONT_KEYWORDS = new Set([
 	'status-bar',
 ])
 
-export function isFontKeyword(node) {
-	const firstChild = node.children.first
-	return firstChild.type === 'Identifier' && FONT_KEYWORDS.has(firstChild.name)
-}
-
 const SIZE_KEYWORDS = new Set([
 	/* <absolute-size> values */
 	'xx-small',
@@ -36,6 +31,13 @@ const SIZE_KEYWORDS = new Set([
 
 const COMMA = 44 // ','.charCodeAt(0) === 44
 const SLASH = 47 // '/'.charCodeAt(0) === 47
+const TYPE_OPERATOR = 'Operator'
+const TYPE_IDENTIFIER = 'Identifier'
+
+export function isFontKeyword(node) {
+	let firstChild = node.children.first
+	return firstChild.type === TYPE_IDENTIFIER && FONT_KEYWORDS.has(firstChild.name)
+}
 
 export function destructure(value, stringifyNode) {
 	let font_family = []
@@ -46,7 +48,7 @@ export function destructure(value, stringifyNode) {
 		// any node that comes before the '/' is the font-size
 		if (
 			item.next &&
-			item.next.data.type === 'Operator' &&
+			item.next.data.type === TYPE_OPERATOR &&
 			item.next.data.value.charCodeAt(0) === SLASH
 		) {
 			font_size = stringifyNode(node)
@@ -56,7 +58,7 @@ export function destructure(value, stringifyNode) {
 		// any node that comes after '/' is the line-height
 		if (
 			item.prev &&
-			item.prev.data.type === 'Operator' &&
+			item.prev.data.type === TYPE_OPERATOR &&
 			item.prev.data.value.charCodeAt(0) === SLASH
 		) {
 			line_height = stringifyNode(node)
@@ -66,7 +68,7 @@ export function destructure(value, stringifyNode) {
 		// any node that's followed by ',' is a font-family
 		if (
 			item.next &&
-			item.next.data.type === 'Operator' &&
+			item.next.data.type === TYPE_OPERATOR &&
 			item.next.data.value.charCodeAt(0) === COMMA &&
 			!font_family[0]
 		) {
@@ -83,7 +85,7 @@ export function destructure(value, stringifyNode) {
 		if (
 			node.type === 'Dimension' &&
 			item.prev &&
-			item.prev.data.type === 'Identifier' &&
+			item.prev.data.type === TYPE_IDENTIFIER &&
 			item.prev.data.name === 'oblique'
 		) {
 			// put in the correct amount of whitespace between `oblique` and `<angle>`
@@ -113,7 +115,7 @@ export function destructure(value, stringifyNode) {
 		}
 
 		// Any remaining identifiers can be font-size, font-style, font-stretch, font-variant or font-weight
-		if (node.type === 'Identifier') {
+		if (node.type === TYPE_IDENTIFIER) {
 			if (SIZE_KEYWORDS.has(node.name)) {
 				font_size = node.name
 				return

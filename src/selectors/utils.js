@@ -26,7 +26,7 @@ export function compareSpecificity(a, b) {
  * @returns {Selector[]} Analyzed selectors in the selectorList
  */
 function analyzeList(selectorListAst, cb) {
-  const childSelectors = []
+  let childSelectors = []
   walk(selectorListAst, {
     visit: 'Selector',
     enter: function (node) {
@@ -65,7 +65,7 @@ export function isAccessibility(selector) {
     // Test for [aria-] or [role] inside :is()/:where() and friends
     else if (node.type === 'PseudoClassSelector') {
       if (isPseudoFunction(node.name)) {
-        const list = analyzeList(node, isAccessibility)
+        let list = analyzeList(node, isAccessibility)
 
         if (list.some(b => b === true)) {
           isA11y = true
@@ -119,7 +119,7 @@ export function getComplexity(selector) {
 
     if (node.type === 'PseudoClassSelector') {
       if (isPseudoFunction(node.name)) {
-        const list = analyzeList(node, getComplexity)
+        let list = analyzeList(node, getComplexity)
 
         // Bail out for empty/non-existent :nth-child() params
         if (list.length === 0) return
