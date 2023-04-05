@@ -423,18 +423,26 @@ function analyze(css) {
               if (nodeName.length > 20 || nodeName.length < 3) {
                 return this.skip
               }
-              let stringified = stringifyNode(valueNode)
-              let lowerCased = nodeName.toLowerCase()
 
-              if (namedColors.has(lowerCased)) {
+              if (namedColors.has(nodeName)) {
+                let stringified = stringifyNode(valueNode)
                 colors.push(stringified, property)
                 colorFormats.push('named')
-              } else if (colorKeywords.has(lowerCased)) {
+                return
+              }
+
+              if (colorKeywords.has(nodeName)) {
+                let stringified = stringifyNode(valueNode)
                 colors.push(stringified, property)
-                colorFormats.push(lowerCased)
-              } else if (systemColors.has(lowerCased)) {
+                colorFormats.push(nodeName.toLowerCase())
+                return
+              }
+
+              if (systemColors.has(nodeName)) {
+                let stringified = stringifyNode(valueNode)
                 colors.push(stringified, property)
                 colorFormats.push('system')
+                return
               }
               return this.skip
             }
@@ -443,11 +451,11 @@ function analyze(css) {
               if (strEquals('var', nodeName)) {
                 return this.skip
               }
-              let fnName = nodeName.toLowerCase()
-              let stringified = stringifyNode(valueNode)
-              if (colorFunctions.has(fnName)) {
+
+              if (colorFunctions.has(nodeName)) {
+                let stringified = stringifyNode(valueNode)
                 colors.push(stringified, property)
-                colorFormats.push(fnName)
+                colorFormats.push(nodeName.toLowerCase())
               }
               // No this.skip here intentionally,
               // otherwise we'll miss colors in linear-gradient() etc.
