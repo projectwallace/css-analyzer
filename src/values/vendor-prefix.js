@@ -5,11 +5,11 @@ export function isAstVendorPrefixed(node) {
     return false
   }
 
-  const children = node.children.toArray()
+  let children = node.children.toArray()
 
   for (let index = 0; index < children.length; index++) {
-    const node = children[index]
-    const { type, name } = node;
+    let node = children[index]
+    let { type, name } = node;
 
     if (type === 'Identifier' && hasVendorPrefix(name)) {
       return true

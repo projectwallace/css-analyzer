@@ -28,8 +28,8 @@ function ratio(part, total) {
  * Analyze CSS
  * @param {string} css
  */
-const analyze = (css) => {
-  const start = Date.now()
+function analyze(css) {
+  let start = Date.now()
 
   /**
    * Recreate the authored CSS from a CSSTree node
@@ -47,17 +47,17 @@ const analyze = (css) => {
   // Stylesheet
   let totalComments = 0
   let commentsSize = 0
-  const embeds = new CountableCollection()
+  let embeds = new CountableCollection()
   let embedSize = 0
-  const embedTypes = {
+  let embedTypes = {
     total: 0,
     /** @type {Map<string, {size: number, count: number}>} */
     unique: new Map()
   }
 
-  const startParse = Date.now()
+  let startParse = Date.now()
 
-  const ast = parse(css, {
+  let ast = parse(css, {
     parseCustomProperty: true, // To find font-families, colors, etc.
     positions: true, // So we can use stringifyNode()
     /** @param {string} comment */
@@ -67,86 +67,86 @@ const analyze = (css) => {
     },
   })
 
-  const startAnalysis = Date.now()
+  let startAnalysis = Date.now()
   let linesOfCode = ast.loc.end.line - ast.loc.start.line + 1
 
   // Atrules
   let totalAtRules = 0
   /** @type {{[property: string]: string}[]} */
-  const fontfaces = []
-  const layers = new CountableCollection()
-  const imports = new CountableCollection()
-  const medias = new CountableCollection()
-  const mediaBrowserhacks = new CountableCollection()
-  const charsets = new CountableCollection()
-  const supports = new CountableCollection()
-  const supportsBrowserhacks = new CountableCollection()
-  const keyframes = new CountableCollection()
-  const prefixedKeyframes = new CountableCollection()
-  const containers = new CountableCollection()
+  let fontfaces = []
+  let layers = new CountableCollection()
+  let imports = new CountableCollection()
+  let medias = new CountableCollection()
+  let mediaBrowserhacks = new CountableCollection()
+  let charsets = new CountableCollection()
+  let supports = new CountableCollection()
+  let supportsBrowserhacks = new CountableCollection()
+  let keyframes = new CountableCollection()
+  let prefixedKeyframes = new CountableCollection()
+  let containers = new CountableCollection()
 
   // Rules
   let totalRules = 0
   let emptyRules = 0
-  const ruleSizes = new AggregateCollection()
-  const selectorsPerRule = new AggregateCollection()
-  const declarationsPerRule = new AggregateCollection()
+  let ruleSizes = new AggregateCollection()
+  let selectorsPerRule = new AggregateCollection()
+  let declarationsPerRule = new AggregateCollection()
 
   // Selectors
-  const keyframeSelectors = new CountableCollection()
-  const uniqueSelectors = new Set()
-  const prefixedSelectors = new CountableCollection()
+  let keyframeSelectors = new CountableCollection()
+  let uniqueSelectors = new Set()
+  let prefixedSelectors = new CountableCollection()
   /** @type {Specificity} */
   let maxSpecificity
   /** @type {Specificity} */
   let minSpecificity
-  const specificityA = new AggregateCollection()
-  const specificityB = new AggregateCollection()
-  const specificityC = new AggregateCollection()
-  const uniqueSpecificities = new CountableCollection()
-  const selectorComplexities = new AggregateCollection()
+  let specificityA = new AggregateCollection()
+  let specificityB = new AggregateCollection()
+  let specificityC = new AggregateCollection()
+  let uniqueSpecificities = new CountableCollection()
+  let selectorComplexities = new AggregateCollection()
   /** @type {Specificity[]} */
-  const specificities = []
-  const ids = new CountableCollection()
-  const a11y = new CountableCollection()
+  let specificities = []
+  let ids = new CountableCollection()
+  let a11y = new CountableCollection()
 
   // Declarations
-  const uniqueDeclarations = new Set()
+  let uniqueDeclarations = new Set()
   let totalDeclarations = 0
   let importantDeclarations = 0
   let importantsInKeyframes = 0
   let importantCustomProperties = new CountableCollection()
 
   // Properties
-  const properties = new CountableCollection()
-  const propertyHacks = new CountableCollection()
-  const propertyVendorPrefixes = new CountableCollection()
-  const customProperties = new CountableCollection()
-  const propertyComplexities = new AggregateCollection()
+  let properties = new CountableCollection()
+  let propertyHacks = new CountableCollection()
+  let propertyVendorPrefixes = new CountableCollection()
+  let customProperties = new CountableCollection()
+  let propertyComplexities = new AggregateCollection()
 
   // Values
-  const vendorPrefixedValues = new CountableCollection()
-  const valueBrowserhacks = new CountableCollection()
-  const zindex = new CountableCollection()
-  const textShadows = new CountableCollection()
-  const boxShadows = new CountableCollection()
-  const fontFamilies = new CountableCollection()
-  const fontSizes = new CountableCollection()
-  const lineHeights = new CountableCollection()
-  const timingFunctions = new CountableCollection()
-  const durations = new CountableCollection()
-  const colors = new ContextCollection()
-  const colorFormats = new CountableCollection()
-  const units = new ContextCollection()
+  let vendorPrefixedValues = new CountableCollection()
+  let valueBrowserhacks = new CountableCollection()
+  let zindex = new CountableCollection()
+  let textShadows = new CountableCollection()
+  let boxShadows = new CountableCollection()
+  let fontFamilies = new CountableCollection()
+  let fontSizes = new CountableCollection()
+  let lineHeights = new CountableCollection()
+  let timingFunctions = new CountableCollection()
+  let durations = new CountableCollection()
+  let colors = new ContextCollection()
+  let colorFormats = new CountableCollection()
+  let units = new ContextCollection()
 
   walk(ast, function (node) {
     switch (node.type) {
       case 'Atrule': {
         totalAtRules++
-        const atRuleName = node.name
+        let atRuleName = node.name
 
         if (atRuleName === 'font-face') {
-          const descriptors = {}
+          let descriptors = {}
 
           node.block.children.forEach(descriptor => {
             // Ignore 'Raw' nodes in case of CSS syntax errors
@@ -160,7 +160,7 @@ const analyze = (css) => {
         }
 
         if (atRuleName === 'media') {
-          const prelude = stringifyNode(node.prelude)
+          let prelude = stringifyNode(node.prelude)
           medias.push(prelude)
           if (isMediaBrowserhack(node.prelude)) {
             mediaBrowserhacks.push(prelude)
@@ -168,7 +168,7 @@ const analyze = (css) => {
           break
         }
         if (atRuleName === 'supports') {
-          const prelude = stringifyNode(node.prelude)
+          let prelude = stringifyNode(node.prelude)
           supports.push(prelude)
           if (isSupportsBrowserhack(node.prelude)) {
             supportsBrowserhacks.push(prelude)
@@ -176,7 +176,7 @@ const analyze = (css) => {
           break
         }
         if (endsWith('keyframes', atRuleName)) {
-          const name = '@' + atRuleName + ' ' + stringifyNode(node.prelude)
+          let name = '@' + atRuleName + ' ' + stringifyNode(node.prelude)
           if (hasVendorPrefix(atRuleName)) {
             prefixedKeyframes.push(name)
           }
@@ -196,7 +196,7 @@ const analyze = (css) => {
           break
         }
         if (atRuleName === 'layer') {
-          const prelude = stringifyNode(node.prelude)
+          let prelude = stringifyNode(node.prelude)
           prelude
             .split(',')
             .forEach(name => layers.push(name.trim()))
@@ -204,8 +204,8 @@ const analyze = (css) => {
         break
       }
       case 'Rule': {
-        const numSelectors = node.prelude.children ? node.prelude.children.size : 0
-        const numDeclarations = node.block.children ? node.block.children.size : 0
+        let numSelectors = node.prelude.children ? node.prelude.children.size : 0
+        let numDeclarations = node.block.children ? node.block.children.size : 0
 
         ruleSizes.push(numSelectors + numDeclarations)
         selectorsPerRule.push(numSelectors)
@@ -219,16 +219,16 @@ const analyze = (css) => {
         break
       }
       case 'Selector': {
-        const selector = stringifyNode(node)
+        let selector = stringifyNode(node)
 
         if (this.atrule && endsWith('keyframes', this.atrule.name)) {
           keyframeSelectors.push(selector)
           return this.skip
         }
 
-        const [{ value: specificityObj }] = calculate(node)
+        let [{ value: specificityObj }] = calculate(node)
         /** @type {Specificity} */
-        const specificity = [specificityObj.a, specificityObj.b, specificityObj.c]
+        let specificity = [specificityObj.a, specificityObj.b, specificityObj.c]
 
         if (specificity[0] > 0) {
           ids.push(selector)
@@ -238,7 +238,7 @@ const analyze = (css) => {
           a11y.push(selector)
         }
 
-        const [complexity, isPrefixed] = getComplexity(node)
+        let [complexity, isPrefixed] = getComplexity(node)
 
         if (isPrefixed) {
           prefixedSelectors.push(selector)
@@ -291,9 +291,9 @@ const analyze = (css) => {
       }
       case 'Url': {
         if (startsWith('data:', node.value)) {
-          var embed = node.value
-          var size = embed.length
-          var type = getEmbedType(embed)
+          let embed = node.value
+          let size = embed.length
+          let type = getEmbedType(embed)
 
           embedTypes.total++
           embedSize += size
@@ -320,8 +320,8 @@ const analyze = (css) => {
           break
         }
 
-        const declaration = this.declaration
-        const { property, important } = declaration
+        let declaration = this.declaration
+        let { property, important } = declaration
 
         if (isAstVendorPrefixed(node)) {
           vendorPrefixedValues.push(stringifyNode(node))
@@ -373,7 +373,7 @@ const analyze = (css) => {
         } else if (isProperty('line-height', property)) {
           lineHeights.push((stringifyNode(node)))
         } else if (isProperty('transition', property) || isProperty('animation', property)) {
-          const [times, fns] = analyzeAnimation(node.children, stringifyNode)
+          let [times, fns] = analyzeAnimation(node.children, stringifyNode)
           for (let i = 0; i < times.length; i++) {
             durations.push(times[i])
           }
@@ -412,15 +412,15 @@ const analyze = (css) => {
               return this.skip
             }
             case 'Identifier': {
-              const { name } = valueNode
+              let { name } = valueNode
               // Bail out if it can't be a color name
               // 20 === 'lightgoldenrodyellow'.length
               // 3 === 'red'.length
               if (name.length > 20 || name.length < 3) {
                 return this.skip
               }
-              const stringified = stringifyNode(valueNode)
-              const lowerCased = name.toLowerCase()
+              let stringified = stringifyNode(valueNode)
+              let lowerCased = name.toLowerCase()
 
               if (namedColors.has(lowerCased)) {
                 colors.push(stringified, property)
@@ -439,8 +439,8 @@ const analyze = (css) => {
               if (strEquals('var', valueNode.name)) {
                 return this.skip
               }
-              const fnName = valueNode.name.toLowerCase()
-              const stringified = stringifyNode(valueNode)
+              let fnName = valueNode.name.toLowerCase()
+              let stringified = stringifyNode(valueNode)
               if (colorFunctions.has(fnName)) {
                 colors.push(stringified, property)
                 colorFormats.push(fnName)
@@ -471,7 +471,7 @@ const analyze = (css) => {
           }
         }
 
-        const { property } = node
+        let { property } = node
 
         properties.push(property)
 
@@ -495,21 +495,21 @@ const analyze = (css) => {
     }
   })
 
-  const embeddedContent = embeds.count()
+  let embeddedContent = embeds.count()
 
-  const totalUniqueDeclarations = uniqueDeclarations.size
+  let totalUniqueDeclarations = uniqueDeclarations.size
 
-  const totalSelectors = selectorComplexities.size()
-  const specificitiesA = specificityA.aggregate()
-  const specificitiesB = specificityB.aggregate()
-  const specificitiesC = specificityC.aggregate()
-  const uniqueSpecificitiesCount = uniqueSpecificities.count()
-  const complexityCount = new CountableCollection(selectorComplexities.toArray()).count()
-  const totalUniqueSelectors = uniqueSelectors.size
-  const uniqueRuleSize = new CountableCollection(ruleSizes.toArray()).count()
-  const uniqueSelectorsPerRule = new CountableCollection(selectorsPerRule.toArray()).count()
-  const uniqueDeclarationsPerRule = new CountableCollection(declarationsPerRule.toArray()).count()
-  const assign = Object.assign
+  let totalSelectors = selectorComplexities.size()
+  let specificitiesA = specificityA.aggregate()
+  let specificitiesB = specificityB.aggregate()
+  let specificitiesC = specificityC.aggregate()
+  let uniqueSpecificitiesCount = uniqueSpecificities.count()
+  let complexityCount = new CountableCollection(selectorComplexities.toArray()).count()
+  let totalUniqueSelectors = uniqueSelectors.size
+  let uniqueRuleSize = new CountableCollection(ruleSizes.toArray()).count()
+  let uniqueSelectorsPerRule = new CountableCollection(selectorsPerRule.toArray()).count()
+  let uniqueDeclarationsPerRule = new CountableCollection(declarationsPerRule.toArray()).count()
+  let assign = Object.assign
 
   return {
     stylesheet: {

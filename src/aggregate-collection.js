@@ -7,14 +7,14 @@
  * @returns {Number} mode - The `mode` value of `arr`
  */
 function Mode(arr) {
-  const frequencies = new Map()
+  let frequencies = new Map()
   let maxOccurrences = -1
   let maxOccurenceCount = 0
   let sum = 0
 
   for (let i = 0; i < arr.length; i++) {
-    const element = arr[i]
-    const updatedCount = (frequencies.get(element) || 0) + 1
+    let element = arr[i]
+    let updatedCount = (frequencies.get(element) || 0) + 1
     frequencies.set(element, updatedCount)
 
     if (updatedCount > maxOccurrences) {
@@ -40,8 +40,8 @@ function Mode(arr) {
  * @returns {Number} - The array's Median
  */
 function Median(arr) {
-  const middle = arr.length / 2
-  const lowerMiddleRank = Math.floor(middle)
+  let middle = arr.length / 2
+  let lowerMiddleRank = Math.floor(middle)
 
   if (middle !== lowerMiddleRank) {
     return arr[lowerMiddleRank]
@@ -84,12 +84,12 @@ class AggregateCollection {
 
     // TODO: can we avoid this sort()? It's slow
     /** @type Number[] */
-    const sorted = this._items.slice().sort((a, b) => a - b)
-    const min = sorted[0]
-    const max = sorted[sorted.length - 1]
+    let sorted = this._items.slice().sort((a, b) => a - b)
+    let min = sorted[0]
+    let max = sorted[sorted.length - 1]
 
-    const mode = Mode(sorted)
-    const median = Median(sorted)
+    let mode = Mode(sorted)
+    let median = Median(sorted)
 
     return {
       min,
