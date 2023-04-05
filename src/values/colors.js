@@ -1,6 +1,21 @@
-export const namedColors = new Set([
+import { KeywordSet } from "../keyword-set.js"
+
+export const namedColors = new KeywordSet([
   // CSS Named Colors
   // Spec: https://drafts.csswg.org/css-color/#named-colors
+
+  // Heuristic: popular names first for quick finding in set.has()
+  'white',
+  'black',
+  'red',
+  'blue',
+  'gray',
+  'grey',
+  'green',
+  'rebeccapurple',
+  'yellow',
+  'orange',
+
   'aliceblue',
   'antiquewhite',
   'aqua',
@@ -8,9 +23,7 @@ export const namedColors = new Set([
   'azure',
   'beige',
   'bisque',
-  'black',
   'blanchedalmond',
-  'blue',
   'blueviolet',
   'brown',
   'burlywood',
@@ -54,10 +67,7 @@ export const namedColors = new Set([
   'ghostwhite',
   'gold',
   'goldenrod',
-  'gray',
-  'green',
   'greenyellow',
-  'grey',
   'honeydew',
   'hotpink',
   'indianred',
@@ -106,7 +116,6 @@ export const namedColors = new Set([
   'oldlace',
   'olive',
   'olivedrab',
-  'orange',
   'orangered',
   'orchid',
   'palegoldenrod',
@@ -120,8 +129,6 @@ export const namedColors = new Set([
   'plum',
   'powderblue',
   'purple',
-  'rebeccapurple',
-  'red',
   'rosybrown',
   'royalblue',
   'saddlebrown',
@@ -145,13 +152,11 @@ export const namedColors = new Set([
   'turquoise',
   'violet',
   'wheat',
-  'white',
   'whitesmoke',
-  'yellow',
   'yellowgreen',
 ])
 
-export const systemColors = new Set([
+export const systemColors = new KeywordSet([
   // CSS System Colors
   // Spec: https://drafts.csswg.org/css-color/#css-system-colors
   'canvas',
@@ -176,7 +181,7 @@ export const systemColors = new Set([
   // Spec: https://drafts.csswg.org/css-color/#deprecated-system-colors
 ])
 
-export const colorFunctions = new Set([
+export const colorFunctions = new KeywordSet([
   'rgb',
   'rgba',
   'hsl',
@@ -189,7 +194,7 @@ export const colorFunctions = new Set([
   'color',
 ])
 
-export const colorKeywords = new Set([
-  'currentcolor',
+export const colorKeywords = new KeywordSet([
   'transparent',
+  'currentcolor',
 ])

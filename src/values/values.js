@@ -1,4 +1,6 @@
-const keywords = new Set([
+import { KeywordSet } from "../keyword-set.js"
+
+const keywords = new KeywordSet([
   'auto',
   'inherit',
   'initial',

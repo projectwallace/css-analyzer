@@ -1,4 +1,6 @@
-const timingKeywords = new Set([
+import { KeywordSet } from "../keyword-set.js"
+
+const timingKeywords = new KeywordSet([
   'linear',
   'ease',
   'ease-in',

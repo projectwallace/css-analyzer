@@ -1,4 +1,6 @@
-const FONT_KEYWORDS = new Set([
+import { KeywordSet } from "../keyword-set.js"
+
+const FONT_KEYWORDS = new KeywordSet([
 	// Global CSS keywords
 	'inherit',
 	'initial',
@@ -14,7 +16,7 @@ const FONT_KEYWORDS = new Set([
 	'status-bar',
 ])
 
-const SIZE_KEYWORDS = new Set([
+const SIZE_KEYWORDS = new KeywordSet([
 	/* <absolute-size> values */
 	'xx-small',
 	'x-small',
