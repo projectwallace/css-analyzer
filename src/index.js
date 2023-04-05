@@ -281,10 +281,13 @@ function analyze(css) {
           break
         }
 
-        if (endsWith('\\9', node.unit)) {
-          units.push(node.unit.substring(0, node.unit.length - 2), this.declaration.property)
+        /** @type {string} */
+        let unit = node.unit
+
+        if (endsWith('\\9', unit)) {
+          units.push(unit.substring(0, unit.length - 2), this.declaration.property)
         } else {
-          units.push(node.unit, this.declaration.property)
+          units.push(unit, this.declaration.property)
         }
 
         return this.skip
@@ -400,6 +403,8 @@ function analyze(css) {
         }
 
         walk(node, function (valueNode) {
+          let nodeName = valueNode.name
+
           switch (valueNode.type) {
             case 'Hash': {
               let hexLength = valueNode.value.length
@@ -412,15 +417,14 @@ function analyze(css) {
               return this.skip
             }
             case 'Identifier': {
-              let { name } = valueNode
               // Bail out if it can't be a color name
               // 20 === 'lightgoldenrodyellow'.length
               // 3 === 'red'.length
-              if (name.length > 20 || name.length < 3) {
+              if (nodeName.length > 20 || nodeName.length < 3) {
                 return this.skip
               }
               let stringified = stringifyNode(valueNode)
-              let lowerCased = name.toLowerCase()
+              let lowerCased = nodeName.toLowerCase()
 
               if (namedColors.has(lowerCased)) {
                 colors.push(stringified, property)
@@ -436,10 +440,10 @@ function analyze(css) {
             }
             case 'Function': {
               // Don't walk var() multiple times
-              if (strEquals('var', valueNode.name)) {
+              if (strEquals('var', nodeName)) {
                 return this.skip
               }
-              let fnName = valueNode.name.toLowerCase()
+              let fnName = nodeName.toLowerCase()
               let stringified = stringifyNode(valueNode)
               if (colorFunctions.has(fnName)) {
                 colors.push(stringified, property)

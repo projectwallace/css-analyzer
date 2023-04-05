@@ -58,14 +58,14 @@ export function endsWith(base, test) {
 /**
  * Case-insensitive testing whether a string starts with a given substring
  * @param {string} base
- * @param {test} test
+ * @param {string} test
  * @returns {boolean} true if `test` starts with `base`, false otherwise
  */
 export function startsWith(base, test) {
   let len = base.length
   if (test.length < len) return false
 
-  for (let i = 0; i < base.length; i++) {
+  for (let i = 0; i < len; i++) {
     if (compareChar(base.charCodeAt(i), test.charCodeAt(i)) === false) {
       return false
     }
