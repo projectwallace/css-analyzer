@@ -892,6 +892,8 @@ Colors('ignores CSS keywords', () => {
       color: unset;
       color: initial;
       color: transparent;
+      color: revert;
+      color: revert-layer;
       background: none;
     }
 

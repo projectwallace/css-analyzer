@@ -20,21 +20,28 @@ VendorPrefix('finds simple prefixes', () => {
       background: var(--test);
       margin: -0.3em;
     }
+
+    @supports (position: -webkit-sticky) {
+      thing {
+        position: -webkit-sticky;
+        position: sticky;
+      }
+    }
   `
   const actual = analyze(fixture).values.prefixes
   const expected = {
-    total: 7,
+    total: 8,
     totalUnique: 7,
     unique: {
       '-moz-max-content': 1,
       '-webkit-max-content': 1,
       '0 0 0 3px -moz-mac-focusring': 1,
-      '-webkit-sticky': 1,
+      '-webkit-sticky': 2,
       '-webkit-transform 0.3s ease-out': 1,
       '-moz-transform 0.3s ease-out': 1,
       '-o-transform 0.3s ease-out': 1,
     },
-    uniquenessRatio: 1
+    uniquenessRatio: 7 / 8
   }
 
   assert.equal(actual, expected)

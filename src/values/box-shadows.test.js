@@ -64,8 +64,14 @@ BoxShadows('finds vendor prefixed values', () => {
 BoxShadows('ignores keywords', () => {
   const fixture = `
     box-shadows-keyword {
-      box-shadow: initial;
       box-shadow: none;
+
+      /* Global keywords */
+      box-shadow: initial;
+      box-shadow: inherit;
+      box-shadow: revert;
+      box-shadow: revert-layer;
+      box-shadow: unset;
     }
   `
   const actual = analyze(fixture).values.boxShadows

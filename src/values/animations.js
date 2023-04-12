@@ -1,6 +1,6 @@
 import { KeywordSet } from "../keyword-set.js"
 
-const timingKeywords = new KeywordSet([
+const TIMING_KEYWORDS = new KeywordSet([
   'linear',
   'ease',
   'ease-in',
@@ -8,6 +8,11 @@ const timingKeywords = new KeywordSet([
   'ease-in-out',
   'step-start',
   'step-end',
+])
+
+const TIMING_FUNCTION_VALUES = new KeywordSet([
+  'cubic-bezier',
+  'steps'
 ])
 
 export function analyzeAnimation(children, stringifyNode) {
@@ -26,14 +31,10 @@ export function analyzeAnimation(children, stringifyNode) {
       durationFound = true
       return durations.push(stringifyNode(child))
     }
-    if (type === 'Identifier' && timingKeywords.has(child.name)) {
+    if (type === 'Identifier' && TIMING_KEYWORDS.has(child.name)) {
       return timingFunctions.push(stringifyNode(child))
     }
-    if (type === 'Function'
-      && (
-        child.name === 'cubic-bezier' || child.name === 'steps'
-      )
-    ) {
+    if (type === 'Function' && TIMING_FUNCTION_VALUES.has(child.name)) {
       return timingFunctions.push(stringifyNode(child))
     }
   })

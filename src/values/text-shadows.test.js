@@ -74,9 +74,14 @@ TextShadows('finds vendor prefixed values', () => {
 TextShadows('ignores keywords', () => {
   const fixture = `
     text-shadows-keyword {
-      text-shadow: initial;
       text-shadow: none;
+
+      /* Global values */
       text-shadow: inherit;
+      text-shadow: initial;
+      text-shadow: revert;
+      text-shadow: revert-layer;
+      text-shadow: unset;
     }
   `
   const actual = analyze(fixture).values.textShadows

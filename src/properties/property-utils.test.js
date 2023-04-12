@@ -1,6 +1,5 @@
 import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
-import { analyze } from '../index.js'
 import { isHack, isCustom, isProperty } from './property-utils.js'
 
 const PropertyUtils = suite('Property Utils')
