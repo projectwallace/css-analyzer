@@ -41405,21 +41405,23 @@
       "uniquenessRatio": 0.3076923076923077
     },
     "textShadows": {
-      "total": 6,
-      "totalUnique": 5,
+      "total": 12,
+      "totalUnique": 6,
       "unique": {
+        "none": 6,
         "0 1px 2px rgba(0,0,0,.5)": 1,
         "0 0 3px rgba(20, 22, 26, .7)": 2,
         "0 1px 1px 0 var(--fds-black-alpha-10)": 1,
         "0 0 4px var(--fds-black-alpha-50)": 1,
         "0 0 4px rgba(0, 0, 0, .5)": 1
       },
-      "uniquenessRatio": 0.8333333333333334
+      "uniquenessRatio": 0.5
     },
     "boxShadows": {
-      "total": 79,
-      "totalUnique": 72,
+      "total": 87,
+      "totalUnique": 73,
       "unique": {
+        "none": 8,
         "0 3px 8px rgba(0, 0, 0, .3)": 4,
         "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)": 1,
         "0 0 6px rgba(0, 0, 0, .6)": 1,
@@ -41493,7 +41495,7 @@
         "inset 0 0 0 4px rgba(53,120,229,.20)": 1,
         "0 0 0 1px rgba(0, 0, 0, .1), 0 1px 10px rgba(0, 0, 0, .35)": 2
       },
-      "uniquenessRatio": 0.9113924050632911
+      "uniquenessRatio": 0.8390804597701149
     },
     "animations": {
       "durations": {

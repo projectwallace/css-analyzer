@@ -1,5 +1,103 @@
-import { strEquals, startsWith, endsWith } from '../string-utils.js'
 import walk from 'css-tree/walker'
+import { strEquals, startsWith, endsWith } from '../string-utils.js'
+import { hasVendorPrefix } from '../vendor-prefix.js'
+
+export function walkAtRules(ast, stringifyNode, callback) {
+  walk(ast, {
+    visit: 'Atrule',
+    /** @param {import('css-tree').Atrule} node */
+    enter: function (node) {
+      let name = node.name
+
+      if (strEquals('font-face', name)) {
+        let descriptors = {}
+
+        node.block.children.forEach(descriptor => {
+          // Ignore 'Raw' nodes in case of CSS syntax errors
+          if (descriptor.type === 'Declaration') {
+            descriptors[descriptor.property] = stringifyNode(descriptor.value)
+          }
+        })
+
+        callback({
+          node,
+          name: 'font-face',
+          descriptors
+        })
+        return this.skip
+      }
+
+      if (strEquals('media', name)) {
+        callback({
+          node,
+          name: 'media',
+          is_browserhack: isMediaBrowserhack(node.prelude)
+        })
+        return this.skip
+      }
+
+      if (strEquals('supports', name)) {
+        callback({
+          node,
+          name: 'supports',
+          is_browserhack: isSupportsBrowserhack(node.prelude)
+        })
+        return this.skip
+      }
+
+      if (endsWith('keyframes', name)) {
+        callback({
+          node,
+          name: 'keyframes',
+          full_name: '@' + name + ' ' + stringifyNode(node.prelude),
+          has_prefix: hasVendorPrefix(name)
+        })
+        return this.skip
+      }
+
+      if (strEquals('import', name)) {
+        callback({
+          node,
+          name: 'import'
+        })
+        return this.skip
+      }
+
+      if (strEquals('charset', name)) {
+        callback({
+          node,
+          name: 'charset'
+        })
+        return this.skip
+      }
+
+      if (strEquals('container', name)) {
+        callback({
+          node,
+          name: 'container'
+        })
+        return this.skip
+      }
+
+      if (strEquals('layer', name)) {
+        callback({
+          node,
+          name: 'layer',
+          layers: stringifyNode(node.prelude)
+            .split(',')
+            .map(layer => layer.trim())
+        })
+        return this.skip
+      }
+
+      callback({
+        node,
+        name,
+      })
+      return this.skip
+    }
+  })
+}
 
 /**
  * Check whether node.property === property and node.value === value,
@@ -20,7 +118,7 @@ function isPropertyValue(node, property, value) {
  * @param {import('css-tree').AtrulePrelude} prelude
  * @returns true if the atrule is a browserhack
  */
-export function isSupportsBrowserhack(prelude) {
+function isSupportsBrowserhack(prelude) {
   let returnValue = false
 
   walk(prelude, function (node) {
@@ -43,7 +141,7 @@ export function isSupportsBrowserhack(prelude) {
  * @param {import('css-tree').AtrulePrelude} prelude
  * @returns true if the atrule is a browserhack
  */
-export function isMediaBrowserhack(prelude) {
+function isMediaBrowserhack(prelude) {
   let returnValue = false
 
   walk(prelude, function (node) {

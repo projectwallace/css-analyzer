@@ -13,11 +13,12 @@ TextShadows('finds simple values', () => {
       text-shadow: white 2px 5px;
       text-shadow: 5px 10px;
       text-shadow: red 0 -2px;
+      text-shadow: none;
     }
   `
   const actual = analyze(fixture).values.textShadows
   const expected = {
-    total: 6,
+    total: 7,
     unique: {
       '1px 1px 2px black': 1,
       '#fc0 1px 0 10px': 1,
@@ -25,8 +26,9 @@ TextShadows('finds simple values', () => {
       'white 2px 5px': 1,
       '5px 10px': 1,
       'red 0 -2px': 1,
+      'none': 1
     },
-    totalUnique: 6,
+    totalUnique: 7,
     uniquenessRatio: 1
   }
 
@@ -75,8 +77,10 @@ TextShadows('ignores keywords', () => {
   const fixture = `
     text-shadows-keyword {
       text-shadow: initial;
-      text-shadow: none;
       text-shadow: inherit;
+      text-shadow: revert;
+      text-shadow: revert-layer;
+      text-shadow: unset;
     }
   `
   const actual = analyze(fixture).values.textShadows

@@ -1,12 +1,6 @@
 import { KeywordSet } from "../keyword-set.js"
 
 const FONT_KEYWORDS = new KeywordSet([
-	// Global CSS keywords
-	'inherit',
-	'initial',
-	'unset',
-	'revert',
-
 	// System font keywords
 	'caption',
 	'icon',

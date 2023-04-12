@@ -1,24 +1,30 @@
 import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
-import { calculate } from '@bramus/specificity/core'
-import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
-import { getComplexity, isAccessibility, compareSpecificity } from './selectors/utils.js'
-import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
+import { walkRules } from './rules/walk-rules.js'
+import { compareSpecificity } from './selectors/utils.js'
+import { walkSelectors } from './selectors/walk-selectors.js'
+import { walkAtRules } from './atrules/atrules.js'
+import { walkColors } from './values/colors.js'
 import { destructure, isFontKeyword } from './values/destructure-font-shorthand.js'
-import { isValueKeyword } from './values/values.js'
-import { analyzeAnimation } from './values/animations.js'
+import { isValueGlobalKeyword } from './values/values.js'
+import { destructure_animation } from './values/animations.js'
 import { isAstVendorPrefixed } from './values/vendor-prefix.js'
 import { ContextCollection } from './context-collection.js'
 import { CountableCollection } from './countable-collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
-import { strEquals, startsWith, endsWith } from './string-utils.js'
-import { hasVendorPrefix } from './vendor-prefix.js'
-import { isCustom, isHack, isProperty } from './properties/property-utils.js'
-import { getEmbedType } from './stylesheet/stylesheet.js'
+import { isProperty } from './properties/property-utils.js'
+import { walkProperties } from './properties/properties.js'
+import { walkEmbeds } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
+import { walkUnits } from './values/units.js'
+import { walkDeclarations } from './declarations/declarations.js'
 
 /** @typedef {[number, number, number]} Specificity */
 
+/**
+ * @param {number} part
+ * @param {number} total
+ */
 function ratio(part, total) {
   if (total === 0) return 0
   return part / total
@@ -139,370 +145,256 @@ function analyze(css) {
   let colorFormats = new CountableCollection()
   let units = new ContextCollection()
 
-  walk(ast, function (node) {
-    switch (node.type) {
-      case 'Atrule': {
-        totalAtRules++
-        let atRuleName = node.name
+  walkEmbeds(ast, function ({ embed, size, type }) {
+    embedTypes.total++
+    embedSize += size
 
-        if (atRuleName === 'font-face') {
-          let descriptors = {}
+    if (embedTypes.unique.has(type)) {
+      let item = embedTypes.unique.get(type)
+      item.count++
+      item.size += size
+      embedTypes.unique.set(type, item)
+    } else {
+      embedTypes.unique.set(type, {
+        count: 1,
+        size
+      })
+    }
 
-          node.block.children.forEach(descriptor => {
-            // Ignore 'Raw' nodes in case of CSS syntax errors
-            if (descriptor.type === 'Declaration') {
-              descriptors[descriptor.property] = stringifyNode(descriptor.value)
-            }
-          })
+    embeds.push(embed)
+  })
 
-          fontfaces.push(descriptors)
-          break
-        }
+  walkAtRules(ast, stringifyNode, function (atrule) {
+    totalAtRules++
 
-        if (atRuleName === 'media') {
-          let prelude = stringifyNode(node.prelude)
-          medias.push(prelude)
-          if (isMediaBrowserhack(node.prelude)) {
-            mediaBrowserhacks.push(prelude)
-          }
-          break
-        }
-        if (atRuleName === 'supports') {
-          let prelude = stringifyNode(node.prelude)
-          supports.push(prelude)
-          if (isSupportsBrowserhack(node.prelude)) {
-            supportsBrowserhacks.push(prelude)
-          }
-          break
-        }
-        if (endsWith('keyframes', atRuleName)) {
-          let name = '@' + atRuleName + ' ' + stringifyNode(node.prelude)
-          if (hasVendorPrefix(atRuleName)) {
-            prefixedKeyframes.push(name)
-          }
-          keyframes.push(name)
-          break
-        }
-        if (atRuleName === 'import') {
-          imports.push(stringifyNode(node.prelude))
-          break
-        }
-        if (atRuleName === 'charset') {
-          charsets.push(stringifyNode(node.prelude))
-          break
-        }
-        if (atRuleName === 'container') {
-          containers.push(stringifyNode(node.prelude))
-          break
-        }
-        if (atRuleName === 'layer') {
-          let prelude = stringifyNode(node.prelude)
-          prelude
-            .split(',')
-            .forEach(name => layers.push(name.trim()))
-        }
-        break
+    if (atrule.name === 'font-face') {
+      fontfaces.push(atrule.descriptors)
+      return
+    }
+
+    if (atrule.name === 'media') {
+      let str = stringifyNode(atrule.node.prelude)
+      medias.push(str)
+
+      if (atrule.is_browserhack) {
+        mediaBrowserhacks.push(str)
       }
-      case 'Rule': {
-        let numSelectors = node.prelude.children ? node.prelude.children.size : 0
-        let numDeclarations = node.block.children ? node.block.children.size : 0
+      return
+    }
 
-        ruleSizes.push(numSelectors + numDeclarations)
-        selectorsPerRule.push(numSelectors)
-        declarationsPerRule.push(numDeclarations)
+    if (atrule.name === 'supports') {
+      let str = stringifyNode(atrule.node.prelude)
+      supports.push(str)
 
-        totalRules++
-
-        if (numDeclarations === 0) {
-          emptyRules++
-        }
-        break
+      if (atrule.is_browserhack) {
+        supportsBrowserhacks.push(str)
       }
-      case 'Selector': {
-        let selector = stringifyNode(node)
+      return
+    }
 
-        if (this.atrule && endsWith('keyframes', this.atrule.name)) {
-          keyframeSelectors.push(selector)
-          return this.skip
-        }
+    if (atrule.name === 'keyframes') {
+      keyframes.push(atrule.full_name)
 
-        let [{ value: specificityObj }] = calculate(node)
-        /** @type {Specificity} */
-        let specificity = [specificityObj.a, specificityObj.b, specificityObj.c]
+      if (atrule.has_prefix) {
+        prefixedKeyframes.push(atrule.full_name)
+      }
+      return
+    }
 
-        if (specificity[0] > 0) {
-          ids.push(selector)
-        }
+    if (atrule.name === 'import') {
+      imports.push(stringifyNode(atrule.node.prelude))
+      return
+    }
 
-        if (isAccessibility(node)) {
-          a11y.push(selector)
-        }
+    if (atrule.name === 'charset') {
+      charsets.push(stringifyNode(atrule.node.prelude))
+      return
+    }
 
-        let [complexity, isPrefixed] = getComplexity(node)
+    if (atrule.name === 'container') {
+      containers.push(stringifyNode(atrule.node.prelude))
+      return
+    }
 
-        if (isPrefixed) {
-          prefixedSelectors.push(selector)
-        }
+    if (atrule.name === 'layer') {
+      atrule.layers.forEach(layer => layers.push(layer))
+      return
+    }
+  })
 
-        uniqueSelectors.add(selector)
-        selectorComplexities.push(complexity)
-        uniqueSpecificities.push(specificity[0] + ',' + specificity[1] + ',' + specificity[2])
+  walkRules(ast, function (rule) {
+    totalRules++
+    ruleSizes.push(rule.size)
+    selectorsPerRule.push(rule.selector_count)
+    declarationsPerRule.push(rule.declaration_count)
 
-        if (maxSpecificity === undefined) {
-          maxSpecificity = specificity
-        }
+    if (rule.declaration_count === 0) {
+      emptyRules++
+    }
+  })
 
-        if (minSpecificity === undefined) {
-          minSpecificity = specificity
-        }
+  walkSelectors(ast, function (selector) {
+    let str = stringifyNode(selector.node)
+    let specificity = selector.specificity
 
-        specificityA.push(specificity[0])
-        specificityB.push(specificity[1])
-        specificityC.push(specificity[2])
+    if (selector.is_keyframe_selector) {
+      keyframeSelectors.push(str)
+      return
+    }
 
-        if (minSpecificity !== undefined && compareSpecificity(minSpecificity, specificity) < 0) {
-          minSpecificity = specificity
-        }
+    if (specificity[0] > 0) {
+      ids.push(str)
+    }
 
-        if (maxSpecificity !== undefined && compareSpecificity(maxSpecificity, specificity) > 0) {
-          maxSpecificity = specificity
-        }
+    if (selector.is_accesibility) {
+      a11y.push(str)
+    }
 
-        specificities.push(specificity)
+    if (selector.is_prefixed) {
+      prefixedSelectors.push(str)
+    }
 
-        // Avoid deeper walking of selectors to not mess with
-        // our specificity calculations in case of a selector
-        // with :where() or :is() that contain SelectorLists
-        // as children
+    uniqueSelectors.add(str)
+    selectorComplexities.push(selector.complexity)
+    uniqueSpecificities.push(specificity[0] + ',' + specificity[1] + ',' + specificity[2])
+
+    if (maxSpecificity === undefined) {
+      maxSpecificity = specificity
+    }
+
+    if (minSpecificity === undefined) {
+      minSpecificity = specificity
+    }
+
+    specificityA.push(specificity[0])
+    specificityB.push(specificity[1])
+    specificityC.push(specificity[2])
+
+    if (minSpecificity !== undefined && compareSpecificity(minSpecificity, specificity) < 0) {
+      minSpecificity = specificity
+    }
+
+    if (maxSpecificity !== undefined && compareSpecificity(maxSpecificity, specificity) > 0) {
+      maxSpecificity = specificity
+    }
+
+    specificities.push(specificity)
+  })
+
+  walkDeclarations(ast, function (declaration) {
+    totalDeclarations++
+    uniqueDeclarations.add(stringifyNode(declaration.node))
+
+    if (declaration.is_important) {
+      importantDeclarations++
+
+      if (declaration.is_in_keyframes) {
+        importantsInKeyframes++
+      }
+    }
+  })
+
+  walkProperties(ast, function (property) {
+    properties.push(property.property)
+    propertyComplexities.push(property.complexity)
+
+    if (property.is_browserhack) {
+      propertyHacks.push(property.property)
+    } else if (property.has_vendor_prefix) {
+      propertyVendorPrefixes.push(property.property)
+    } else if (property.is_custom) {
+      customProperties.push(property.property)
+
+      if (property.is_important) {
+        importantCustomProperties.push(property.property)
+      }
+    }
+  })
+
+  walkColors(ast, stringifyNode, function (color) {
+    colors.push(color.color, color.property)
+    colorFormats.push(color.format)
+  })
+
+  walkUnits(ast, function (unit) {
+    units.push(unit.unit, unit.property)
+  })
+
+  walk(ast, {
+    visit: 'Declaration',
+    /** @param {import('css-tree').Declaration} declaration */
+    enter: function (declaration) {
+      if (this.atrulePrelude !== null) {
         return this.skip
       }
-      case 'Dimension': {
-        if (!this.declaration) {
-          break
-        }
 
-        /** @type {string} */
-        let unit = node.unit
+      let { property, important, value } = declaration
 
-        if (endsWith('\\9', unit)) {
-          units.push(unit.substring(0, unit.length - 2), this.declaration.property)
-        } else {
-          units.push(unit, this.declaration.property)
-        }
+      if (value.type === 'Raw') return
 
+      if (isValueGlobalKeyword(value)) {
         return this.skip
       }
-      case 'Url': {
-        if (startsWith('data:', node.value)) {
-          let embed = node.value
-          let size = embed.length
-          let type = getEmbedType(embed)
 
-          embedTypes.total++
-          embedSize += size
-
-          if (embedTypes.unique.has(type)) {
-            let item = embedTypes.unique.get(type)
-            item.count++
-            item.size += size
-            embedTypes.unique.set(type, item)
-          } else {
-            embedTypes.unique.set(type, {
-              count: 1,
-              size
-            })
-          }
-
-          // @deprecated
-          embeds.push(embed)
-        }
-        break
+      if (isAstVendorPrefixed(value)) {
+        vendorPrefixedValues.push(stringifyNode(value))
       }
-      case 'Value': {
-        if (isValueKeyword(node)) {
-          break
-        }
 
-        let declaration = this.declaration
-        let { property, important } = declaration
-
-        if (isAstVendorPrefixed(node)) {
-          vendorPrefixedValues.push(stringifyNode(node))
-        }
-
-        // i.e. `property: value !ie`
-        if (typeof important === 'string') {
-          valueBrowserhacks.push(stringifyNodePlain(node) + '!' + important)
-        }
-
-        // i.e. `property: value\9`
-        if (isIe9Hack(node)) {
-          valueBrowserhacks.push(stringifyNode(node))
-        }
-
-        // Process properties first that don't have colors,
-        // so we can avoid further walking them;
-        if (isProperty('z-index', property)) {
-          if (!isValueKeyword(node)) {
-            zindex.push(stringifyNode(node))
-          }
-          return this.skip
-        } else if (isProperty('font', property)) {
-          if (isFontKeyword(node)) return
-
-          let { font_size, line_height, font_family } = destructure(node, stringifyNode)
-
-          if (font_family) {
-            fontFamilies.push(font_family)
-          }
-          if (font_size) {
-            fontSizes.push(font_size)
-          }
-          if (line_height) {
-            lineHeights.push(line_height)
-          }
-
-          break
-        } else if (isProperty('font-size', property)) {
-          if (!isFontKeyword(node)) {
-            fontSizes.push(stringifyNode(node))
-          }
-          break
-        } else if (isProperty('font-family', property)) {
-          if (!isFontKeyword(node)) {
-            fontFamilies.push(stringifyNode(node))
-          }
-          break
-        } else if (isProperty('line-height', property)) {
-          lineHeights.push((stringifyNode(node)))
-        } else if (isProperty('transition', property) || isProperty('animation', property)) {
-          let [times, fns] = analyzeAnimation(node.children, stringifyNode)
-          for (let i = 0; i < times.length; i++) {
-            durations.push(times[i])
-          }
-          for (let i = 0; i < fns.length; i++) {
-            timingFunctions.push(fns[i])
-          }
-          break
-        } else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
-          durations.push(stringifyNode(node))
-          break
-        } else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
-          timingFunctions.push(stringifyNode(node))
-          break
-        } else if (isProperty('text-shadow', property)) {
-          if (!isValueKeyword(node)) {
-            textShadows.push(stringifyNode(node))
-          }
-          // no break here: potentially contains colors
-        } else if (isProperty('box-shadow', property)) {
-          if (!isValueKeyword(node)) {
-            boxShadows.push(stringifyNode(node))
-          }
-          // no break here: potentially contains colors
-        }
-
-        walk(node, function (valueNode) {
-          let nodeName = valueNode.name
-
-          switch (valueNode.type) {
-            case 'Hash': {
-              let hexLength = valueNode.value.length
-              if (endsWith('\\9', valueNode.value)) {
-                hexLength = hexLength - 2
-              }
-              colors.push('#' + valueNode.value, property)
-              colorFormats.push(`hex` + hexLength)
-
-              return this.skip
-            }
-            case 'Identifier': {
-              // Bail out if it can't be a color name
-              // 20 === 'lightgoldenrodyellow'.length
-              // 3 === 'red'.length
-              if (nodeName.length > 20 || nodeName.length < 3) {
-                return this.skip
-              }
-
-              if (namedColors.has(nodeName)) {
-                let stringified = stringifyNode(valueNode)
-                colors.push(stringified, property)
-                colorFormats.push('named')
-                return
-              }
-
-              if (colorKeywords.has(nodeName)) {
-                let stringified = stringifyNode(valueNode)
-                colors.push(stringified, property)
-                colorFormats.push(nodeName.toLowerCase())
-                return
-              }
-
-              if (systemColors.has(nodeName)) {
-                let stringified = stringifyNode(valueNode)
-                colors.push(stringified, property)
-                colorFormats.push('system')
-                return
-              }
-              return this.skip
-            }
-            case 'Function': {
-              // Don't walk var() multiple times
-              if (strEquals('var', nodeName)) {
-                return this.skip
-              }
-
-              if (colorFunctions.has(nodeName)) {
-                let stringified = stringifyNode(valueNode)
-                colors.push(stringified, property)
-                colorFormats.push(nodeName.toLowerCase())
-              }
-              // No this.skip here intentionally,
-              // otherwise we'll miss colors in linear-gradient() etc.
-            }
-          }
-        })
-        break
+      // i.e. `property: value !ie`
+      if (typeof important === 'string') {
+        valueBrowserhacks.push(stringifyNodePlain(value) + '!' + important)
       }
-      case 'Declaration': {
-        // Do not process Declarations in atRule preludes
-        // because we will handle them manually
-        if (this.atrulePrelude !== null) {
-          return this.skip
+
+      // i.e. `property: value\9`
+      if (isIe9Hack(value)) {
+        valueBrowserhacks.push(stringifyNode(value))
+      }
+
+      // Process properties first that don't have colors,
+      // so we can avoid further walking them;
+      if (isProperty('z-index', property)) {
+        zindex.push(stringifyNode(value))
+      } else if (isProperty('font', property)) {
+        if (isFontKeyword(value)) return
+
+        let { font_size, line_height, font_family } = destructure(value, stringifyNode)
+
+        if (font_family) {
+          fontFamilies.push(font_family)
+        }
+        if (font_size) {
+          fontSizes.push(font_size)
+        }
+        if (line_height) {
+          lineHeights.push(line_height)
         }
 
-        totalDeclarations++
-
-        uniqueDeclarations.add(stringifyNode(node))
-
-        if (node.important === true) {
-          importantDeclarations++
-
-          if (this.atrule && endsWith('keyframes', this.atrule.name)) {
-            importantsInKeyframes++
-          }
+      } else if (isProperty('font-size', property)) {
+        if (!isFontKeyword(value)) {
+          fontSizes.push(stringifyNode(value))
         }
-
-        let { property } = node
-
-        properties.push(property)
-
-        if (hasVendorPrefix(property)) {
-          propertyVendorPrefixes.push(property)
-          propertyComplexities.push(2)
-        } else if (isHack(property)) {
-          propertyHacks.push(property)
-          propertyComplexities.push(2)
-        } else if (isCustom(property)) {
-          customProperties.push(property)
-          propertyComplexities.push(2)
-          if (node.important === true) {
-            importantCustomProperties.push(property)
-          }
-        } else {
-          propertyComplexities.push(1)
+      } else if (isProperty('font-family', property)) {
+        if (!isFontKeyword(value)) {
+          fontFamilies.push(stringifyNode(value))
         }
-        break
+      } else if (isProperty('line-height', property)) {
+        lineHeights.push((stringifyNode(value)))
+      } else if (isProperty('transition', property) || isProperty('animation', property)) {
+        let [times, fns] = destructure_animation(value.children)
+        for (let i = 0; i < times.length; i++) {
+          durations.push(stringifyNode(times[i]))
+        }
+        for (let i = 0; i < fns.length; i++) {
+          timingFunctions.push(stringifyNode(fns[i]))
+        }
+      } else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
+        durations.push(stringifyNode(value))
+      } else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
+        timingFunctions.push(stringifyNode(value))
+      } else if (isProperty('text-shadow', property)) {
+        textShadows.push(stringifyNode(value))
+      } else if (isProperty('box-shadow', property)) {
+        boxShadows.push(stringifyNode(value))
       }
     }
   })

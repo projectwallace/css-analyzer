@@ -99,10 +99,12 @@ FontFamilies('handles system fonts', () => {
 FontFamilies('ignores keywords and global values', () => {
   const fixture = `
     test {
-      font: inherit;
-      font: initial;
-      font: unset;
-      font: revert;
+      /* Global values */
+      font-size: inherit;
+      font-size: initial;
+      font-size: revert;
+      font-size: revert-layer;
+      font-size: unset;
     }
   `
   const actual = analyze(fixture).values.fontFamilies

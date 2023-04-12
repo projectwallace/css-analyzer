@@ -13,20 +13,24 @@ ZIndex('finds simple values', () => {
       z-index: 99999;
       z-index: -100;
       z-index: 0;
+      z-index: auto;
+      z-index: calc(var(--model-z-index) - 1);
     }
   `
   const actual = analyze(fixture).values.zindexes
   const expected = {
-    total: 6,
-    totalUnique: 5,
+    total: 8,
+    totalUnique: 7,
     unique: {
       '0': 2,
       '1': 1,
       '99999': 1,
       '-1': 1,
       '-100': 1,
+      'auto': 1,
+      'calc(var(--model-z-index) - 1)': 1,
     },
-    uniquenessRatio: 5 / 6
+    uniquenessRatio: 7 / 8
   }
 
   assert.equal(actual, expected)
@@ -35,9 +39,11 @@ ZIndex('finds simple values', () => {
 ZIndex('ignores global CSS keywords', () => {
   const fixture = `
     test {
-      z-index: auto;
       z-index: inherit;
       z-index: initial;
+      z-index: revert;
+      z-index: revert-layer;
+      z-index: unset;
     }
   `
   const actual = analyze(fixture).values.zindexes

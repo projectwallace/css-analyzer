@@ -1,22 +1,17 @@
 import { KeywordSet } from "../keyword-set.js"
 
 const keywords = new KeywordSet([
-  'auto',
   'inherit',
   'initial',
   'unset',
   'revert',
-  'none', // for `text-shadow`, `box-shadow` and `background`
+  'revert-layer',
 ])
 
-export function isValueKeyword(node) {
-  if (!node.children) return false
-
-  let firstChild = node.children.first
-
-  if (!firstChild) return false
-
+/** @param {import('css-tree').Value} node */
+export function isValueGlobalKeyword(node) {
   if (node.children.size > 1) return false
-
+  let firstChild = node.children.first
+  if (!firstChild) return false
   return firstChild.type === 'Identifier' && keywords.has(firstChild.name)
 }

@@ -23202,12 +23202,13 @@
       "uniquenessRatio": 0.5
     },
     "textShadows": {
-      "total": 2,
-      "totalUnique": 1,
+      "total": 3,
+      "totalUnique": 2,
       "unique": {
+        "none": 1,
         "0 2px 4px rgba(0,0,0,.5)": 2
       },
-      "uniquenessRatio": 0.5
+      "uniquenessRatio": 0.6666666666666666
     },
     "boxShadows": {
       "total": 18,

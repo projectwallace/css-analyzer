@@ -1,11 +1,11 @@
-import * as fs from 'fs'
+import * as fs from 'fs/promises'
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
 import { analyze } from './index.js'
 
 const Smoke = suite('Smoke testing')
 
-Object.entries({
+let tests = {
   'Bol.com': 'bol-com-20190617',
   'Bootstrap v5.0.0': 'bootstrap-5.0.0',
   'CNN': 'cnn-20220403',
@@ -17,24 +17,23 @@ Object.entries({
   'Trello': 'trello-20190617',
   'Gazelle': 'gazelle-20210905',
   'Smashing Magazine': 'smashing-magazine-20190319',
-}).map(([name, fileName]) => {
-  const css = fs.readFileSync(`./src/__fixtures__/${fileName}.css`, 'utf-8')
-  const json = fs.readFileSync(`./src/__fixtures__/${fileName}.json`, 'utf-8')
-  return {
-    name,
-    fileName,
-    json,
-    css,
-  }
-}).forEach(({ name, fileName, css, json }) => {
+}
+
+for (let [name, fileName] of Object.entries(tests)) {
+  let [css, json] = await Promise.all([
+    fs.readFile(`./src/__fixtures__/${fileName}.css`, { encoding: 'utf-8' }),
+    fs.readFile(`./src/__fixtures__/${fileName}.json`, { encoding: 'utf-8' })
+  ])
+
   // const result = analyze(css)
   // delete result.__meta__
-  // fs.writeFileSync(`./src/__fixtures__/${fileName}.json`, JSON.stringify(result, null, 2))
+  // await fs.writeFile(`./src/__fixtures__/${fileName}.json`, JSON.stringify(result, null, 2))
+
   Smoke(`${name} matches fixture`, () => {
     const result = analyze(css)
     delete result.__meta__
     assert.fixture(JSON.stringify(result, null, 2), json)
   })
-})
+}
 
 Smoke.run()

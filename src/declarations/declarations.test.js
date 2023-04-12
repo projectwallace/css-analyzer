@@ -41,6 +41,17 @@ Declarations('should be counted', () => {
   assert.is(actual.unique.ratio, 5 / 6)
 })
 
+Declarations('handles empty values', () => {
+  let css = `
+    thing {
+      height:;
+      width: ;
+    }
+  `
+
+  assert.not.throws(() => analyze(css))
+})
+
 Declarations('should count !importants', () => {
   const fixture = `
     some {

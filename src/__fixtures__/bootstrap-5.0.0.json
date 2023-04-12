@@ -25262,16 +25262,17 @@
       "uniquenessRatio": 0.35135135135135137
     },
     "textShadows": {
-      "total": 1,
-      "totalUnique": 1,
+      "total": 3,
+      "totalUnique": 2,
       "unique": {
-        "0 0 0 #212529": 1
+        "0 0 0 #212529": 1,
+        "none": 2
       },
-      "uniquenessRatio": 1
+      "uniquenessRatio": 0.6666666666666666
     },
     "boxShadows": {
-      "total": 54,
-      "totalUnique": 26,
+      "total": 55,
+      "totalUnique": 27,
       "unique": {
         "inset 0 0 0 9999px var(--bs-table-accent-bg)": 1,
         "0 0 0 0.25rem rgba(13, 110, 253, 0.25)": 7,
@@ -25298,9 +25299,10 @@
         "inset 0 -1px 0 rgba(0, 0, 0, 0.125)": 1,
         "0 0.5rem 1rem rgba(0, 0, 0, 0.15)": 2,
         "0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)": 1,
-        "0 1rem 3rem rgba(0, 0, 0, 0.175)": 1
+        "0 1rem 3rem rgba(0, 0, 0, 0.175)": 1,
+        "none": 1
       },
-      "uniquenessRatio": 0.48148148148148145
+      "uniquenessRatio": 0.4909090909090909
     },
     "animations": {
       "durations": {

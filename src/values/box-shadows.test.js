@@ -8,16 +8,18 @@ BoxShadows('finds simple values', () => {
   const fixture = `
     box-shadows-simple {
       box-shadow: 1px 1px 2px black;
+      box-shadow: none;
     }
   `
   const actual = analyze(fixture).values.boxShadows
   const expected = {
-    total: 1,
+    total: 2,
     unique: {
       '1px 1px 2px black': 1,
+      'none': 1,
     },
-    totalUnique: 1,
-    uniquenessRatio: 1
+    totalUnique: 2,
+    uniquenessRatio: 2 / 2
   }
 
   assert.equal(actual, expected)
@@ -65,7 +67,10 @@ BoxShadows('ignores keywords', () => {
   const fixture = `
     box-shadows-keyword {
       box-shadow: initial;
-      box-shadow: none;
+      box-shadow: inherit;
+      box-shadow: revert;
+      box-shadow: revert-layer;
+      box-shadow: unset;
     }
   `
   const actual = analyze(fixture).values.boxShadows

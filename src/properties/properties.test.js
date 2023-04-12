@@ -55,6 +55,13 @@ Properties('counts vendor prefixes', () => {
       -o-border-radius: 2px;
     }
 
+    @supports (position: -webkit-sticky) {
+      thing {
+        position: -webkit-sticky;
+        position: sticky;
+      }
+    }
+
     @media (min-width: 0) {
       @supports (-o-border-radius: 2px) {
         prefixed2 {
@@ -73,7 +80,7 @@ Properties('counts vendor prefixes', () => {
   assert.is(actual.total, 4)
   assert.is(actual.totalUnique, 3)
   assert.equal(actual.unique, expected)
-  assert.is(actual.ratio, 4 / 5)
+  assert.is(actual.ratio, 4 / 7)
 })
 
 Properties('counts browser hacks', () => {

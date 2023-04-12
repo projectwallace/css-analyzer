@@ -1,6 +1,9 @@
-import { KeywordSet } from "../keyword-set.js"
+import walk from 'css-tree/walker'
+import { KeywordSet } from '../keyword-set.js'
+import { endsWith, strEquals } from '../string-utils.js'
+import { isProperty } from '../properties/property-utils.js'
 
-export const namedColors = new KeywordSet([
+const namedColors = new KeywordSet([
   // CSS Named Colors
   // Spec: https://drafts.csswg.org/css-color/#named-colors
 
@@ -156,7 +159,7 @@ export const namedColors = new KeywordSet([
   'yellowgreen',
 ])
 
-export const systemColors = new KeywordSet([
+const systemColors = new KeywordSet([
   // CSS System Colors
   // Spec: https://drafts.csswg.org/css-color/#css-system-colors
   'canvas',
@@ -181,7 +184,7 @@ export const systemColors = new KeywordSet([
   // Spec: https://drafts.csswg.org/css-color/#deprecated-system-colors
 ])
 
-export const colorFunctions = new KeywordSet([
+const colorFunctions = new KeywordSet([
   'rgb',
   'rgba',
   'hsl',
@@ -194,7 +197,116 @@ export const colorFunctions = new KeywordSet([
   'color',
 ])
 
-export const colorKeywords = new KeywordSet([
+const colorKeywords = new KeywordSet([
   'transparent',
   'currentcolor',
 ])
+
+/**
+ * @typedef Color
+ * @property {string} color
+ * @property {string} property
+ * @property {string} format
+ *
+ * @callback ColorCb
+ * @param {Color} color
+ */
+
+/**
+ * @param {import('css-tree').CssNode} ast
+ * @param {Function} stringifyNode
+ * @param {ColorCb} callback
+ */
+export function walkColors(ast, stringifyNode, callback) {
+  walk(ast, {
+    visit: 'Declaration',
+    /** @param {import('css-tree').Declaration} declaration */
+    enter: function (declaration) {
+      walk(declaration, function (x_node) {
+        if (x_node.type !== 'Value') return
+
+        let property = declaration.property
+
+        // These properties are known to be problematic because they possibly contain color-like names
+        if (isProperty('font', property) || isProperty('font-family', property)) {
+          return this.skip
+        }
+
+        walk(x_node, function (node) {
+          if (node.type === 'Hash') {
+            let hex_length = node.value.length
+
+            if (endsWith('\\9', node.value)) {
+              hex_length = hex_length - 2
+            }
+
+            callback({
+              color: '#' + node.value,
+              property,
+              format: 'hex' + hex_length,
+            })
+            return this.skip
+          }
+
+          let name = node.name
+
+          if (node.type === 'Identifier') {
+            // Bail out if it can't be a color name
+            // 20 === 'lightgoldenrodyellow'.length
+            // 3 === 'red'.length
+            if (name.length > 20 || name.length < 3) {
+              return
+            }
+
+            if (namedColors.has(name)) {
+              callback({
+                color: stringifyNode(node),
+                property,
+                format: 'named'
+              })
+              return this.skip
+            }
+
+            if (colorKeywords.has(name)) {
+              callback({
+                color: stringifyNode(node),
+                property,
+                format: name.toLowerCase()
+              })
+              return this.skip
+            }
+
+            if (systemColors.has(name)) {
+              callback({
+                color: stringifyNode(node),
+                property,
+                format: 'system'
+              })
+              return this.skip
+            }
+
+            return this.skip
+          }
+
+          if (node.type === 'Function') {
+            // Don't walk var() multiple times
+            if (strEquals('var', name)) {
+              return this.skip
+            }
+
+            if (colorFunctions.has(name)) {
+              callback({
+                color: stringifyNode(node),
+                property,
+                format: name.toLowerCase()
+              })
+            }
+
+            // No this.skip here intentionally,
+            // otherwise we'll miss colors in linear-gradient() etc.
+          }
+        })
+      })
+    }
+  })
+}

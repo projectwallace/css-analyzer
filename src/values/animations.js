@@ -1,16 +1,22 @@
 import { KeywordSet } from "../keyword-set.js"
 
 const timingKeywords = new KeywordSet([
-  'linear',
   'ease',
   'ease-in',
   'ease-out',
   'ease-in-out',
+  'linear',
   'step-start',
   'step-end',
 ])
 
-export function analyzeAnimation(children, stringifyNode) {
+const TIMING_FUNCTION_VALUES = new KeywordSet([
+  'cubic-bezier',
+  'steps'
+])
+
+/** @param {import('css-tree').List} children */
+export function destructure_animation(children) {
   let durationFound = false
   let durations = []
   let timingFunctions = []
@@ -24,17 +30,13 @@ export function analyzeAnimation(children, stringifyNode) {
     }
     if (type === 'Dimension' && durationFound === false) {
       durationFound = true
-      return durations.push(stringifyNode(child))
+      return durations.push(child)
     }
     if (type === 'Identifier' && timingKeywords.has(child.name)) {
-      return timingFunctions.push(stringifyNode(child))
+      return timingFunctions.push(child)
     }
-    if (type === 'Function'
-      && (
-        child.name === 'cubic-bezier' || child.name === 'steps'
-      )
-    ) {
-      return timingFunctions.push(stringifyNode(child))
+    if (type === 'Function' && TIMING_FUNCTION_VALUES.has(child.name)) {
+      return timingFunctions.push(child)
     }
   })
 

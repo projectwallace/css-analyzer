@@ -97,15 +97,12 @@ FontSizes('handles system fonts', () => {
 FontSizes('ignores keywords and global values', () => {
   const fixture = `
     test {
-      font: inherit;
-      font: initial;
-      font: unset;
-      font: revert;
-
-      /*TODO:font-size: inherit;
+      /* Global values */
+      font-size: inherit;
       font-size: initial;
+      font-size: revert;
+      font-size: revert-layer;
       font-size: unset;
-      font-size: revert;*/
     }
   `
   const actual = analyze(fixture).values.fontSizes
