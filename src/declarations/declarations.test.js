@@ -4,6 +4,17 @@ import { analyze } from '../index.js'
 
 const Declarations = suite('Declarations')
 
+Declarations('handles empty values', () => {
+  let css = `
+    thing {
+      height:;
+      width: ;
+    }
+  `
+
+  assert.not.throws(() => analyze(css))
+})
+
 Declarations('should be counted', () => {
   const fixture = `
     rule {

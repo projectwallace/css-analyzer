@@ -25,6 +25,20 @@ export function isCustom(property) {
   return property.charCodeAt(0) === 45 && property.charCodeAt(1) === 45
 }
 
+/**
+ * A check to verify that a propery is `basename` or a prefixed
+ * version of that, but never a custom property that accidentally
+ * ends with the same substring.
+ *
+ * @example
+ * isProperty('animation', 'animation') // true
+ * isProperty('animation', '-webkit-animation') // true
+ * isProperty('animation', '--my-animation') // false
+ *
+ * @param {string} basename
+ * @param {string} property
+ * @returns {boolean} True if `property` equals `basename` without prefix
+ */
 export function isProperty(basename, property) {
   if (isCustom(property)) return false
   return endsWith(basename, property)

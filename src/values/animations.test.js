@@ -94,19 +94,22 @@ Animations('finds shorthand timing functions', () => {
       transition: all 4s cubic-bezier(0,1,0,1);
       transition: all 5s linear 5000ms;
 
+      transition: all 6s Cubic-Bezier(0,1,0,1);
+
       --my-animation: invalid;
       --my-transition: invalid;
     }
   `
   const actual = analyze(fixture).values.animations.timingFunctions
   const expected = {
-    total: 4,
-    totalUnique: 2,
+    total: 5,
+    totalUnique: 3,
     unique: {
       'linear': 2,
       'cubic-bezier(0,1,0,1)': 2,
+      'Cubic-Bezier(0,1,0,1)': 1,
     },
-    uniquenessRatio: 2 / 4
+    uniquenessRatio: 3 / 5
   }
   assert.equal(actual, expected)
 })

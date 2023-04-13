@@ -1,13 +1,6 @@
 import { KeywordSet } from "../keyword-set.js"
 
-const FONT_KEYWORDS = new KeywordSet([
-	// Global CSS keywords
-	'inherit',
-	'initial',
-	'unset',
-	'revert',
-
-	// System font keywords
+const SYSTEM_FONTS = new KeywordSet([
 	'caption',
 	'icon',
 	'menu',
@@ -36,9 +29,9 @@ const SLASH = 47 // '/'.charCodeAt(0) === 47
 const TYPE_OPERATOR = 'Operator'
 const TYPE_IDENTIFIER = 'Identifier'
 
-export function isFontKeyword(node) {
+export function isSystemFont(node) {
 	let firstChild = node.children.first
-	return firstChild.type === TYPE_IDENTIFIER && FONT_KEYWORDS.has(firstChild.name)
+	return firstChild.type === TYPE_IDENTIFIER && SYSTEM_FONTS.has(firstChild.name)
 }
 
 export function destructure(value, stringifyNode) {

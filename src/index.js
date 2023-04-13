@@ -4,7 +4,7 @@ import { calculate } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getComplexity, isAccessibility, compareSpecificity } from './selectors/utils.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
-import { destructure, isFontKeyword } from './values/destructure-font-shorthand.js'
+import { destructure, isSystemFont } from './values/destructure-font-shorthand.js'
 import { isValueKeyword } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isAstVendorPrefixed } from './values/vendor-prefix.js'
@@ -343,12 +343,10 @@ function analyze(css) {
         // Process properties first that don't have colors,
         // so we can avoid further walking them;
         if (isProperty('z-index', property)) {
-          if (!isValueKeyword(node)) {
-            zindex.push(stringifyNode(node))
-          }
+          zindex.push(stringifyNode(node))
           return this.skip
         } else if (isProperty('font', property)) {
-          if (isFontKeyword(node)) return
+          if (isSystemFont(node)) return
 
           let { font_size, line_height, font_family } = destructure(node, stringifyNode)
 
@@ -364,12 +362,12 @@ function analyze(css) {
 
           break
         } else if (isProperty('font-size', property)) {
-          if (!isFontKeyword(node)) {
+          if (!isSystemFont(node)) {
             fontSizes.push(stringifyNode(node))
           }
           break
         } else if (isProperty('font-family', property)) {
-          if (!isFontKeyword(node)) {
+          if (!isSystemFont(node)) {
             fontFamilies.push(stringifyNode(node))
           }
           break
