@@ -14,6 +14,7 @@ VendorPrefix('finds simple prefixes', () => {
       -webkit-transition: -webkit-transform 0.3s ease-out;
       -moz-transition: -moz-transform 0.3s ease-out;
       -o-transition: -o-transform 0.3s ease-out;
+      transition: -o-transform 0.3s ease-out;
     }
 
     not-a-prefix {
@@ -39,7 +40,7 @@ VendorPrefix('finds simple prefixes', () => {
       '-webkit-sticky': 2,
       '-webkit-transform 0.3s ease-out': 1,
       '-moz-transform 0.3s ease-out': 1,
-      '-o-transform 0.3s ease-out': 1,
+      '-o-transform 0.3s ease-out': 2,
     },
     uniquenessRatio: 7 / 8
   }
