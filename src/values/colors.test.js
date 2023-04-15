@@ -1051,4 +1051,49 @@ Colors('insane color mode', () => {
   assert.not.throws(() => analyze(fixture))
 })
 
+Colors('Lists locations when unstable flag is set', () => {
+  let css = `
+    thing {
+      color: red;
+      color: #f00;
+      color: rgb(255, 0, 0);
+      background-color: red;
+    }
+  `
+  let actual = analyze(css, { useUnstableLocations: true })
+
+  assert.equal(actual.values.colors.__unstable__uniqueWithLocations, {
+    'red': [
+      {
+        line: 3,
+        column: 14,
+        offset: 26,
+        length: 3,
+      },
+      {
+        line: 6,
+        column: 25,
+        offset: 103,
+        length: 3,
+      }
+    ],
+    '#f00': [
+      {
+        line: 4,
+        column: 14,
+        offset: 44,
+        length: 4,
+      }
+    ],
+    'rgb(255, 0, 0)': [
+      {
+        line: 5,
+        column: 14,
+        offset: 63,
+        length: 14,
+      }
+    ]
+  })
+})
+
 Colors.run()

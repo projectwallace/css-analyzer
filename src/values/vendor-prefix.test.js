@@ -31,7 +31,7 @@ VendorPrefix('finds simple prefixes', () => {
   `
   const actual = analyze(fixture).values.prefixes
   const expected = {
-    total: 8,
+    total: 9,
     totalUnique: 7,
     unique: {
       '-moz-max-content': 1,
@@ -42,7 +42,7 @@ VendorPrefix('finds simple prefixes', () => {
       '-moz-transform 0.3s ease-out': 1,
       '-o-transform 0.3s ease-out': 2,
     },
-    uniquenessRatio: 7 / 8
+    uniquenessRatio: 7 / 9,
   }
 
   assert.equal(actual, expected)
