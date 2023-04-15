@@ -25,11 +25,17 @@ function ratio(part, total) {
   return part / total
 }
 
+let defaults = {
+  useUnstableLocations: false
+}
+
 /**
  * Analyze CSS
  * @param {string} css
  */
-export function analyze(css) {
+function analyze(css, options = {}) {
+  let settings = Object.assign({}, defaults, options)
+  let useLocations = settings.useUnstableLocations === true
   let start = Date.now()
 
   /**
@@ -75,16 +81,16 @@ export function analyze(css) {
   let totalAtRules = 0
   /** @type {{[property: string]: string}[]} */
   let fontfaces = []
-  let layers = new Collection()
-  let imports = new Collection()
-  let medias = new Collection()
-  let mediaBrowserhacks = new Collection()
-  let charsets = new Collection()
-  let supports = new Collection()
-  let supportsBrowserhacks = new Collection()
-  let keyframes = new Collection()
-  let prefixedKeyframes = new Collection()
-  let containers = new Collection()
+  let layers = new Collection({ useLocations })
+  let imports = new Collection({ useLocations })
+  let medias = new Collection({ useLocations })
+  let mediaBrowserhacks = new Collection({ useLocations })
+  let charsets = new Collection({ useLocations })
+  let supports = new Collection({ useLocations })
+  let supportsBrowserhacks = new Collection({ useLocations })
+  let keyframes = new Collection({ useLocations })
+  let prefixedKeyframes = new Collection({ useLocations })
+  let containers = new Collection({ useLocations })
 
   // Rules
   let totalRules = 0
@@ -94,9 +100,9 @@ export function analyze(css) {
   let declarationsPerRule = new AggregateCollection()
 
   // Selectors
-  let keyframeSelectors = new Collection()
+  let keyframeSelectors = new Collection({ useLocations })
   let uniqueSelectors = new Set()
-  let prefixedSelectors = new Collection()
+  let prefixedSelectors = new Collection({ useLocations })
   /** @type {Specificity} */
   let maxSpecificity
   /** @type {Specificity} */
@@ -108,35 +114,35 @@ export function analyze(css) {
   let selectorComplexities = new AggregateCollection()
   /** @type {Specificity[]} */
   let specificities = []
-  let ids = new Collection()
-  let a11y = new Collection()
+  let ids = new Collection({ useLocations })
+  let a11y = new Collection({ useLocations })
 
   // Declarations
   let uniqueDeclarations = new Set()
   let totalDeclarations = 0
   let importantDeclarations = 0
   let importantsInKeyframes = 0
-  let importantCustomProperties = new Collection()
+  let importantCustomProperties = new Collection({ useLocations })
 
   // Properties
-  let properties = new Collection()
-  let propertyHacks = new Collection()
-  let propertyVendorPrefixes = new Collection()
-  let customProperties = new Collection()
+  let properties = new Collection({ useLocations })
+  let propertyHacks = new Collection({ useLocations })
+  let propertyVendorPrefixes = new Collection({ useLocations })
+  let customProperties = new Collection({ useLocations })
   let propertyComplexities = new AggregateCollection()
 
   // Values
-  let vendorPrefixedValues = new Collection()
-  let valueBrowserhacks = new Collection()
-  let zindex = new Collection()
-  let textShadows = new Collection()
-  let boxShadows = new Collection()
-  let fontFamilies = new Collection()
-  let fontSizes = new Collection()
-  let lineHeights = new Collection()
-  let timingFunctions = new Collection()
-  let durations = new Collection()
-  let colors = new ContextCollection()
+  let vendorPrefixedValues = new Collection({ useLocations })
+  let valueBrowserhacks = new Collection({ useLocations })
+  let zindex = new Collection({ useLocations })
+  let textShadows = new Collection({ useLocations })
+  let boxShadows = new Collection({ useLocations })
+  let fontFamilies = new Collection({ useLocations })
+  let fontSizes = new Collection({ useLocations })
+  let lineHeights = new Collection({ useLocations })
+  let timingFunctions = new Collection({ useLocations })
+  let durations = new Collection({ useLocations })
+  let colors = new ContextCollection({ useLocations })
   let colorFormats = new CountableCollection()
   let units = new ContextCollection()
   let gradients = new CountableCollection()
@@ -364,12 +370,12 @@ export function analyze(css) {
 
           break
         } else if (isProperty('font-size', property)) {
-          if (!isFontKeyword(node)) {
+          if (!isSystemFont(node)) {
             fontSizes.push(stringifyNode(node), node.loc)
           }
           break
         } else if (isProperty('font-family', property)) {
-          if (!isFontKeyword(node)) {
+          if (!isSystemFont(node)) {
             fontFamilies.push(stringifyNode(node), node.loc)
           }
           break

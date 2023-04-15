@@ -1,12 +1,19 @@
 export class Collection {
-	constructor() {
+	constructor({ useLocations = false }) {
 		/** @type {Map<string, Array<Number>>} */
 		this._items = new Map()
 		this._total = 0
+		/** @type {number[]} */
 		this.node_lines = []
+		/** @type {number[]} */
 		this.node_columns = []
+		/** @type {number[]} */
 		this.node_lenghts = []
+		/** @type {number[]} */
 		this.node_offsets = []
+
+		/** @type {boolean} */
+		this.useLocations = useLocations
 	}
 
 	/**
@@ -14,7 +21,8 @@ export class Collection {
 	 * @param {import('css-tree').CssLocation} node_location
 	 */
 	push(item, node_location) {
-		let index = this._totalq
+		let index = this._total
+
 		this.node_lines[index] = node_location.start.line
 		this.node_columns[index] = node_location.start.column
 		this.node_offsets[index] = node_location.start.offset
@@ -24,7 +32,6 @@ export class Collection {
 			/** @type number[] */
 			let list = this._items.get(item)
 			list.push(index)
-			// this._items.set(item, list)
 			this._total++
 			return
 		}
@@ -38,7 +45,7 @@ export class Collection {
 	}
 
 	count() {
-		let items = new Map()
+		let uniqueWithLocations = new Map()
 		let unique = {}
 		this._items.forEach((list, key) => {
 			let nodes = list.map(index => ({
@@ -47,17 +54,27 @@ export class Collection {
 				offset: this.node_offsets[index],
 				length: this.node_lenghts[index],
 			}))
-			items.set(key, nodes)
+			uniqueWithLocations.set(key, nodes)
 			unique[key] = list.length
 		})
+
+		if (this.useLocations) {
+			return {
+				total: this._total,
+				totalUnique: this._items.size,
+				unique: Object.fromEntries(this._items),
+				unique,
+				uniquenessRatio: this._total === 0 ? 0 : this._items.size / this._total,
+				__unstable__uniqueWithLocations: Object.fromEntries(uniqueWithLocations),
+			}
+		}
 
 		return {
 			total: this._total,
 			totalUnique: this._items.size,
-			// unique: Object.fromEntries(this._items),
+			unique: Object.fromEntries(this._items),
 			unique,
 			uniquenessRatio: this._total === 0 ? 0 : this._items.size / this._total,
-			// __unstable__itemsWithLocations: Object.fromEntries(items),
 		}
 	}
 }
