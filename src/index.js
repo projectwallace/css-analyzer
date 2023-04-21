@@ -98,6 +98,9 @@ function analyze(css, options = {}) {
   let ruleSizes = new AggregateCollection()
   let selectorsPerRule = new AggregateCollection()
   let declarationsPerRule = new AggregateCollection()
+  let uniqueRuleSize = new Collection({ useLocations })
+  let uniqueSelectorsPerRule = new Collection({ useLocations })
+  let uniqueDeclarationsPerRule = new Collection({ useLocations })
 
   // Selectors
   let keyframeSelectors = new Collection({ useLocations })
@@ -110,8 +113,9 @@ function analyze(css, options = {}) {
   let specificityA = new AggregateCollection()
   let specificityB = new AggregateCollection()
   let specificityC = new AggregateCollection()
-  let uniqueSpecificities = new CountableCollection()
+  let uniqueSpecificities = new Collection({ useLocations })
   let selectorComplexities = new AggregateCollection()
+  let uniqueSelectorComplexities = new Collection({ useLocations })
   /** @type {Specificity[]} */
   let specificities = []
   let ids = new Collection({ useLocations })
@@ -169,45 +173,45 @@ function analyze(css, options = {}) {
 
         if (atRuleName === 'media') {
           let prelude = stringifyNode(node.prelude)
-          medias.push(prelude, node.loc)
+          medias.push(prelude, node.prelude.loc)
           if (isMediaBrowserhack(node.prelude)) {
-            mediaBrowserhacks.push(prelude, node.loc)
+            mediaBrowserhacks.push(prelude, node.prelude.loc)
           }
           break
         }
         if (atRuleName === 'supports') {
           let prelude = stringifyNode(node.prelude)
-          supports.push(prelude, node.loc)
+          supports.push(prelude, node.prelude.loc)
           if (isSupportsBrowserhack(node.prelude)) {
-            supportsBrowserhacks.push(prelude, node.loc)
+            supportsBrowserhacks.push(prelude, node.prelude.loc)
           }
           break
         }
         if (endsWith('keyframes', atRuleName)) {
           let name = '@' + atRuleName + ' ' + stringifyNode(node.prelude)
           if (hasVendorPrefix(atRuleName)) {
-            prefixedKeyframes.push(name, node.loc)
+            prefixedKeyframes.push(name, node.prelude.loc)
           }
-          keyframes.push(name, node.loc)
+          keyframes.push(name, node.prelude.loc)
           break
         }
         if (atRuleName === 'import') {
-          imports.push(stringifyNode(node.prelude), node.loc)
+          imports.push(stringifyNode(node.prelude), node.prelude.loc)
           break
         }
         if (atRuleName === 'charset') {
-          charsets.push(stringifyNode(node.prelude), node.loc)
+          charsets.push(stringifyNode(node.prelude), node.prelude.loc)
           break
         }
         if (atRuleName === 'container') {
-          containers.push(stringifyNode(node.prelude), node.loc)
+          containers.push(stringifyNode(node.prelude), node.prelude.loc)
           break
         }
         if (atRuleName === 'layer') {
           let prelude = stringifyNode(node.prelude)
           prelude
             .split(',')
-            .forEach(name => layers.push(name.trim(), node.loc))
+            .forEach(name => layers.push(name.trim(), node.prelude.loc))
         }
         break
       }
@@ -216,8 +220,11 @@ function analyze(css, options = {}) {
         let numDeclarations = node.block.children ? node.block.children.size : 0
 
         ruleSizes.push(numSelectors + numDeclarations)
+        uniqueRuleSize.push(numSelectors + numDeclarations, node.loc)
         selectorsPerRule.push(numSelectors)
+        uniqueSelectorsPerRule.push(numSelectors, node.prelude.loc)
         declarationsPerRule.push(numDeclarations)
+        uniqueDeclarationsPerRule.push(numDeclarations, node.block.loc)
 
         totalRules++
 
@@ -254,7 +261,8 @@ function analyze(css, options = {}) {
 
         uniqueSelectors.add(selector)
         selectorComplexities.push(complexity)
-        uniqueSpecificities.push(specificity[0] + ',' + specificity[1] + ',' + specificity[2])
+        uniqueSelectorComplexities.push(complexity, node.loc)
+        uniqueSpecificities.push(specificity[0] + ',' + specificity[1] + ',' + specificity[2], node.loc)
 
         if (maxSpecificity === undefined) {
           maxSpecificity = specificity
@@ -552,12 +560,7 @@ function analyze(css, options = {}) {
   let specificitiesA = specificityA.aggregate()
   let specificitiesB = specificityB.aggregate()
   let specificitiesC = specificityC.aggregate()
-  let uniqueSpecificitiesCount = uniqueSpecificities.count()
-  let complexityCount = new CountableCollection(selectorComplexities.toArray()).count()
   let totalUniqueSelectors = uniqueSelectors.size
-  let uniqueRuleSize = new CountableCollection(ruleSizes.toArray()).count()
-  let uniqueSelectorsPerRule = new CountableCollection(selectorsPerRule.toArray()).count()
-  let uniqueDeclarationsPerRule = new CountableCollection(declarationsPerRule.toArray()).count()
   let assign = Object.assign
 
   return {
@@ -621,29 +624,23 @@ function analyze(css, options = {}) {
       },
       sizes: assign(
         ruleSizes.aggregate(),
+        uniqueRuleSize.count(),
         {
           items: ruleSizes.toArray(),
-          unique: uniqueRuleSize.unique,
-          totalUnique: uniqueRuleSize.totalUnique,
-          uniquenessRatio: uniqueRuleSize.uniquenessRatio
         },
       ),
       selectors: assign(
         selectorsPerRule.aggregate(),
+        uniqueSelectorsPerRule.count(),
         {
           items: selectorsPerRule.toArray(),
-          unique: uniqueSelectorsPerRule.unique,
-          totalUnique: uniqueSelectorsPerRule.totalUnique,
-          uniquenessRatio: uniqueSelectorsPerRule.uniquenessRatio
         },
       ),
       declarations: assign(
         declarationsPerRule.aggregate(),
+        uniqueDeclarationsPerRule.count(),
         {
           items: declarationsPerRule.toArray(),
-          unique: uniqueDeclarationsPerRule.unique,
-          totalUnique: uniqueDeclarationsPerRule.totalUnique,
-          uniquenessRatio: uniqueDeclarationsPerRule.uniquenessRatio,
         },
       ),
     },
@@ -651,29 +648,31 @@ function analyze(css, options = {}) {
       total: totalSelectors,
       totalUnique: totalUniqueSelectors,
       uniquenessRatio: ratio(totalUniqueSelectors, totalSelectors),
-      specificity: {
-        /** @type Specificity */
-        min: minSpecificity === undefined ? [0, 0, 0] : minSpecificity,
-        /** @type Specificity */
-        max: maxSpecificity === undefined ? [0, 0, 0] : maxSpecificity,
-        /** @type Specificity */
-        sum: [specificitiesA.sum, specificitiesB.sum, specificitiesC.sum],
-        /** @type Specificity */
-        mean: [specificitiesA.mean, specificitiesB.mean, specificitiesC.mean],
-        /** @type Specificity */
-        mode: [specificitiesA.mode, specificitiesB.mode, specificitiesC.mode],
-        /** @type Specificity */
-        median: [specificitiesA.median, specificitiesB.median, specificitiesC.median],
-        items: specificities,
-        unique: uniqueSpecificitiesCount.unique,
-        totalUnique: uniqueSpecificitiesCount.totalUnique,
-        uniquenessRatio: uniqueSpecificitiesCount.uniquenessRatio,
-      },
+      specificity: assign(
+        uniqueSpecificities.count(),
+        {
+          /** @type Specificity */
+          min: minSpecificity === undefined ? [0, 0, 0] : minSpecificity,
+          /** @type Specificity */
+          max: maxSpecificity === undefined ? [0, 0, 0] : maxSpecificity,
+          /** @type Specificity */
+          sum: [specificitiesA.sum, specificitiesB.sum, specificitiesC.sum],
+          /** @type Specificity */
+          mean: [specificitiesA.mean, specificitiesB.mean, specificitiesC.mean],
+          /** @type Specificity */
+          mode: [specificitiesA.mode, specificitiesB.mode, specificitiesC.mode],
+          /** @type Specificity */
+          median: [specificitiesA.median, specificitiesB.median, specificitiesC.median],
+          items: specificities,
+        }
+      ),
       complexity: assign(
         selectorComplexities.aggregate(),
-        complexityCount, {
-        items: selectorComplexities.toArray(),
-      }),
+        uniqueSelectorComplexities.count(),
+        {
+          items: selectorComplexities.toArray(),
+        }
+      ),
       id: assign(
         ids.count(), {
         ratio: ratio(ids.size(), totalSelectors),

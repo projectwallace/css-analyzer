@@ -13,7 +13,7 @@ export class Collection {
 		this.node_offsets = []
 
 		/** @type {boolean} */
-		this.useLocations = useLocations
+		this._useLocations = useLocations
 	}
 
 	/**
@@ -58,7 +58,7 @@ export class Collection {
 			unique[key] = list.length
 		})
 
-		if (this.useLocations) {
+		if (this._useLocations) {
 			return {
 				total: this._total,
 				totalUnique: this._items.size,
