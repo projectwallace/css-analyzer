@@ -31,7 +31,7 @@ files.forEach(([filename, name, expectedDuration]) => {
   const fileSize = byteSize(css.length)
   suite.push([
     `${name.padEnd(maxLen + 2)} ${fileSize.padStart(7)}`,
-    () => analyzeCss(css),
+    () => analyzeCss(css, { useUnstableLocations: false }),
     expectedDuration,
     css.length,
   ])
