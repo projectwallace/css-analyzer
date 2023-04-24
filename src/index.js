@@ -148,6 +148,7 @@ function analyze(css, options = {}) {
   let colors = new ContextCollection({ useLocations })
   let colorFormats = new Collection({ useLocations })
   let units = new ContextCollection({ useLocations })
+  let gradients = new Collection({ useLocations })
 
   walk(ast, function (node) {
     switch (node.type) {
@@ -482,12 +483,12 @@ function analyze(css, options = {}) {
 
               if (colorFunctions.has(nodeName)) {
                 colors.push(stringifyNode(valueNode), property, valueNode.loc)
-                colorFormats.push(nodeName.toLowerCase())
+                colorFormats.push(nodeName.toLowerCase(), valueNode.loc)
                 return
               }
 
               if (endsWith('gradient', nodeName)) {
-                gradients.push(stringifyNode(valueNode))
+                gradients.push(stringifyNode(valueNode), valueNode.loc)
                 return
               }
               // No this.skip here intentionally,
