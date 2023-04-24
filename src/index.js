@@ -10,7 +10,6 @@ import { analyzeAnimation } from './values/animations.js'
 import { isAstVendorPrefixed } from './values/vendor-prefix.js'
 import { ContextCollection } from './context-collection.js'
 import { Collection } from './collection.js'
-import { CountableCollection } from './countable-collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
 import { strEquals, startsWith, endsWith } from './string-utils.js'
 import { hasVendorPrefix } from './vendor-prefix.js'
@@ -54,7 +53,7 @@ function analyze(css, options = {}) {
   // Stylesheet
   let totalComments = 0
   let commentsSize = 0
-  let embeds = new CountableCollection()
+  let embeds = new Collection({ useLocations })
   let embedSize = 0
   let embedTypes = {
     total: 0,
@@ -147,9 +146,8 @@ function analyze(css, options = {}) {
   let timingFunctions = new Collection({ useLocations })
   let durations = new Collection({ useLocations })
   let colors = new ContextCollection({ useLocations })
-  let colorFormats = new CountableCollection()
-  let units = new ContextCollection()
-  let gradients = new CountableCollection()
+  let colorFormats = new Collection({ useLocations })
+  let units = new ContextCollection({ useLocations })
 
   walk(ast, function (node) {
     switch (node.type) {
@@ -330,7 +328,7 @@ function analyze(css, options = {}) {
           }
 
           // @deprecated
-          embeds.push(embed)
+          embeds.push(embed, node.loc)
         }
         break
       }
@@ -442,7 +440,7 @@ function analyze(css, options = {}) {
                 hexLength = hexLength - 2
               }
               colors.push('#' + valueNode.value, property, valueNode.loc)
-              colorFormats.push(`hex` + hexLength)
+              colorFormats.push(`hex` + hexLength, valueNode.loc)
 
               return this.skip
             }
@@ -457,21 +455,21 @@ function analyze(css, options = {}) {
               if (namedColors.has(nodeName)) {
                 let stringified = stringifyNode(valueNode)
                 colors.push(stringified, property, valueNode.loc)
-                colorFormats.push('named')
+                colorFormats.push('named', valueNode.loc)
                 return
               }
 
               if (colorKeywords.has(nodeName)) {
                 let stringified = stringifyNode(valueNode)
                 colors.push(stringified, property, valueNode.loc)
-                colorFormats.push(nodeName.toLowerCase())
+                colorFormats.push(nodeName.toLowerCase(), valueNode.loc)
                 return
               }
 
               if (systemColors.has(nodeName)) {
                 let stringified = stringifyNode(valueNode)
                 colors.push(stringified, property, valueNode.loc)
-                colorFormats.push('system')
+                colorFormats.push('system', valueNode.loc)
                 return
               }
               return this.skip
