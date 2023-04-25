@@ -41259,6 +41259,35 @@
         "uniquenessRatio": 0.007142857142857143
       }
     },
+    "gradients": {
+      "total": 22,
+      "totalUnique": 22,
+      "unique": {
+        "linear-gradient(#4e69a2, #3b5998 50%)": 1,
+        "linear-gradient(white, #D3D8E8)": 1,
+        "linear-gradient(#67ae55, #578843)": 1,
+        "linear-gradient(#79bc64, #578843)": 1,
+        "linear-gradient(#698fbf, #506fa5)": 1,
+        "linear-gradient(#7d9dce, #506fa5)": 1,
+        "linear-gradient(#ce6565, #a84646)": 1,
+        "linear-gradient(#e07d7d, #af4b4b)": 1,
+        "linear-gradient(#fdfdfd, #e5e5e5)": 1,
+        "linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, .1))": 1,
+        "linear-gradient(rgba(0,0,0,0), rgba(0, 0, 0, .8))": 1,
+        "linear-gradient(0deg,rgba(0,0,0,.4),transparent)": 1,
+        "linear-gradient(0deg,rgba(255, 255, 255, .8), rgba(255, 255, 255, 0))": 1,
+        "linear-gradient(to bottom right, #79A6FF, #B1D2FF)": 1,
+        "linear-gradient( 180deg, rgba(0, 0, 0, .4), transparent 15%, rgba(0, 0, 0, .0) )": 1,
+        "linear-gradient( 180deg, rgba(0, 0, 0, .0), transparent 15%, transparent 90%, rgba(0, 0, 0, .4) )": 1,
+        "linear-gradient(to right, var(--fds-blue-60), var(--fds-blue-40))": 1,
+        "linear-gradient(to bottom right, #3578E5, #54C7EC)": 1,
+        "linear-gradient(to top, var(--fds-black-alpha-50), transparent)": 1,
+        "linear-gradient(-180deg, var(--fds-black-alpha-20) 20%, var(--fds-black-alpha-80) 100%)": 1,
+        "linear-gradient(var(--fds-spectrum-cherry-tint-90), var(--fds-spectrum-cherry-tint-90))": 1,
+        "linear-gradient(var(--fds-black-alpha-05), var(--fds-black-alpha-05))": 1
+      },
+      "uniquenessRatio": 1
+    },
     "fontFamilies": {
       "total": 37,
       "totalUnique": 14,

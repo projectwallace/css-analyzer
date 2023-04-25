@@ -309,6 +309,12 @@ Api('handles empty input gracefully', () => {
           "uniquenessRatio": 0,
         }
       },
+      "gradients": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
+      },
       "fontFamilies": {
         "total": 0,
         "totalUnique": 0,

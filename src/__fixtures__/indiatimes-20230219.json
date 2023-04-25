@@ -55486,6 +55486,37 @@
         "uniquenessRatio": 0.007352941176470588
       }
     },
+    "gradients": {
+      "total": 35,
+      "totalUnique": 24,
+      "unique": {
+        "linear-gradient(270deg, #3948da, #0927b6)": 4,
+        "linear-gradient(180deg, transparent, rgba(0, 0, 0, .22) 50%, rgba(0, 0, 0, .62) 71%, rgba(0, 0, 0, .69) 81%, rgba(0, 0, 0, .76))": 1,
+        "linear-gradient(180deg, hsla(0, 0%, 100%, 0), #f9f9f9)": 1,
+        "linear-gradient(hsla(0, 0%, 100%, 0) 5%, #fff)": 1,
+        "linear-gradient(180deg, hsla(0, 0%, 9%, 0), #171717)": 3,
+        "linear-gradient(0deg, #4364ff, #0037ff)": 2,
+        "linear-gradient(180deg, hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, .79) 51%, #fff)": 1,
+        "linear-gradient(0deg, #ffed59, #f6d93a)": 1,
+        "linear-gradient(0deg, transparent, #171717)": 1,
+        "linear-gradient(180deg, transparent, rgba(0, 0, 0, .04) 19%, rgba(0, 0, 0, .22) 69%, rgba(0, 0, 0, .7) 98%, rgba(0, 0, 0, .8) 99%, transparent)": 1,
+        "linear-gradient(180deg, #ff5354, #9764ff)": 1,
+        "linear-gradient(180deg, transparent, rgba(0, 0, 0, .1) 20%, rgba(0, 0, 0, .4) 71%, rgba(0, 0, 0, .4) 81%, rgba(0, 0, 0, .5))": 1,
+        "linear-gradient(90deg, hsla(0, 0%, 9%, 0) 0, #171717)": 1,
+        "linear-gradient(90deg, transparent, hsla(0, 0%, 100%, .8) 50%, #fff 71%, #fff 81%, #fff)": 1,
+        "linear-gradient(0deg, #3457a7, #3457a7)": 3,
+        "linear-gradient(0deg, rgba(33, 33, 33, 0), #212121)": 1,
+        "linear-gradient(180deg, transparent, #000)": 1,
+        "-webkit-gradient(linear, left top, right top, color-stop(8%, #eee), color-stop(24%, #ddd), color-stop(36%, #eee))": 2,
+        "-webkit-linear-gradient(left, #eee 8%, #ddd 24%, #eee 36%)": 2,
+        "linear-gradient(90deg, #eee 8%, #ddd 24%, #eee 36%)": 2,
+        "-webkit-gradient(linear, left top, right top, color-stop(8%, #2b2929), color-stop(24%, #3d3b3b), color-stop(36%, #2b2929))": 1,
+        "-webkit-linear-gradient(left, #2b2929 8%, #3d3b3b 24%, #2b2929 36%)": 1,
+        "linear-gradient(90deg, #2b2929 8%, #3d3b3b 24%, #2b2929 36%)": 1,
+        "linear-gradient(270deg, #dcdbdb 50%, hsla(0, 0%, 100%, 0) 0)": 1
+      },
+      "uniquenessRatio": 0.6857142857142857
+    },
     "fontFamilies": {
       "total": 70,
       "totalUnique": 9,

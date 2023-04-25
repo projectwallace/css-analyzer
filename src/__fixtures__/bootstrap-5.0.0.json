@@ -25187,6 +25187,15 @@
         "uniquenessRatio": 0.0064516129032258064
       }
     },
+    "gradients": {
+      "total": 2,
+      "totalUnique": 2,
+      "unique": {
+        "linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0))": 1,
+        "linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent)": 1
+      },
+      "uniquenessRatio": 1
+    },
     "fontFamilies": {
       "total": 5,
       "totalUnique": 2,

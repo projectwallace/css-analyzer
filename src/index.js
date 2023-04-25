@@ -138,6 +138,7 @@ function analyze(css) {
   let colors = new ContextCollection()
   let colorFormats = new CountableCollection()
   let units = new ContextCollection()
+  let gradients = new CountableCollection()
 
   walk(ast, function (node) {
     switch (node.type) {
@@ -454,6 +455,12 @@ function analyze(css) {
                 let stringified = stringifyNode(valueNode)
                 colors.push(stringified, property)
                 colorFormats.push(nodeName.toLowerCase())
+                return
+              }
+
+              if (endsWith('gradient', nodeName)) {
+                gradients.push(stringifyNode(valueNode))
+                return
               }
               // No this.skip here intentionally,
               // otherwise we'll miss colors in linear-gradient() etc.
@@ -703,6 +710,7 @@ function analyze(css) {
           formats: colorFormats.count(),
         },
       ),
+      gradients: gradients.count(),
       fontFamilies: fontFamilies.count(),
       fontSizes: fontSizes.count(),
       lineHeights: lineHeights.count(),
