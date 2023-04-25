@@ -36264,6 +36264,14 @@
         "uniquenessRatio": 0.0011490950876185005
       }
     },
+    "gradients": {
+      "total": 2,
+      "totalUnique": 1,
+      "unique": {
+        "linear-gradient(#54a3ff, #006eed)": 2
+      },
+      "uniquenessRatio": 0.5
+    },
     "fontFamilies": {
       "total": 13,
       "totalUnique": 7,

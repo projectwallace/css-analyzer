@@ -40955,6 +40955,26 @@
         "uniquenessRatio": 0.004230118443316413
       }
     },
+    "gradients": {
+      "total": 26,
+      "totalUnique": 13,
+      "unique": {
+        "-webkit-gradient(linear, left top, left bottom, from(#3EB9DE), to(#3A80DE))": 2,
+        "linear-gradient(#3EB9DE, #3A80DE)": 2,
+        "-webkit-gradient(linear, left top, right top, from(#c3e8ff), to(#fff))": 2,
+        "linear-gradient(90deg, #c3e8ff, #fff)": 2,
+        "-webkit-gradient(linear, left bottom, left top, from(#5243AA), to(#0079bf))": 2,
+        "linear-gradient(0deg, #5243AA 0%, #0079bf 100%)": 2,
+        "linear-gradient(135deg, #0079BF, #5067C5)": 2,
+        "-webkit-gradient(linear, left top, left bottom, from(#696CBF), to(#E2859F))": 2,
+        "linear-gradient(#696CBF, #E2859F)": 2,
+        "-webkit-gradient(linear, left top, left bottom, from(#42548E), to(#6B668C))": 2,
+        "linear-gradient(180deg, #42548E 0%, #6B668C 100%)": 2,
+        "-webkit-gradient(linear, left top, left bottom, from(#fff), color-stop(46%, #f7ecff), color-stop(74%, #d2ecff), to(#fff))": 2,
+        "linear-gradient(to bottom, #fff 0%, #f7ecff 46%, #d2ecff 74%, #fff 100%)": 2
+      },
+      "uniquenessRatio": 0.5
+    },
     "fontFamilies": {
       "total": 71,
       "totalUnique": 10,
