@@ -27,6 +27,27 @@ Animations('finds simple durations', () => {
   assert.equal(actual, expected)
 })
 
+Animations('finds duration lists', () => {
+  const fixture = `
+    durations {
+      animation-duration: 1s, 1s;
+      transition-duration: 300ms, 400ms;
+    }
+  `
+  const actual = analyze(fixture).values.animations.durations
+  const expected = {
+    total: 4,
+    totalUnique: 3,
+    unique: {
+      '1s': 2,
+      '300ms': 1,
+      '400ms': 1,
+    },
+    uniquenessRatio: 3 / 4
+  }
+  assert.equal(actual, expected)
+})
+
 Animations('finds simple timing functions', () => {
   const fixture = `
     timings {
@@ -50,6 +71,26 @@ Animations('finds simple timing functions', () => {
       'steps(3)': 1,
     },
     uniquenessRatio: 3 / 4
+  }
+  assert.equal(actual, expected)
+})
+
+Animations('finds timing functions in value lists', () => {
+  const fixture = `
+    timings {
+      animation-timing-function: ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1);
+    }
+  `
+  const actual = analyze(fixture).values.animations.timingFunctions
+  const expected = {
+    total: 3,
+    totalUnique: 3,
+    unique: {
+      'ease': 1,
+      'step-start': 1,
+      'cubic-bezier(0.1, 0.7, 1, 0.1)': 1,
+    },
+    uniquenessRatio: 1
   }
   assert.equal(actual, expected)
 })

@@ -23237,7 +23237,7 @@
     },
     "animations": {
       "durations": {
-        "total": 55,
+        "total": 57,
         "totalUnique": 13,
         "unique": {
           "0": 2,
@@ -23250,11 +23250,11 @@
           ".3s": 7,
           "2s": 2,
           ".15s": 8,
-          ".5s,.4s": 2,
-          ".1s": 2,
-          ".5s": 2
+          ".5s": 4,
+          ".4s": 2,
+          ".1s": 2
         },
-        "uniquenessRatio": 0.23636363636363636
+        "uniquenessRatio": 0.22807017543859648
       },
       "timingFunctions": {
         "total": 36,
