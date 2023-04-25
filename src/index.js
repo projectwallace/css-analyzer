@@ -384,10 +384,26 @@ function analyze(css) {
           }
           break
         } else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
-          durations.push(stringifyNode(node))
+          if (node.children && node.children.size > 1) {
+            node.children.forEach(child => {
+              if (child.type !== 'Operator') {
+                durations.push(stringifyNode(child))
+              }
+            })
+          } else {
+            durations.push(stringifyNode(node))
+          }
           break
         } else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
-          timingFunctions.push(stringifyNode(node))
+          if (node.children && node.children.size > 1) {
+            node.children.forEach(child => {
+              if (child.type !== 'Operator') {
+                timingFunctions.push(stringifyNode(child))
+              }
+            })
+          } else {
+            timingFunctions.push(stringifyNode(node))
+          }
           break
         } else if (isProperty('text-shadow', property)) {
           if (!isValueKeyword(node)) {
