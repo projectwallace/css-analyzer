@@ -401,22 +401,22 @@ function analyze(css, options = {}) {
           if (node.children && node.children.size > 1) {
             node.children.forEach(child => {
               if (child.type !== 'Operator') {
-                durations.push(stringifyNode(child))
+                durations.push(stringifyNode(child), node.loc)
               }
             })
           } else {
-            durations.push(stringifyNode(node))
+            durations.push(stringifyNode(node), node.loc)
           }
           break
         } else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
           if (node.children && node.children.size > 1) {
             node.children.forEach(child => {
               if (child.type !== 'Operator') {
-                timingFunctions.push(stringifyNode(child))
+                timingFunctions.push(stringifyNode(child), node.loc)
               }
             })
           } else {
-            timingFunctions.push(stringifyNode(node))
+            timingFunctions.push(stringifyNode(node), node.loc)
           }
           break
         } else if (isProperty('text-shadow', property)) {
