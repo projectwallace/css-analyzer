@@ -261,6 +261,50 @@ AtRules('finds @imports', () => {
   assert.equal(actual, expected)
 })
 
+AtRules.only('finds layer names across `@layer` and `@import layer()`', () => {
+  const fixture = `
+    @import url("https://example.com/with-media-query") (min-width: 33em);
+    @import "https://unpkg.com/open-props" layer(base);
+    @import url("https://unpkg.com/open-props") layer(base);
+
+    /* styles imported into to the <layer-name> layer */
+    @import url('example.css') layer(named-layer);
+
+    /* styles imported into to a new anonymous layer */
+    @import url('../example.css') layer;
+
+    @import url('remedy.css') layer(reset.remedy);
+
+    /* establish a layer order up-front, from lowest to highest priority */
+    @layer reset, defaults, utilities;
+
+    /* add styles to layers */
+    @layer utilities {
+      /* high layer priority, despite low specificity */
+      [data-color='brand'] {
+        color: var(--brand, rebeccapurple);
+      }
+    }
+  `
+  const actual = analyze(fixture).stylesheet.layers
+  const expected = {
+    total: 9,
+    totalUnique: 7,
+    unique: {
+      'base': 2,
+      'named-layer': 1,
+      '<anonymous>': 1,
+      'reset.remedy': 1,
+      'reset': 1,
+      'defaults': 1,
+      'utilities': 2,
+    },
+    uniquenessRatio: 7 / 9,
+  }
+
+  assert.equal(actual, expected)
+})
+
 AtRules('finds @charsets', () => {
   const fixture = `
     @charset "UTF-8";
