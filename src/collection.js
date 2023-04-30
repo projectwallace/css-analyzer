@@ -61,8 +61,8 @@ export class Collection {
 		if (this._useLocations) {
 			return {
 				total: this._total,
-				unique,
 				totalUnique: this._items.size,
+				unique,
 				uniquenessRatio: this._total === 0 ? 0 : this._items.size / this._total,
 				__unstable__uniqueWithLocations: Object.fromEntries(uniqueWithLocations),
 			}
@@ -70,9 +70,8 @@ export class Collection {
 
 		return {
 			total: this._total,
-			unique: Object.fromEntries(this._items),
-			unique,
 			totalUnique: this._items.size,
+			unique,
 			uniquenessRatio: this._total === 0 ? 0 : this._items.size / this._total,
 		}
 	}

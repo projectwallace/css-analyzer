@@ -9,8 +9,8 @@
     },
     "embeddedContent": {
       "total": 0,
-      "unique": {},
       "totalUnique": 0,
+      "unique": {},
       "uniquenessRatio": 0,
       "size": {
         "total": 0,
@@ -75,45 +75,46 @@
     },
     "import": {
       "total": 0,
-      "unique": {},
       "totalUnique": 0,
+      "unique": {},
       "uniquenessRatio": 0
     },
     "media": {
       "total": 2,
+      "totalUnique": 2,
       "unique": {
         "screen and (min-width:768px) and (max-width:1200px)": 1,
         "screen and (min-width:768px) and (max-width:770px)": 1
       },
-      "totalUnique": 2,
       "uniquenessRatio": 1,
       "browserhacks": {
         "total": 0,
-        "unique": {},
         "totalUnique": 0,
+        "unique": {},
         "uniquenessRatio": 0
       }
     },
     "charset": {
       "total": 0,
-      "unique": {},
       "totalUnique": 0,
+      "unique": {},
       "uniquenessRatio": 0
     },
     "supports": {
       "total": 0,
-      "unique": {},
       "totalUnique": 0,
+      "unique": {},
       "uniquenessRatio": 0,
       "browserhacks": {
         "total": 0,
-        "unique": {},
         "totalUnique": 0,
+        "unique": {},
         "uniquenessRatio": 0
       }
     },
     "keyframes": {
       "total": 5,
+      "totalUnique": 5,
       "unique": {
         "@keyframes cliprotate": 1,
         "@keyframes rotate": 1,
@@ -121,26 +122,25 @@
         "@keyframes moveline": 1,
         "@keyframes placeHolderShimmer": 1
       },
-      "totalUnique": 5,
       "uniquenessRatio": 1,
       "prefixed": {
         "total": 0,
-        "unique": {},
         "totalUnique": 0,
+        "unique": {},
         "uniquenessRatio": 0,
         "ratio": 0
       }
     },
     "container": {
       "total": 0,
-      "unique": {},
       "totalUnique": 0,
+      "unique": {},
       "uniquenessRatio": 0
     },
     "layer": {
       "total": 0,
-      "unique": {},
       "totalUnique": 0,
+      "unique": {},
       "uniquenessRatio": 0
     }
   },
@@ -2289,6 +2289,7 @@
         6
       ],
       "total": 2128,
+      "totalUnique": 53,
       "unique": {
         "2": 830,
         "3": 407,
@@ -2344,7 +2345,6 @@
         "486": 1,
         "1291": 1
       },
-      "totalUnique": 53,
       "uniquenessRatio": 0.024906015037593984
     },
     "selectors": {
@@ -4486,6 +4486,7 @@
         1
       ],
       "total": 2128,
+      "totalUnique": 43,
       "unique": {
         "1": 1799,
         "2": 152,
@@ -4531,7 +4532,6 @@
         "485": 1,
         "1290": 1
       },
-      "totalUnique": 43,
       "uniquenessRatio": 0.020206766917293232
     },
     "declarations": {
@@ -6673,6 +6673,7 @@
         5
       ],
       "total": 2128,
+      "totalUnique": 15,
       "unique": {
         "1": 1035,
         "2": 384,
@@ -6690,7 +6691,6 @@
         "15": 2,
         "17": 1
       },
-      "totalUnique": 15,
       "uniquenessRatio": 0.007048872180451127
     }
   },
@@ -46572,6 +46572,7 @@
         ]
       ],
       "total": 7968,
+      "totalUnique": 33,
       "unique": {
         "0,3,1": 578,
         "0,2,1": 513,
@@ -46607,7 +46608,6 @@
         "1,0,0": 7,
         "0,3,3": 1
       },
-      "totalUnique": 33,
       "uniquenessRatio": 0.004141566265060241
     },
     "complexity": {
@@ -46619,6 +46619,7 @@
       "range": 15,
       "sum": 35719,
       "total": 7968,
+      "totalUnique": 16,
       "unique": {
         "1": 1155,
         "2": 822,
@@ -46637,7 +46638,6 @@
         "15": 5,
         "16": 4
       },
-      "totalUnique": 16,
       "uniquenessRatio": 0.002008032128514056,
       "items": [
         7,
@@ -54612,6 +54612,7 @@
     },
     "id": {
       "total": 24,
+      "totalUnique": 21,
       "unique": {
         "#stories-tab .card-caption-title": 3,
         ".menu-open #header": 1,
@@ -54635,30 +54636,30 @@
         "#clipped": 1,
         "#fixed": 1
       },
-      "totalUnique": 21,
       "uniquenessRatio": 0.875,
       "ratio": 0.0030120481927710845
     },
     "accessibility": {
       "total": 0,
-      "unique": {},
       "totalUnique": 0,
+      "unique": {},
       "uniquenessRatio": 0,
       "ratio": 0
     },
     "keyframes": {
       "total": 12,
+      "totalUnique": 4,
       "unique": {
         "0%": 5,
         "to": 5,
         "49%": 1,
         "50%": 1
       },
-      "totalUnique": 4,
       "uniquenessRatio": 0.3333333333333333
     },
     "prefixed": {
       "total": 5,
+      "totalUnique": 5,
       "unique": {
         ".facebook-live::-webkit-scrollbar-track": 1,
         ".facebook-live::-webkit-scrollbar": 1,
@@ -54666,7 +54667,6 @@
         "::-moz-selection": 1,
         ".slider::-webkit-scrollbar": 1
       },
-      "totalUnique": 5,
       "uniquenessRatio": 1,
       "ratio": 0.0006275100401606426
     }
@@ -54690,6 +54690,7 @@
   },
   "properties": {
     "total": 5380,
+    "totalUnique": 124,
     "unique": {
       "font-family": 65,
       "font-size": 171,
@@ -54816,10 +54817,10 @@
       "border-top-right-radius": 1,
       "background-position-x": 1
     },
-    "totalUnique": 124,
     "uniquenessRatio": 0.023048327137546468,
     "prefixed": {
       "total": 22,
+      "totalUnique": 8,
       "unique": {
         "-webkit-text-size-adjust": 1,
         "-webkit-tap-highlight-color": 1,
@@ -54830,12 +54831,12 @@
         "-webkit-transform": 7,
         "-webkit-animation": 6
       },
-      "totalUnique": 8,
       "uniquenessRatio": 0.36363636363636365,
       "ratio": 0.004089219330855019
     },
     "custom": {
       "total": 13,
+      "totalUnique": 13,
       "unique": {
         "--n": 1,
         "--fifa-white": 1,
@@ -54851,21 +54852,20 @@
         "--fifa-mu": 1,
         "--fifa-blue": 1
       },
-      "totalUnique": 13,
       "uniquenessRatio": 1,
       "ratio": 0.0024163568773234202,
       "importants": {
         "total": 0,
-        "unique": {},
         "totalUnique": 0,
+        "unique": {},
         "uniquenessRatio": 0,
         "ratio": 0
       }
     },
     "browserhacks": {
       "total": 0,
-      "unique": {},
       "totalUnique": 0,
+      "unique": {},
       "uniquenessRatio": 0,
       "ratio": 0
     },
@@ -54882,6 +54882,7 @@
   "values": {
     "colors": {
       "total": 952,
+      "totalUnique": 134,
       "unique": {
         "#ccc": 5,
         "transparent": 49,
@@ -55018,11 +55019,11 @@
         "rgba(240, 135, 135, .08)": 1,
         "#1d1d1d": 1
       },
-      "totalUnique": 134,
       "uniquenessRatio": 0.1407563025210084,
       "itemsPerContext": {
         "background-color": {
           "total": 160,
+          "totalUnique": 44,
           "unique": {
             "#ccc": 1,
             "#fff": 41,
@@ -55069,19 +55070,19 @@
             "#f8f8f8": 1,
             "rgba(0, 0, 0, .3)": 1
           },
-          "totalUnique": 44,
           "uniquenessRatio": 0.275
         },
         "-webkit-tap-highlight-color": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "transparent": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "color": {
           "total": 279,
+          "totalUnique": 43,
           "unique": {
             "#171717": 15,
             "#8a8a8a": 3,
@@ -55127,11 +55128,11 @@
             "#ff5076": 1,
             "#333": 1
           },
-          "totalUnique": 43,
           "uniquenessRatio": 0.15412186379928317
         },
         "background": {
           "total": 176,
+          "totalUnique": 51,
           "unique": {
             "#fafafa": 4,
             "rgba(0, 0, 0, .9)": 2,
@@ -55185,11 +55186,11 @@
             "#3d3b3b": 3,
             "#1d1d1d": 1
           },
-          "totalUnique": 51,
           "uniquenessRatio": 0.2897727272727273
         },
         "box-shadow": {
           "total": 56,
+          "totalUnique": 18,
           "unique": {
             "rgba(0, 0, 0, .18)": 2,
             "rgba(0, 0, 0, .15)": 4,
@@ -55210,11 +55211,11 @@
             "rgba(32, 33, 36, .3)": 1,
             "rgba(240, 135, 135, .08)": 1
           },
-          "totalUnique": 18,
           "uniquenessRatio": 0.32142857142857145
         },
         "fill": {
           "total": 85,
+          "totalUnique": 15,
           "unique": {
             "#fff": 43,
             "#000": 9,
@@ -55232,11 +55233,11 @@
             "#ffed59": 1,
             "currentColor": 1
           },
-          "totalUnique": 15,
           "uniquenessRatio": 0.17647058823529413
         },
         "border": {
           "total": 68,
+          "totalUnique": 18,
           "unique": {
             "#fff": 11,
             "#f1f1f1": 11,
@@ -55257,11 +55258,11 @@
             "#202020": 1,
             "#dcdcdc": 1
           },
-          "totalUnique": 18,
           "uniquenessRatio": 0.2647058823529412
         },
         "border-bottom": {
           "total": 54,
+          "totalUnique": 19,
           "unique": {
             "hsla(0, 0%, 100%, .3)": 3,
             "#d6d1d1": 1,
@@ -55283,19 +55284,19 @@
             "#dadce0": 1,
             "rgba(0, 0, 0, .2)": 1
           },
-          "totalUnique": 19,
           "uniquenessRatio": 0.35185185185185186
         },
         "border-bottom-color": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "#fff": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "border-right": {
           "total": 7,
+          "totalUnique": 6,
           "unique": {
             "#c4c4c4": 1,
             "#ccc": 1,
@@ -55304,11 +55305,11 @@
             "#000": 1,
             "#3357a7": 1
           },
-          "totalUnique": 6,
           "uniquenessRatio": 0.8571428571428571
         },
         "border-top": {
           "total": 8,
+          "totalUnique": 5,
           "unique": {
             "#eee": 1,
             "hsla(0, 0%, 9%, .1)": 2,
@@ -55316,11 +55317,11 @@
             "transparent": 2,
             "#dadce0": 1
           },
-          "totalUnique": 5,
           "uniquenessRatio": 0.625
         },
         "background-image": {
           "total": 34,
+          "totalUnique": 15,
           "unique": {
             "hsla(0, 0%, 100%, 0)": 3,
             "#f9f9f9": 1,
@@ -55338,145 +55339,145 @@
             "#000": 1,
             "#dcdbdb": 1
           },
-          "totalUnique": 15,
           "uniquenessRatio": 0.4411764705882353
         },
         "border-color": {
           "total": 5,
+          "totalUnique": 3,
           "unique": {
             "#ccc": 1,
             "#3457a7": 2,
             "transparent": 2
           },
-          "totalUnique": 3,
           "uniquenessRatio": 0.6
         },
         "border-left": {
           "total": 2,
+          "totalUnique": 2,
           "unique": {
             "#fff": 1,
             "#3457a7": 1
           },
-          "totalUnique": 2,
           "uniquenessRatio": 1
         },
         "text-shadow": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "rgba(0, 0, 0, .4)": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "stroke": {
           "total": 3,
+          "totalUnique": 3,
           "unique": {
             "#fce44d": 1,
             "#fff": 1,
             "#666": 1
           },
-          "totalUnique": 3,
           "uniquenessRatio": 1
         },
         "--fifa-white": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "#fff": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "--fifa-black": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "#000": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "--fifa-table-border": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "#f4f4f4": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "--fifa-light-gray": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "#f6f7fb": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "--fifa-border": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "#dee2e6": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "--fifa-eee": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "#eee": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "--fifa-yellow": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "#ffeb3b": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "--fifa-red": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "#fa0200": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "--fifa-green": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "green": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "--fifa-lp": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "#c8102e": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "--fifa-mu": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "#da291c": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "--fifa-blue": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "#4285f4": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         }
       },
       "formats": {
         "total": 952,
+        "totalUnique": 7,
         "unique": {
           "hex3": 386,
           "transparent": 49,
@@ -55486,12 +55487,12 @@
           "named": 10,
           "currentcolor": 1
         },
-        "totalUnique": 7,
         "uniquenessRatio": 0.007352941176470588
       }
     },
     "gradients": {
       "total": 35,
+      "totalUnique": 24,
       "unique": {
         "linear-gradient(270deg, #3948da, #0927b6)": 4,
         "linear-gradient(180deg, transparent, rgba(0, 0, 0, .22) 50%, rgba(0, 0, 0, .62) 71%, rgba(0, 0, 0, .69) 81%, rgba(0, 0, 0, .76))": 1,
@@ -55518,11 +55519,11 @@
         "linear-gradient(90deg, #2b2929 8%, #3d3b3b 24%, #2b2929 36%)": 1,
         "linear-gradient(270deg, #dcdbdb 50%, hsla(0, 0%, 100%, 0) 0)": 1
       },
-      "totalUnique": 24,
       "uniquenessRatio": 0.6857142857142857
     },
     "fontFamilies": {
       "total": 70,
+      "totalUnique": 9,
       "unique": {
         "montserrat-light": 2,
         "montserrat-regular": 17,
@@ -55534,11 +55535,11 @@
         "Georgia": 1,
         "Arial, Helvetica, sans-serif": 2
       },
-      "totalUnique": 9,
       "uniquenessRatio": 0.12857142857142856
     },
     "fontSizes": {
       "total": 176,
+      "totalUnique": 42,
       "unique": {
         "0": 3,
         ".625rem": 4,
@@ -55583,11 +55584,11 @@
         ".8125em": 1,
         ".9375rem": 1
       },
-      "totalUnique": 42,
       "uniquenessRatio": 0.23863636363636365
     },
     "lineHeights": {
       "total": 119,
+      "totalUnique": 43,
       "unique": {
         "0": 20,
         "1": 10,
@@ -55633,11 +55634,11 @@
         "1.88": 1,
         "1.7em": 1
       },
-      "totalUnique": 43,
       "uniquenessRatio": 0.36134453781512604
     },
     "zindexes": {
       "total": 99,
+      "totalUnique": 20,
       "unique": {
         "0": 2,
         "1": 41,
@@ -55660,19 +55661,19 @@
         "99999": 2,
         "-1": 2
       },
-      "totalUnique": 20,
       "uniquenessRatio": 0.20202020202020202
     },
     "textShadows": {
       "total": 1,
+      "totalUnique": 1,
       "unique": {
         "1px 1px 2px rgba(0, 0, 0, .4)": 1
       },
-      "totalUnique": 1,
       "uniquenessRatio": 1
     },
     "boxShadows": {
       "total": 51,
+      "totalUnique": 28,
       "unique": {
         "0 5px 11px 0 rgba(0, 0, 0, .18), 0 4px 15px 0 rgba(0, 0, 0, .15)": 2,
         "0 0 10px 0 rgba(0, 0, 0, .1)": 16,
@@ -55703,12 +55704,12 @@
         "0 .3125rem 1.25rem 0 rgba(0, 0, 0, .1)": 1,
         "0 4px 20px 0 rgba(240, 135, 135, .08)": 1
       },
-      "totalUnique": 28,
       "uniquenessRatio": 0.5490196078431373
     },
     "animations": {
       "durations": {
         "total": 42,
+        "totalUnique": 10,
         "unique": {
           ".2s": 9,
           ".1s": 1,
@@ -55721,11 +55722,11 @@
           "16s": 4,
           "8s": 2
         },
-        "totalUnique": 10,
         "uniquenessRatio": 0.23809523809523808
       },
       "timingFunctions": {
         "total": 38,
+        "totalUnique": 6,
         "unique": {
           "ease-in-out": 16,
           "ease": 5,
@@ -55734,12 +55735,12 @@
           "ease-in": 1,
           "steps(2)": 4
         },
-        "totalUnique": 6,
         "uniquenessRatio": 0.15789473684210525
       }
     },
     "prefixes": {
       "total": 12,
+      "totalUnique": 9,
       "unique": {
         "-webkit-transform .25s ease-in-out": 2,
         "transform .25s ease-in-out, -webkit-transform .25s ease-in-out": 1,
@@ -55751,17 +55752,17 @@
         "-webkit-gradient(linear, left top, right top, color-stop(8%, #2b2929), color-stop(24%, #3d3b3b), color-stop(36%, #2b2929))": 1,
         "-webkit-linear-gradient(left, #2b2929 8%, #3d3b3b 24%, #2b2929 36%)": 1
       },
-      "totalUnique": 9,
       "uniquenessRatio": 0.75
     },
     "browserhacks": {
       "total": 0,
-      "unique": {},
       "totalUnique": 0,
+      "unique": {},
       "uniquenessRatio": 0
     },
     "units": {
       "total": 2462,
+      "totalUnique": 9,
       "unique": {
         "rem": 782,
         "vh": 14,
@@ -55773,468 +55774,467 @@
         "turn": 2,
         "vw": 1
       },
-      "totalUnique": 9,
       "uniquenessRatio": 0.0036555645816409425,
       "itemsPerContext": {
         "font-size": {
           "total": 168,
+          "totalUnique": 3,
           "unique": {
             "rem": 75,
             "px": 85,
             "em": 8
           },
-          "totalUnique": 3,
           "uniquenessRatio": 0.017857142857142856
         },
         "height": {
           "total": 184,
+          "totalUnique": 3,
           "unique": {
             "vh": 11,
             "rem": 77,
             "px": 96
           },
-          "totalUnique": 3,
           "uniquenessRatio": 0.016304347826086956
         },
         "width": {
           "total": 178,
+          "totalUnique": 3,
           "unique": {
             "rem": 78,
             "px": 99,
             "vw": 1
           },
-          "totalUnique": 3,
           "uniquenessRatio": 0.016853932584269662
         },
         "min-height": {
           "total": 40,
+          "totalUnique": 3,
           "unique": {
             "vh": 2,
             "px": 37,
             "rem": 1
           },
-          "totalUnique": 3,
           "uniquenessRatio": 0.075
         },
         "max-width": {
           "total": 115,
+          "totalUnique": 2,
           "unique": {
             "rem": 28,
             "px": 87
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.017391304347826087
         },
         "padding-left": {
           "total": 19,
+          "totalUnique": 2,
           "unique": {
             "rem": 5,
             "px": 14
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.10526315789473684
         },
         "padding-right": {
           "total": 18,
+          "totalUnique": 2,
           "unique": {
             "rem": 6,
             "px": 12
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.1111111111111111
         },
         "margin-right": {
           "total": 154,
+          "totalUnique": 2,
           "unique": {
             "rem": 66,
             "px": 88
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.012987012987012988
         },
         "margin-top": {
           "total": 82,
+          "totalUnique": 2,
           "unique": {
             "rem": 21,
             "px": 61
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.024390243902439025
         },
         "margin-bottom": {
           "total": 132,
+          "totalUnique": 3,
           "unique": {
             "rem": 56,
             "px": 75,
             "em": 1
           },
-          "totalUnique": 3,
           "uniquenessRatio": 0.022727272727272728
         },
         "border-radius": {
           "total": 125,
+          "totalUnique": 2,
           "unique": {
             "rem": 31,
             "px": 94
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.016
         },
         "padding": {
           "total": 299,
+          "totalUnique": 3,
           "unique": {
             "rem": 147,
             "px": 150,
             "em": 2
           },
-          "totalUnique": 3,
           "uniquenessRatio": 0.010033444816053512
         },
         "line-height": {
           "total": 39,
+          "totalUnique": 3,
           "unique": {
             "rem": 16,
             "px": 22,
             "em": 1
           },
-          "totalUnique": 3,
           "uniquenessRatio": 0.07692307692307693
         },
         "padding-bottom": {
           "total": 41,
+          "totalUnique": 2,
           "unique": {
             "rem": 9,
             "px": 32
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.04878048780487805
         },
         "box-shadow": {
           "total": 80,
+          "totalUnique": 2,
           "unique": {
             "px": 65,
             "rem": 15
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.025
         },
         "right": {
           "total": 41,
+          "totalUnique": 2,
           "unique": {
             "rem": 8,
             "px": 33
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.04878048780487805
         },
         "top": {
           "total": 59,
+          "totalUnique": 2,
           "unique": {
             "rem": 5,
             "px": 54
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.03389830508474576
         },
         "margin": {
           "total": 83,
+          "totalUnique": 2,
           "unique": {
             "rem": 47,
             "px": 36
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.024096385542168676
         },
         "padding-top": {
           "total": 40,
+          "totalUnique": 3,
           "unique": {
             "px": 28,
             "rem": 11,
             "em": 1
           },
-          "totalUnique": 3,
           "uniquenessRatio": 0.075
         },
         "border": {
           "total": 72,
+          "totalUnique": 2,
           "unique": {
             "px": 65,
             "rem": 7
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.027777777777777776
         },
         "left": {
           "total": 32,
+          "totalUnique": 3,
           "unique": {
             "px": 28,
             "em": 1,
             "rem": 3
           },
-          "totalUnique": 3,
           "uniquenessRatio": 0.09375
         },
         "border-bottom": {
           "total": 57,
+          "totalUnique": 2,
           "unique": {
             "px": 56,
             "rem": 1
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.03508771929824561
         },
         "vertical-align": {
           "total": 31,
+          "totalUnique": 2,
           "unique": {
             "px": 30,
             "rem": 1
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.06451612903225806
         },
         "border-right": {
           "total": 7,
+          "totalUnique": 1,
           "unique": {
             "px": 7
           },
-          "totalUnique": 1,
           "uniquenessRatio": 0.14285714285714285
         },
         "transition": {
           "total": 27,
+          "totalUnique": 1,
           "unique": {
             "s": 27
           },
-          "totalUnique": 1,
           "uniquenessRatio": 0.037037037037037035
         },
         "bottom": {
           "total": 21,
+          "totalUnique": 2,
           "unique": {
             "px": 18,
             "rem": 3
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.09523809523809523
         },
         "margin-left": {
           "total": 52,
+          "totalUnique": 3,
           "unique": {
             "px": 39,
             "rem": 11,
             "em": 2
           },
-          "totalUnique": 3,
           "uniquenessRatio": 0.057692307692307696
         },
         "max-height": {
           "total": 32,
+          "totalUnique": 2,
           "unique": {
             "px": 31,
             "vh": 1
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.0625
         },
         "transform": {
           "total": 26,
+          "totalUnique": 3,
           "unique": {
             "deg": 23,
             "px": 2,
             "turn": 1
           },
-          "totalUnique": 3,
           "uniquenessRatio": 0.11538461538461539
         },
         "min-width": {
           "total": 21,
+          "totalUnique": 2,
           "unique": {
             "px": 15,
             "rem": 6
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.09523809523809523
         },
         "background": {
           "total": 14,
+          "totalUnique": 2,
           "unique": {
             "deg": 13,
             "px": 1
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.14285714285714285
         },
         "flex": {
           "total": 69,
+          "totalUnique": 2,
           "unique": {
             "px": 30,
             "rem": 39
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.028985507246376812
         },
         "background-position": {
           "total": 12,
+          "totalUnique": 1,
           "unique": {
             "px": 12
           },
-          "totalUnique": 1,
           "uniquenessRatio": 0.08333333333333333
         },
         "border-top": {
           "total": 10,
+          "totalUnique": 1,
           "unique": {
             "px": 10
           },
-          "totalUnique": 1,
           "uniquenessRatio": 0.1
         },
         "animation": {
           "total": 8,
+          "totalUnique": 1,
           "unique": {
             "s": 8
           },
-          "totalUnique": 1,
           "uniquenessRatio": 0.125
         },
         "grid-template-columns": {
           "total": 2,
+          "totalUnique": 1,
           "unique": {
             "fr": 2
           },
-          "totalUnique": 1,
           "uniquenessRatio": 0.5
         },
         "grid-column-gap": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "px": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "letter-spacing": {
           "total": 12,
+          "totalUnique": 1,
           "unique": {
             "px": 12
           },
-          "totalUnique": 1,
           "uniquenessRatio": 0.08333333333333333
         },
         "background-image": {
           "total": 15,
+          "totalUnique": 1,
           "unique": {
             "deg": 15
           },
-          "totalUnique": 1,
           "uniquenessRatio": 0.06666666666666667
         },
         "border-width": {
           "total": 4,
+          "totalUnique": 1,
           "unique": {
             "px": 4
           },
-          "totalUnique": 1,
           "uniquenessRatio": 0.25
         },
         "-webkit-transition": {
           "total": 3,
+          "totalUnique": 1,
           "unique": {
             "s": 3
           },
-          "totalUnique": 1,
           "uniquenessRatio": 0.3333333333333333
         },
         "border-left": {
           "total": 2,
+          "totalUnique": 2,
           "unique": {
             "px": 1,
             "rem": 1
           },
-          "totalUnique": 2,
           "uniquenessRatio": 1
         },
         "text-shadow": {
           "total": 3,
+          "totalUnique": 1,
           "unique": {
             "px": 3
           },
-          "totalUnique": 1,
           "uniquenessRatio": 0.3333333333333333
         },
         "filter": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "px": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "-webkit-transform": {
           "total": 6,
+          "totalUnique": 3,
           "unique": {
             "px": 1,
             "deg": 4,
             "turn": 1
           },
-          "totalUnique": 3,
           "uniquenessRatio": 0.5
         },
         "font": {
           "total": 6,
+          "totalUnique": 2,
           "unique": {
             "em": 2,
             "rem": 4
           },
-          "totalUnique": 2,
           "uniquenessRatio": 0.3333333333333333
         },
         "border-bottom-right-radius": {
           "total": 2,
+          "totalUnique": 1,
           "unique": {
             "rem": 2
           },
-          "totalUnique": 1,
           "uniquenessRatio": 0.5
         },
         "gap": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "rem": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "-webkit-animation": {
           "total": 6,
+          "totalUnique": 1,
           "unique": {
             "s": 6
           },
-          "totalUnique": 1,
           "uniquenessRatio": 0.16666666666666666
         },
         "border-top-right-radius": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "rem": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         },
         "background-size": {
           "total": 8,
+          "totalUnique": 1,
           "unique": {
             "px": 8
           },
-          "totalUnique": 1,
           "uniquenessRatio": 0.125
         },
         "background-position-x": {
           "total": 1,
+          "totalUnique": 1,
           "unique": {
             "px": 1
           },
-          "totalUnique": 1,
           "uniquenessRatio": 1
         }
       }
