@@ -8,7 +8,7 @@ export class Collection {
 		/** @type {number[]} */
 		this.node_columns = []
 		/** @type {number[]} */
-		this.node_lenghts = []
+		this.node_lengths = []
 		/** @type {number[]} */
 		this.node_offsets = []
 
@@ -26,7 +26,7 @@ export class Collection {
 		this.node_lines[index] = node_location.start.line
 		this.node_columns[index] = node_location.start.column
 		this.node_offsets[index] = node_location.start.offset
-		this.node_lenghts[index] = node_location.end.offset - node_location.start.offset
+		this.node_lengths[index] = node_location.end.offset - node_location.start.offset
 
 		if (this._items.has(item)) {
 			/** @type number[] */
@@ -52,7 +52,7 @@ export class Collection {
 				line: this.node_lines[index],
 				column: this.node_columns[index],
 				offset: this.node_offsets[index],
-				length: this.node_lenghts[index],
+				length: this.node_lengths[index],
 			}))
 			uniqueWithLocations.set(key, nodes)
 			unique[key] = list.length
