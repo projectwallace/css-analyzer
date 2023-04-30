@@ -623,24 +623,24 @@ function analyze(css, options = {}) {
       },
       sizes: assign(
         ruleSizes.aggregate(),
-        uniqueRuleSize.count(),
         {
           items: ruleSizes.toArray(),
         },
+        uniqueRuleSize.count(),
       ),
       selectors: assign(
         selectorsPerRule.aggregate(),
-        uniqueSelectorsPerRule.count(),
         {
           items: selectorsPerRule.toArray(),
         },
+        uniqueSelectorsPerRule.count(),
       ),
       declarations: assign(
         declarationsPerRule.aggregate(),
-        uniqueDeclarationsPerRule.count(),
         {
           items: declarationsPerRule.toArray(),
         },
+        uniqueDeclarationsPerRule.count(),
       ),
     },
     selectors: {
@@ -648,7 +648,6 @@ function analyze(css, options = {}) {
       totalUnique: totalUniqueSelectors,
       uniquenessRatio: ratio(totalUniqueSelectors, totalSelectors),
       specificity: assign(
-        uniqueSpecificities.count(),
         {
           /** @type Specificity */
           min: minSpecificity === undefined ? [0, 0, 0] : minSpecificity,
@@ -663,7 +662,8 @@ function analyze(css, options = {}) {
           /** @type Specificity */
           median: [specificitiesA.median, specificitiesB.median, specificitiesC.median],
           items: specificities,
-        }
+        },
+        uniqueSpecificities.count(),
       ),
       complexity: assign(
         selectorComplexities.aggregate(),
