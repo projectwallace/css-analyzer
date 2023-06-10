@@ -3,24 +3,6 @@ import { startsWith, strEquals } from '../string-utils.js'
 import { hasVendorPrefix } from '../vendor-prefix.js'
 
 /**
- * Compare specificity A to Specificity B
- * @param {[number,number,number]} a - Specificity A
- * @param {[number,number,number]} b - Specificity B
- * @returns {number} sortIndex - 0 when a==b, 1 when a<b, -1 when a>b
- */
-export function compareSpecificity(a, b) {
-  if (a[0] === b[0]) {
-    if (a[1] === b[1]) {
-      return b[2] - a[2]
-    }
-
-    return b[1] - a[1]
-  }
-
-  return b[0] - a[0]
-}
-
-/**
  *
  * @param {import('css-tree').SelectorList} selectorListAst
  * @returns {Selector[]} Analyzed selectors in the selectorList
