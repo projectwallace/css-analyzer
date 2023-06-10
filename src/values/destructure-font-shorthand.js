@@ -31,6 +31,7 @@ const TYPE_IDENTIFIER = 'Identifier'
 
 export function isSystemFont(node) {
 	let firstChild = node.children.first
+	if (firstChild === null) return false
 	return firstChild.type === TYPE_IDENTIFIER && SYSTEM_FONTS.has(firstChild.name)
 }
 
