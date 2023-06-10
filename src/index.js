@@ -2,7 +2,7 @@ import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
 import { calculate } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
-import { getComplexity, isAccessibility, compareSpecificity } from './selectors/utils.js'
+import { getComplexity, isAccessibility } from './selectors/utils.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
 import { destructure, isSystemFont } from './values/destructure-font-shorthand.js'
 import { isValueKeyword } from './values/values.js'
@@ -28,7 +28,7 @@ function ratio(part, total) {
  * Analyze CSS
  * @param {string} css
  */
-function analyze(css) {
+export function analyze(css) {
   let start = Date.now()
 
   /**
@@ -749,7 +749,20 @@ function analyze(css) {
   }
 }
 
-export {
-  analyze,
-  compareSpecificity,
+/**
+ * Compare specificity A to Specificity B
+ * @param {Specificity} a - Specificity A
+ * @param {Specificity} b - Specificity B
+ * @returns {number} sortIndex - 0 when a==b, 1 when a<b, -1 when a>b
+ */
+export function compareSpecificity(a, b) {
+  if (a[0] === b[0]) {
+    if (a[1] === b[1]) {
+      return b[2] - a[2]
+    }
+
+    return b[1] - a[1]
+  }
+
+  return b[0] - a[0]
 }

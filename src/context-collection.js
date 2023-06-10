@@ -27,7 +27,7 @@ class ContextCollection {
      * @type {Map<string, {
      * total: number,
      * totalUnique: number,
-     * unique: {[string]: number},
+     * unique: {[k: string]: number},
      * uniquenessRatio: number
      * }>}
      */
