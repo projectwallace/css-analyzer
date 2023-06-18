@@ -369,4 +369,41 @@ Selectors('analyzes vendor prefixed selectors', () => {
   })
 })
 
+Selectors('Can keep track of selector locations if we as it to do so', () => {
+  const fixture = `
+    rule {
+      color: green;
+    }
+
+    @media print {
+      @media (min-width: 1000px) {
+        @supports (display: grid) {
+          another-rule {
+            color: purple;
+          }
+        }
+      }
+    }
+  `
+  let actual = analyze(fixture, { useUnstableLocations: true }).selectors.complexity.__unstable__uniqueWithLocations
+  let expected = {
+    '1': [
+      {
+        line: 2,
+        column: 5,
+        offset: 5,
+        length: 4,
+      },
+      {
+        line: 9,
+        column: 11,
+        offset: 139,
+        length: 12,
+      }
+    ]
+  }
+
+  assert.equal(actual, expected)
+})
+
 Selectors.run()

@@ -29,8 +29,14 @@ let defaults = {
 }
 
 /**
+ * @typedef Options
+ * @property {boolean} useUnstableLocations **WARNING: EXPERIMENTAL!** Use Locations (`{ 'item': [{ line, column, offset, length }] }`) instead of a regular count per occurrence (`{ 'item': 3 }`)
+ */
+
+/**
  * Analyze CSS
  * @param {string} css
+ * @param {Options} options
  */
 function analyze(css, options = {}) {
   let settings = Object.assign({}, defaults, options)
