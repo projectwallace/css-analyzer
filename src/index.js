@@ -38,7 +38,7 @@ let defaults = {
  * @param {string} css
  * @param {Options} options
  */
-function analyze(css, options = {}) {
+export function analyze(css, options = {}) {
   let settings = Object.assign({}, defaults, options)
   let useLocations = settings.useUnstableLocations === true
   let start = Date.now()
