@@ -9,7 +9,7 @@ import { isValueKeyword } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isAstVendorPrefixed } from './values/vendor-prefix.js'
 import { ContextCollection } from './context-collection.js'
-import { CountableCollection } from './countable-collection.js'
+import { Collection } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
 import { strEquals, startsWith, endsWith } from './string-utils.js'
 import { hasVendorPrefix } from './vendor-prefix.js'
@@ -24,11 +24,23 @@ function ratio(part, total) {
   return part / total
 }
 
+let defaults = {
+  useUnstableLocations: false
+}
+
+/**
+ * @typedef Options
+ * @property {boolean} useUnstableLocations **WARNING: EXPERIMENTAL!** Use Locations (`{ 'item': [{ line, column, offset, length }] }`) instead of a regular count per occurrence (`{ 'item': 3 }`)
+ */
+
 /**
  * Analyze CSS
  * @param {string} css
+ * @param {Options} options
  */
-export function analyze(css) {
+export function analyze(css, options = {}) {
+  let settings = Object.assign({}, defaults, options)
+  let useLocations = settings.useUnstableLocations === true
   let start = Date.now()
 
   /**
@@ -47,7 +59,7 @@ export function analyze(css) {
   // Stylesheet
   let totalComments = 0
   let commentsSize = 0
-  let embeds = new CountableCollection()
+  let embeds = new Collection({ useLocations })
   let embedSize = 0
   let embedTypes = {
     total: 0,
@@ -74,16 +86,16 @@ export function analyze(css) {
   let totalAtRules = 0
   /** @type {{[property: string]: string}[]} */
   let fontfaces = []
-  let layers = new CountableCollection()
-  let imports = new CountableCollection()
-  let medias = new CountableCollection()
-  let mediaBrowserhacks = new CountableCollection()
-  let charsets = new CountableCollection()
-  let supports = new CountableCollection()
-  let supportsBrowserhacks = new CountableCollection()
-  let keyframes = new CountableCollection()
-  let prefixedKeyframes = new CountableCollection()
-  let containers = new CountableCollection()
+  let layers = new Collection({ useLocations })
+  let imports = new Collection({ useLocations })
+  let medias = new Collection({ useLocations })
+  let mediaBrowserhacks = new Collection({ useLocations })
+  let charsets = new Collection({ useLocations })
+  let supports = new Collection({ useLocations })
+  let supportsBrowserhacks = new Collection({ useLocations })
+  let keyframes = new Collection({ useLocations })
+  let prefixedKeyframes = new Collection({ useLocations })
+  let containers = new Collection({ useLocations })
 
   // Rules
   let totalRules = 0
@@ -91,11 +103,14 @@ export function analyze(css) {
   let ruleSizes = new AggregateCollection()
   let selectorsPerRule = new AggregateCollection()
   let declarationsPerRule = new AggregateCollection()
+  let uniqueRuleSize = new Collection({ useLocations })
+  let uniqueSelectorsPerRule = new Collection({ useLocations })
+  let uniqueDeclarationsPerRule = new Collection({ useLocations })
 
   // Selectors
-  let keyframeSelectors = new CountableCollection()
+  let keyframeSelectors = new Collection({ useLocations })
   let uniqueSelectors = new Set()
-  let prefixedSelectors = new CountableCollection()
+  let prefixedSelectors = new Collection({ useLocations })
   /** @type {Specificity} */
   let maxSpecificity
   /** @type {Specificity} */
@@ -103,42 +118,43 @@ export function analyze(css) {
   let specificityA = new AggregateCollection()
   let specificityB = new AggregateCollection()
   let specificityC = new AggregateCollection()
-  let uniqueSpecificities = new CountableCollection()
+  let uniqueSpecificities = new Collection({ useLocations })
   let selectorComplexities = new AggregateCollection()
+  let uniqueSelectorComplexities = new Collection({ useLocations })
   /** @type {Specificity[]} */
   let specificities = []
-  let ids = new CountableCollection()
-  let a11y = new CountableCollection()
+  let ids = new Collection({ useLocations })
+  let a11y = new Collection({ useLocations })
 
   // Declarations
   let uniqueDeclarations = new Set()
   let totalDeclarations = 0
   let importantDeclarations = 0
   let importantsInKeyframes = 0
-  let importantCustomProperties = new CountableCollection()
+  let importantCustomProperties = new Collection({ useLocations })
 
   // Properties
-  let properties = new CountableCollection()
-  let propertyHacks = new CountableCollection()
-  let propertyVendorPrefixes = new CountableCollection()
-  let customProperties = new CountableCollection()
+  let properties = new Collection({ useLocations })
+  let propertyHacks = new Collection({ useLocations })
+  let propertyVendorPrefixes = new Collection({ useLocations })
+  let customProperties = new Collection({ useLocations })
   let propertyComplexities = new AggregateCollection()
 
   // Values
-  let vendorPrefixedValues = new CountableCollection()
-  let valueBrowserhacks = new CountableCollection()
-  let zindex = new CountableCollection()
-  let textShadows = new CountableCollection()
-  let boxShadows = new CountableCollection()
-  let fontFamilies = new CountableCollection()
-  let fontSizes = new CountableCollection()
-  let lineHeights = new CountableCollection()
-  let timingFunctions = new CountableCollection()
-  let durations = new CountableCollection()
-  let colors = new ContextCollection()
-  let colorFormats = new CountableCollection()
-  let units = new ContextCollection()
-  let gradients = new CountableCollection()
+  let vendorPrefixedValues = new Collection({ useLocations })
+  let valueBrowserhacks = new Collection({ useLocations })
+  let zindex = new Collection({ useLocations })
+  let textShadows = new Collection({ useLocations })
+  let boxShadows = new Collection({ useLocations })
+  let fontFamilies = new Collection({ useLocations })
+  let fontSizes = new Collection({ useLocations })
+  let lineHeights = new Collection({ useLocations })
+  let timingFunctions = new Collection({ useLocations })
+  let durations = new Collection({ useLocations })
+  let colors = new ContextCollection({ useLocations })
+  let colorFormats = new Collection({ useLocations })
+  let units = new ContextCollection({ useLocations })
+  let gradients = new Collection({ useLocations })
 
   walk(ast, function (node) {
     switch (node.type) {
@@ -162,45 +178,45 @@ export function analyze(css) {
 
         if (atRuleName === 'media') {
           let prelude = stringifyNode(node.prelude)
-          medias.push(prelude)
+          medias.push(prelude, node.prelude.loc)
           if (isMediaBrowserhack(node.prelude)) {
-            mediaBrowserhacks.push(prelude)
+            mediaBrowserhacks.push(prelude, node.prelude.loc)
           }
           break
         }
         if (atRuleName === 'supports') {
           let prelude = stringifyNode(node.prelude)
-          supports.push(prelude)
+          supports.push(prelude, node.prelude.loc)
           if (isSupportsBrowserhack(node.prelude)) {
-            supportsBrowserhacks.push(prelude)
+            supportsBrowserhacks.push(prelude, node.prelude.loc)
           }
           break
         }
         if (endsWith('keyframes', atRuleName)) {
           let name = '@' + atRuleName + ' ' + stringifyNode(node.prelude)
           if (hasVendorPrefix(atRuleName)) {
-            prefixedKeyframes.push(name)
+            prefixedKeyframes.push(name, node.prelude.loc)
           }
-          keyframes.push(name)
+          keyframes.push(name, node.prelude.loc)
           break
         }
         if (atRuleName === 'import') {
-          imports.push(stringifyNode(node.prelude))
+          imports.push(stringifyNode(node.prelude), node.prelude.loc)
           break
         }
         if (atRuleName === 'charset') {
-          charsets.push(stringifyNode(node.prelude))
+          charsets.push(stringifyNode(node.prelude), node.prelude.loc)
           break
         }
         if (atRuleName === 'container') {
-          containers.push(stringifyNode(node.prelude))
+          containers.push(stringifyNode(node.prelude), node.prelude.loc)
           break
         }
         if (atRuleName === 'layer') {
           let prelude = stringifyNode(node.prelude)
           prelude
             .split(',')
-            .forEach(name => layers.push(name.trim()))
+            .forEach(name => layers.push(name.trim(), node.prelude.loc))
         }
         break
       }
@@ -209,8 +225,11 @@ export function analyze(css) {
         let numDeclarations = node.block.children ? node.block.children.size : 0
 
         ruleSizes.push(numSelectors + numDeclarations)
+        uniqueRuleSize.push(numSelectors + numDeclarations, node.loc)
         selectorsPerRule.push(numSelectors)
+        uniqueSelectorsPerRule.push(numSelectors, node.prelude.loc)
         declarationsPerRule.push(numDeclarations)
+        uniqueDeclarationsPerRule.push(numDeclarations, node.block.loc)
 
         totalRules++
 
@@ -223,7 +242,7 @@ export function analyze(css) {
         let selector = stringifyNode(node)
 
         if (this.atrule && endsWith('keyframes', this.atrule.name)) {
-          keyframeSelectors.push(selector)
+          keyframeSelectors.push(selector, node.loc)
           return this.skip
         }
 
@@ -232,22 +251,23 @@ export function analyze(css) {
         let specificity = [specificityObj.a, specificityObj.b, specificityObj.c]
 
         if (specificity[0] > 0) {
-          ids.push(selector)
+          ids.push(selector, node.loc)
         }
 
         if (isAccessibility(node)) {
-          a11y.push(selector)
+          a11y.push(selector, node.loc)
         }
 
         let [complexity, isPrefixed] = getComplexity(node)
 
         if (isPrefixed) {
-          prefixedSelectors.push(selector)
+          prefixedSelectors.push(selector, node.loc)
         }
 
         uniqueSelectors.add(selector)
         selectorComplexities.push(complexity)
-        uniqueSpecificities.push(specificity[0] + ',' + specificity[1] + ',' + specificity[2])
+        uniqueSelectorComplexities.push(complexity, node.loc)
+        uniqueSpecificities.push(specificity[0] + ',' + specificity[1] + ',' + specificity[2], node.loc)
 
         if (maxSpecificity === undefined) {
           maxSpecificity = specificity
@@ -286,9 +306,9 @@ export function analyze(css) {
         let unit = node.unit
 
         if (endsWith('\\9', unit)) {
-          units.push(unit.substring(0, unit.length - 2), this.declaration.property)
+          units.push(unit.substring(0, unit.length - 2), this.declaration.property, node.loc)
         } else {
-          units.push(unit, this.declaration.property)
+          units.push(unit, this.declaration.property, node.loc)
         }
 
         return this.skip
@@ -315,7 +335,7 @@ export function analyze(css) {
           }
 
           // @deprecated
-          embeds.push(embed)
+          embeds.push(embed, node.loc)
         }
         break
       }
@@ -328,23 +348,23 @@ export function analyze(css) {
         let { property, important } = declaration
 
         if (isAstVendorPrefixed(node)) {
-          vendorPrefixedValues.push(stringifyNode(node))
+          vendorPrefixedValues.push(stringifyNode(node), node.loc)
         }
 
         // i.e. `property: value !ie`
         if (typeof important === 'string') {
-          valueBrowserhacks.push(stringifyNodePlain(node) + '!' + important)
+          valueBrowserhacks.push(stringifyNodePlain(node) + '!' + important, node.loc)
         }
 
         // i.e. `property: value\9`
         if (isIe9Hack(node)) {
-          valueBrowserhacks.push(stringifyNode(node))
+          valueBrowserhacks.push(stringifyNode(node), node.loc)
         }
 
         // Process properties first that don't have colors,
         // so we can avoid further walking them;
         if (isProperty('z-index', property)) {
-          zindex.push(stringifyNode(node))
+          zindex.push(stringifyNode(node), node.loc)
           return this.skip
         } else if (isProperty('font', property)) {
           if (isSystemFont(node)) return
@@ -352,67 +372,67 @@ export function analyze(css) {
           let { font_size, line_height, font_family } = destructure(node, stringifyNode)
 
           if (font_family) {
-            fontFamilies.push(font_family)
+            fontFamilies.push(font_family, node.loc)
           }
           if (font_size) {
-            fontSizes.push(font_size)
+            fontSizes.push(font_size, node.loc)
           }
           if (line_height) {
-            lineHeights.push(line_height)
+            lineHeights.push(line_height, node.loc)
           }
 
           break
         } else if (isProperty('font-size', property)) {
           if (!isSystemFont(node)) {
-            fontSizes.push(stringifyNode(node))
+            fontSizes.push(stringifyNode(node), node.loc)
           }
           break
         } else if (isProperty('font-family', property)) {
           if (!isSystemFont(node)) {
-            fontFamilies.push(stringifyNode(node))
+            fontFamilies.push(stringifyNode(node), node.loc)
           }
           break
         } else if (isProperty('line-height', property)) {
-          lineHeights.push((stringifyNode(node)))
+          lineHeights.push(stringifyNode(node), node.loc)
         } else if (isProperty('transition', property) || isProperty('animation', property)) {
           let [times, fns] = analyzeAnimation(node.children, stringifyNode)
           for (let i = 0; i < times.length; i++) {
-            durations.push(times[i])
+            durations.push(times[i], node.loc)
           }
           for (let i = 0; i < fns.length; i++) {
-            timingFunctions.push(fns[i])
+            timingFunctions.push(fns[i], node.loc)
           }
           break
         } else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
           if (node.children && node.children.size > 1) {
             node.children.forEach(child => {
               if (child.type !== 'Operator') {
-                durations.push(stringifyNode(child))
+                durations.push(stringifyNode(child), node.loc)
               }
             })
           } else {
-            durations.push(stringifyNode(node))
+            durations.push(stringifyNode(node), node.loc)
           }
           break
         } else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
           if (node.children && node.children.size > 1) {
             node.children.forEach(child => {
               if (child.type !== 'Operator') {
-                timingFunctions.push(stringifyNode(child))
+                timingFunctions.push(stringifyNode(child), node.loc)
               }
             })
           } else {
-            timingFunctions.push(stringifyNode(node))
+            timingFunctions.push(stringifyNode(node), node.loc)
           }
           break
         } else if (isProperty('text-shadow', property)) {
           if (!isValueKeyword(node)) {
-            textShadows.push(stringifyNode(node))
+            textShadows.push(stringifyNode(node), node.loc)
           }
           // no break here: potentially contains colors
         } else if (isProperty('box-shadow', property)) {
           if (!isValueKeyword(node)) {
-            boxShadows.push(stringifyNode(node))
+            boxShadows.push(stringifyNode(node), node.loc)
           }
           // no break here: potentially contains colors
         }
@@ -426,8 +446,8 @@ export function analyze(css) {
               if (endsWith('\\9', valueNode.value)) {
                 hexLength = hexLength - 2
               }
-              colors.push('#' + valueNode.value, property)
-              colorFormats.push(`hex` + hexLength)
+              colors.push('#' + valueNode.value, property, valueNode.loc)
+              colorFormats.push(`hex` + hexLength, valueNode.loc)
 
               return this.skip
             }
@@ -441,22 +461,22 @@ export function analyze(css) {
 
               if (namedColors.has(nodeName)) {
                 let stringified = stringifyNode(valueNode)
-                colors.push(stringified, property)
-                colorFormats.push('named')
+                colors.push(stringified, property, valueNode.loc)
+                colorFormats.push('named', valueNode.loc)
                 return
               }
 
               if (colorKeywords.has(nodeName)) {
                 let stringified = stringifyNode(valueNode)
-                colors.push(stringified, property)
-                colorFormats.push(nodeName.toLowerCase())
+                colors.push(stringified, property, valueNode.loc)
+                colorFormats.push(nodeName.toLowerCase(), valueNode.loc)
                 return
               }
 
               if (systemColors.has(nodeName)) {
                 let stringified = stringifyNode(valueNode)
-                colors.push(stringified, property)
-                colorFormats.push('system')
+                colors.push(stringified, property, valueNode.loc)
+                colorFormats.push('system', valueNode.loc)
                 return
               }
               return this.skip
@@ -468,14 +488,13 @@ export function analyze(css) {
               }
 
               if (colorFunctions.has(nodeName)) {
-                let stringified = stringifyNode(valueNode)
-                colors.push(stringified, property)
-                colorFormats.push(nodeName.toLowerCase())
+                colors.push(stringifyNode(valueNode), property, valueNode.loc)
+                colorFormats.push(nodeName.toLowerCase(), valueNode.loc)
                 return
               }
 
               if (endsWith('gradient', nodeName)) {
-                gradients.push(stringifyNode(valueNode))
+                gradients.push(stringifyNode(valueNode), valueNode.loc)
                 return
               }
               // No this.skip here intentionally,
@@ -505,20 +524,30 @@ export function analyze(css) {
         }
 
         let { property } = node
+        let propertyLoc = {
+          start: {
+            line: node.loc.start.line,
+            column: node.loc.start.column,
+            offset: node.loc.start.offset
+          },
+          end: {
+            offset: node.loc.start.offset + property.length
+          }
+        }
 
-        properties.push(property)
+        properties.push(property, propertyLoc)
 
         if (hasVendorPrefix(property)) {
-          propertyVendorPrefixes.push(property)
+          propertyVendorPrefixes.push(property, propertyLoc)
           propertyComplexities.push(2)
         } else if (isHack(property)) {
-          propertyHacks.push(property)
+          propertyHacks.push(property, propertyLoc)
           propertyComplexities.push(2)
         } else if (isCustom(property)) {
-          customProperties.push(property)
+          customProperties.push(property, propertyLoc)
           propertyComplexities.push(2)
           if (node.important === true) {
-            importantCustomProperties.push(property)
+            importantCustomProperties.push(property, propertyLoc)
           }
         } else {
           propertyComplexities.push(1)
@@ -536,12 +565,7 @@ export function analyze(css) {
   let specificitiesA = specificityA.aggregate()
   let specificitiesB = specificityB.aggregate()
   let specificitiesC = specificityC.aggregate()
-  let uniqueSpecificitiesCount = uniqueSpecificities.count()
-  let complexityCount = new CountableCollection(selectorComplexities.toArray()).count()
   let totalUniqueSelectors = uniqueSelectors.size
-  let uniqueRuleSize = new CountableCollection(ruleSizes.toArray()).count()
-  let uniqueSelectorsPerRule = new CountableCollection(selectorsPerRule.toArray()).count()
-  let uniqueDeclarationsPerRule = new CountableCollection(declarationsPerRule.toArray()).count()
   let assign = Object.assign
 
   return {
@@ -607,57 +631,53 @@ export function analyze(css) {
         ruleSizes.aggregate(),
         {
           items: ruleSizes.toArray(),
-          unique: uniqueRuleSize.unique,
-          totalUnique: uniqueRuleSize.totalUnique,
-          uniquenessRatio: uniqueRuleSize.uniquenessRatio
         },
+        uniqueRuleSize.count(),
       ),
       selectors: assign(
         selectorsPerRule.aggregate(),
         {
           items: selectorsPerRule.toArray(),
-          unique: uniqueSelectorsPerRule.unique,
-          totalUnique: uniqueSelectorsPerRule.totalUnique,
-          uniquenessRatio: uniqueSelectorsPerRule.uniquenessRatio
         },
+        uniqueSelectorsPerRule.count(),
       ),
       declarations: assign(
         declarationsPerRule.aggregate(),
         {
           items: declarationsPerRule.toArray(),
-          unique: uniqueDeclarationsPerRule.unique,
-          totalUnique: uniqueDeclarationsPerRule.totalUnique,
-          uniquenessRatio: uniqueDeclarationsPerRule.uniquenessRatio,
         },
+        uniqueDeclarationsPerRule.count(),
       ),
     },
     selectors: {
       total: totalSelectors,
       totalUnique: totalUniqueSelectors,
       uniquenessRatio: ratio(totalUniqueSelectors, totalSelectors),
-      specificity: {
-        /** @type Specificity */
-        min: minSpecificity === undefined ? [0, 0, 0] : minSpecificity,
-        /** @type Specificity */
-        max: maxSpecificity === undefined ? [0, 0, 0] : maxSpecificity,
-        /** @type Specificity */
-        sum: [specificitiesA.sum, specificitiesB.sum, specificitiesC.sum],
-        /** @type Specificity */
-        mean: [specificitiesA.mean, specificitiesB.mean, specificitiesC.mean],
-        /** @type Specificity */
-        mode: [specificitiesA.mode, specificitiesB.mode, specificitiesC.mode],
-        /** @type Specificity */
-        median: [specificitiesA.median, specificitiesB.median, specificitiesC.median],
-        items: specificities,
-        unique: uniqueSpecificitiesCount.unique,
-        totalUnique: uniqueSpecificitiesCount.totalUnique,
-        uniquenessRatio: uniqueSpecificitiesCount.uniquenessRatio,
-      },
+      specificity: assign(
+        {
+          /** @type Specificity */
+          min: minSpecificity === undefined ? [0, 0, 0] : minSpecificity,
+          /** @type Specificity */
+          max: maxSpecificity === undefined ? [0, 0, 0] : maxSpecificity,
+          /** @type Specificity */
+          sum: [specificitiesA.sum, specificitiesB.sum, specificitiesC.sum],
+          /** @type Specificity */
+          mean: [specificitiesA.mean, specificitiesB.mean, specificitiesC.mean],
+          /** @type Specificity */
+          mode: [specificitiesA.mode, specificitiesB.mode, specificitiesC.mode],
+          /** @type Specificity */
+          median: [specificitiesA.median, specificitiesB.median, specificitiesC.median],
+          items: specificities,
+        },
+        uniqueSpecificities.count(),
+      ),
       complexity: assign(
         selectorComplexities.aggregate(),
-        complexityCount, {
-        items: selectorComplexities.toArray(),
-      }),
+        uniqueSelectorComplexities.count(),
+        {
+          items: selectorComplexities.toArray(),
+        }
+      ),
       id: assign(
         ids.count(), {
         ratio: ratio(ids.size(), totalSelectors),

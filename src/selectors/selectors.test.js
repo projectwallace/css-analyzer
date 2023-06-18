@@ -47,6 +47,7 @@ Selectors('handles CSS without selectors', () => {
       median: [0, 0, 0],
       items: [],
       unique: {},
+      total: 0,
       totalUnique: 0,
       uniquenessRatio: 0,
     },
@@ -285,6 +286,7 @@ Selectors('handles emoji selectors', () => {
       unique: {
         '0,1,0': 1,
       },
+      total: 1,
       totalUnique: 1,
       uniquenessRatio: 1 / 1,
     },
@@ -365,6 +367,43 @@ Selectors('analyzes vendor prefixed selectors', () => {
     'input[type=text]::-moz-placeholder': 1,
     'input[type=text]:-moz-placeholder': 1,
   })
+})
+
+Selectors('Can keep track of selector locations if we as it to do so', () => {
+  const fixture = `
+    rule {
+      color: green;
+    }
+
+    @media print {
+      @media (min-width: 1000px) {
+        @supports (display: grid) {
+          another-rule {
+            color: purple;
+          }
+        }
+      }
+    }
+  `
+  let actual = analyze(fixture, { useUnstableLocations: true }).selectors.complexity.__unstable__uniqueWithLocations
+  let expected = {
+    '1': [
+      {
+        line: 2,
+        column: 5,
+        offset: 5,
+        length: 4,
+      },
+      {
+        line: 9,
+        column: 11,
+        offset: 139,
+        length: 12,
+      }
+    ]
+  }
+
+  assert.equal(actual, expected)
 })
 
 Selectors.run()

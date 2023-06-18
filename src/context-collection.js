@@ -1,25 +1,28 @@
-import { CountableCollection } from './countable-collection.js'
+import { Collection } from './collection.js'
 
 class ContextCollection {
-  constructor() {
-    this._list = new CountableCollection()
-    /** @type {Map<string, CountableCollection>} */
+  constructor({ useLocations = false }) {
+    this._list = new Collection({ useLocations })
+    /** @type {Map<string, Collection>} */
     this._contexts = new Map()
+    /** @type {boolean} */
+    this.useLocations = useLocations
   }
 
   /**
    * Add an item to this _list's context
    * @param {string} item Item to push
    * @param {string} context Context to push Item to
+   * @param {import('css-tree').CssLocation} node_location
    */
-  push(item, context) {
-    this._list.push(item)
+  push(item, context, node_location) {
+    this._list.push(item, node_location)
 
     if (!this._contexts.has(context)) {
-      this._contexts.set(context, new CountableCollection())
+      this._contexts.set(context, new Collection({ useLocations: this.useLocations }))
     }
 
-    this._contexts.get(context).push(item)
+    this._contexts.get(context).push(item, node_location)
   }
 
   count() {
