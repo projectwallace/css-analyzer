@@ -155,6 +155,7 @@ export function analyze(css, options = {}) {
   let colorFormats = new Collection({ useLocations })
   let units = new ContextCollection({ useLocations })
   let gradients = new Collection({ useLocations })
+  let borderRadii = new Collection({ useLocations })
 
   walk(ast, function (node) {
     switch (node.type) {
@@ -425,6 +426,11 @@ export function analyze(css, options = {}) {
             timingFunctions.push(stringifyNode(node), node.loc)
           }
           break
+        } else if (isProperty('radius', property)) {
+          if (!isValueKeyword(node)) {
+            console.log(property, stringifyNode(node))
+            borderRadii.push(stringifyNode(node), node.loc)
+          }
         } else if (isProperty('text-shadow', property)) {
           if (!isValueKeyword(node)) {
             textShadows.push(stringifyNode(node), node.loc)
@@ -753,6 +759,7 @@ export function analyze(css, options = {}) {
       zindexes: zindex.count(),
       textShadows: textShadows.count(),
       boxShadows: boxShadows.count(),
+      borderRadii: borderRadii.count(),
       animations: {
         durations: durations.count(),
         timingFunctions: timingFunctions.count(),

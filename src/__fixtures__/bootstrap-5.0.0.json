@@ -25315,6 +25315,26 @@
       },
       "uniquenessRatio": 0.48148148148148145
     },
+    "borderRadii": {
+      "total": 169,
+      "totalUnique": 13,
+      "unique": {
+        "0": 62,
+        "0.2rem": 9,
+        "0.25rem": 54,
+        "0.3rem": 10,
+        "0.25em": 1,
+        "50%": 4,
+        "2em": 1,
+        "1rem": 4,
+        "calc(0.25rem - 1px)": 15,
+        "calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0": 1,
+        "0 0 calc(0.25rem - 1px) calc(0.25rem - 1px)": 1,
+        "calc(0.3rem - 1px)": 6,
+        "50rem": 1
+      },
+      "uniquenessRatio": 0.07692307692307693
+    },
     "animations": {
       "durations": {
         "total": 64,

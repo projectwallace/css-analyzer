@@ -23239,6 +23239,26 @@
       },
       "uniquenessRatio": 0.6111111111111112
     },
+    "borderRadii": {
+      "total": 66,
+      "totalUnique": 13,
+      "unique": {
+        "0": 2,
+        "4px": 40,
+        "64px": 3,
+        "32px": 3,
+        "6px": 3,
+        "4px 4px 0 0": 1,
+        "8px": 4,
+        "30px": 1,
+        "16px": 4,
+        "0 4px 4px 0": 1,
+        "4px 0 0 4px": 1,
+        "40px": 1,
+        "400px 12px 400px 12px/12px 150px 12px 150px": 2
+      },
+      "uniquenessRatio": 0.19696969696969696
+    },
     "animations": {
       "durations": {
         "total": 57,
