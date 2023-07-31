@@ -22,7 +22,7 @@ Selectors('are analyzed', () => {
   `
   const actual = analyze(fixture).selectors
 
-  // assert.equal(actual.total, 2)
+  assert.equal(actual.total, 2)
   assert.equal(actual.totalUnique, 2)
 })
 
@@ -91,6 +91,12 @@ Selectors('handles CSS without selectors', () => {
       unique: {},
       uniquenessRatio: 0,
       ratio: 0,
+    },
+    combinators: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
     },
   }
   assert.equal(actual, expected)
@@ -331,6 +337,12 @@ Selectors('handles emoji selectors', () => {
       uniquenessRatio: 0,
       ratio: 0,
     },
+    combinators: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+    },
   }
   assert.equal(actual, expected)
 })
@@ -369,7 +381,93 @@ Selectors('analyzes vendor prefixed selectors', () => {
   })
 })
 
-Selectors('Can keep track of selector locations if we as it to do so', () => {
+Selectors('counts combinators', () => {
+  let result = analyze(`
+    a,
+    a b,
+    a > b,
+    a ~ b,
+    a + b,
+    a    b,
+    a + b c > d e ~ f,
+    :is(a + b, a, e > f) {
+    }
+  `)
+  let actual = result.selectors.combinators
+
+  assert.is(actual.total, 12)
+  assert.is(actual.totalUnique, 4)
+  assert.is(actual.uniquenessRatio, 4 / 12)
+  assert.equal(actual.unique, {
+    ' ': 4,
+    '>': 3,
+    '~': 2,
+    '+': 3
+  })
+})
+
+Selectors('tracks combinator locations', () => {
+  let css = `
+    a b,
+    a > b,
+    a
+      b,
+    a:not(b) c,
+    a[attr] b {}
+  `
+  let result = analyze(css, {
+    useUnstableLocations: true
+  })
+  let actual = result.selectors.combinators
+
+  assert.equal(actual.__unstable__uniqueWithLocations, {
+    ' ': [
+      {
+        line: 2,
+        column: 6,
+        offset: 6,
+        length: 1,
+      },
+      {
+        line: 4,
+        column: 6,
+        offset: 26,
+        length: 1,
+      },
+      {
+        line: 6,
+        column: 13,
+        offset: 48,
+        length: 1,
+      },
+      {
+        line: 7,
+        column: 12,
+        offset: 63,
+        length: 1,
+      }
+    ],
+    '>': [
+      {
+        line: 3,
+        column: 7,
+        offset: 16,
+        length: 1,
+      }
+    ]
+  })
+
+  let as_strings = actual.__unstable__uniqueWithLocations[' ']
+    .map(loc => css.substring(loc.offset, loc.offset + loc.length))
+  assert.equal(as_strings, [
+    ' ',
+    `\n`,
+    ' ',
+    ' '
+  ])
+})
+
+Selectors('Can keep track of selector locations if we ask it to do so', () => {
   const fixture = `
     rule {
       color: green;

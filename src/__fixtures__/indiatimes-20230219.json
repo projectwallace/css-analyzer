@@ -54669,6 +54669,17 @@
       },
       "uniquenessRatio": 1,
       "ratio": 0.0006275100401606426
+    },
+    "combinators": {
+      "total": 10557,
+      "totalUnique": 4,
+      "unique": {
+        " ": 10509,
+        "~": 3,
+        ">": 41,
+        "+": 4
+      },
+      "uniquenessRatio": 0.0003788955195604812
     }
   },
   "declarations": {

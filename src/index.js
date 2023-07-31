@@ -2,7 +2,7 @@ import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
 import { calculate } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
-import { getComplexity, isAccessibility } from './selectors/utils.js'
+import { getCombinators, getComplexity, isAccessibility } from './selectors/utils.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
 import { destructure, isSystemFont } from './values/destructure-font-shorthand.js'
 import { isValueKeyword } from './values/values.js'
@@ -125,6 +125,7 @@ export function analyze(css, options = {}) {
   let specificities = []
   let ids = new Collection({ useLocations })
   let a11y = new Collection({ useLocations })
+  let combinators = new Collection({ useLocations })
 
   // Declarations
   let uniqueDeclarations = new Set()
@@ -246,14 +247,6 @@ export function analyze(css, options = {}) {
           return this.skip
         }
 
-        let [{ value: specificityObj }] = calculate(node)
-        /** @type {Specificity} */
-        let specificity = [specificityObj.a, specificityObj.b, specificityObj.c]
-
-        if (specificity[0] > 0) {
-          ids.push(selector, node.loc)
-        }
-
         if (isAccessibility(node)) {
           a11y.push(selector, node.loc)
         }
@@ -267,6 +260,12 @@ export function analyze(css, options = {}) {
         uniqueSelectors.add(selector)
         selectorComplexities.push(complexity)
         uniqueSelectorComplexities.push(complexity, node.loc)
+
+        // #region specificity
+        let [{ value: specificityObj }] = calculate(node)
+        /** @type {Specificity} */
+        let specificity = [specificityObj.a, specificityObj.b, specificityObj.c]
+
         uniqueSpecificities.push(specificity[0] + ',' + specificity[1] + ',' + specificity[2], node.loc)
 
         if (maxSpecificity === undefined) {
@@ -290,6 +289,15 @@ export function analyze(css, options = {}) {
         }
 
         specificities.push(specificity)
+        // #endregion
+
+        if (specificity[0] > 0) {
+          ids.push(selector, node.loc)
+        }
+
+        getCombinators(node, function onCombinator(combinator) {
+          combinators.push(combinator.name, combinator.loc)
+        })
 
         // Avoid deeper walking of selectors to not mess with
         // our specificity calculations in case of a selector
@@ -692,7 +700,8 @@ export function analyze(css, options = {}) {
         {
           ratio: ratio(prefixedSelectors.size(), totalSelectors),
         },
-      )
+      ),
+      combinators: combinators.count(),
     },
     declarations: {
       total: totalDeclarations,
