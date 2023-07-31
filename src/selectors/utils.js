@@ -119,7 +119,7 @@ export function getComplexity(selector) {
 }
 
 /**
- * Walk a selector node and trigger a callback every time  a Combinator was found
+ * Walk a selector node and trigger a callback every time a Combinator was found
  * We need create the `loc` for descendant combinators manually, because CSSTree
  * does not keep track of whitespace for us. We'll assume that the combinator is
  * alwas a single ` ` (space) character, even though there could be newlines or
@@ -128,15 +128,18 @@ export function getComplexity(selector) {
  * @param {*} onMatch
  */
 export function getCombinators(node, onMatch) {
-  let previousNode
-
-  walk(node, function (selectorNode) {
+  walk(node, function (
+    /** @type {import('css-tree').CssNode} */ selectorNode,
+    /** @type {import('css-tree').ListItem} */ item
+  ) {
     if (selectorNode.type === 'Combinator') {
+      // .loc is null when selectorNode.name === ' '
       if (selectorNode.loc === null) {
+        let previousLoc = item.prev.data.loc.end
         let start = {
-          offset: previousNode.offset,
-          line: previousNode.line,
-          column: previousNode.column
+          offset: previousLoc.offset,
+          line: previousLoc.line,
+          column: previousLoc.column
         }
 
         onMatch({
@@ -156,10 +159,6 @@ export function getCombinators(node, onMatch) {
           loc: selectorNode.loc
         })
       }
-    }
-
-    if (selectorNode.loc !== null) {
-      previousNode = selectorNode.loc.end
     }
   })
 }
