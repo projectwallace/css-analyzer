@@ -544,4 +544,69 @@ AtRules('analyzes container queries', () => {
   assert.equal(actual, expected)
 })
 
+AtRules('analyzes @property', () => {
+  const fixture = `
+    /* Examples from https://nerdy.dev/cant-break-this-design-system */
+    @property --focal-size {
+      syntax: '<length-percentage>';
+      initial-value: 100%;
+      inherits: false;
+    }
+
+    @property --hue {
+      syntax: '<angle>';
+      initial-value: .5turn;
+      inherits: false;
+    }
+
+    @property --surface {
+      syntax: '<color>';
+      initial-value: #333;
+      inherits: true;
+    }
+
+    @property --surface-over {
+      syntax: '<color>';
+      initial-value: #444;
+      inherits: true;
+    }
+
+    @property --surface-under {
+      syntax: '<color>';
+      initial-value: #222;
+      inherits: true;
+    }
+    /* end nerdy.dev examples */
+
+    @media all {
+      @layer test {
+        @property --test-dupe {
+          syntax: '<color>';
+          inherits: false;
+        }
+        @property --test-dupe {
+          syntax: '<color>';
+          inherits: false;
+        }
+      }
+    }
+  `
+  const actual = analyze(fixture).atrules.property
+  const expected = {
+    total: 7,
+    totalUnique: 6,
+    unique: {
+      '--focal-size': 1,
+      '--hue': 1,
+      '--surface': 1,
+      '--surface-over': 1,
+      '--surface-under': 1,
+      '--test-dupe': 2,
+    },
+    uniquenessRatio: 6 / 7
+  }
+
+  assert.equal(actual, expected)
+})
+
 AtRules.run()
