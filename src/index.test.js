@@ -113,6 +113,12 @@ Api('handles empty input gracefully', () => {
         "totalUnique": 0,
         "unique": {},
         "uniquenessRatio": 0
+      },
+      "property": {
+        "total": 0,
+        "totalUnique": 0,
+        "unique": {},
+        "uniquenessRatio": 0
       }
     },
     "rules": {

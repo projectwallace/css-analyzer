@@ -96,6 +96,7 @@ export function analyze(css, options = {}) {
   let keyframes = new Collection({ useLocations })
   let prefixedKeyframes = new Collection({ useLocations })
   let containers = new Collection({ useLocations })
+  let registeredProperties = new Collection({ useLocations })
 
   // Rules
   let totalRules = 0
@@ -218,6 +219,12 @@ export function analyze(css, options = {}) {
           prelude
             .split(',')
             .forEach(name => layers.push(name.trim(), node.prelude.loc))
+          break
+        }
+        if (atRuleName === 'property') {
+          let prelude = stringifyNode(node.prelude)
+          registeredProperties.push(prelude, node.prelude.loc)
+          break
         }
         break
       }
@@ -628,6 +635,7 @@ export function analyze(css, options = {}) {
       }),
       container: containers.count(),
       layer: layers.count(),
+      property: registeredProperties.count(),
     },
     rules: {
       total: totalRules,
