@@ -6,17 +6,15 @@ import { analyze } from './index.js'
 const Smoke = suite('Smoke testing')
 
 Object.entries({
-  'Bol.com': 'bol-com-20190617',
-  'Bootstrap v5.0.0': 'bootstrap-5.0.0',
-  'CNN': 'cnn-20220403',
-  'CSS Tricks': 'css-tricks-20190319',
-  'Facebook': 'facebook-20190319',
-  'GitHub': 'github-20210501',
-  'India Times': 'indiatimes-20230219',
-  'Lego.com': 'lego-20190617',
-  'Trello': 'trello-20190617',
-  'Gazelle': 'gazelle-20210905',
-  'Smashing Magazine': 'smashing-magazine-20190319',
+  'Bol.com': 'bol-com-20231008',
+  'Bootstrap v5.3.2': 'bootstrap-5.3.2',
+  'CNN': 'cnn-20231008',
+  'CSS Tricks': 'css-tricks-20231008',
+  'Gazelle': 'gazelle-20231008',
+  'GitHub': 'github-20231008',
+  'India Times': 'indiatimes-20231008',
+  'Smashing Magazine': 'smashing-magazine-20231008',
+  'Trello': 'trello-20231008',
 }).map(([name, fileName]) => {
   const css = fs.readFileSync(`./src/__fixtures__/${fileName}.css`, 'utf-8')
   const json = fs.readFileSync(`./src/__fixtures__/${fileName}.json`, 'utf-8')

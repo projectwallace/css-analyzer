@@ -35,8 +35,13 @@ export function isSystemFont(node) {
 	return firstChild.type === TYPE_IDENTIFIER && SYSTEM_FONTS.has(firstChild.name)
 }
 
+/**
+ * @param {import('css-tree').Value} value
+ * @param {*} stringifyNode
+ */
 export function destructure(value, stringifyNode) {
-	let font_family = []
+
+	let font_family = new Array(2)
 	let font_size
 	let line_height
 
@@ -122,7 +127,7 @@ export function destructure(value, stringifyNode) {
 	return {
 		font_size,
 		line_height,
-		font_family: stringifyNode({
+		font_family: (font_family[0] || font_family[1]) ? stringifyNode({
 			loc: {
 				start: {
 					offset: (font_family[0] || font_family[1]).loc.start.offset
@@ -131,6 +136,6 @@ export function destructure(value, stringifyNode) {
 					offset: font_family[1].loc.end.offset
 				}
 			}
-		}),
+		}) : null,
 	}
 }
