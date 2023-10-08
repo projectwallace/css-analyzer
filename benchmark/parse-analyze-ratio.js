@@ -14,19 +14,12 @@ const files = [
   ['trello-20190617', 'Trello.com']
 ]
 
-let maxLen = -1
-
-files.forEach(([, name]) => {
-  if (name.length > maxLen) {
-    maxLen = name.length
-  }
-})
+let maxLen = Math.max(...files.map(([, name]) => name.length))
 
 console.log('Running benchmark on /dist/analyzer.modern.js:')
-const header = `${'File'.padEnd(maxLen + 2)} | ${'Size'.padStart(7)} |  total | parse | Analyze        |`
-console.log(''.padEnd(header.length, '='))
+const header = `| ${'File'.padEnd(maxLen + 2)} | ${'Size'.padStart(7)} |  total | parse | Analyze        |`
 console.log(header)
-console.log(''.padEnd(header.length, '='))
+console.log(''.padEnd(header.length, '-'))
 
 files.forEach(([filename, name]) => {
   const css = fs.readFileSync(`./src/__fixtures__/${filename}.css`, 'utf-8')
@@ -39,5 +32,5 @@ files.forEach(([filename, name]) => {
   const totalTime = String(result.__meta__.total).padStart(4)
   const analyzeRatio = (analyzeTime / totalTime * 100).toFixed(1)
 
-  console.log(`${name} | ${fileSize} | ${totalTime}ms | ${parseTime}ms | ${analyzeTime}ms (${analyzeRatio}%) |`)
+  console.log(`| ${name} | ${fileSize} | ${totalTime}ms | ${parseTime}ms | ${analyzeTime}ms (${analyzeRatio}%) |`)
 })
