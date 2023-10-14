@@ -181,6 +181,7 @@ export function analyze(css, options = {}) {
         if (atRuleName === 'media') {
           let prelude = stringifyNode(node.prelude)
           medias.push(prelude, node.prelude.loc)
+
           if (isMediaBrowserhack(node.prelude)) {
             mediaBrowserhacks.push(prelude, node.prelude.loc)
           }
@@ -214,18 +215,15 @@ export function analyze(css, options = {}) {
           containers.push(stringifyNode(node.prelude), node.prelude.loc)
           break
         }
-        if (atRuleName === 'layer') {
-          let prelude = stringifyNode(node.prelude)
-          prelude
-            .split(',')
-            .forEach(name => layers.push(name.trim(), node.prelude.loc))
-          break
-        }
         if (atRuleName === 'property') {
           let prelude = stringifyNode(node.prelude)
           registeredProperties.push(prelude, node.prelude.loc)
           break
         }
+        break
+      }
+      case 'Layer': {
+        layers.push(node.name, node.loc)
         break
       }
       case 'Rule': {

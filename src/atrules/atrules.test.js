@@ -8,6 +8,11 @@ AtRules('finds @layer', () => {
   // Fixture is pretty much a straight copy from all code examples from
   // https://css-tricks.com/css-cascade-layers/
   const fixture = `
+    @import url('test.css') layer;
+    @import url('test.css') layer();
+    @import url('test.css') layer(test);
+    @import url('test.css') layer(test.abc);
+
     /* establish a layer order up-front, from lowest to highest priority */
     @layer reset, defaults, patterns, components, utilities, overrides;
 
@@ -74,8 +79,8 @@ AtRules('finds @layer', () => {
   `
   const actual = analyze(fixture).atrules.layer
   const expected = {
-    total: 46,
-    totalUnique: 25,
+    total: 48,
+    totalUnique: 27,
     unique: {
       "defaults": 5,
       "layer-1": 1,
@@ -102,8 +107,10 @@ AtRules('finds @layer', () => {
       "layouts": 1,
       "structures": 1,
       "overrides": 1,
+      "test": 1,
+      "test.abc": 1,
     },
-    uniquenessRatio: 25 / 46
+    uniquenessRatio: 27 / 48
   }
 
   assert.equal(actual, expected)
