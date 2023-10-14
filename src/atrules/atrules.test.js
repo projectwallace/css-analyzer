@@ -296,16 +296,20 @@ AtRules('finds @supports', () => {
     @media (min-width: 0) {
       @supports (-webkit-appearance: none) {}
     }
+
+    /* Should not wrap in extra (), because CSSTree will see it as 2 Conditions */
+    @supports not (stroke-color: transparent) {}
   `
   const actual = analyze(fixture).atrules.supports
 
-  assert.equal(actual.total, 4)
-  assert.equal(actual.totalUnique, 3)
-  assert.equal(actual.uniquenessRatio, 3 / 4)
+  assert.equal(actual.total, 5)
+  assert.equal(actual.totalUnique, 4)
+  assert.equal(actual.uniquenessRatio, 4 / 5)
   assert.equal(actual.unique, {
     '(filter: blur(5px))': 1,
     '(display: table-cell) and (display: list-item)': 1,
     '(-webkit-appearance: none)': 2,
+    'not (stroke-color: transparent)': 1,
   })
 })
 

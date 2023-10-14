@@ -187,14 +187,6 @@ export function analyze(css, options = {}) {
           }
           break
         }
-        if (atRuleName === 'supports') {
-          let prelude = stringifyNode(node.prelude)
-          supports.push(prelude, node.prelude.loc)
-          if (isSupportsBrowserhack(node.prelude)) {
-            supportsBrowserhacks.push(prelude, node.prelude.loc)
-          }
-          break
-        }
         if (endsWith('keyframes', atRuleName)) {
           let name = '@' + atRuleName + ' ' + stringifyNode(node.prelude)
           if (hasVendorPrefix(atRuleName)) {
@@ -224,6 +216,21 @@ export function analyze(css, options = {}) {
       }
       case 'Layer': {
         layers.push(node.name, node.loc)
+        break
+      }
+      case 'Condition': {
+        if (node.kind === 'supports') {
+          if (node.children && node.children.size === 1 && node.children.first.type === 'Condition') {
+            break
+          }
+          let prelude = stringifyNode(node)
+          supports.push(prelude, node.loc)
+
+          if (isSupportsBrowserhack(node)) {
+            supportsBrowserhacks.push(prelude, node.loc)
+          }
+          return this.skip
+        }
         break
       }
       case 'Rule': {
