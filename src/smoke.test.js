@@ -1,4 +1,4 @@
-import * as fs from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
 import { analyze } from './index.js'
@@ -16,8 +16,8 @@ Object.entries({
   'Smashing Magazine': 'smashing-magazine-20231008',
   'Trello': 'trello-20231008',
 }).map(([name, fileName]) => {
-  const css = fs.readFileSync(`./src/__fixtures__/${fileName}.css`, 'utf-8')
-  const json = fs.readFileSync(`./src/__fixtures__/${fileName}.json`, 'utf-8')
+  const css = readFileSync(`./src/__fixtures__/${fileName}.css`, 'utf-8')
+  const json = readFileSync(`./src/__fixtures__/${fileName}.json`, 'utf-8')
   return {
     name,
     fileName,
@@ -25,14 +25,19 @@ Object.entries({
     css,
   }
 }).forEach(({ name, fileName, css, json }) => {
-  // const result = analyze(css)
-  // delete result.__meta__
-  // fs.writeFileSync(`./src/__fixtures__/${fileName}.json`, JSON.stringify(result, null, 2))
-  Smoke(`${name} matches fixture`, () => {
-    const result = analyze(css)
-    delete result.__meta__
-    assert.fixture(JSON.stringify(result, null, 2), json)
-  })
+  const actual = analyze(css)
+  delete actual.__meta__
+  const expected = JSON.parse(json)
+
+  // writeFileSync(`./src/__fixtures__/${fileName}.json`, JSON.stringify(actual, null, 2))
+
+  Smoke(`${name} - Stylesheet`, () => assert.equal(actual.stylesheet, expected.stylesheet))
+  Smoke(`${name} - Atrules`, () => assert.equal(actual.atrules, expected.atrules))
+  Smoke(`${name} - Rules`, () => assert.equal(actual.rules, expected.rules))
+  Smoke(`${name} - Selectors`, () => assert.equal(actual.selectors, expected.selectors))
+  Smoke(`${name} - Declarations`, () => assert.equal(actual.declarations, expected.declarations))
+  Smoke(`${name} - Properties`, () => assert.equal(actual.properties, expected.properties))
+  Smoke(`${name} - Values`, () => assert.equal(actual.values, expected.values))
 })
 
 Smoke.run()
