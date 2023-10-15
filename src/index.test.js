@@ -408,7 +408,7 @@ Api('handles empty input gracefully', () => {
 })
 
 Api('has metadata', () => {
-  const fixture = Array.from({ length: 10 }).map(_ => `
+  const fixture = Array.from({ length: 100 }).map(_ => `
     html {
       font: 1em/1 sans-serif;
       color: rgb(0 0 0 / 0.5);
