@@ -248,11 +248,16 @@ AtRules('finds @imports', () => {
     @import url('../example.css') layer;
 
     @import url('remedy.css') layer(reset.remedy);
+
+    @import 'test.css' supports((display: grid));
+    @import 'test.css' supports(not (display: grid));
+    @import 'test.css' supports(selector(a:has(b)));
+    /*@import "test.css" supports((selector(h2 > p) and (font-tech(color-COLRv1))));*/
   `
-  const actual = analyze(fixture).atrules.import
+  const actual = analyze(fixture).atrules
   const expected = {
-    total: 7,
-    totalUnique: 7,
+    total: 10,
+    totalUnique: 10,
     unique: {
       '"https://example.com/without-url"': 1,
       'url("https://example.com/with-url")': 1,
@@ -261,11 +266,45 @@ AtRules('finds @imports', () => {
       'url(\'example.css\') layer(named-layer)': 1,
       'url(\'../example.css\') layer': 1,
       'url(\'remedy.css\') layer(reset.remedy)': 1,
+      "'test.css' supports((display: grid))": 1,
+      "'test.css' supports(not (display: grid))": 1,
+      "'test.css' supports(selector(a:has(b)))": 1,
+      // '"test.css" supports((selector(h2 > p) and (font-tech(color-COLRv1))))': 1,
     },
     uniquenessRatio: 1,
   }
 
-  assert.equal(actual, expected)
+  assert.equal(actual.import, expected)
+
+  const expected_supports = {
+    total: 3,
+    totalUnique: 3,
+    unique: {
+      "(display: grid)": 1,
+      "not (display: grid)": 1,
+      "selector(a:has(b))": 1,
+      // "selector(h2 > p) and (font-tech(color-COLRv1))": 1,
+    },
+    uniquenessRatio: 1,
+    browserhacks: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+    }
+  }
+  assert.equal(actual.supports, expected_supports, 'Incorrect SupportsCondition matches')
+
+  const expected_layers = {
+    total: 2,
+    totalUnique: 2,
+    unique: {
+      'named-layer': 1,
+      'reset.remedy': 1,
+    },
+    uniquenessRatio: 1,
+  }
+  assert.equal(actual.layer, expected_layers, 'Incorrect Layer matches')
 })
 
 AtRules('finds @charsets', () => {

@@ -206,6 +206,16 @@ export function analyze(css, options = {}) {
           break
         }
         if (atRuleName === 'import') {
+          walk(node, function (prelude_node) {
+            if (prelude_node.type === 'Condition' && prelude_node.kind === 'supports') {
+              supports.push(stringifyNode(prelude_node), prelude_node.loc)
+
+              if (isSupportsBrowserhack(prelude_node)) {
+                supportsBrowserhacks.push(stringifyNode(prelude_node), prelude_node.loc)
+              }
+              return this.break
+            }
+          })
           imports.push(stringifyNode(node.prelude), node.prelude.loc)
           break
         }
