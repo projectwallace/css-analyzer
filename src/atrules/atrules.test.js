@@ -338,17 +338,21 @@ AtRules('finds @supports', () => {
 
     /* Should not wrap in extra (), because CSSTree will see it as 2 Conditions */
     @supports not (stroke-color: transparent) {}
+    @supports (not (stroke-color: transparent)) {}
   `
   const actual = analyze(fixture).atrules.supports
+  delete actual.browserhacks
 
-  assert.equal(actual.total, 5)
-  assert.equal(actual.totalUnique, 4)
-  assert.equal(actual.uniquenessRatio, 4 / 5)
-  assert.equal(actual.unique, {
-    '(filter: blur(5px))': 1,
-    '(display: table-cell) and (display: list-item)': 1,
-    '(-webkit-appearance: none)': 2,
-    'not (stroke-color: transparent)': 1,
+  assert.equal(actual, {
+    total: 6,
+    totalUnique: 4,
+    uniquenessRatio: 4 / 6,
+    unique: {
+      '(filter: blur(5px))': 1,
+      '(display: table-cell) and (display: list-item)': 1,
+      '(-webkit-appearance: none)': 2,
+      'not (stroke-color: transparent)': 2,
+    }
   })
 })
 
@@ -405,19 +409,22 @@ AtRules('finds @media', () => {
     }
   `
   const actual = analyze(fixture).atrules.media
+  delete actual.browserhacks
 
-  assert.is(actual.total, 7)
-  assert.is(actual.totalUnique, 7)
-  assert.equal(actual.unique, {
-    'screen': 1,
-    'screen and (min-width: 33em)': 1,
-    '(min-width: 20px)': 1,
-    '(max-width: 200px)': 1,
-    'screen or print': 1,
-    'all and (transform-3d), (-webkit-transform-3d)': 1,
-    '(min-width: 0)': 1,
+  assert.equal(actual, {
+    total: 7,
+    totalUnique: 7,
+    uniquenessRatio: 1,
+    unique: {
+      'screen': 1,
+      'screen and (min-width: 33em)': 1,
+      '(min-width: 20px)': 1,
+      '(max-width: 200px)': 1,
+      'screen or print': 1,
+      'all and (transform-3d), (-webkit-transform-3d)': 1,
+      '(min-width: 0)': 1,
+    }
   })
-  assert.is(actual.uniquenessRatio, 1)
 })
 
 AtRules('finds @media browserhacks', () => {
