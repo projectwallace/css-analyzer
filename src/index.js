@@ -270,10 +270,18 @@ export function analyze(css, options = {}) {
 
         // #region specificity
         let [{ value: specificityObj }] = calculate(node)
-        /** @type {Specificity} */
-        let specificity = [specificityObj.a, specificityObj.b, specificityObj.c]
+        let sa = specificityObj.a
+        let sb = specificityObj.b
+        let sc = specificityObj.c
 
-        uniqueSpecificities.push(specificity[0] + ',' + specificity[1] + ',' + specificity[2], node.loc)
+        /** @type {Specificity} */
+        let specificity = [sa, sb, sc]
+
+        uniqueSpecificities.push(sa + ',' + sb + ',' + sc, node.loc)
+
+        specificityA.push(sa)
+        specificityB.push(sb)
+        specificityC.push(sc)
 
         if (maxSpecificity === undefined) {
           maxSpecificity = specificity
@@ -282,10 +290,6 @@ export function analyze(css, options = {}) {
         if (minSpecificity === undefined) {
           minSpecificity = specificity
         }
-
-        specificityA.push(specificity[0])
-        specificityB.push(specificity[1])
-        specificityC.push(specificity[2])
 
         if (minSpecificity !== undefined && compareSpecificity(minSpecificity, specificity) < 0) {
           minSpecificity = specificity
@@ -298,7 +302,7 @@ export function analyze(css, options = {}) {
         specificities.push(specificity)
         // #endregion
 
-        if (specificity[0] > 0) {
+        if (sa > 0) {
           ids.push(selector, node.loc)
         }
 
