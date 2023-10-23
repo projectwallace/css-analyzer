@@ -8,6 +8,11 @@ AtRules('finds @layer', () => {
   // Fixture is pretty much a straight copy from all code examples from
   // https://css-tricks.com/css-cascade-layers/
   const fixture = `
+    @import url('test.css') layer;
+    @import url('test.css') layer();
+    @import url('test.css') layer(test);
+    @import url('test.css') layer(test.abc);
+
     /* establish a layer order up-front, from lowest to highest priority */
     @layer reset, defaults, patterns, components, utilities, overrides;
 
@@ -74,8 +79,8 @@ AtRules('finds @layer', () => {
   `
   const actual = analyze(fixture).atrules.layer
   const expected = {
-    total: 46,
-    totalUnique: 25,
+    total: 48,
+    totalUnique: 27,
     unique: {
       "defaults": 5,
       "layer-1": 1,
@@ -102,8 +107,10 @@ AtRules('finds @layer', () => {
       "layouts": 1,
       "structures": 1,
       "overrides": 1,
+      "test": 1,
+      "test.abc": 1,
     },
-    uniquenessRatio: 25 / 46
+    uniquenessRatio: 27 / 48
   }
 
   assert.equal(actual, expected)
@@ -241,11 +248,16 @@ AtRules('finds @imports', () => {
     @import url('../example.css') layer;
 
     @import url('remedy.css') layer(reset.remedy);
+
+    @import 'test.css' supports((display: grid));
+    @import 'test.css' supports(not (display: grid));
+    @import 'test.css' supports(selector(a:has(b)));
+    /*@import "test.css" supports((selector(h2 > p) and (font-tech(color-COLRv1))));*/
   `
-  const actual = analyze(fixture).atrules.import
+  const actual = analyze(fixture).atrules
   const expected = {
-    total: 7,
-    totalUnique: 7,
+    total: 10,
+    totalUnique: 10,
     unique: {
       '"https://example.com/without-url"': 1,
       'url("https://example.com/with-url")': 1,
@@ -254,11 +266,45 @@ AtRules('finds @imports', () => {
       'url(\'example.css\') layer(named-layer)': 1,
       'url(\'../example.css\') layer': 1,
       'url(\'remedy.css\') layer(reset.remedy)': 1,
+      "'test.css' supports((display: grid))": 1,
+      "'test.css' supports(not (display: grid))": 1,
+      "'test.css' supports(selector(a:has(b)))": 1,
+      // '"test.css" supports((selector(h2 > p) and (font-tech(color-COLRv1))))': 1,
     },
     uniquenessRatio: 1,
   }
 
-  assert.equal(actual, expected)
+  assert.equal(actual.import, expected)
+
+  const expected_supports = {
+    total: 3,
+    totalUnique: 3,
+    unique: {
+      "(display: grid)": 1,
+      "not (display: grid)": 1,
+      "selector(a:has(b))": 1,
+      // "selector(h2 > p) and (font-tech(color-COLRv1))": 1,
+    },
+    uniquenessRatio: 1,
+    browserhacks: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+    }
+  }
+  assert.equal(actual.supports, expected_supports, 'Incorrect SupportsCondition matches')
+
+  const expected_layers = {
+    total: 2,
+    totalUnique: 2,
+    unique: {
+      'named-layer': 1,
+      'reset.remedy': 1,
+    },
+    uniquenessRatio: 1,
+  }
+  assert.equal(actual.layer, expected_layers, 'Incorrect Layer matches')
 })
 
 AtRules('finds @charsets', () => {
@@ -289,16 +335,24 @@ AtRules('finds @supports', () => {
     @media (min-width: 0) {
       @supports (-webkit-appearance: none) {}
     }
+
+    /* Should not wrap in extra (), because CSSTree will see it as 2 Conditions */
+    @supports not (stroke-color: transparent) {}
+    @supports (not (stroke-color: transparent)) {}
   `
   const actual = analyze(fixture).atrules.supports
+  delete actual.browserhacks
 
-  assert.equal(actual.total, 4)
-  assert.equal(actual.totalUnique, 3)
-  assert.equal(actual.uniquenessRatio, 3 / 4)
-  assert.equal(actual.unique, {
-    '(filter: blur(5px))': 1,
-    '(display: table-cell) and (display: list-item)': 1,
-    '(-webkit-appearance: none)': 2,
+  assert.equal(actual, {
+    total: 6,
+    totalUnique: 4,
+    uniquenessRatio: 4 / 6,
+    unique: {
+      '(filter: blur(5px))': 1,
+      '(display: table-cell) and (display: list-item)': 1,
+      '(-webkit-appearance: none)': 2,
+      'not (stroke-color: transparent)': 2,
+    }
   })
 })
 
@@ -355,19 +409,22 @@ AtRules('finds @media', () => {
     }
   `
   const actual = analyze(fixture).atrules.media
+  delete actual.browserhacks
 
-  assert.is(actual.total, 7)
-  assert.is(actual.totalUnique, 7)
-  assert.equal(actual.unique, {
-    'screen': 1,
-    'screen and (min-width: 33em)': 1,
-    '(min-width: 20px)': 1,
-    '(max-width: 200px)': 1,
-    'screen or print': 1,
-    'all and (transform-3d), (-webkit-transform-3d)': 1,
-    '(min-width: 0)': 1,
+  assert.equal(actual, {
+    total: 7,
+    totalUnique: 7,
+    uniquenessRatio: 1,
+    unique: {
+      'screen': 1,
+      'screen and (min-width: 33em)': 1,
+      '(min-width: 20px)': 1,
+      '(max-width: 200px)': 1,
+      'screen or print': 1,
+      'all and (transform-3d), (-webkit-transform-3d)': 1,
+      '(min-width: 0)': 1,
+    }
   })
-  assert.is(actual.uniquenessRatio, 1)
 })
 
 AtRules('finds @media browserhacks', () => {

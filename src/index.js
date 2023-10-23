@@ -181,16 +181,19 @@ export function analyze(css, options = {}) {
         if (atRuleName === 'media') {
           let prelude = stringifyNode(node.prelude)
           medias.push(prelude, node.prelude.loc)
+
           if (isMediaBrowserhack(node.prelude)) {
             mediaBrowserhacks.push(prelude, node.prelude.loc)
           }
           break
         }
         if (atRuleName === 'supports') {
-          let prelude = stringifyNode(node.prelude)
-          supports.push(prelude, node.prelude.loc)
-          if (isSupportsBrowserhack(node.prelude)) {
-            supportsBrowserhacks.push(prelude, node.prelude.loc)
+          let prelude = node.prelude
+          let condition = stringifyNode(prelude)
+          supports.push(condition, prelude.loc)
+
+          if (isSupportsBrowserhack(prelude)) {
+            supportsBrowserhacks.push(condition, prelude.loc)
           }
           break
         }
@@ -203,6 +206,17 @@ export function analyze(css, options = {}) {
           break
         }
         if (atRuleName === 'import') {
+          walk(node, function (prelude_node) {
+            if (prelude_node.type === 'Condition' && prelude_node.kind === 'supports') {
+              let prelude = stringifyNode(prelude_node)
+              supports.push(prelude, prelude_node.loc)
+
+              if (isSupportsBrowserhack(prelude_node)) {
+                supportsBrowserhacks.push(prelude, prelude_node.loc)
+              }
+              return this.break
+            }
+          })
           imports.push(stringifyNode(node.prelude), node.prelude.loc)
           break
         }
@@ -214,18 +228,15 @@ export function analyze(css, options = {}) {
           containers.push(stringifyNode(node.prelude), node.prelude.loc)
           break
         }
-        if (atRuleName === 'layer') {
-          let prelude = stringifyNode(node.prelude)
-          prelude
-            .split(',')
-            .forEach(name => layers.push(name.trim(), node.prelude.loc))
-          break
-        }
         if (atRuleName === 'property') {
           let prelude = stringifyNode(node.prelude)
           registeredProperties.push(prelude, node.prelude.loc)
           break
         }
+        break
+      }
+      case 'Layer': {
+        layers.push(node.name, node.loc)
         break
       }
       case 'Rule': {
