@@ -30,7 +30,7 @@ class ContextCollection {
      * @type {Map<string, {
      * total: number,
      * totalUnique: number,
-     * unique: {[k: string]: number},
+     * unique: Record<string, number>,
      * uniquenessRatio: number
      * }>}
      */

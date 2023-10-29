@@ -1,6 +1,6 @@
 export class Collection {
 	constructor({ useLocations = false }) {
-		/** @type {Map<string, Array<Number>>} */
+		/** @type {Map<string, number[]>} */
 		this._items = new Map()
 		this._total = 0
 		/** @type {number[]} */
@@ -44,6 +44,15 @@ export class Collection {
 		return this._total
 	}
 
+	/**
+	 * @typedef CssLocation
+	 * @property {number} line
+	 * @property {number} column
+	 * @property {number} offset
+	 * @property {number} length
+	 *
+	 * @returns {{ total: number; totalUnique: number; uniquenessRatio: number; unique: Record<string, number>; __unstable__uniqueWithLocations: Record<string, CssLocation[]>}}
+	 */
 	count() {
 		let uniqueWithLocations = new Map()
 		let unique = {}

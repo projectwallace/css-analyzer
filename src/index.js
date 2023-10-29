@@ -84,7 +84,7 @@ export function analyze(css, options = {}) {
 
   // Atrules
   let totalAtRules = 0
-  /** @type {{[property: string]: string}[]} */
+  /** @type {Record<string: string>}[]} */
   let fontfaces = []
   let layers = new Collection({ useLocations })
   let imports = new Collection({ useLocations })
