@@ -71,6 +71,12 @@ AtRules('finds @layer', () => {
     @layer components {
       @layer defaults, structures, themes, utilities;
     }
+
+    @layer {
+      test {
+        color: green;
+      }
+    }
   `
   const actual = analyze(fixture).atrules.layer
   const expected = {

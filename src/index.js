@@ -214,7 +214,7 @@ export function analyze(css, options = {}) {
           containers.push(stringifyNode(node.prelude), node.prelude.loc)
           break
         }
-        if (atRuleName === 'layer') {
+        if (atRuleName === 'layer' && node.prelude !== null) {
           let prelude = stringifyNode(node.prelude)
           prelude
             .split(',')
