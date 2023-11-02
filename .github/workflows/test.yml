@@ -36,4 +36,3 @@ jobs:
         run: npm test
       - name: Run type checks
         run: npm run check
-        if: ${{ matrix.node-version }} == '20'
