@@ -11,7 +11,7 @@ on:
 
 jobs:
   test:
-    name: Unit tests
+    name: Tests
     runs-on: ubuntu-latest
 
     strategy:
@@ -20,13 +20,20 @@ jobs:
           - 14.13.0
           - 16
           - 18
+          - 20
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - run: npm install --ignore-scripts --no-audit
-      - run: npm test
+      - name: Install dependencies
+        run: npm install --ignore-scripts --no-audit
+      - name: Run unit tests
+        run: npm test
+      - name: Run type checks
+        run: npm run check
+        if: ${{ matrix.node-version }} == 20

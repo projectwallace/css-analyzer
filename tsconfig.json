@@ -1,0 +1,33 @@
+{
+	"include": ["src/**/*"],
+
+	"compilerOptions": {
+		"rootDir": "src",
+
+		// target node v8+ (https://node.green/)
+		// the only missing feature is Array.prototype.values
+		"lib": ["es2019", "DOM", "DOM.Iterable"],
+		"target": "es2019",
+
+		"module": "esnext",
+		"moduleResolution": "node",
+
+		// silences wrong TS error, we don't compile, we only typecheck
+		"outDir": "./irrelevant/unused",
+
+		"declaration": true,
+		"declarationDir": "types",
+
+		"noEmitOnError": true,
+		"noErrorTruncation": true,
+
+		"allowJs": true,
+		"checkJs": true,
+
+		// TODO: error all the things
+		//"strict": true,
+		// "noImplicitThis": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+	}
+}

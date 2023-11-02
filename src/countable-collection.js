@@ -1,7 +1,7 @@
 class CountableCollection {
 
   /** @param {string[]?} initial */
-  constructor(initial) {
+  constructor(initial = undefined) {
     /** @type {Map<string, number>} */
     this._items = new Map()
     this._total = 0

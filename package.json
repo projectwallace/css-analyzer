@@ -27,7 +27,8 @@
   },
   "scripts": {
     "test": "uvu",
-    "build": "microbundle"
+    "build": "microbundle",
+    "check": "tsc --noEmit"
   },
   "keywords": [
     "projectwallace",
@@ -47,6 +48,7 @@
   },
   "devDependencies": {
     "microbundle": "^0.15.1",
+    "typescript": "^5.2.2",
     "uvu": "^0.5.6"
   },
   "mangle": {
