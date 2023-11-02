@@ -178,53 +178,56 @@ export function analyze(css, options = {}) {
           break
         }
 
-        if (atRuleName === 'media') {
-          let prelude = stringifyNode(node.prelude)
-          medias.push(prelude, node.prelude.loc)
-          if (isMediaBrowserhack(node.prelude)) {
-            mediaBrowserhacks.push(prelude, node.prelude.loc)
+        // All the AtRules in here MUST have a prelude, we we can count their names
+        if (node.prelude !== null) {
+          if (atRuleName === 'media') {
+            let prelude = stringifyNode(node.prelude)
+            medias.push(prelude, node.prelude.loc)
+            if (isMediaBrowserhack(node.prelude)) {
+              mediaBrowserhacks.push(prelude, node.prelude.loc)
+            }
+            break
           }
-          break
-        }
-        if (atRuleName === 'supports') {
-          let prelude = stringifyNode(node.prelude)
-          supports.push(prelude, node.prelude.loc)
-          if (isSupportsBrowserhack(node.prelude)) {
-            supportsBrowserhacks.push(prelude, node.prelude.loc)
+          if (atRuleName === 'supports') {
+            let prelude = stringifyNode(node.prelude)
+            supports.push(prelude, node.prelude.loc)
+            if (isSupportsBrowserhack(node.prelude)) {
+              supportsBrowserhacks.push(prelude, node.prelude.loc)
+            }
+            break
           }
-          break
-        }
-        if (endsWith('keyframes', atRuleName)) {
-          let name = '@' + atRuleName + ' ' + stringifyNode(node.prelude)
-          if (hasVendorPrefix(atRuleName)) {
-            prefixedKeyframes.push(name, node.prelude.loc)
+          if (endsWith('keyframes', atRuleName)) {
+            let name = '@' + atRuleName + ' ' + stringifyNode(node.prelude)
+            if (hasVendorPrefix(atRuleName)) {
+              prefixedKeyframes.push(name, node.prelude.loc)
+            }
+            keyframes.push(name, node.prelude.loc)
+            break
           }
-          keyframes.push(name, node.prelude.loc)
-          break
-        }
-        if (atRuleName === 'import') {
-          imports.push(stringifyNode(node.prelude), node.prelude.loc)
-          break
-        }
-        if (atRuleName === 'charset') {
-          charsets.push(stringifyNode(node.prelude), node.prelude.loc)
-          break
-        }
-        if (atRuleName === 'container') {
-          containers.push(stringifyNode(node.prelude), node.prelude.loc)
-          break
-        }
-        if (atRuleName === 'layer') {
-          let prelude = stringifyNode(node.prelude)
-          prelude
-            .split(',')
-            .forEach(name => layers.push(name.trim(), node.prelude.loc))
-          break
-        }
-        if (atRuleName === 'property') {
-          let prelude = stringifyNode(node.prelude)
-          registeredProperties.push(prelude, node.prelude.loc)
-          break
+          if (atRuleName === 'import') {
+            imports.push(stringifyNode(node.prelude), node.prelude.loc)
+            break
+          }
+          if (atRuleName === 'charset') {
+            charsets.push(stringifyNode(node.prelude), node.prelude.loc)
+            break
+          }
+          if (atRuleName === 'container') {
+            containers.push(stringifyNode(node.prelude), node.prelude.loc)
+            break
+          }
+          if (atRuleName === 'layer') {
+            let prelude = stringifyNode(node.prelude)
+            prelude
+              .split(',')
+              .forEach(name => layers.push(name.trim(), node.prelude.loc))
+            break
+          }
+          if (atRuleName === 'property') {
+            let prelude = stringifyNode(node.prelude)
+            registeredProperties.push(prelude, node.prelude.loc)
+            break
+          }
         }
         break
       }

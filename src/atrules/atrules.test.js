@@ -71,6 +71,13 @@ AtRules('finds @layer', () => {
     @layer components {
       @layer defaults, structures, themes, utilities;
     }
+
+    /* Anonymous layer (no prelude/layer name) */
+    @layer {
+      test {
+        color: green;
+      }
+    }
   `
   const actual = analyze(fixture).atrules.layer
   const expected = {
@@ -241,6 +248,9 @@ AtRules('finds @imports', () => {
     @import url('../example.css') layer;
 
     @import url('remedy.css') layer(reset.remedy);
+
+    /* @import without prelude */
+    @import;
   `
   const actual = analyze(fixture).atrules.import
   const expected = {
@@ -265,6 +275,9 @@ AtRules('finds @charsets', () => {
   const fixture = `
     @charset "UTF-8";
     @charset "UTF-16";
+
+    /* No prelude */
+    @charset;
   `
   const actual = analyze(fixture).atrules.charset
   const expected = {
@@ -289,6 +302,9 @@ AtRules('finds @supports', () => {
     @media (min-width: 0) {
       @supports (-webkit-appearance: none) {}
     }
+
+    /* No prelude */
+    @supports {}
   `
   const actual = analyze(fixture).atrules.supports
 
@@ -353,6 +369,9 @@ AtRules('finds @media', () => {
     @supports (-webkit-appearance: none) {
       @media (min-width: 0) {}
     }
+
+    /* No prelude */
+    @media {}
   `
   const actual = analyze(fixture).atrules.media
 
@@ -426,6 +445,9 @@ AtRules('analyzes @keyframes', () => {
     @keyframes one {}
     @keyframes one {}
     @keyframes TWO {}
+
+    /* No prelude */
+    @keyframes {}
 
     /* Prefixes */
     @-webkit-keyframes animation {}
@@ -523,6 +545,9 @@ AtRules('analyzes container queries', () => {
       /* only applies when an inline-size container is available */
       h2 { font-size: calc(1.2em + 1cqi); }
     }
+
+    /* No prelude */
+    @container {}
   `
   const result = analyze(fixture)
   const actual = result.atrules.container
@@ -590,6 +615,9 @@ AtRules('analyzes @property', () => {
         }
       }
     }
+
+    /* No prelude */
+    @property {}
   `
   const actual = analyze(fixture).atrules.property
   const expected = {
