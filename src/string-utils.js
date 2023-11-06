@@ -1,7 +1,7 @@
 /**
  * Case-insensitive compare two character codes
- * @param {string} referenceCode
- * @param {string} testCode
+ * @param {number} referenceCode
+ * @param {number} testCode
  * @see https://github.com/csstree/csstree/blob/41f276e8862d8223eeaa01a3d113ab70bb13d2d9/lib/tokenizer/utils.js#L22
  */
 function compareChar(referenceCode, testCode) {

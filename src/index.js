@@ -38,7 +38,7 @@ let defaults = {
  * @param {string} css
  * @param {Options} options
  */
-export function analyze(css, options = {}) {
+export function analyze(css, options = { useUnstableLocations: false }) {
   let settings = Object.assign({}, defaults, options)
   let useLocations = settings.useUnstableLocations === true
   let start = Date.now()
@@ -84,7 +84,7 @@ export function analyze(css, options = {}) {
 
   // Atrules
   let totalAtRules = 0
-  /** @type {Record<string: string>}[]} */
+  /** @type {Record<string, string>[]}} */
   let fontfaces = []
   let layers = new Collection({ useLocations })
   let imports = new Collection({ useLocations })
@@ -165,6 +165,7 @@ export function analyze(css, options = {}) {
         let atRuleName = node.name
 
         if (atRuleName === 'font-face') {
+          /** @type Record<string, string> */
           let descriptors = {}
 
           node.block.children.forEach(descriptor => {
@@ -269,7 +270,7 @@ export function analyze(css, options = {}) {
 
         uniqueSelectors.add(selector)
         selectorComplexities.push(complexity)
-        uniqueSelectorComplexities.push(complexity, node.loc)
+        uniqueSelectorComplexities.push(String(complexity), node.loc)
 
         // #region specificity
         let [{ value: specificityObj }] = calculate(node)

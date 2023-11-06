@@ -50,11 +50,10 @@ export class Collection {
 	 * @property {number} column
 	 * @property {number} offset
 	 * @property {number} length
-	 *
-	 * @returns {{ total: number; totalUnique: number; uniquenessRatio: number; unique: Record<string, number>; __unstable__uniqueWithLocations: Record<string, CssLocation[]>}}
 	 */
 	count() {
 		let uniqueWithLocations = new Map()
+		/** @type Record<string, number> */
 		let unique = {}
 		this._items.forEach((list, key) => {
 			let nodes = list.map(index => ({
@@ -73,6 +72,7 @@ export class Collection {
 				totalUnique: this._items.size,
 				unique,
 				uniquenessRatio: this._total === 0 ? 0 : this._items.size / this._total,
+				/** @type {Record<string, CssLocation[]>} */
 				__unstable__uniqueWithLocations: Object.fromEntries(uniqueWithLocations),
 			}
 		}
@@ -81,7 +81,7 @@ export class Collection {
 			total: this._total,
 			totalUnique: this._items.size,
 			unique,
-			uniquenessRatio: this._total === 0 ? 0 : this._items.size / this._total,
+			uniquenessRatio: this._total === 0 ? 0 : this._items.size / this._total
 		}
 	}
 }

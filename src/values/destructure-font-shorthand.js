@@ -82,20 +82,6 @@ export function destructure(value, stringifyNode) {
 			return
 		}
 
-		// If, after taking care of font-size and line-height, we still have a remaining dimension, it must be the oblique angle
-		if (
-			node.type === 'Dimension' &&
-			item.prev &&
-			item.prev.data.type === TYPE_IDENTIFIER &&
-			item.prev.data.name === 'oblique'
-		) {
-			// put in the correct amount of whitespace between `oblique` and `<angle>`
-			font_style +=
-				''.padStart(node.loc.start.offset - item.prev.data.loc.end.offset) +
-				stringifyNode(node)
-			return
-		}
-
 		// any node that's a number and not previously caught by line-height or font-size is the font-weight
 		// (oblique <angle> will not be caught here, because that's a Dimension, not a Number)
 		if (node.type === 'Number') {
