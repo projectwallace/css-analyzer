@@ -6,7 +6,7 @@ class ContextCollection {
     /** @type {Map<string, Collection>} */
     this._contexts = new Map()
     /** @type {boolean} */
-    this.useLocations = useLocations
+    this._useLocations = useLocations
   }
 
   /**
@@ -19,7 +19,7 @@ class ContextCollection {
     this._list.push(item, node_location)
 
     if (!this._contexts.has(context)) {
-      this._contexts.set(context, new Collection({ useLocations: this.useLocations }))
+      this._contexts.set(context, new Collection({ useLocations: this._useLocations }))
     }
 
     this._contexts.get(context).push(item, node_location)

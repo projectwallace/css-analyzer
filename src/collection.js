@@ -4,13 +4,13 @@ export class Collection {
 		this._items = new Map()
 		this._total = 0
 		/** @type {number[]} */
-		this.node_lines = []
+		this._node_lines = []
 		/** @type {number[]} */
-		this.node_columns = []
+		this._node_columns = []
 		/** @type {number[]} */
-		this.node_lengths = []
+		this._node_lengths = []
 		/** @type {number[]} */
-		this.node_offsets = []
+		this._node_offsets = []
 
 		/** @type {boolean} */
 		this._useLocations = useLocations
@@ -23,10 +23,10 @@ export class Collection {
 	push(item, node_location) {
 		let index = this._total
 
-		this.node_lines[index] = node_location.start.line
-		this.node_columns[index] = node_location.start.column
-		this.node_offsets[index] = node_location.start.offset
-		this.node_lengths[index] = node_location.end.offset - node_location.start.offset
+		this._node_lines[index] = node_location.start.line
+		this._node_columns[index] = node_location.start.column
+		this._node_offsets[index] = node_location.start.offset
+		this._node_lengths[index] = node_location.end.offset - node_location.start.offset
 
 		if (this._items.has(item)) {
 			/** @type number[] */
@@ -58,10 +58,10 @@ export class Collection {
 		let unique = {}
 		this._items.forEach((list, key) => {
 			let nodes = list.map(index => ({
-				line: this.node_lines[index],
-				column: this.node_columns[index],
-				offset: this.node_offsets[index],
-				length: this.node_lengths[index],
+				line: this._node_lines[index],
+				column: this._node_columns[index],
+				offset: this._node_offsets[index],
+				length: this._node_lengths[index],
 			}))
 			uniqueWithLocations.set(key, nodes)
 			unique[key] = list.length
