@@ -89,15 +89,16 @@ export function destructure(value, stringifyNode) {
 		}
 
 		// If, after taking care of font-size and line-height, we still have a remaining dimension, it must be the oblique angle
+		let prev = item.prev
 		if (
 			node.type === Dimension &&
-			item.prev &&
-			item.prev.data.type === Identifier &&
-			item.prev.data.name === 'oblique'
+			prev &&
+			prev.data.type === Identifier &&
+			prev.data.name === 'oblique'
 		) {
 			// put in the correct amount of whitespace between `oblique` and `<angle>`
 			font_style +=
-				''.padStart(node.loc.start.offset - item.prev.data.loc.end.offset) +
+				''.padStart(node.loc.start.offset - prev.data.loc.end.offset) +
 				stringifyNode(node)
 			return
 		}
@@ -123,8 +124,9 @@ export function destructure(value, stringifyNode) {
 
 		// Any remaining identifiers can be font-size, font-style, font-stretch, font-variant or font-weight
 		if (node.type === Identifier) {
-			if (SIZE_KEYWORDS.has(node.name)) {
-				font_size = node.name
+			let name = node.name
+			if (SIZE_KEYWORDS.has(name)) {
+				font_size = name
 				return
 			}
 		}

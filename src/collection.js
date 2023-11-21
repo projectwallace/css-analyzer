@@ -1,19 +1,22 @@
 export class Collection {
-	constructor({ _u = false }) {
+	constructor({ l = false }) {
 		/** @type {Map<string, number[]>} */
 		this._items = new Map()
 		this._total = 0
-		/** @type {number[]} */
-		this._node_lines = []
-		/** @type {number[]} */
-		this._node_columns = []
-		/** @type {number[]} */
-		this._node_lengths = []
-		/** @type {number[]} */
-		this._node_offsets = []
+
+		if (l) {
+			/** @type {number[]} */
+			this._node_lines = []
+			/** @type {number[]} */
+			this._node_columns = []
+			/** @type {number[]} */
+			this._node_lengths = []
+			/** @type {number[]} */
+			this._node_offsets = []
+		}
 
 		/** @type {boolean} */
-		this._useLocations = _u
+		this._useLocations = l
 	}
 
 	/**
@@ -22,13 +25,16 @@ export class Collection {
 	 */
 	push(item, node_location) {
 		let index = this._total
-		let start = node_location.start
-		let start_offset = start.offset
 
-		this._node_lines[index] = start.line
-		this._node_columns[index] = start.column
-		this._node_offsets[index] = start_offset
-		this._node_lengths[index] = node_location.end.offset - start_offset
+		if (this._useLocations) {
+			let start = node_location.start
+			let start_offset = start.offset
+
+			this._node_lines[index] = start.line
+			this._node_columns[index] = start.column
+			this._node_offsets[index] = start_offset
+			this._node_lengths[index] = node_location.end.offset - start_offset
+		}
 
 		if (this._items.has(item)) {
 			/** @type number[] */

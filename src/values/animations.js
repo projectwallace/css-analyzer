@@ -28,6 +28,7 @@ export function analyzeAnimation(children, stringifyNode) {
 
   children.forEach(child => {
     let type = child.type
+    let name = child.name
 
     // Right after a ',' we start over again
     if (type === Operator) {
@@ -37,10 +38,10 @@ export function analyzeAnimation(children, stringifyNode) {
       durationFound = true
       return durations.push(stringifyNode(child))
     }
-    if (type === Identifier && TIMING_KEYWORDS.has(child.name)) {
+    if (type === Identifier && TIMING_KEYWORDS.has(name)) {
       return timingFunctions.push(stringifyNode(child))
     }
-    if (type === Func && TIMING_FUNCTION_VALUES.has(child.name)) {
+    if (type === Func && TIMING_FUNCTION_VALUES.has(name)) {
       return timingFunctions.push(stringifyNode(child))
     }
   })

@@ -73,7 +73,7 @@ export function analyze(css, options = {}) {
   // Stylesheet
   let totalComments = 0
   let commentsSize = 0
-  let embeds = new Collection({ _u: useLocations })
+  let embeds = new Collection({ l: useLocations })
   let embedSize = 0
   let embedTypes = {
     total: 0,
@@ -100,17 +100,17 @@ export function analyze(css, options = {}) {
   let totalAtRules = 0
   /** @type {Record<string: string>}[]} */
   let fontfaces = []
-  let layers = new Collection({ _u: useLocations })
-  let imports = new Collection({ _u: useLocations })
-  let medias = new Collection({ _u: useLocations })
-  let mediaBrowserhacks = new Collection({ _u: useLocations })
-  let charsets = new Collection({ _u: useLocations })
-  let supports = new Collection({ _u: useLocations })
-  let supportsBrowserhacks = new Collection({ _u: useLocations })
-  let keyframes = new Collection({ _u: useLocations })
-  let prefixedKeyframes = new Collection({ _u: useLocations })
-  let containers = new Collection({ _u: useLocations })
-  let registeredProperties = new Collection({ _u: useLocations })
+  let layers = new Collection({ l: useLocations })
+  let imports = new Collection({ l: useLocations })
+  let medias = new Collection({ l: useLocations })
+  let mediaBrowserhacks = new Collection({ l: useLocations })
+  let charsets = new Collection({ l: useLocations })
+  let supports = new Collection({ l: useLocations })
+  let supportsBrowserhacks = new Collection({ l: useLocations })
+  let keyframes = new Collection({ l: useLocations })
+  let prefixedKeyframes = new Collection({ l: useLocations })
+  let containers = new Collection({ l: useLocations })
+  let registeredProperties = new Collection({ l: useLocations })
 
   // Rules
   let totalRules = 0
@@ -118,14 +118,14 @@ export function analyze(css, options = {}) {
   let ruleSizes = new AggregateCollection()
   let selectorsPerRule = new AggregateCollection()
   let declarationsPerRule = new AggregateCollection()
-  let uniqueRuleSize = new Collection({ _u: useLocations })
-  let uniqueSelectorsPerRule = new Collection({ _u: useLocations })
-  let uniqueDeclarationsPerRule = new Collection({ _u: useLocations })
+  let uniqueRuleSize = new Collection({ l: useLocations })
+  let uniqueSelectorsPerRule = new Collection({ l: useLocations })
+  let uniqueDeclarationsPerRule = new Collection({ l: useLocations })
 
   // Selectors
-  let keyframeSelectors = new Collection({ _u: useLocations })
+  let keyframeSelectors = new Collection({ l: useLocations })
   let uniqueSelectors = new Set()
-  let prefixedSelectors = new Collection({ _u: useLocations })
+  let prefixedSelectors = new Collection({ l: useLocations })
   /** @type {Specificity} */
   let maxSpecificity
   /** @type {Specificity} */
@@ -133,44 +133,44 @@ export function analyze(css, options = {}) {
   let specificityA = new AggregateCollection()
   let specificityB = new AggregateCollection()
   let specificityC = new AggregateCollection()
-  let uniqueSpecificities = new Collection({ _u: useLocations })
+  let uniqueSpecificities = new Collection({ l: useLocations })
   let selectorComplexities = new AggregateCollection()
-  let uniqueSelectorComplexities = new Collection({ _u: useLocations })
+  let uniqueSelectorComplexities = new Collection({ l: useLocations })
   /** @type {Specificity[]} */
   let specificities = []
-  let ids = new Collection({ _u: useLocations })
-  let a11y = new Collection({ _u: useLocations })
-  let combinators = new Collection({ _u: useLocations })
+  let ids = new Collection({ l: useLocations })
+  let a11y = new Collection({ l: useLocations })
+  let combinators = new Collection({ l: useLocations })
 
   // Declarations
   let uniqueDeclarations = new Set()
   let totalDeclarations = 0
   let importantDeclarations = 0
   let importantsInKeyframes = 0
-  let importantCustomProperties = new Collection({ _u: useLocations })
+  let importantCustomProperties = new Collection({ l: useLocations })
 
   // Properties
-  let properties = new Collection({ _u: useLocations })
-  let propertyHacks = new Collection({ _u: useLocations })
-  let propertyVendorPrefixes = new Collection({ _u: useLocations })
-  let customProperties = new Collection({ _u: useLocations })
+  let properties = new Collection({ l: useLocations })
+  let propertyHacks = new Collection({ l: useLocations })
+  let propertyVendorPrefixes = new Collection({ l: useLocations })
+  let customProperties = new Collection({ l: useLocations })
   let propertyComplexities = new AggregateCollection()
 
   // Values
-  let vendorPrefixedValues = new Collection({ _u: useLocations })
-  let valueBrowserhacks = new Collection({ _u: useLocations })
-  let zindex = new Collection({ _u: useLocations })
-  let textShadows = new Collection({ _u: useLocations })
-  let boxShadows = new Collection({ _u: useLocations })
-  let fontFamilies = new Collection({ _u: useLocations })
-  let fontSizes = new Collection({ _u: useLocations })
-  let lineHeights = new Collection({ _u: useLocations })
-  let timingFunctions = new Collection({ _u: useLocations })
-  let durations = new Collection({ _u: useLocations })
-  let colors = new ContextCollection({ _u: useLocations })
-  let colorFormats = new Collection({ _u: useLocations })
-  let units = new ContextCollection({ _u: useLocations })
-  let gradients = new Collection({ _u: useLocations })
+  let vendorPrefixedValues = new Collection({ l: useLocations })
+  let valueBrowserhacks = new Collection({ l: useLocations })
+  let zindex = new Collection({ l: useLocations })
+  let textShadows = new Collection({ l: useLocations })
+  let boxShadows = new Collection({ l: useLocations })
+  let fontFamilies = new Collection({ l: useLocations })
+  let fontSizes = new Collection({ l: useLocations })
+  let lineHeights = new Collection({ l: useLocations })
+  let timingFunctions = new Collection({ l: useLocations })
+  let durations = new Collection({ l: useLocations })
+  let colors = new ContextCollection({ l: useLocations })
+  let colorFormats = new Collection({ l: useLocations })
+  let units = new ContextCollection({ l: useLocations })
+  let gradients = new Collection({ l: useLocations })
 
   walk(ast, function (node) {
     switch (node.type) {
