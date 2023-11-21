@@ -1,10 +1,11 @@
 export class Collection {
-	constructor({ l = false }) {
+	/** @param {boolean} useLocations */
+	constructor(useLocations = false) {
 		/** @type {Map<string, number[]>} */
 		this._items = new Map()
 		this._total = 0
 
-		if (l) {
+		if (useLocations) {
 			/** @type {number[]} */
 			this._node_lines = []
 			/** @type {number[]} */
@@ -16,7 +17,7 @@ export class Collection {
 		}
 
 		/** @type {boolean} */
-		this._useLocations = l
+		this._useLocations = useLocations
 	}
 
 	/**

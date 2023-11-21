@@ -1,12 +1,13 @@
 import { Collection } from './collection.js'
 
 class ContextCollection {
-  constructor({ l = false }) {
-    this._list = new Collection({ l })
+  /** @param {boolean} useLocations */
+  constructor(useLocations) {
+    this._list = new Collection(useLocations)
     /** @type {Map<string, Collection>} */
     this._contexts = new Map()
     /** @type {boolean} */
-    this._useLocations = l
+    this._useLocations = useLocations
   }
 
   /**
@@ -19,7 +20,7 @@ class ContextCollection {
     this._list.p(item, node_location)
 
     if (!this._contexts.has(context)) {
-      this._contexts.set(context, new Collection({ l: this._useLocations }))
+      this._contexts.set(context, new Collection(this._useLocations))
     }
 
     this._contexts.get(context).p(item, node_location)
