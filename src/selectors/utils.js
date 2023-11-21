@@ -1,6 +1,17 @@
 import walk from 'css-tree/walker'
 import { startsWith, strEquals } from '../string-utils.js'
 import { hasVendorPrefix } from '../vendor-prefix.js'
+import {
+  PseudoClassSelector,
+  IdSelector,
+  ClassSelector,
+  PseudoElementSelector,
+  TypeSelector,
+  Combinator,
+  Selector,
+  AttributeSelector,
+  Nth,
+} from '../css-tree-node-types.js'
 
 /**
  *
@@ -10,7 +21,7 @@ import { hasVendorPrefix } from '../vendor-prefix.js'
 function analyzeList(selectorListAst, cb) {
   let childSelectors = []
   walk(selectorListAst, {
-    visit: 'Selector',
+    visit: Selector,
     enter: function (node) {
       childSelectors.push(cb(node))
     }
@@ -38,14 +49,15 @@ export function isAccessibility(selector) {
   let isA11y = false
 
   walk(selector, function (node) {
-    if (node.type === 'AttributeSelector') {
-      if (strEquals('role', node.name.name) || startsWith('aria-', node.name.name)) {
+    if (node.type === AttributeSelector) {
+      let name = node.name.name
+      if (strEquals('role', name) || startsWith('aria-', name)) {
         isA11y = true
         return this.break
       }
     }
     // Test for [aria-] or [role] inside :is()/:where() and friends
-    else if (node.type === 'PseudoClassSelector') {
+    else if (node.type === PseudoClassSelector) {
       if (isPseudoFunction(node.name)) {
         let list = analyzeList(node, isAccessibility)
 
@@ -72,15 +84,15 @@ export function getComplexity(selector) {
   let isPrefixed = false
 
   walk(selector, function (node) {
-    if (node.type === 'Selector' || node.type === 'Nth') return
+    if (node.type === Selector || node.type === Nth) return
 
     complexity++
 
-    if (node.type === 'IdSelector'
-      || node.type === 'ClassSelector'
-      || node.type === 'PseudoElementSelector'
-      || node.type === 'TypeSelector'
-      || node.type === 'PseudoClassSelector'
+    if (node.type === IdSelector
+      || node.type === ClassSelector
+      || node.type === PseudoElementSelector
+      || node.type === TypeSelector
+      || node.type === PseudoClassSelector
     ) {
       if (hasVendorPrefix(node.name)) {
         isPrefixed = true
@@ -88,7 +100,7 @@ export function getComplexity(selector) {
       }
     }
 
-    if (node.type === 'AttributeSelector') {
+    if (node.type === AttributeSelector) {
       if (Boolean(node.value)) {
         complexity++
       }
@@ -99,7 +111,7 @@ export function getComplexity(selector) {
       return this.skip
     }
 
-    if (node.type === 'PseudoClassSelector') {
+    if (node.type === PseudoClassSelector) {
       if (isPseudoFunction(node.name)) {
         let list = analyzeList(node, getComplexity)
 
@@ -132,9 +144,12 @@ export function getCombinators(node, onMatch) {
     /** @type {import('css-tree').CssNode} */ selectorNode,
     /** @type {import('css-tree').ListItem} */ item
   ) {
-    if (selectorNode.type === 'Combinator') {
+    if (selectorNode.type === Combinator) {
+      let loc = selectorNode.loc
+      let name = selectorNode.name
+
       // .loc is null when selectorNode.name === ' '
-      if (selectorNode.loc === null) {
+      if (loc === null) {
         let previousLoc = item.prev.data.loc.end
         let start = {
           offset: previousLoc.offset,
@@ -143,7 +158,7 @@ export function getCombinators(node, onMatch) {
         }
 
         onMatch({
-          name: selectorNode.name,
+          name,
           loc: {
             start,
             end: {
@@ -155,8 +170,8 @@ export function getCombinators(node, onMatch) {
         })
       } else {
         onMatch({
-          name: selectorNode.name,
-          loc: selectorNode.loc
+          name,
+          loc
         })
       }
     }

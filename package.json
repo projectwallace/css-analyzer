@@ -39,7 +39,12 @@
     "analytics",
     "performance",
     "styleguide",
-    "metrics"
+    "metrics",
+    "designsystem",
+    "fonts",
+    "colors",
+    "quality",
+    "code"
   ],
   "dependencies": {
     "@bramus/specificity": "^2.3.0",

@@ -30,11 +30,15 @@ class CountableCollection {
   }
 
   count() {
+    let items = this._items
+    let size = items.size
+    let total = this._total
+
     return {
-      total: this._total,
-      totalUnique: this._items.size,
-      unique: Object.fromEntries(this._items),
-      uniquenessRatio: this._total === 0 ? 0 : this._items.size / this._total,
+      total: total,
+      totalUnique: size,
+      unique: Object.fromEntries(items),
+      uniquenessRatio: total === 0 ? 0 : size / total,
     }
   }
 }

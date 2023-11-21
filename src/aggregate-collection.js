@@ -11,8 +11,9 @@ function Mode(arr) {
   let maxOccurrences = -1
   let maxOccurenceCount = 0
   let sum = 0
+  let len = arr.length
 
-  for (let i = 0; i < arr.length; i++) {
+  for (let i = 0; i < len; i++) {
     let element = arr[i]
     let updatedCount = (frequencies.get(element) || 0) + 1
     frequencies.set(element, updatedCount)
@@ -70,7 +71,9 @@ class AggregateCollection {
   }
 
   aggregate() {
-    if (this._items.length === 0) {
+    let len = this._items.length
+
+    if (len === 0) {
       return {
         min: 0,
         max: 0,
@@ -86,19 +89,20 @@ class AggregateCollection {
     /** @type Number[] */
     let sorted = this._items.slice().sort((a, b) => a - b)
     let min = sorted[0]
-    let max = sorted[sorted.length - 1]
+    let max = sorted[len - 1]
 
     let mode = Mode(sorted)
     let median = Median(sorted)
+    let sum = this._sum
 
     return {
       min,
       max,
-      mean: this._sum / sorted.length,
+      mean: sum / len,
       mode,
       median,
       range: max - min,
-      sum: this._sum,
+      sum: sum,
     }
   }
 
