@@ -23,7 +23,7 @@ export class Collection {
 	 * @param {string} item
 	 * @param {import('css-tree').CssLocation} node_location
 	 */
-	push(item, node_location) {
+	p(item, node_location) {
 		let index = this._total
 
 		if (this._useLocations) {
@@ -61,7 +61,7 @@ export class Collection {
 	 *
 	 * @returns {{ total: number; totalUnique: number; uniquenessRatio: number; unique: Record<string, number>; __unstable__uniqueWithLocations: Record<string, CssLocation[]>}}
 	 */
-	count() {
+	c() {
 		let useLocations = this._useLocations
 		let uniqueWithLocations = new Map()
 		let unique = {}
