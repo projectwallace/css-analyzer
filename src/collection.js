@@ -65,7 +65,10 @@ export class Collection {
 		let useLocations = this._useLocations
 		let uniqueWithLocations = new Map()
 		let unique = {}
-		this._items.forEach((list, key) => {
+		let items = this._items
+		let size = items.size
+
+		items.forEach((list, key) => {
 			if (useLocations) {
 				let nodes = list.map(index => ({
 					line: this._node_lines[index],
@@ -81,18 +84,18 @@ export class Collection {
 		if (this._useLocations) {
 			return {
 				total: this._total,
-				totalUnique: this._items.size,
+				totalUnique: size,
 				unique,
-				uniquenessRatio: this._total === 0 ? 0 : this._items.size / this._total,
+				uniquenessRatio: this._total === 0 ? 0 : size / this._total,
 				__unstable__uniqueWithLocations: Object.fromEntries(uniqueWithLocations),
 			}
 		}
 
 		return {
 			total: this._total,
-			totalUnique: this._items.size,
+			totalUnique: size,
 			unique,
-			uniquenessRatio: this._total === 0 ? 0 : this._items.size / this._total,
+			uniquenessRatio: this._total === 0 ? 0 : size / this._total,
 		}
 	}
 }
