@@ -16,9 +16,10 @@ import {
  * @returns true if declaratioNode is the given property: value, false otherwise
  */
 function isPropertyValue(node, property, value) {
+  let firstChild = node.value.children.first
   return strEquals(property, node.property)
-    && node.value.children.first.type === Identifier
-    && strEquals(value, node.value.children.first.name)
+    && firstChild.type === Identifier
+    && strEquals(value, firstChild.name)
 }
 
 /**
@@ -53,38 +54,43 @@ export function isMediaBrowserhack(prelude) {
   let returnValue = false
 
   walk(prelude, function (node) {
+    let children = node.children
+    let name = node.name
+    let value = node.value
+
     if (node.type === MediaQuery
-      && node.children.size === 1
-      && node.children.first.type === Identifier
+      && children.size === 1
+      && children.first.type === Identifier
     ) {
-      node = node.children.first
+      let n = children.first.name
       // Note: CSSTree adds a trailing space to \\9
-      if (startsWith('\\0', node.name) || endsWith('\\9 ', node.name)) {
+      if (startsWith('\\0', n) || endsWith('\\9 ', n)) {
         returnValue = true
         return this.break
       }
     }
     if (node.type === MediaFeature) {
-      if (node.value !== null && node.value.unit === '\\0') {
+      if (value !== null && value.unit === '\\0') {
         returnValue = true
         return this.break
       }
-      if (strEquals('-moz-images-in-menus', node.name)
-        || strEquals('min--moz-device-pixel-ratio', node.name)
-        || strEquals('-ms-high-contrast', node.name)
+      if (strEquals('-moz-images-in-menus', name)
+        || strEquals('min--moz-device-pixel-ratio', name)
+        || strEquals('-ms-high-contrast', name)
       ) {
         returnValue = true
         return this.break
       }
-      if (strEquals('min-resolution', node.name)
-        && strEquals('.001', node.value.value)
-        && strEquals('dpcm', node.value.unit)
+      if (strEquals('min-resolution', name)
+        && strEquals('.001', value.value)
+        && strEquals('dpcm', value.unit)
       ) {
         returnValue = true
         return this.break
       }
-      if (strEquals('-webkit-min-device-pixel-ratio', node.name)) {
-        if ((strEquals('0', node.value.value) || strEquals('10000', node.value.value))) {
+      if (strEquals('-webkit-min-device-pixel-ratio', name)) {
+        let val = value.value
+        if ((strEquals('0', val) || strEquals('10000', val))) {
           returnValue = true
           return this.break
         }
