@@ -66,7 +66,8 @@ export function analyze(css, options = {}) {
   }
 
   function stringifyNodePlain(node) {
-    return css.substring(node.loc.start.offset, node.loc.end.offset)
+    let loc = node.loc
+    return css.substring(loc.start.offset, loc.end.offset)
   }
 
   // Stylesheet
@@ -566,15 +567,15 @@ export function analyze(css, options = {}) {
           }
         }
 
-        let { property } = node
+        let { property, loc: { start } } = node
         let propertyLoc = {
           start: {
-            line: node.loc.start.line,
-            column: node.loc.start.column,
-            offset: node.loc.start.offset
+            line: start.line,
+            column: start.column,
+            offset: start.offset
           },
           end: {
-            offset: node.loc.start.offset + property.length
+            offset: start.offset + property.length
           }
         }
 

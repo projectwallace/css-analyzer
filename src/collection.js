@@ -22,11 +22,13 @@ export class Collection {
 	 */
 	push(item, node_location) {
 		let index = this._total
+		let start = node_location.start
+		let start_offset = start.offset
 
-		this._node_lines[index] = node_location.start.line
-		this._node_columns[index] = node_location.start.column
-		this._node_offsets[index] = node_location.start.offset
-		this._node_lengths[index] = node_location.end.offset - node_location.start.offset
+		this._node_lines[index] = start.line
+		this._node_columns[index] = start.column
+		this._node_offsets[index] = start_offset
+		this._node_lengths[index] = node_location.end.offset - start_offset
 
 		if (this._items.has(item)) {
 			/** @type number[] */
