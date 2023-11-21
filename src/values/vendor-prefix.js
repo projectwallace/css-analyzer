@@ -1,21 +1,27 @@
 import { hasVendorPrefix } from '../vendor-prefix.js'
+import { Func, Identifier } from '../css-tree-node-types.js'
 
+/**
+ * @param {import('css-tree').Value} node
+ */
 export function isAstVendorPrefixed(node) {
-  if (!node.children) {
+  let children = node.children
+
+  if (!children) {
     return false
   }
 
-  let children = node.children.toArray()
+  let list = children.toArray()
 
-  for (let index = 0; index < children.length; index++) {
-    let node = children[index]
+  for (let index = 0; index < list.length; index++) {
+    let node = list[index]
     let { type, name } = node;
 
-    if (type === 'Identifier' && hasVendorPrefix(name)) {
+    if (type === Identifier && hasVendorPrefix(name)) {
       return true
     }
 
-    if (type === 'Function') {
+    if (type === Func) {
       if (hasVendorPrefix(name)) {
         return true
       }

@@ -1,12 +1,12 @@
 import { Collection } from './collection.js'
 
 class ContextCollection {
-  constructor({ useLocations = false }) {
-    this._list = new Collection({ useLocations })
+  constructor({ _u = false }) {
+    this._list = new Collection({ _u })
     /** @type {Map<string, Collection>} */
     this._contexts = new Map()
     /** @type {boolean} */
-    this._useLocations = useLocations
+    this._useLocations = _u
   }
 
   /**

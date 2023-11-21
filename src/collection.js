@@ -1,5 +1,5 @@
 export class Collection {
-	constructor({ useLocations = false }) {
+	constructor({ _u = false }) {
 		/** @type {Map<string, number[]>} */
 		this._items = new Map()
 		this._total = 0
@@ -13,7 +13,7 @@ export class Collection {
 		this._node_offsets = []
 
 		/** @type {boolean} */
-		this._useLocations = useLocations
+		this._useLocations = _u
 	}
 
 	/**
@@ -54,16 +54,19 @@ export class Collection {
 	 * @returns {{ total: number; totalUnique: number; uniquenessRatio: number; unique: Record<string, number>; __unstable__uniqueWithLocations: Record<string, CssLocation[]>}}
 	 */
 	count() {
+		let useLocations = this._useLocations
 		let uniqueWithLocations = new Map()
 		let unique = {}
 		this._items.forEach((list, key) => {
-			let nodes = list.map(index => ({
-				line: this._node_lines[index],
-				column: this._node_columns[index],
-				offset: this._node_offsets[index],
-				length: this._node_lengths[index],
-			}))
-			uniqueWithLocations.set(key, nodes)
+			if (useLocations) {
+				let nodes = list.map(index => ({
+					line: this._node_lines[index],
+					column: this._node_columns[index],
+					offset: this._node_offsets[index],
+					length: this._node_lengths[index],
+				}))
+				uniqueWithLocations.set(key, nodes)
+			}
 			unique[key] = list.length
 		})
 

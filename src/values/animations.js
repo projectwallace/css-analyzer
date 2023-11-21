@@ -1,4 +1,10 @@
 import { KeywordSet } from "../keyword-set.js"
+import {
+  Operator,
+  Dimension,
+  Identifier,
+  Func,
+} from '../css-tree-node-types.js'
 
 const TIMING_KEYWORDS = new KeywordSet([
   'linear',
@@ -24,17 +30,17 @@ export function analyzeAnimation(children, stringifyNode) {
     let type = child.type
 
     // Right after a ',' we start over again
-    if (type === 'Operator') {
+    if (type === Operator) {
       return durationFound = false
     }
-    if (type === 'Dimension' && durationFound === false) {
+    if (type === Dimension && durationFound === false) {
       durationFound = true
       return durations.push(stringifyNode(child))
     }
-    if (type === 'Identifier' && TIMING_KEYWORDS.has(child.name)) {
+    if (type === Identifier && TIMING_KEYWORDS.has(child.name)) {
       return timingFunctions.push(stringifyNode(child))
     }
-    if (type === 'Function' && TIMING_FUNCTION_VALUES.has(child.name)) {
+    if (type === Func && TIMING_FUNCTION_VALUES.has(child.name)) {
       return timingFunctions.push(stringifyNode(child))
     }
   })

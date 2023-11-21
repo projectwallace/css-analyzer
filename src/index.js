@@ -16,6 +16,19 @@ import { hasVendorPrefix } from './vendor-prefix.js'
 import { isCustom, isHack, isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
+import {
+  Atrule,
+  Selector,
+  Dimension,
+  Url,
+  Value,
+  Declaration,
+  Hash,
+  Rule,
+  Identifier,
+  Func,
+  Operator
+} from './css-tree-node-types.js'
 
 /** @typedef {[number, number, number]} Specificity */
 
@@ -59,7 +72,7 @@ export function analyze(css, options = {}) {
   // Stylesheet
   let totalComments = 0
   let commentsSize = 0
-  let embeds = new Collection({ useLocations })
+  let embeds = new Collection({ _u: useLocations })
   let embedSize = 0
   let embedTypes = {
     total: 0,
@@ -86,17 +99,17 @@ export function analyze(css, options = {}) {
   let totalAtRules = 0
   /** @type {Record<string: string>}[]} */
   let fontfaces = []
-  let layers = new Collection({ useLocations })
-  let imports = new Collection({ useLocations })
-  let medias = new Collection({ useLocations })
-  let mediaBrowserhacks = new Collection({ useLocations })
-  let charsets = new Collection({ useLocations })
-  let supports = new Collection({ useLocations })
-  let supportsBrowserhacks = new Collection({ useLocations })
-  let keyframes = new Collection({ useLocations })
-  let prefixedKeyframes = new Collection({ useLocations })
-  let containers = new Collection({ useLocations })
-  let registeredProperties = new Collection({ useLocations })
+  let layers = new Collection({ _u: useLocations })
+  let imports = new Collection({ _u: useLocations })
+  let medias = new Collection({ _u: useLocations })
+  let mediaBrowserhacks = new Collection({ _u: useLocations })
+  let charsets = new Collection({ _u: useLocations })
+  let supports = new Collection({ _u: useLocations })
+  let supportsBrowserhacks = new Collection({ _u: useLocations })
+  let keyframes = new Collection({ _u: useLocations })
+  let prefixedKeyframes = new Collection({ _u: useLocations })
+  let containers = new Collection({ _u: useLocations })
+  let registeredProperties = new Collection({ _u: useLocations })
 
   // Rules
   let totalRules = 0
@@ -104,14 +117,14 @@ export function analyze(css, options = {}) {
   let ruleSizes = new AggregateCollection()
   let selectorsPerRule = new AggregateCollection()
   let declarationsPerRule = new AggregateCollection()
-  let uniqueRuleSize = new Collection({ useLocations })
-  let uniqueSelectorsPerRule = new Collection({ useLocations })
-  let uniqueDeclarationsPerRule = new Collection({ useLocations })
+  let uniqueRuleSize = new Collection({ _u: useLocations })
+  let uniqueSelectorsPerRule = new Collection({ _u: useLocations })
+  let uniqueDeclarationsPerRule = new Collection({ _u: useLocations })
 
   // Selectors
-  let keyframeSelectors = new Collection({ useLocations })
+  let keyframeSelectors = new Collection({ _u: useLocations })
   let uniqueSelectors = new Set()
-  let prefixedSelectors = new Collection({ useLocations })
+  let prefixedSelectors = new Collection({ _u: useLocations })
   /** @type {Specificity} */
   let maxSpecificity
   /** @type {Specificity} */
@@ -119,48 +132,48 @@ export function analyze(css, options = {}) {
   let specificityA = new AggregateCollection()
   let specificityB = new AggregateCollection()
   let specificityC = new AggregateCollection()
-  let uniqueSpecificities = new Collection({ useLocations })
+  let uniqueSpecificities = new Collection({ _u: useLocations })
   let selectorComplexities = new AggregateCollection()
-  let uniqueSelectorComplexities = new Collection({ useLocations })
+  let uniqueSelectorComplexities = new Collection({ _u: useLocations })
   /** @type {Specificity[]} */
   let specificities = []
-  let ids = new Collection({ useLocations })
-  let a11y = new Collection({ useLocations })
-  let combinators = new Collection({ useLocations })
+  let ids = new Collection({ _u: useLocations })
+  let a11y = new Collection({ _u: useLocations })
+  let combinators = new Collection({ _u: useLocations })
 
   // Declarations
   let uniqueDeclarations = new Set()
   let totalDeclarations = 0
   let importantDeclarations = 0
   let importantsInKeyframes = 0
-  let importantCustomProperties = new Collection({ useLocations })
+  let importantCustomProperties = new Collection({ _u: useLocations })
 
   // Properties
-  let properties = new Collection({ useLocations })
-  let propertyHacks = new Collection({ useLocations })
-  let propertyVendorPrefixes = new Collection({ useLocations })
-  let customProperties = new Collection({ useLocations })
+  let properties = new Collection({ _u: useLocations })
+  let propertyHacks = new Collection({ _u: useLocations })
+  let propertyVendorPrefixes = new Collection({ _u: useLocations })
+  let customProperties = new Collection({ _u: useLocations })
   let propertyComplexities = new AggregateCollection()
 
   // Values
-  let vendorPrefixedValues = new Collection({ useLocations })
-  let valueBrowserhacks = new Collection({ useLocations })
-  let zindex = new Collection({ useLocations })
-  let textShadows = new Collection({ useLocations })
-  let boxShadows = new Collection({ useLocations })
-  let fontFamilies = new Collection({ useLocations })
-  let fontSizes = new Collection({ useLocations })
-  let lineHeights = new Collection({ useLocations })
-  let timingFunctions = new Collection({ useLocations })
-  let durations = new Collection({ useLocations })
-  let colors = new ContextCollection({ useLocations })
-  let colorFormats = new Collection({ useLocations })
-  let units = new ContextCollection({ useLocations })
-  let gradients = new Collection({ useLocations })
+  let vendorPrefixedValues = new Collection({ _u: useLocations })
+  let valueBrowserhacks = new Collection({ _u: useLocations })
+  let zindex = new Collection({ _u: useLocations })
+  let textShadows = new Collection({ _u: useLocations })
+  let boxShadows = new Collection({ _u: useLocations })
+  let fontFamilies = new Collection({ _u: useLocations })
+  let fontSizes = new Collection({ _u: useLocations })
+  let lineHeights = new Collection({ _u: useLocations })
+  let timingFunctions = new Collection({ _u: useLocations })
+  let durations = new Collection({ _u: useLocations })
+  let colors = new ContextCollection({ _u: useLocations })
+  let colorFormats = new Collection({ _u: useLocations })
+  let units = new ContextCollection({ _u: useLocations })
+  let gradients = new Collection({ _u: useLocations })
 
   walk(ast, function (node) {
     switch (node.type) {
-      case 'Atrule': {
+      case Atrule: {
         totalAtRules++
         let atRuleName = node.name
 
@@ -169,7 +182,7 @@ export function analyze(css, options = {}) {
 
           node.block.children.forEach(descriptor => {
             // Ignore 'Raw' nodes in case of CSS syntax errors
-            if (descriptor.type === 'Declaration') {
+            if (descriptor.type === Declaration) {
               descriptors[descriptor.property] = stringifyNode(descriptor.value)
             }
           })
@@ -231,7 +244,7 @@ export function analyze(css, options = {}) {
         }
         break
       }
-      case 'Rule': {
+      case Rule: {
         let numSelectors = node.prelude.children ? node.prelude.children.size : 0
         let numDeclarations = node.block.children ? node.block.children.size : 0
 
@@ -249,7 +262,7 @@ export function analyze(css, options = {}) {
         }
         break
       }
-      case 'Selector': {
+      case Selector: {
         let selector = stringifyNode(node)
 
         if (this.atrule && endsWith('keyframes', this.atrule.name)) {
@@ -319,7 +332,7 @@ export function analyze(css, options = {}) {
         // as children
         return this.skip
       }
-      case 'Dimension': {
+      case Dimension: {
         if (!this.declaration) {
           break
         }
@@ -335,7 +348,7 @@ export function analyze(css, options = {}) {
 
         return this.skip
       }
-      case 'Url': {
+      case Url: {
         if (startsWith('data:', node.value)) {
           let embed = node.value
           let size = embed.length
@@ -361,7 +374,7 @@ export function analyze(css, options = {}) {
         }
         break
       }
-      case 'Value': {
+      case Value: {
         if (isValueKeyword(node)) {
           break
         }
@@ -428,7 +441,7 @@ export function analyze(css, options = {}) {
         } else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
           if (node.children && node.children.size > 1) {
             node.children.forEach(child => {
-              if (child.type !== 'Operator') {
+              if (child.type !== Operator) {
                 durations.push(stringifyNode(child), node.loc)
               }
             })
@@ -439,7 +452,7 @@ export function analyze(css, options = {}) {
         } else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
           if (node.children && node.children.size > 1) {
             node.children.forEach(child => {
-              if (child.type !== 'Operator') {
+              if (child.type !== Operator) {
                 timingFunctions.push(stringifyNode(child), node.loc)
               }
             })
@@ -463,7 +476,7 @@ export function analyze(css, options = {}) {
           let nodeName = valueNode.name
 
           switch (valueNode.type) {
-            case 'Hash': {
+            case Hash: {
               let hexLength = valueNode.value.length
               if (endsWith('\\9', valueNode.value)) {
                 hexLength = hexLength - 2
@@ -473,11 +486,12 @@ export function analyze(css, options = {}) {
 
               return this.skip
             }
-            case 'Identifier': {
+            case Identifier: {
               // Bail out if it can't be a color name
               // 20 === 'lightgoldenrodyellow'.length
               // 3 === 'red'.length
-              if (nodeName.length > 20 || nodeName.length < 3) {
+              let nodeLen = nodeName.length
+              if (nodeLen > 20 || nodeLen < 3) {
                 return this.skip
               }
 
@@ -503,7 +517,7 @@ export function analyze(css, options = {}) {
               }
               return this.skip
             }
-            case 'Function': {
+            case Func: {
               // Don't walk var() multiple times
               if (strEquals('var', nodeName)) {
                 return this.skip
@@ -526,7 +540,7 @@ export function analyze(css, options = {}) {
         })
         break
       }
-      case 'Declaration': {
+      case Declaration: {
         // Do not process Declarations in atRule preludes
         // because we will handle them manually
         if (this.atrulePrelude !== null) {
@@ -589,12 +603,14 @@ export function analyze(css, options = {}) {
   let specificitiesC = specificityC.aggregate()
   let totalUniqueSelectors = uniqueSelectors.size
   let assign = Object.assign
+  let cssLen = css.length
+  let fontFacesCount = fontfaces.length
 
   return {
     stylesheet: {
       sourceLinesOfCode: totalAtRules + totalSelectors + totalDeclarations + keyframeSelectors.size(),
       linesOfCode,
-      size: css.length,
+      size: cssLen,
       comments: {
         total: totalComments,
         size: commentsSize,
@@ -602,7 +618,7 @@ export function analyze(css, options = {}) {
       embeddedContent: assign(embeddedContent, {
         size: {
           total: embedSize,
-          ratio: ratio(embedSize, css.length),
+          ratio: ratio(embedSize, cssLen),
         },
         types: {
           total: embedTypes.total,
@@ -614,10 +630,10 @@ export function analyze(css, options = {}) {
     },
     atrules: {
       fontface: {
-        total: fontfaces.length,
-        totalUnique: fontfaces.length,
+        total: fontFacesCount,
+        totalUnique: fontFacesCount,
         unique: fontfaces,
-        uniquenessRatio: fontfaces.length === 0 ? 0 : 1
+        uniquenessRatio: fontFacesCount === 0 ? 0 : 1
       },
       import: imports.count(),
       media: assign(

@@ -1,4 +1,5 @@
 import { KeywordSet } from "../keyword-set.js"
+import { Identifier, Nr, Dimension, Operator } from '../css-tree-node-types.js'
 
 const SYSTEM_FONTS = new KeywordSet([
 	'caption',
@@ -26,13 +27,19 @@ const SIZE_KEYWORDS = new KeywordSet([
 
 const COMMA = 44 // ','.charCodeAt(0) === 44
 const SLASH = 47 // '/'.charCodeAt(0) === 47
-const TYPE_OPERATOR = 'Operator'
-const TYPE_IDENTIFIER = 'Identifier'
+
+/**
+ * @param {string} str
+ * @param {number} at
+ */
+function charCodeAt(str, at) {
+	return str.charCodeAt(at)
+}
 
 export function isSystemFont(node) {
 	let firstChild = node.children.first
 	if (firstChild === null) return false
-	return firstChild.type === TYPE_IDENTIFIER && SYSTEM_FONTS.has(firstChild.name)
+	return firstChild.type === Identifier && SYSTEM_FONTS.has(firstChild.name)
 }
 
 /**
@@ -40,7 +47,6 @@ export function isSystemFont(node) {
  * @param {*} stringifyNode
  */
 export function destructure(value, stringifyNode) {
-
 	let font_family = new Array(2)
 	let font_size
 	let line_height
@@ -49,8 +55,8 @@ export function destructure(value, stringifyNode) {
 		// any node that comes before the '/' is the font-size
 		if (
 			item.next &&
-			item.next.data.type === TYPE_OPERATOR &&
-			item.next.data.value.charCodeAt(0) === SLASH
+			item.next.data.type === Operator &&
+			charCodeAt(item.next.data.value, 0) === SLASH
 		) {
 			font_size = stringifyNode(node)
 			return
@@ -59,8 +65,8 @@ export function destructure(value, stringifyNode) {
 		// any node that comes after '/' is the line-height
 		if (
 			item.prev &&
-			item.prev.data.type === TYPE_OPERATOR &&
-			item.prev.data.value.charCodeAt(0) === SLASH
+			item.prev.data.type === Operator &&
+			charCodeAt(item.prev.data.value, 0) === SLASH
 		) {
 			line_height = stringifyNode(node)
 			return
@@ -69,8 +75,8 @@ export function destructure(value, stringifyNode) {
 		// any node that's followed by ',' is a font-family
 		if (
 			item.next &&
-			item.next.data.type === TYPE_OPERATOR &&
-			item.next.data.value.charCodeAt(0) === COMMA &&
+			item.next.data.type === Operator &&
+			charCodeAt(item.next.data.value, 0) === COMMA &&
 			!font_family[0]
 		) {
 			font_family[0] = node
@@ -84,9 +90,9 @@ export function destructure(value, stringifyNode) {
 
 		// If, after taking care of font-size and line-height, we still have a remaining dimension, it must be the oblique angle
 		if (
-			node.type === 'Dimension' &&
+			node.type === Dimension &&
 			item.prev &&
-			item.prev.data.type === TYPE_IDENTIFIER &&
+			item.prev.data.type === Identifier &&
 			item.prev.data.name === 'oblique'
 		) {
 			// put in the correct amount of whitespace between `oblique` and `<angle>`
@@ -98,7 +104,7 @@ export function destructure(value, stringifyNode) {
 
 		// any node that's a number and not previously caught by line-height or font-size is the font-weight
 		// (oblique <angle> will not be caught here, because that's a Dimension, not a Number)
-		if (node.type === 'Number') {
+		if (node.type === Nr) {
 			return
 		}
 
@@ -116,7 +122,7 @@ export function destructure(value, stringifyNode) {
 		}
 
 		// Any remaining identifiers can be font-size, font-style, font-stretch, font-variant or font-weight
-		if (node.type === TYPE_IDENTIFIER) {
+		if (node.type === Identifier) {
 			if (SIZE_KEYWORDS.has(node.name)) {
 				font_size = node.name
 				return
