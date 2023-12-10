@@ -16,6 +16,7 @@ const fixture = `
   [attr],
   [attr=value],
   :where(#id, .class),
+  :where(#a #b #c #d #e #f #g #h #i #j #k #l #m #n #o #p #q #r #s #t #u #v #w #x #y #z),
   main > :is(h1, h2),
   input[type=text]::-webkit-input-placeholder,
   ::-webkit-scrollbar,
@@ -36,6 +37,7 @@ Complexity('calculates complexity', () => {
     1,
     2,
     3,
+    52,
     5,
     5,
     2,
@@ -72,10 +74,11 @@ Complexity('calculates complexity uniqueness', () => {
     '3': 5,
     '4': 1,
     '5': 2,
+    '52': 1,
   }
 
-  assert.is(actual.totalUnique, 5)
-  assert.is(actual.uniquenessRatio, 5 / 15)
+  assert.is(actual.totalUnique, 6)
+  assert.is(actual.uniquenessRatio, 6 / 16)
   assert.equal(actual.unique, expected)
 })
 

@@ -76,7 +76,7 @@ export function isAccessibility(selector) {
 
 /**
  * Get the Complexity for the AST of a Selector Node
- * @param {import('css-tree').Selector} ast - AST Node for a Selector
+ * @param {import('css-tree').Selector} selector - AST Node for a Selector
  * @return {[number, boolean]} - The numeric complexity of the Selector and whether it's prefixed or not
  */
 export function getComplexity(selector) {
