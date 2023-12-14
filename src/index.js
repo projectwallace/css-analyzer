@@ -2,12 +2,12 @@ import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
 import { calculate } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
-import { getCombinators, getComplexity, isAccessibility } from './selectors/utils.js'
+import { getCombinators, getComplexity, isAccessibility, isPrefixed } from './selectors/utils.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
 import { destructure, isSystemFont } from './values/destructure-font-shorthand.js'
 import { isValueKeyword } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
-import { isAstVendorPrefixed } from './values/vendor-prefix.js'
+import { isValuePrefixed } from './values/vendor-prefix.js'
 import { ContextCollection } from './context-collection.js'
 import { Collection } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
@@ -15,7 +15,7 @@ import { strEquals, startsWith, endsWith } from './string-utils.js'
 import { hasVendorPrefix } from './vendor-prefix.js'
 import { isCustom, isHack, isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
-import { isIe9Hack } from './values/browserhacks.js'
+import { isIe9Hack, isBrowserhack } from './values/browserhacks.js'
 import {
   Atrule,
   Selector,
@@ -279,9 +279,9 @@ export function analyze(css, options = {}) {
           a11y.p(selector, node.loc)
         }
 
-        let [complexity, isPrefixed] = getComplexity(node)
+        let complexity = getComplexity(node)
 
-        if (isPrefixed) {
+        if (isPrefixed(node)) {
           prefixedSelectors.p(selector, node.loc)
         }
 
@@ -387,7 +387,7 @@ export function analyze(css, options = {}) {
         let declaration = this.declaration
         let { property, important } = declaration
 
-        if (isAstVendorPrefixed(node)) {
+        if (isValuePrefixed(node)) {
           vendorPrefixedValues.p(stringifyNode(node), node.loc)
         }
 
@@ -834,3 +834,28 @@ export function compareSpecificity(a, b) {
 
   return b[0] - a[0]
 }
+
+export {
+  getComplexity as selectorComplexity,
+  isPrefixed as isSelectorPrefixed,
+  isAccessibility as isAccessibilitySelector,
+} from './selectors/utils.js'
+
+export {
+  isSupportsBrowserhack,
+  isMediaBrowserhack
+} from './atrules/atrules.js'
+
+export {
+  isBrowserhack as isValueBrowserhack
+} from './values/browserhacks.js'
+
+export {
+  isHack as isPropertyHack,
+} from './properties/property-utils.js'
+
+export {
+  isValuePrefixed
+} from './values/vendor-prefix.js'
+
+export { hasVendorPrefix } from './vendor-prefix.js'

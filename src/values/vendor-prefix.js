@@ -4,7 +4,7 @@ import { Func, Identifier } from '../css-tree-node-types.js'
 /**
  * @param {import('css-tree').Value} node
  */
-export function isAstVendorPrefixed(node) {
+export function isValuePrefixed(node) {
   let children = node.children
 
   if (!children) {
@@ -26,7 +26,7 @@ export function isAstVendorPrefixed(node) {
         return true
       }
 
-      if (isAstVendorPrefixed(node)) {
+      if (isValuePrefixed(node)) {
         return true
       }
     }
