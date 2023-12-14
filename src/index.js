@@ -15,7 +15,7 @@ import { strEquals, startsWith, endsWith } from './string-utils.js'
 import { hasVendorPrefix } from './vendor-prefix.js'
 import { isCustom, isHack, isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
-import { isIe9Hack, isBrowserhack } from './values/browserhacks.js'
+import { isIe9Hack } from './values/browserhacks.js'
 import {
   Atrule,
   Selector,
