@@ -15,7 +15,6 @@ export function isIe9Hack(node) {
 	return false
 }
 
-
 /**
  * @param {import('css-tree').Value} node
  * @param {boolean|string} important  - // i.e. `property: value !ie`
