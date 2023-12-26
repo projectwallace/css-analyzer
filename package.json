@@ -27,6 +27,7 @@
   },
   "scripts": {
     "test": "uvu",
+    "lint": "oxlint",
     "build": "microbundle"
   },
   "keywords": [
@@ -52,6 +53,7 @@
   },
   "devDependencies": {
     "microbundle": "^0.15.1",
+    "oxlint": "^0.0.22",
     "uvu": "^0.5.6"
   },
   "mangle": {
