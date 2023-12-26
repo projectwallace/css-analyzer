@@ -101,7 +101,7 @@ export function getComplexity(selector) {
     }
 
     if (node.type === AttributeSelector) {
-      if (Boolean(node.value)) {
+      if (node.value) {
         complexity++
       }
       if (hasVendorPrefix(node.name.name)) {

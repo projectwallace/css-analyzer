@@ -214,7 +214,6 @@ Api('handles empty input gracefully', () => {
         "total": 0,
         "totalUnique": 0,
         "unique": {},
-        "total": 0,
         "uniquenessRatio": 0,
         "items": []
       },
