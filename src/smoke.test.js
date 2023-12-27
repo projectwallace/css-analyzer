@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'fs'
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
 import { analyze } from './index.js'
