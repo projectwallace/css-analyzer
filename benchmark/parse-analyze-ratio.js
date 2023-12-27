@@ -1,6 +1,6 @@
 import byteSize from './format-filesize.js'
 import { analyze as analyzeCss } from '../dist/analyzer.modern.js'
-import * as fs from 'fs'
+import * as fs from 'node:fs'
 const files = [
   ['bol-com-20190617', 'Bol.com'],
   ['bootstrap-5.0.0', 'Bootstrap 5.0.0'],
