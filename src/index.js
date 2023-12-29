@@ -192,7 +192,7 @@ export function analyze(css, options = {}) {
           break
         }
 
-        // All the AtRules in here MUST have a prelude, we we can count their names
+        // All the AtRules in here MUST have a prelude, so we can count their names
         if (node.prelude !== null) {
           let prelude = node.prelude
           let preludeStr = prelude && stringifyNode(node.prelude)
@@ -240,6 +240,11 @@ export function analyze(css, options = {}) {
           }
           if (atRuleName === 'property') {
             registeredProperties.p(preludeStr, loc)
+            break
+          }
+        } else {
+          if (atRuleName === 'layer') {
+            layers.p('<anonymous>', node.loc)
             break
           }
         }
