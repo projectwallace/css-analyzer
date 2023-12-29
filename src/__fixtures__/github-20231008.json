@@ -3,6 +3,7 @@
     "sourceLinesOfCode": 33278,
     "linesOfCode": 51852,
     "size": 1206900,
+    "complexity": 104774,
     "comments": {
       "total": 4,
       "size": 528
@@ -296,6 +297,16 @@
       "totalUnique": 0,
       "unique": {},
       "uniquenessRatio": 0
+    },
+    "total": 677,
+    "complexity": {
+      "min": 1,
+      "max": 2,
+      "mean": 1.0014771048744462,
+      "mode": 1,
+      "median": 1,
+      "range": 1,
+      "sum": 678
     }
   },
   "rules": {
@@ -92207,6 +92218,15 @@
         "total": 0,
         "ratio": 0
       }
+    },
+    "complexity": {
+      "min": 1,
+      "max": 1,
+      "mean": 1,
+      "mode": 1,
+      "median": 1,
+      "range": 0,
+      "sum": 21677
     }
   },
   "properties": {
@@ -102091,6 +102111,15 @@
           "uniquenessRatio": 1
         }
       }
+    },
+    "complexity": {
+      "min": 1,
+      "max": 2,
+      "mean": 1.00175118014314,
+      "mode": 1,
+      "median": 1,
+      "range": 1,
+      "sum": 26314
     }
   }
 }

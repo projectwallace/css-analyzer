@@ -4,6 +4,66 @@ import { analyze } from '../index.js'
 
 const AtRules = suite('at-rules')
 
+AtRules('counts total atrules', () => {
+  let css = `
+    @import url(test.css);
+
+    @layer a, b, c;
+
+    @media all {
+      a {}
+    }
+
+    @supports (display: grid) {
+      a {}
+    }
+  `
+  let actual = analyze(css).atrules.total
+  assert.is(actual, 4)
+})
+
+AtRules('calculates complexity', () => {
+  let css = `
+    /* 1 */
+    @import url(test.css);
+
+    /* 1 */
+    @layer a, b, c;
+    /* 2 */
+    @layer {}
+
+    /* 1 */
+    @supports (display: grid) {}
+    /* 2 */
+    @supports (-webkit-appearance: none) {}
+
+    /* 1 */
+    @media all {}
+    /* 2 */
+    @media (min-resolution: .001dpcm) {}
+
+    /* 1 */
+    @font-face {
+      font-family: Arial;
+    }
+
+    /* 1 */
+    @keyframes one {}
+    /* 2 */
+    @-webkit-keyframes one {}
+  `
+  let actual = analyze(css).atrules.complexity
+  assert.equal(actual, {
+    min: 1,
+    max: 2,
+    mean: 14 / 10,
+    mode: 1,
+    median: 1,
+    range: 1,
+    sum: 14,
+  })
+})
+
 AtRules('finds @layer', () => {
   // Fixture is pretty much a straight copy from all code examples from
   // https://css-tricks.com/css-cascade-layers/

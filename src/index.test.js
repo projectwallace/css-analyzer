@@ -1,5 +1,5 @@
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import { suite } from "uvu"
+import * as assert from "uvu/assert"
 import {
   analyze,
   compareSpecificity,
@@ -12,7 +12,7 @@ import {
   isPropertyHack,
   isValuePrefixed,
   hasVendorPrefix,
-} from "./index.js";
+} from "./index.js"
 
 const Api = suite("Public API")
 
@@ -67,7 +67,7 @@ Api("does not break on CSS Syntax Errors", () => {
 
 Api("handles empty input gracefully", () => {
   const actual = analyze("")
-  delete actual.__meta__;
+  delete actual.__meta__
   const expected = {
     stylesheet: {
       sourceLinesOfCode: 0,
@@ -93,6 +93,7 @@ Api("handles empty input gracefully", () => {
           unique: {},
         },
       },
+      complexity: 0,
     },
     atrules: {
       fontface: {
@@ -168,6 +169,16 @@ Api("handles empty input gracefully", () => {
         unique: {},
         uniquenessRatio: 0,
       },
+      total: 0,
+      complexity: {
+        min: 0,
+        max: 0,
+        mean: 0,
+        mode: 0,
+        median: 0,
+        range: 0,
+        sum: 0,
+      }
     },
     rules: {
       total: 0,
@@ -218,85 +229,69 @@ Api("handles empty input gracefully", () => {
         uniquenessRatio: 0,
       },
     },
-    "selectors": {
-      "total": 0,
-      "totalUnique": 0,
-      "uniquenessRatio": 0,
-      "specificity": {
-        "min": [0, 0, 0],
-        "max": [0, 0, 0],
-        "sum": [
-          0,
-          0,
-          0,
-        ],
-        "mean": [
-          0,
-          0,
-          0,
-        ],
-        "mode": [
-          0,
-          0,
-          0,
-        ],
-        "median": [
-          0,
-          0,
-          0,
-        ],
-        "items": [],
-        "unique": {},
-        "total": 0,
-        "totalUnique": 0,
-        "uniquenessRatio": 0,
+    selectors: {
+      total: 0,
+      totalUnique: 0,
+      uniquenessRatio: 0,
+      specificity: {
+        min: [0, 0, 0],
+        max: [0, 0, 0],
+        sum: [0, 0, 0],
+        mean: [0, 0, 0],
+        mode: [0, 0, 0],
+        median: [0, 0, 0],
+        items: [],
+        unique: {},
+        total: 0,
+        totalUnique: 0,
+        uniquenessRatio: 0,
       },
-      "complexity": {
-        "min": 0,
-        "max": 0,
-        "mean": 0,
-        "mode": 0,
-        "median": 0,
-        "range": 0,
-        "sum": 0,
-        "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0,
-        "items": []
+      complexity: {
+        min: 0,
+        max: 0,
+        mean: 0,
+        mode: 0,
+        median: 0,
+        range: 0,
+        sum: 0,
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
+        items: [],
       },
-      "id": {
-        "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0,
-        "ratio": 0
+      id: {
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
+        ratio: 0,
       },
-      "accessibility": {
-        "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0,
-        "ratio": 0
+      accessibility: {
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
+        ratio: 0,
       },
-      "keyframes": {
-        "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0
+      keyframes: {
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
       },
-      "prefixed": {
-        "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0,
-        "ratio": 0
+      prefixed: {
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
+        ratio: 0,
       },
-      "combinators": {
-        "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0,
+      combinators: {
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
       },
     },
     declarations: {
@@ -315,6 +310,15 @@ Api("handles empty input gracefully", () => {
           ratio: 0,
         },
       },
+      complexity: {
+        min: 0,
+        max: 0,
+        mean: 0,
+        mode: 0,
+        median: 0,
+        range: 0,
+        sum: 0,
+      }
     },
     properties: {
       total: 0,
@@ -448,8 +452,17 @@ Api("handles empty input gracefully", () => {
         uniquenessRatio: 0,
         itemsPerContext: {},
       },
+      complexity: {
+        min: 0,
+        max: 0,
+        mean: 0,
+        mode: 0,
+        median: 0,
+        range: 0,
+        sum: 0,
+      }
     },
-  };
+  }
 
   assert.equal(actual, expected)
 })
@@ -460,7 +473,7 @@ Api("has metadata", () => {
       (_) => `
     html {
       font: 1em/1 sans-serif;
-      color: rgb(0 0 0 / 0.5)
+      color: rgb(0 0 0 / 0.5);
     }
 
     @media screen {
@@ -476,7 +489,7 @@ Api("has metadata", () => {
     .join("")
 
   const result = analyze(fixture)
-  const actual = result.__meta__;
+  const actual = result.__meta__
 
   assert.type(actual.parseTime, "number")
   assert.ok(
