@@ -47,7 +47,7 @@ export function isSystemFont(node) {
  * @param {*} stringifyNode
  */
 export function destructure(value, stringifyNode) {
-	let font_family = new Array(2)
+	let font_family = Array.from({ length: 2 })
 	let font_size
 	let line_height
 
@@ -81,7 +81,7 @@ export function destructure(value, stringifyNode) {
 		) {
 			font_family[0] = node
 
-			if (!font_size && item.prev != null) {
+			if (!font_size && item.prev !== null) {
 				font_size = stringifyNode(item.prev.data)
 			}
 

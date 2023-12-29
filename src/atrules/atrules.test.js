@@ -35,6 +35,9 @@ AtRules('finds @layer', () => {
       @layer sub-layer-1 { a { color: yellow; } }
       @layer sub-layer-2 { a { color: green; } }
       /* un-nested */ a { color: blue; }
+      @layer {
+        anonymous {}
+      }
     }
     /* un-layered */ a { color: indigo; }
 
@@ -81,8 +84,8 @@ AtRules('finds @layer', () => {
   `
   const actual = analyze(fixture).atrules.layer
   const expected = {
-    total: 46,
-    totalUnique: 25,
+    total: 48,
+    totalUnique: 26,
     unique: {
       "defaults": 5,
       "layer-1": 1,
@@ -109,8 +112,9 @@ AtRules('finds @layer', () => {
       "layouts": 1,
       "structures": 1,
       "overrides": 1,
+      "<anonymous>": 2,
     },
-    uniquenessRatio: 25 / 46
+    uniquenessRatio: 26 / 48
   }
 
   assert.equal(actual, expected)
