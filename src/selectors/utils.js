@@ -75,13 +75,41 @@ export function isAccessibility(selector) {
 }
 
 /**
+ * @param {import('css-tree').Selector} selector
+ * @returns {boolean} Whether the selector contains a vendor prefix
+ */
+export function isPrefixed(selector) {
+  let isPrefixed = false
+
+  walk(selector, function (node) {
+    if (node.type === IdSelector
+      || node.type === ClassSelector
+      || node.type === PseudoElementSelector
+      || node.type === TypeSelector
+      || node.type === PseudoClassSelector
+    ) {
+      if (hasVendorPrefix(node.name)) {
+        isPrefixed = true
+        return this.break
+      }
+    } else if (node.type === AttributeSelector) {
+      if (hasVendorPrefix(node.name.name)) {
+        isPrefixed = true
+        return this.break
+      }
+    }
+  })
+
+  return isPrefixed;
+}
+
+/**
  * Get the Complexity for the AST of a Selector Node
  * @param {import('css-tree').Selector} selector - AST Node for a Selector
  * @return {[number, boolean]} - The numeric complexity of the Selector and whether it's prefixed or not
  */
 export function getComplexity(selector) {
   let complexity = 0
-  let isPrefixed = false
 
   walk(selector, function (node) {
     if (node.type === Selector || node.type === Nth) return
@@ -95,7 +123,6 @@ export function getComplexity(selector) {
       || node.type === PseudoClassSelector
     ) {
       if (hasVendorPrefix(node.name)) {
-        isPrefixed = true
         complexity++
       }
     }
@@ -105,7 +132,6 @@ export function getComplexity(selector) {
         complexity++
       }
       if (hasVendorPrefix(node.name.name)) {
-        isPrefixed = true
         complexity++
       }
       return this.skip
@@ -118,16 +144,15 @@ export function getComplexity(selector) {
         // Bail out for empty/non-existent :nth-child() params
         if (list.length === 0) return
 
-        list.forEach(([c, p]) => {
+        list.forEach((c) => {
           complexity += c
-          if (p === true) isPrefixed = true
         })
         return this.skip
       }
     }
   })
 
-  return [complexity, isPrefixed]
+  return complexity
 }
 
 /**
