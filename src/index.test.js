@@ -14,59 +14,59 @@ import {
   hasVendorPrefix,
 } from "./index.js";
 
-const Api = suite("Public API")
+const Api = suite("Public API");
 
 Api("exposes the 'analyze' method", () => {
-  assert.is(typeof analyze, "function")
-})
+  assert.is(typeof analyze, "function");
+});
 
 Api('exposes the "compareSpecificity" method', () => {
-  assert.is(typeof compareSpecificity, "function")
-})
+  assert.is(typeof compareSpecificity, "function");
+});
 
 Api('exposes the "selectorComplexity" method', () => {
-  assert.is(typeof selectorComplexity, "function")
-})
+  assert.is(typeof selectorComplexity, "function");
+});
 
 Api('exposes the "isSelectorPrefixed" method', () => {
-  assert.is(typeof isSelectorPrefixed, "function")
-})
+  assert.is(typeof isSelectorPrefixed, "function");
+});
 
 Api('exposes the "isAccessibilitySelector" method', () => {
-  assert.is(typeof isAccessibilitySelector, "function")
-})
+  assert.is(typeof isAccessibilitySelector, "function");
+});
 
 Api('exposes the "isMediaBrowserhack" method', () => {
-  assert.is(typeof isMediaBrowserhack, "function")
-})
+  assert.is(typeof isMediaBrowserhack, "function");
+});
 
 Api('exposes the "isSupportsBrowserhack" method', () => {
-  assert.is(typeof isSupportsBrowserhack, "function")
-})
+  assert.is(typeof isSupportsBrowserhack, "function");
+});
 
 Api('exposes the "isValueBrowserhack" method', () => {
-  assert.is(typeof isValueBrowserhack, "function")
-})
+  assert.is(typeof isValueBrowserhack, "function");
+});
 
 Api('exposes the "isPropertyHack" method', () => {
-  assert.is(typeof isPropertyHack, "function")
-})
+  assert.is(typeof isPropertyHack, "function");
+});
 
 Api('exposes the "isValuePrefixed" method', () => {
-  assert.is(typeof isValuePrefixed, "function")
-})
+  assert.is(typeof isValuePrefixed, "function");
+});
 
 Api('exposes the "hasVendorPrefix" method', () => {
-  assert.is(typeof hasVendorPrefix, "function")
-})
+  assert.is(typeof hasVendorPrefix, "function");
+});
 
 Api("does not break on CSS Syntax Errors", () => {
-  assert.not.throws(() => analyze("test, {}"))
-  assert.not.throws(() => analyze("test { color red }"))
-})
+  assert.not.throws(() => analyze("test, {}"));
+  assert.not.throws(() => analyze("test { color red }"));
+});
 
 Api("handles empty input gracefully", () => {
-  const actual = analyze("")
+  const actual = analyze("");
   delete actual.__meta__;
   const expected = {
     stylesheet: {
@@ -93,6 +93,7 @@ Api("handles empty input gracefully", () => {
           unique: {},
         },
       },
+      complexity: 0,
     },
     atrules: {
       fontface: {
@@ -168,6 +169,16 @@ Api("handles empty input gracefully", () => {
         unique: {},
         uniquenessRatio: 0,
       },
+      total: 0,
+      complexity: {
+        min: 0,
+        max: 0,
+        mean: 0,
+        mode: 0,
+        median: 0,
+        range: 0,
+        sum: 0,
+      }
     },
     rules: {
       total: 0,
@@ -218,85 +229,69 @@ Api("handles empty input gracefully", () => {
         uniquenessRatio: 0,
       },
     },
-    "selectors": {
-      "total": 0,
-      "totalUnique": 0,
-      "uniquenessRatio": 0,
-      "specificity": {
-        "min": [0, 0, 0],
-        "max": [0, 0, 0],
-        "sum": [
-          0,
-          0,
-          0,
-        ],
-        "mean": [
-          0,
-          0,
-          0,
-        ],
-        "mode": [
-          0,
-          0,
-          0,
-        ],
-        "median": [
-          0,
-          0,
-          0,
-        ],
-        "items": [],
-        "unique": {},
-        "total": 0,
-        "totalUnique": 0,
-        "uniquenessRatio": 0,
+    selectors: {
+      total: 0,
+      totalUnique: 0,
+      uniquenessRatio: 0,
+      specificity: {
+        min: [0, 0, 0],
+        max: [0, 0, 0],
+        sum: [0, 0, 0],
+        mean: [0, 0, 0],
+        mode: [0, 0, 0],
+        median: [0, 0, 0],
+        items: [],
+        unique: {},
+        total: 0,
+        totalUnique: 0,
+        uniquenessRatio: 0,
       },
-      "complexity": {
-        "min": 0,
-        "max": 0,
-        "mean": 0,
-        "mode": 0,
-        "median": 0,
-        "range": 0,
-        "sum": 0,
-        "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0,
-        "items": []
+      complexity: {
+        min: 0,
+        max: 0,
+        mean: 0,
+        mode: 0,
+        median: 0,
+        range: 0,
+        sum: 0,
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
+        items: [],
       },
-      "id": {
-        "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0,
-        "ratio": 0
+      id: {
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
+        ratio: 0,
       },
-      "accessibility": {
-        "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0,
-        "ratio": 0
+      accessibility: {
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
+        ratio: 0,
       },
-      "keyframes": {
-        "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0
+      keyframes: {
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
       },
-      "prefixed": {
-        "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0,
-        "ratio": 0
+      prefixed: {
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
+        ratio: 0,
       },
-      "combinators": {
-        "total": 0,
-        "totalUnique": 0,
-        "unique": {},
-        "uniquenessRatio": 0,
+      combinators: {
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
       },
     },
     declarations: {
@@ -315,6 +310,15 @@ Api("handles empty input gracefully", () => {
           ratio: 0,
         },
       },
+      complexity: {
+        min: 0,
+        max: 0,
+        mean: 0,
+        mode: 0,
+        median: 0,
+        range: 0,
+        sum: 0,
+      }
     },
     properties: {
       total: 0,
@@ -448,11 +452,20 @@ Api("handles empty input gracefully", () => {
         uniquenessRatio: 0,
         itemsPerContext: {},
       },
+      complexity: {
+        min: 0,
+        max: 0,
+        mean: 0,
+        mode: 0,
+        median: 0,
+        range: 0,
+        sum: 0,
+      }
     },
   };
 
-  assert.equal(actual, expected)
-})
+  assert.equal(actual, expected);
+});
 
 Api("has metadata", () => {
   const fixture = Array.from({ length: 100 })
@@ -473,28 +486,28 @@ Api("has metadata", () => {
     }
   `
     )
-    .join("")
+    .join("");
 
-  const result = analyze(fixture)
+  const result = analyze(fixture);
   const actual = result.__meta__;
 
-  assert.type(actual.parseTime, "number")
+  assert.type(actual.parseTime, "number");
   assert.ok(
     actual.parseTime > 0,
     `expected parseTime to be bigger than 0, got ${actual.parseTime}`
-  )
+  );
 
-  assert.type(actual.analyzeTime, "number")
+  assert.type(actual.analyzeTime, "number");
   assert.ok(
     actual.analyzeTime > 0,
     `expected analyzeTime to be bigger than 0, got ${actual.parseTime}`
-  )
+  );
 
-  assert.type(actual.total, "number")
+  assert.type(actual.total, "number");
   assert.ok(
     actual.total > 0,
     `expected total time to be bigger than 0, got ${actual.parseTime}`
-  )
-})
+  );
+});
 
-Api.run()
+Api.run();

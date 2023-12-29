@@ -98,6 +98,7 @@ export function analyze(css, options = {}) {
 
   // Atrules
   let totalAtRules = 0
+  let atRuleComplexities = new AggregateCollection()
   /** @type {Record<string: string>}[]} */
   let fontfaces = []
   let fontfaces_with_loc = new Collection(useLocations)
@@ -146,6 +147,7 @@ export function analyze(css, options = {}) {
   // Declarations
   let uniqueDeclarations = new Set()
   let totalDeclarations = 0
+  let declarationComplexities = new AggregateCollection()
   let importantDeclarations = 0
   let importantsInKeyframes = 0
   let importantCustomProperties = new Collection(useLocations)
@@ -158,6 +160,7 @@ export function analyze(css, options = {}) {
   let propertyComplexities = new AggregateCollection()
 
   // Values
+  let valueComplexities = new AggregateCollection()
   let vendorPrefixedValues = new Collection(useLocations)
   let valueBrowserhacks = new Collection(useLocations)
   let zindex = new Collection(useLocations)
@@ -177,6 +180,8 @@ export function analyze(css, options = {}) {
     switch (node.type) {
       case Atrule: {
         totalAtRules++
+        let complexity = 1
+
         let atRuleName = node.name
 
         if (atRuleName === 'font-face') {
@@ -190,10 +195,13 @@ export function analyze(css, options = {}) {
             // Ignore 'Raw' nodes in case of CSS syntax errors
             if (descriptor.type === Declaration) {
               descriptors[descriptor.property] = stringifyNode(descriptor.value)
+              // 1 for property, 1 for value
+              complexity += 2
             }
           })
 
           fontfaces.push(descriptors)
+          atRuleComplexities.push(complexity)
           break
         }
 
@@ -207,52 +215,47 @@ export function analyze(css, options = {}) {
             medias.p(preludeStr, loc)
             if (isMediaBrowserhack(prelude)) {
               mediaBrowserhacks.p(preludeStr, loc)
+              complexity++
             }
-            break
-          }
-          if (atRuleName === 'supports') {
+          } else if (atRuleName === 'supports') {
             supports.p(preludeStr, loc)
+            // TODO: analyze vendor prefixes in @supports
+            // TODO: analyze complexity of @supports 'declaration'
             if (isSupportsBrowserhack(prelude)) {
               supportsBrowserhacks.p(preludeStr, loc)
+              complexity++
             }
-            break
-          }
-          if (endsWith('keyframes', atRuleName)) {
+          } else if (endsWith('keyframes', atRuleName)) {
             let name = '@' + atRuleName + ' ' + preludeStr
             if (hasVendorPrefix(atRuleName)) {
               prefixedKeyframes.p(name, loc)
+              complexity++
             }
             keyframes.p(name, loc)
-            break
-          }
-          if (atRuleName === 'import') {
+          } else if (atRuleName === 'import') {
             imports.p(preludeStr, loc)
-            break
-          }
-          if (atRuleName === 'charset') {
+            // TODO: analyze complexity of media queries, layers and supports in @import
+            // see https://github.com/projectwallace/css-analyzer/issues/326
+          } else if (atRuleName === 'charset') {
             charsets.p(preludeStr, loc)
-            break
-          }
-          if (atRuleName === 'container') {
+          } else if (atRuleName === 'container') {
             containers.p(preludeStr, loc)
-            break
-          }
-          if (atRuleName === 'layer') {
+            // TODO: calculate complexity of container 'declaration'
+          } else if (atRuleName === 'layer') {
             preludeStr
               .split(',')
               .forEach(name => layers.p(name.trim(), loc))
-            break
-          }
-          if (atRuleName === 'property') {
+          } else if (atRuleName === 'property') {
             registeredProperties.p(preludeStr, loc)
-            break
+            // TODO: add complexity for descriptors
           }
         } else {
           if (atRuleName === 'layer') {
             layers.p('<anonymous>', node.loc)
-            break
+            complexity++
           }
         }
+        atRuleComplexities.push(complexity)
         break
       }
       case Rule: {
@@ -391,28 +394,36 @@ export function analyze(css, options = {}) {
       }
       case Value: {
         if (isValueKeyword(node)) {
+          valueComplexities.push(1)
           break
         }
 
         let declaration = this.declaration
         let { property, important } = declaration
+        let complexity = 1
 
         if (isValuePrefixed(node)) {
           vendorPrefixedValues.p(stringifyNode(node), node.loc)
+          complexity++
         }
 
         // i.e. `property: value !ie`
         if (typeof important === 'string') {
           valueBrowserhacks.p(stringifyNodePlain(node) + '!' + important, node.loc)
+          complexity++
         }
 
         // i.e. `property: value\9`
         if (isIe9Hack(node)) {
           valueBrowserhacks.p(stringifyNode(node), node.loc)
+          complexity++
         }
 
         let children = node.children
         let loc = node.loc
+
+        // TODO: should shorthands be counted towards complexity?
+        valueComplexities.push(complexity)
 
         // Process properties first that don't have colors,
         // so we can avoid further walking them;
@@ -566,16 +577,21 @@ export function analyze(css, options = {}) {
         }
 
         totalDeclarations++
+        let complexity = 1
 
         uniqueDeclarations.add(stringifyNode(node))
 
         if (node.important === true) {
           importantDeclarations++
+          complexity++
 
           if (this.atrule && endsWith('keyframes', this.atrule.name)) {
             importantsInKeyframes++
+            complexity++
           }
         }
+
+        declarationComplexities.push(complexity)
 
         let { property, loc: { start } } = node
         let propertyLoc = {
@@ -599,13 +615,15 @@ export function analyze(css, options = {}) {
           propertyComplexities.push(2)
         } else if (isCustom(property)) {
           customProperties.p(property, propertyLoc)
-          propertyComplexities.push(2)
+          propertyComplexities.push(node.important ? 3 : 2)
+
           if (node.important === true) {
             importantCustomProperties.p(property, propertyLoc)
           }
         } else {
           propertyComplexities.push(1)
         }
+
         break
       }
     }
@@ -623,12 +641,18 @@ export function analyze(css, options = {}) {
   let assign = Object.assign
   let cssLen = css.length
   let fontFacesCount = fontfaces.length
+  let atRuleComplexity = atRuleComplexities.aggregate()
+  let selectorComplexity = selectorComplexities.aggregate()
+  let declarationComplexity = declarationComplexities.aggregate()
+  let propertyComplexity = propertyComplexities.aggregate()
+  let valueComplexity = valueComplexities.aggregate()
 
   return {
     stylesheet: {
       sourceLinesOfCode: totalAtRules + totalSelectors + totalDeclarations + keyframeSelectors.size(),
       linesOfCode,
       size: cssLen,
+      complexity: atRuleComplexity.sum + selectorComplexity.sum + declarationComplexity.sum + propertyComplexity.sum + valueComplexity.sum,
       comments: {
         total: totalComments,
         size: commentsSize,
@@ -679,6 +703,8 @@ export function analyze(css, options = {}) {
       container: containers.c(),
       layer: layers.c(),
       property: registeredProperties.c(),
+      total: totalAtRules,
+      complexity: atRuleComplexity
     },
     rules: {
       total: totalRules,
@@ -731,7 +757,7 @@ export function analyze(css, options = {}) {
         uniqueSpecificities.c(),
       ),
       complexity: assign(
-        selectorComplexities.aggregate(),
+        selectorComplexity,
         uniqueSelectorComplexities.c(),
         {
           items: selectorComplexities.toArray(),
@@ -771,6 +797,7 @@ export function analyze(css, options = {}) {
           ratio: ratio(importantsInKeyframes, importantDeclarations),
         },
       },
+      complexity: declarationComplexity,
     },
     properties: assign(
       properties.c(),
@@ -797,7 +824,7 @@ export function analyze(css, options = {}) {
           propertyHacks.c(), {
           ratio: ratio(propertyHacks.size(), properties.size()),
         }),
-        complexity: propertyComplexities.aggregate(),
+        complexity: propertyComplexity,
       }),
     values: {
       colors: assign(
@@ -820,6 +847,7 @@ export function analyze(css, options = {}) {
       prefixes: vendorPrefixedValues.c(),
       browserhacks: valueBrowserhacks.c(),
       units: units.count(),
+      complexity: valueComplexity,
     },
     __meta__: {
       parseTime: startAnalysis - startParse,

@@ -121,4 +121,30 @@ Declarations('should calculate !importants within @keyframes', () => {
   })
 })
 
+Declarations('should count complexity', () => {
+  const css = `
+    a {
+      color: green;
+      color: green !important;
+    }
+
+    @keyframes test {
+      from {
+        opacity: 1 !important;
+      }
+    }
+  `
+  const actual = analyze(css).declarations.complexity
+  const expected = {
+    min: 1,
+    max: 3,
+    mean: 2,
+    mode: 2,
+    median: 2,
+    range: 2,
+    sum: 6,
+  }
+  assert.equal(actual, expected)
+})
+
 Declarations.run()
