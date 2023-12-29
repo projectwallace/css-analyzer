@@ -116,9 +116,7 @@ export function getComplexity(selector) {
 
     complexity++
 
-    if (node.type === IdSelector
-      || node.type === ClassSelector
-      || node.type === PseudoElementSelector
+    if (node.type === PseudoElementSelector
       || node.type === TypeSelector
       || node.type === PseudoClassSelector
     ) {
