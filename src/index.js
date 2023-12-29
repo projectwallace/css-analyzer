@@ -100,6 +100,7 @@ export function analyze(css, options = {}) {
   let totalAtRules = 0
   /** @type {Record<string: string>}[]} */
   let fontfaces = []
+  let fontfaces_with_loc = new Collection(useLocations)
   let layers = new Collection(useLocations)
   let imports = new Collection(useLocations)
   let medias = new Collection(useLocations)
@@ -180,6 +181,10 @@ export function analyze(css, options = {}) {
 
         if (atRuleName === 'font-face') {
           let descriptors = {}
+
+          if (useLocations) {
+            fontfaces_with_loc.p(node.loc.start.offset, node.loc)
+          }
 
           node.block.children.forEach(descriptor => {
             // Ignore 'Raw' nodes in case of CSS syntax errors
@@ -642,12 +647,14 @@ export function analyze(css, options = {}) {
       }),
     },
     atrules: {
-      fontface: {
+      fontface: assign({
         total: fontFacesCount,
         totalUnique: fontFacesCount,
         unique: fontfaces,
-        uniquenessRatio: fontFacesCount === 0 ? 0 : 1
-      },
+        uniquenessRatio: fontFacesCount === 0 ? 0 : 1,
+      }, useLocations ? {
+        __unstable_uniqueWithLocations: fontfaces_with_loc.c(),
+      } : {}),
       import: imports.c(),
       media: assign(
         medias.c(),
