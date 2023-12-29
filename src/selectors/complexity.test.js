@@ -49,16 +49,20 @@ Complexity('calculates complexity', () => {
 
 Complexity('calculates complexity with vendor prefixes', () => {
   const actual = analyze(`
-  no-prefix,
-  fake-webkit,
   input[type=text]::-webkit-input-placeholder,
   ::-webkit-scrollbar,
   .site-header .main-nav:hover>ul>li:nth-child(1) svg,
   :-moz-any(header, footer) {}
+
+  /* not vendor prefixed */
+  no-prefix,
+  fake-webkit,
+  .-mt-px,
+  .-space-x-1 {}
   `).selectors.complexity
 
   assert.equal(actual.unique, {
-    '1': 2,
+    '1': 4,
     '5': 1,
     '2': 1,
     '12': 1,
