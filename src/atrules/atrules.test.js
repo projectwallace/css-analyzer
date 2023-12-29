@@ -42,7 +42,7 @@ AtRules('calculates complexity', () => {
     /* 2 */
     @media (min-resolution: .001dpcm) {}
 
-    /* 3 */
+    /* 1 */
     @font-face {
       font-family: Arial;
     }
@@ -55,12 +55,12 @@ AtRules('calculates complexity', () => {
   let actual = analyze(css).atrules.complexity
   assert.equal(actual, {
     min: 1,
-    max: 3,
-    mean: 16 / 10,
+    max: 2,
+    mean: 14 / 10,
     mode: 1,
-    median: 1.5,
-    range: 2,
-    sum: 16,
+    median: 1,
+    range: 1,
+    sum: 14,
   })
 })
 

@@ -180,7 +180,6 @@ export function analyze(css, options = {}) {
     switch (node.type) {
       case Atrule: {
         totalAtRules++
-        let complexity = 1
 
         let atRuleName = node.name
 
@@ -195,15 +194,15 @@ export function analyze(css, options = {}) {
             // Ignore 'Raw' nodes in case of CSS syntax errors
             if (descriptor.type === Declaration) {
               descriptors[descriptor.property] = stringifyNode(descriptor.value)
-              // 1 for property, 1 for value
-              complexity += 2
             }
           })
 
           fontfaces.push(descriptors)
-          atRuleComplexities.push(complexity)
+          atRuleComplexities.push(1)
           break
         }
+
+        let complexity = 1
 
         // All the AtRules in here MUST have a prelude, so we can count their names
         if (node.prelude !== null) {

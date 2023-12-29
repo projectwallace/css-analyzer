@@ -3,7 +3,7 @@
     "sourceLinesOfCode": 29224,
     "linesOfCode": 45124,
     "size": 846671,
-    "complexity": 97789,
+    "complexity": 97705,
     "comments": {
       "total": 4,
       "size": 1678
@@ -274,12 +274,12 @@
     "total": 931,
     "complexity": {
       "min": 1,
-      "max": 13,
-      "mean": 1.1041890440386681,
+      "max": 2,
+      "mean": 1.0139634801288937,
       "mode": 1,
       "median": 1,
-      "range": 12,
-      "sum": 1028
+      "range": 1,
+      "sum": 944
     }
   },
   "rules": {
