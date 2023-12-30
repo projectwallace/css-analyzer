@@ -77,7 +77,7 @@ export function analyze(css, options = {}) {
   let embedSize = 0
   let embedTypes = {
     total: 0,
-    /** @type {Map<string, {size: number, count: number}>} */
+    /** @type {Map<string, { size: number, count: number } & ({ __unstable__uniqueWithLocations?: undefined } | ({ offset: number, line: number, column: number, length: number }[])) }>} */
     unique: new Map()
   }
 
@@ -375,9 +375,13 @@ export function analyze(css, options = {}) {
           embedSize += size
 
           let loc = {
+            /** @type {number} */
             line: node.loc.start.line,
+            /** @type {number} */
             column: node.loc.start.column,
+            /** @type {number} */
             offset: node.loc.start.offset,
+            /** @type {number} */
             length: node.loc.end.offset - node.loc.start.offset,
           }
 
@@ -390,14 +394,14 @@ export function analyze(css, options = {}) {
               item.__unstable__uniqueWithLocations.push(loc)
             }
           } else {
-            let new_item = {
+            let item = {
               count: 1,
               size
             }
             if (useLocations) {
-              new_item.__unstable__uniqueWithLocations = [loc]
+              item.__unstable__uniqueWithLocations = [loc]
             }
-            embedTypes.unique.set(type, new_item)
+            embedTypes.unique.set(type, item)
           }
 
           // @deprecated
