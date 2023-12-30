@@ -3,8 +3,6 @@ import { startsWith, strEquals } from '../string-utils.js'
 import { hasVendorPrefix } from '../vendor-prefix.js'
 import {
   PseudoClassSelector,
-  IdSelector,
-  ClassSelector,
   PseudoElementSelector,
   TypeSelector,
   Combinator,
@@ -82,9 +80,7 @@ export function isPrefixed(selector) {
   let isPrefixed = false
 
   walk(selector, function (node) {
-    if (node.type === IdSelector
-      || node.type === ClassSelector
-      || node.type === PseudoElementSelector
+    if (node.type === PseudoElementSelector
       || node.type === TypeSelector
       || node.type === PseudoClassSelector
     ) {
