@@ -87449,8 +87449,8 @@
       "uniquenessRatio": 0.09259259259259259
     },
     "prefixed": {
-      "total": 30,
-      "totalUnique": 29,
+      "total": 29,
+      "totalUnique": 28,
       "unique": {
         "button::-moz-focus-inner": 2,
         "input::-moz-focus-inner": 1,
@@ -87479,11 +87479,10 @@
         "::-webkit-search-decoration": 1,
         "::-webkit-file-upload-button": 1,
         "input::-moz-placeholder": 1,
-        "textarea::-moz-placeholder": 1,
-        ".-tw-bottom-\\[35px\\]": 1
+        "textarea::-moz-placeholder": 1
       },
-      "uniquenessRatio": 0.9666666666666667,
-      "ratio": 0.0028161081385525205
+      "uniquenessRatio": 0.9655172413793104,
+      "ratio": 0.0027222378672674364
     },
     "combinators": {
       "total": 12605,

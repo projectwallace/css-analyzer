@@ -58,11 +58,13 @@ Complexity('calculates complexity with vendor prefixes', () => {
   no-prefix,
   fake-webkit,
   .-mt-px,
-  .-space-x-1 {}
+  .-space-x-1,
+  .-pd-translate-y-2,
+  .-pd-translate-x-full {}
   `).selectors.complexity
 
   assert.equal(actual.unique, {
-    '1': 4,
+    '1': 6,
     '5': 1,
     '2': 1,
     '12': 1,
