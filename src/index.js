@@ -374,16 +374,30 @@ export function analyze(css, options = {}) {
           embedTypes.total++
           embedSize += size
 
+          let loc = {
+            line: node.loc.start.line,
+            column: node.loc.start.column,
+            offset: node.loc.start.offset,
+            length: node.loc.end.offset - node.loc.start.offset,
+          }
+
           if (embedTypes.unique.has(type)) {
             let item = embedTypes.unique.get(type)
             item.count++
             item.size += size
             embedTypes.unique.set(type, item)
+            if (useLocations) {
+              item.__unstable__uniqueWithLocations.push(loc)
+            }
           } else {
-            embedTypes.unique.set(type, {
+            let new_item = {
               count: 1,
               size
-            })
+            }
+            if (useLocations) {
+              new_item.__unstable__uniqueWithLocations = [loc]
+            }
+            embedTypes.unique.set(type, new_item)
           }
 
           // @deprecated
@@ -629,6 +643,7 @@ export function analyze(css, options = {}) {
   })
 
   let embeddedContent = embeds.c()
+  delete embeddedContent.__unstable__uniqueWithLocations
 
   let totalUniqueDeclarations = uniqueDeclarations.size
 
