@@ -299,7 +299,7 @@ AtRules('finds @font-face', () => {
     }`
   const actual = analyze(fixture, {
     useUnstableLocations: true
-  }).atrules.fontface.__unstable_uniqueWithLocations
+  }).atrules.fontface.__unstable__uniqueWithLocations
   const expected = {
     5: [{
       line: 2,
