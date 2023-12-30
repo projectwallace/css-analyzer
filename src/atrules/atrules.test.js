@@ -301,48 +301,36 @@ AtRules('finds @font-face', () => {
     useUnstableLocations: true
   }).atrules.fontface.__unstable_uniqueWithLocations
   const expected = {
-    total: 5,
-    totalUnique: 5,
-    unique: {
-      5: 1,
-      100: 1,
-      463: 1,
-      590: 1,
-      850: 1,
-    },
-    __unstable__uniqueWithLocations: {
-      5: [{
-        line: 2,
-        column: 5,
-        offset: 5,
-        length: 89,
-      }],
-      100: [{
-        line: 7,
-        column: 5,
-        offset: 100,
-        length: 357,
-      }],
-      463: [{
-        line: 20,
-        column: 5,
-        offset: 463,
-        length: 121,
-      }],
-      590: [{
-        line: 25,
-        column: 5,
-        offset: 590,
-        length: 173,
-      }],
-      850: [{
-        line: 33,
-        column: 7,
-        offset: 850,
-        length: 127,
-      }],
-    },
-    uniquenessRatio: 1
+    5: [{
+      line: 2,
+      column: 5,
+      offset: 5,
+      length: 89,
+    }],
+    100: [{
+      line: 7,
+      column: 5,
+      offset: 100,
+      length: 357,
+    }],
+    463: [{
+      line: 20,
+      column: 5,
+      offset: 463,
+      length: 121,
+    }],
+    590: [{
+      line: 25,
+      column: 5,
+      offset: 590,
+      length: 173,
+    }],
+    850: [{
+      line: 33,
+      column: 7,
+      offset: 850,
+      length: 127,
+    }],
   }
 
   assert.equal(actual, expected)

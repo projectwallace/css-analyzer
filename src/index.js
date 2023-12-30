@@ -676,7 +676,7 @@ export function analyze(css, options = {}) {
         unique: fontfaces,
         uniquenessRatio: fontFacesCount === 0 ? 0 : 1,
       }, useLocations ? {
-        __unstable_uniqueWithLocations: fontfaces_with_loc.c(),
+        __unstable_uniqueWithLocations: fontfaces_with_loc.c().__unstable__uniqueWithLocations,
       } : {}),
       import: imports.c(),
       media: assign(
