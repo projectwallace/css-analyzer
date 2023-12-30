@@ -99,7 +99,7 @@ export function analyze(css, options = {}) {
   // Atrules
   let totalAtRules = 0
   let atRuleComplexities = new AggregateCollection()
-  /** @type {Record<string: string>}[]} */
+  /** @type {Record<string, string>[]} */
   let fontfaces = []
   let fontfaces_with_loc = new Collection(useLocations)
   let layers = new Collection(useLocations)
@@ -691,7 +691,7 @@ export function analyze(css, options = {}) {
         unique: fontfaces,
         uniquenessRatio: fontFacesCount === 0 ? 0 : 1,
       }, useLocations ? {
-        __unstable_uniqueWithLocations: fontfaces_with_loc.c().__unstable__uniqueWithLocations,
+        __unstable__uniqueWithLocations: fontfaces_with_loc.c().__unstable__uniqueWithLocations,
       } : {}),
       import: imports.c(),
       media: assign(
