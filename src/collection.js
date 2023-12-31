@@ -7,13 +7,7 @@ export class Collection {
 
 		if (useLocations) {
 			/** @type {number[]} */
-			this._node_lines = []
-			/** @type {number[]} */
-			this._node_columns = []
-			/** @type {number[]} */
-			this._node_lengths = []
-			/** @type {number[]} */
-			this._node_offsets = []
+			this._nodes = []
 		}
 
 		/** @type {boolean} */
@@ -30,11 +24,12 @@ export class Collection {
 		if (this._useLocations) {
 			let start = node_location.start
 			let start_offset = start.offset
+			let position = index * 4
 
-			this._node_lines[index] = start.line
-			this._node_columns[index] = start.column
-			this._node_offsets[index] = start_offset
-			this._node_lengths[index] = node_location.end.offset - start_offset
+			this._nodes[position] = start.line
+			this._nodes[position + 1] = start.column
+			this._nodes[position + 2] = start_offset
+			this._nodes[position + 3] = node_location.end.offset - start_offset
 		}
 
 		if (this._items.has(item)) {
@@ -67,36 +62,36 @@ export class Collection {
 		let uniqueWithLocations = new Map()
 		let unique = {}
 		let items = this._items
+		let _nodes = this._nodes
 		let size = items.size
 
 		items.forEach((list, key) => {
 			if (useLocations) {
-				let nodes = list.map(index => ({
-					line: this._node_lines[index],
-					column: this._node_columns[index],
-					offset: this._node_offsets[index],
-					length: this._node_lengths[index],
-				}))
+				let nodes = list.map(index => {
+					let position = index * 4
+					return {
+						line: _nodes[position],
+						column: _nodes[position + 1],
+						offset: _nodes[position + 2],
+						length: _nodes[position + 3],
+					}
+				})
 				uniqueWithLocations.set(key, nodes)
 			}
 			unique[key] = list.length
 		})
 
-		if (this._useLocations) {
-			return {
-				total: this._total,
-				totalUnique: size,
-				unique,
-				uniquenessRatio: this._total === 0 ? 0 : size / this._total,
-				__unstable__uniqueWithLocations: Object.fromEntries(uniqueWithLocations),
-			}
-		}
-
-		return {
+		let data = {
 			total: this._total,
 			totalUnique: size,
 			unique,
 			uniquenessRatio: this._total === 0 ? 0 : size / this._total,
 		}
+
+		if (this._useLocations) {
+			data.__unstable__uniqueWithLocations = Object.fromEntries(uniqueWithLocations)
+		}
+
+		return data
 	}
 }
