@@ -77,7 +77,7 @@ export function analyze(css, options = {}) {
   let embedSize = 0
   let embedTypes = {
     total: 0,
-    /** @type {Map<string, { size: number, count: number } & ({ __unstable__uniqueWithLocations?: undefined } | ({ offset: number, line: number, column: number, length: number }[])) }>} */
+    /** @type {Map<string, { size: number, count: number } & ({ __unstable__uniqueWithLocations?: undefined } | ({ __unstable__uniqueWithLocations: { offset: number, line: number, column: number, length: number }[] })) }>} */
     unique: new Map()
   }
 
