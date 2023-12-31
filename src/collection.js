@@ -55,12 +55,23 @@ export class Collection {
 	 * @property {number} offset
 	 * @property {number} length
 	 *
-	 * @returns {{ total: number; totalUnique: number; uniquenessRatio: number; unique: Record<string, number>; __unstable__uniqueWithLocations: Record<string, CssLocation[]>}}
+	 * @returns {{
+	 * 	total: number;
+	 * 	totalUnique: number;
+	 * 	uniquenessRatio: number;
+	 * 	unique: Record<string, number>;
+	 * } & ({
+	 * 	__unstable__uniqueWithLocations: Record<string, CssLocation[]>
+	 * } | {
+	 * 	__unstable__uniqueWithLocations?: undefined
+	 * })}
 	 */
 	c() {
-		let useLocations = this._useLocations
+		/** @type {Map<string, CssLocation[]>} */
 		let uniqueWithLocations = new Map()
+		/** @type {Record<string, number>} */
 		let unique = {}
+		let useLocations = this._useLocations
 		let items = this._items
 		let _nodes = this._nodes
 		let size = items.size
@@ -69,6 +80,7 @@ export class Collection {
 			if (useLocations) {
 				let nodes = list.map(index => {
 					let position = index * 4
+					/** @type {CssLocation} */
 					return {
 						line: _nodes[position],
 						column: _nodes[position + 1],
@@ -81,14 +93,15 @@ export class Collection {
 			unique[key] = list.length
 		})
 
+		let total = this._total
 		let data = {
-			total: this._total,
+			total,
 			totalUnique: size,
 			unique,
-			uniquenessRatio: this._total === 0 ? 0 : size / this._total,
+			uniquenessRatio: total === 0 ? 0 : size / total,
 		}
 
-		if (this._useLocations) {
+		if (useLocations) {
 			data.__unstable__uniqueWithLocations = Object.fromEntries(uniqueWithLocations)
 		}
 
