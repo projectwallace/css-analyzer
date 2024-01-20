@@ -28,7 +28,8 @@
   "scripts": {
     "test": "uvu",
     "lint": "oxlint",
-    "build": "microbundle"
+    "build": "microbundle",
+    "check": "tsc"
   },
   "keywords": [
     "projectwallace",
@@ -52,6 +53,7 @@
     "css-tree": "^2.3.1"
   },
   "devDependencies": {
+    "@types/css-tree": "^2.3.4",
     "microbundle": "^0.15.1",
     "oxlint": "^0.0.22",
     "uvu": "^0.5.6"

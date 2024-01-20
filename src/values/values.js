@@ -16,11 +16,10 @@ const keywords = new KeywordSet([
  */
 export function isValueKeyword(node) {
   let children = node.children
-  let size = children.size
-
   if (!children) return false
-  if (size > 1 || size === 0) return false
 
   let firstChild = children.first
+  if (firstChild === null) return false
+
   return firstChild.type === Identifier && keywords.has(firstChild.name)
 }

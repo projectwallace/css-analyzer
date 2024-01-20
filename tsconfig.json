@@ -1,0 +1,28 @@
+{
+	"compilerOptions": {
+		// Base options:
+		"skipLibCheck": true,
+		"target": "es2022",
+		"verbatimModuleSyntax": true,
+		"allowJs": true,
+		"checkJs": true,
+		"moduleDetection": "force",
+
+		// Strictness
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+
+		// Type checking, not transpiling
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"allowSyntheticDefaultImports": true,
+		"noEmit": true,
+
+		// Code runs in the DOM
+		"lib": ["ES2022", "DOM", "DOM.Iterable"],
+	},
+	"include": [
+		"src"
+	],
+	"exclude": ["node_modules", "**/*.test.js"]
+}

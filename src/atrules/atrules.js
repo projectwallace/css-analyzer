@@ -1,4 +1,5 @@
 import { strEquals, startsWith, endsWith } from '../string-utils.js'
+// @ts-expect-error CSS Tree types are incomplete
 import walk from 'css-tree/walker'
 import {
   Identifier,
@@ -16,7 +17,9 @@ import {
  * @returns true if declaratioNode is the given property: value, false otherwise
  */
 function isPropertyValue(node, property, value) {
+  if (node.value.type === 'Raw') return false
   let firstChild = node.value.children.first
+  if (firstChild === null) return false
   return strEquals(property, node.property)
     && firstChild.type === Identifier
     && strEquals(value, firstChild.name)
@@ -72,6 +75,7 @@ export function isMediaBrowserhack(prelude) {
     if (node.type === MediaFeature) {
       if (value !== null && value.unit === '\\0') {
         returnValue = true
+        // @ts-expect-error TS doesn't know about CSS Tree's walker breaking
         return this.break
       }
       if (strEquals('-moz-images-in-menus', name)
@@ -79,6 +83,7 @@ export function isMediaBrowserhack(prelude) {
         || strEquals('-ms-high-contrast', name)
       ) {
         returnValue = true
+        // @ts-expect-error TS doesn't know about CSS Tree's walker breaking
         return this.break
       }
       if (strEquals('min-resolution', name)
@@ -86,12 +91,14 @@ export function isMediaBrowserhack(prelude) {
         && strEquals('dpcm', value.unit)
       ) {
         returnValue = true
+        // @ts-expect-error TS doesn't know about CSS Tree's walker breaking
         return this.break
       }
       if (strEquals('-webkit-min-device-pixel-ratio', name)) {
         let val = value.value
         if ((strEquals('0', val) || strEquals('10000', val))) {
           returnValue = true
+          // @ts-expect-error TS doesn't know about CSS Tree's walker breaking
           return this.break
         }
       }

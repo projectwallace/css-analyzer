@@ -23,7 +23,9 @@ const TIMING_FUNCTION_VALUES = new KeywordSet([
 
 export function analyzeAnimation(children, stringifyNode) {
   let durationFound = false
+  /** @type {string[]} */
   let durations = []
+  /** @type {string[]} */
   let timingFunctions = []
 
   children.forEach(child => {

@@ -1,5 +1,8 @@
+// @ts-expect-error Typing of css-tree is incomplete
 import parse from 'css-tree/parser'
+// @ts-expect-error Typing of css-tree is incomplete
 import walk from 'css-tree/walker'
+// @ts-expect-error Typing of specificity is incomplete
 import { calculate } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isAccessibility, isPrefixed } from './selectors/utils.js'
@@ -32,6 +35,10 @@ import {
 
 /** @typedef {[number, number, number]} Specificity */
 
+/**
+ * @param {number} part
+ * @param {number} total
+ */
 function ratio(part, total) {
   if (total === 0) return 0
   return part / total
@@ -57,7 +64,7 @@ export function analyze(css, options = {}) {
   let start = Date.now()
 
   /**
-   * Recreate the authored CSS from a CSSTree node
+   * Recreate the authored CSS from a CSSTree node, with trimming
    * @param {import('css-tree').CssNode} node - Node from CSSTree AST to stringify
    * @returns {string} str - The stringified node
    */
@@ -65,8 +72,14 @@ export function analyze(css, options = {}) {
     return stringifyNodePlain(node).trim()
   }
 
+  /**
+   * Recreate the authored CSS from a CSSTree node, without trimming
+   * @param {import('css-tree').CssNode} node - Node from CSSTree AST to stringify
+   * @returns {string} str - The stringified node
+   */
   function stringifyNodePlain(node) {
     let loc = node.loc
+    // @ts-expect-error we *always* have a `loc` property
     return css.substring(loc.start.offset, loc.end.offset)
   }
 
@@ -128,9 +141,9 @@ export function analyze(css, options = {}) {
   let keyframeSelectors = new Collection(useLocations)
   let uniqueSelectors = new Set()
   let prefixedSelectors = new Collection(useLocations)
-  /** @type {Specificity} */
+  /** @type {Specificity | undefined} */
   let maxSpecificity
-  /** @type {Specificity} */
+  /** @type {Specificity | undefined} */
   let minSpecificity
   let specificityA = new AggregateCollection()
   let specificityB = new AggregateCollection()
@@ -176,7 +189,11 @@ export function analyze(css, options = {}) {
   let units = new ContextCollection(useLocations)
   let gradients = new Collection(useLocations)
 
-  walk(ast, function (node) {
+  /**
+   * @param {import('css-tree').CssNode} node
+   * @returns {void}
+   */
+  function walker(node) {
     switch (node.type) {
       case Atrule: {
         totalAtRules++
@@ -184,20 +201,23 @@ export function analyze(css, options = {}) {
         let atRuleName = node.name
 
         if (atRuleName === 'font-face') {
+          /** @type {Record<string, string>} */
           let descriptors = {}
 
           if (useLocations) {
             fontfaces_with_loc.p(node.loc.start.offset, node.loc)
           }
 
-          node.block.children.forEach(descriptor => {
-            // Ignore 'Raw' nodes in case of CSS syntax errors
-            if (descriptor.type === Declaration) {
-              descriptors[descriptor.property] = stringifyNode(descriptor.value)
-            }
-          })
+          if (node.block !== null) {
+            node.block.children.forEach(descriptor => {
+              // Ignore 'Raw' nodes in case of CSS syntax errors
+              if (descriptor.type === Declaration) {
+                descriptors[descriptor.property] = stringifyNode(descriptor.value)
+              }
+            })
 
-          fontfaces.push(descriptors)
+            fontfaces.push(descriptors)
+          }
           atRuleComplexities.push(1)
           break
         }
@@ -212,7 +232,7 @@ export function analyze(css, options = {}) {
 
           if (atRuleName === 'media') {
             medias.p(preludeStr, loc)
-            if (isMediaBrowserhack(prelude)) {
+            if (prelude.type === 'AtrulePrelude' && isMediaBrowserhack(prelude)) {
               mediaBrowserhacks.p(preludeStr, loc)
               complexity++
             }
@@ -220,7 +240,7 @@ export function analyze(css, options = {}) {
             supports.p(preludeStr, loc)
             // TODO: analyze vendor prefixes in @supports
             // TODO: analyze complexity of @supports 'declaration'
-            if (isSupportsBrowserhack(prelude)) {
+            if (prelude.type === 'AtrulePrelude' && isSupportsBrowserhack(prelude)) {
               supportsBrowserhacks.p(preludeStr, loc)
               complexity++
             }
@@ -260,46 +280,57 @@ export function analyze(css, options = {}) {
       case Rule: {
         let prelude = node.prelude
         let block = node.block
-        let preludeChildren = prelude.children
-        let blockChildren = block.children
-        let numSelectors = preludeChildren ? preludeChildren.size : 0
-        let numDeclarations = blockChildren ? blockChildren.size : 0
+        let num_selectors = 0
+        let num_declarations = 0
 
-        ruleSizes.push(numSelectors + numDeclarations)
-        uniqueRuleSize.p(numSelectors + numDeclarations, node.loc)
-        selectorsPerRule.push(numSelectors)
-        uniqueSelectorsPerRule.p(numSelectors, prelude.loc)
-        declarationsPerRule.push(numDeclarations)
-        uniqueDeclarationsPerRule.p(numDeclarations, block.loc)
+        if (prelude !== null && prelude.type === 'SelectorList') {
+          num_selectors = prelude.children.size
+        }
+
+        if (block !== null && block.type === 'Block') {
+          num_declarations = block.children.size
+        }
+
+        ruleSizes.push(num_selectors + num_declarations)
+        uniqueRuleSize.p(String(num_selectors + num_declarations), node.loc)
+        selectorsPerRule.push(num_selectors)
+        uniqueSelectorsPerRule.p(String(num_selectors), prelude.loc)
+        declarationsPerRule.push(num_declarations)
+        uniqueDeclarationsPerRule.p(String(num_declarations), block.loc)
 
         totalRules++
 
-        if (numDeclarations === 0) {
+        if (num_declarations === 0) {
           emptyRules++
         }
         break
       }
       case Selector: {
+        /** @type {import('css-tree').Atrule | null} */
+        // @ts-expect-error TS does not understand CSSTree's `this` mechanisms
+        let atrule = this.atrule
         let selector = stringifyNode(node)
+        let loc = node.loc
 
-        if (this.atrule && endsWith('keyframes', this.atrule.name)) {
-          keyframeSelectors.p(selector, node.loc)
+        if (atrule && endsWith('keyframes', atrule.name)) {
+          keyframeSelectors.p(selector, loc)
+          // @ts-expect-error TS does not understand CSSTree's `this` mechanisms
           return this.skip
         }
 
         if (isAccessibility(node)) {
-          a11y.p(selector, node.loc)
+          a11y.p(selector, loc)
         }
 
         let complexity = getComplexity(node)
 
         if (isPrefixed(node)) {
-          prefixedSelectors.p(selector, node.loc)
+          prefixedSelectors.p(selector, loc)
         }
 
         uniqueSelectors.add(selector)
         selectorComplexities.push(complexity)
-        uniqueSelectorComplexities.p(complexity, node.loc)
+        uniqueSelectorComplexities.p(String(complexity), loc)
 
         // #region specificity
         let [{ value: specificityObj }] = calculate(node)
@@ -310,7 +341,7 @@ export function analyze(css, options = {}) {
         /** @type {Specificity} */
         let specificity = [sa, sb, sc]
 
-        uniqueSpecificities.p(sa + ',' + sb + ',' + sc, node.loc)
+        uniqueSpecificities.p(sa + ',' + sb + ',' + sc, loc)
 
         specificityA.push(sa)
         specificityB.push(sb)
@@ -336,7 +367,7 @@ export function analyze(css, options = {}) {
         // #endregion
 
         if (sa > 0) {
-          ids.p(selector, node.loc)
+          ids.p(selector, loc)
         }
 
         getCombinators(node, function onCombinator(combinator) {
@@ -374,15 +405,16 @@ export function analyze(css, options = {}) {
           embedTypes.total++
           embedSize += size
 
-          let loc = {
+          let loc = node.loc
+          let data_uri_loc = {
             /** @type {number} */
-            line: node.loc.start.line,
+            line: loc.start.line,
             /** @type {number} */
-            column: node.loc.start.column,
+            column: loc.start.column,
             /** @type {number} */
-            offset: node.loc.start.offset,
+            offset: loc.start.offset,
             /** @type {number} */
-            length: node.loc.end.offset - node.loc.start.offset,
+            length: loc.end.offset - loc.start.offset,
           }
 
           if (embedTypes.unique.has(type)) {
@@ -391,7 +423,7 @@ export function analyze(css, options = {}) {
             item.size += size
             embedTypes.unique.set(type, item)
             if (useLocations) {
-              item.__unstable__uniqueWithLocations.push(loc)
+              item.__unstable__uniqueWithLocations.push(data_uri_loc)
             }
           } else {
             let item = {
@@ -399,13 +431,13 @@ export function analyze(css, options = {}) {
               size
             }
             if (useLocations) {
-              item.__unstable__uniqueWithLocations = [loc]
+              item.__unstable__uniqueWithLocations = [data_uri_loc]
             }
             embedTypes.unique.set(type, item)
           }
 
           // @deprecated
-          embeds.p(embed, node.loc)
+          embeds.p(embed, loc)
         }
         break
       }
@@ -418,26 +450,25 @@ export function analyze(css, options = {}) {
         let declaration = this.declaration
         let { property, important } = declaration
         let complexity = 1
+        let loc = node.loc
+        let children = node.children
 
         if (isValuePrefixed(node)) {
-          vendorPrefixedValues.p(stringifyNode(node), node.loc)
+          vendorPrefixedValues.p(stringifyNode(node), loc)
           complexity++
         }
 
         // i.e. `property: value !ie`
         if (typeof important === 'string') {
-          valueBrowserhacks.p(stringifyNodePlain(node) + '!' + important, node.loc)
+          valueBrowserhacks.p(stringifyNodePlain(node) + '!' + important, loc)
           complexity++
         }
 
         // i.e. `property: value\9`
         if (isIe9Hack(node)) {
-          valueBrowserhacks.p(stringifyNode(node), node.loc)
+          valueBrowserhacks.p(stringifyNode(node), loc)
           complexity++
         }
-
-        let children = node.children
-        let loc = node.loc
 
         // TODO: should shorthands be counted towards complexity?
         valueComplexities.push(complexity)
@@ -602,7 +633,9 @@ export function analyze(css, options = {}) {
           importantDeclarations++
           complexity++
 
-          if (this.atrule && endsWith('keyframes', this.atrule.name)) {
+          // @ts-expect-error TS does not understand CSSTree's `this` mechanisms
+          let atrule = this.atrule
+          if (atrule && endsWith('keyframes', atrule.name)) {
             importantsInKeyframes++
             complexity++
           }
@@ -644,7 +677,9 @@ export function analyze(css, options = {}) {
         break
       }
     }
-  })
+  }
+
+  walk(ast, walker)
 
   let embeddedContent = embeds.c()
   delete embeddedContent.__unstable__uniqueWithLocations
