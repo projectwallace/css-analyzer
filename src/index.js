@@ -476,13 +476,13 @@ export function analyze(css, options = {}) {
         } else if (isProperty('line-height', property)) {
           lineHeights.p(stringifyNode(node), loc)
         } else if (isProperty('transition', property) || isProperty('animation', property)) {
-          let [times, fns] = analyzeAnimation(children, stringifyNode)
-          for (let i = 0; i < times.length; i++) {
-            durations.p(times[i], loc)
-          }
-          for (let i = 0; i < fns.length; i++) {
-            timingFunctions.p(fns[i], loc)
-          }
+          analyzeAnimation(children, function (item) {
+            if (item.type === 'fn') {
+              timingFunctions.p(stringifyNode(item.value), loc)
+            } else if (item.type === 'duration') {
+              durations.p(stringifyNode(item.value), loc)
+            }
+          })
           break
         } else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
           if (children && children.size > 1) {

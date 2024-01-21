@@ -1,3 +1,4 @@
+// @ts-expect-error CSS Tree types are incomplete
 import walk from 'css-tree/walker'
 import { startsWith, strEquals } from '../string-utils.js'
 import { hasVendorPrefix } from '../vendor-prefix.js'
@@ -28,6 +29,7 @@ function analyzeList(selectorListAst, cb) {
   return childSelectors
 }
 
+/** @param {string} name */
 function isPseudoFunction(name) {
   return (
     strEquals(name, 'not')
@@ -102,7 +104,7 @@ export function isPrefixed(selector) {
 /**
  * Get the Complexity for the AST of a Selector Node
  * @param {import('css-tree').Selector} selector - AST Node for a Selector
- * @return {[number, boolean]} - The numeric complexity of the Selector and whether it's prefixed or not
+ * @return {number} - The numeric complexity of the Selector and whether it's prefixed or not
  */
 export function getComplexity(selector) {
   let complexity = 0

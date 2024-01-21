@@ -11,10 +11,7 @@ export function isValuePrefixed(node) {
     return false
   }
 
-  let list = children.toArray()
-
-  for (let index = 0; index < list.length; index++) {
-    let node = list[index]
+  for (let node of children) {
     let { type, name } = node;
 
     if (type === Identifier && hasVendorPrefix(name)) {
@@ -22,11 +19,7 @@ export function isValuePrefixed(node) {
     }
 
     if (type === Func) {
-      if (hasVendorPrefix(name)) {
-        return true
-      }
-
-      if (isValuePrefixed(node)) {
+      if (hasVendorPrefix(name) || isValuePrefixed(node)) {
         return true
       }
     }
