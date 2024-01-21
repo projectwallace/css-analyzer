@@ -2,6 +2,7 @@
 import walk from 'css-tree/walker'
 import { startsWith, strEquals } from '../string-utils.js'
 import { hasVendorPrefix } from '../vendor-prefix.js'
+import { KeywordSet } from '../keyword-set.js'
 import {
   PseudoClassSelector,
   PseudoElementSelector,
@@ -29,20 +30,17 @@ function analyzeList(selectorListAst, cb) {
   return childSelectors
 }
 
-/** @param {string} name */
-function isPseudoFunction(name) {
-  return (
-    strEquals(name, 'not')
-    || strEquals(name, 'nth-child')
-    || strEquals(name, 'nth-last-child')
-    || strEquals(name, 'where')
-    || strEquals(name, 'is')
-    || strEquals(name, 'has')
-    || strEquals(name, 'matches')
-    || strEquals(name, '-webkit-any')
-    || strEquals(name, '-moz-any')
-  )
-}
+const PSEUDO_FUNCTIONS = new KeywordSet([
+  'nth-child',
+  'where',
+  'not',
+  'is',
+  'has',
+  'nth-last-child',
+  'matches',
+  '-webkit-any',
+  '-moz-any',
+])
 
 /** @param {import('css-tree').Selector} selector */
 export function isAccessibility(selector) {
@@ -57,17 +55,17 @@ export function isAccessibility(selector) {
       }
     }
     // Test for [aria-] or [role] inside :is()/:where() and friends
-    else if (node.type === PseudoClassSelector) {
-      if (isPseudoFunction(node.name)) {
-        let list = analyzeList(node, isAccessibility)
+    else if (node.type === PseudoClassSelector && PSEUDO_FUNCTIONS.has(node.name)) {
+      let list = analyzeList(node, isAccessibility)
 
-        if (list.some(b => b === true)) {
+      for (let c of list) {
+        if (c === true) {
           isA11y = true
-          return this.skip
+          break
         }
-
-        return this.skip
       }
+
+      return this.skip
     }
   })
 
@@ -82,15 +80,17 @@ export function isPrefixed(selector) {
   let isPrefixed = false
 
   walk(selector, function (node) {
-    if (node.type === PseudoElementSelector
-      || node.type === TypeSelector
-      || node.type === PseudoClassSelector
+    let type = node.type
+
+    if (type === PseudoElementSelector
+      || type === TypeSelector
+      || type === PseudoClassSelector
     ) {
       if (hasVendorPrefix(node.name)) {
         isPrefixed = true
         return this.break
       }
-    } else if (node.type === AttributeSelector) {
+    } else if (type === AttributeSelector) {
       if (hasVendorPrefix(node.name.name)) {
         isPrefixed = true
         return this.break
@@ -110,20 +110,21 @@ export function getComplexity(selector) {
   let complexity = 0
 
   walk(selector, function (node) {
-    if (node.type === Selector || node.type === Nth) return
+    let type = node.type
+    if (type === Selector || type === Nth) return
 
     complexity++
 
-    if (node.type === PseudoElementSelector
-      || node.type === TypeSelector
-      || node.type === PseudoClassSelector
+    if (type === PseudoElementSelector
+      || type === TypeSelector
+      || type === PseudoClassSelector
     ) {
       if (hasVendorPrefix(node.name)) {
         complexity++
       }
     }
 
-    if (node.type === AttributeSelector) {
+    if (type === AttributeSelector) {
       if (node.value) {
         complexity++
       }
@@ -133,16 +134,16 @@ export function getComplexity(selector) {
       return this.skip
     }
 
-    if (node.type === PseudoClassSelector) {
-      if (isPseudoFunction(node.name)) {
+    if (type === PseudoClassSelector) {
+      if (PSEUDO_FUNCTIONS.has(node.name)) {
         let list = analyzeList(node, getComplexity)
 
         // Bail out for empty/non-existent :nth-child() params
         if (list.length === 0) return
 
-        list.forEach((c) => {
+        for (let c of list) {
           complexity += c
-        })
+        }
         return this.skip
       }
     }

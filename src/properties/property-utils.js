@@ -11,9 +11,9 @@ export function isHack(property) {
   let code = property.charCodeAt(0)
 
   return code === 47 // /
+    || code === 42 // *
     || code === 95 // _
     || code === 43 // +
-    || code === 42 // *
     || code === 38 // &
     || code === 36 // $
     || code === 35 // #

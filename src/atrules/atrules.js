@@ -68,27 +68,26 @@ export function isMediaBrowserhack(prelude) {
         returnValue = true
         return this.break
       }
-    }
-    if (node.type === MediaFeature) {
+    } else if (node.type === MediaFeature) {
       if (value !== null && value.unit === '\\0') {
         returnValue = true
         return this.break
       }
-      if (strEquals('-moz-images-in-menus', name)
+      else if (strEquals('-moz-images-in-menus', name)
         || strEquals('min--moz-device-pixel-ratio', name)
         || strEquals('-ms-high-contrast', name)
       ) {
         returnValue = true
         return this.break
       }
-      if (strEquals('min-resolution', name)
+      else if (strEquals('min-resolution', name)
         && strEquals('.001', value.value)
         && strEquals('dpcm', value.unit)
       ) {
         returnValue = true
         return this.break
       }
-      if (strEquals('-webkit-min-device-pixel-ratio', name)) {
+      else if (strEquals('-webkit-min-device-pixel-ratio', name)) {
         let val = value.value
         if ((strEquals('0', val) || strEquals('10000', val))) {
           returnValue = true

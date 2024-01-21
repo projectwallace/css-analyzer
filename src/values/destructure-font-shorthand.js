@@ -1,5 +1,5 @@
-import { KeywordSet } from "../keyword-set.js"
-import { Identifier, Nr, Dimension, Operator } from '../css-tree-node-types.js'
+import { KeywordSet } from '../keyword-set.js'
+import { Identifier, Nr, Operator } from '../css-tree-node-types.js'
 
 const SYSTEM_FONTS = new KeywordSet([
 	'caption',
@@ -28,14 +28,6 @@ const SIZE_KEYWORDS = new KeywordSet([
 const COMMA = 44 // ','.charCodeAt(0) === 44
 const SLASH = 47 // '/'.charCodeAt(0) === 47
 
-/**
- * @param {string} str
- * @param {number} at
- */
-function charCodeAt(str, at) {
-	return str.charCodeAt(at)
-}
-
 export function isSystemFont(node) {
 	let firstChild = node.children.first
 	if (firstChild === null) return false
@@ -52,37 +44,32 @@ export function destructure(value, stringifyNode) {
 	let line_height
 
 	value.children.forEach(function (node, item) {
+		let prev = item.prev ? item.prev.data : undefined
+		let next = item.next ? item.next.data : undefined
+
 		// any node that comes before the '/' is the font-size
-		if (
-			item.next &&
-			item.next.data.type === Operator &&
-			charCodeAt(item.next.data.value, 0) === SLASH
-		) {
+		if (next && next.type === Operator && next.value.charCodeAt(0) === SLASH) {
 			font_size = stringifyNode(node)
 			return
 		}
 
 		// any node that comes after '/' is the line-height
-		if (
-			item.prev &&
-			item.prev.data.type === Operator &&
-			charCodeAt(item.prev.data.value, 0) === SLASH
-		) {
+		if (prev && prev.type === Operator && prev.value.charCodeAt(0) === SLASH) {
 			line_height = stringifyNode(node)
 			return
 		}
 
 		// any node that's followed by ',' is a font-family
 		if (
-			item.next &&
-			item.next.data.type === Operator &&
-			charCodeAt(item.next.data.value, 0) === COMMA &&
+			next &&
+			next.type === Operator &&
+			next.value.charCodeAt(0) === COMMA &&
 			!font_family[0]
 		) {
 			font_family[0] = node
 
-			if (!font_size && item.prev !== null) {
-				font_size = stringifyNode(item.prev.data)
+			if (!font_size && prev !== null) {
+				font_size = stringifyNode(prev)
 			}
 
 			return
@@ -98,10 +85,10 @@ export function destructure(value, stringifyNode) {
 		if (item.next === null) {
 			font_family[1] = node
 
-			// if, at the last node, we don;t have a size yet, it *must* be the previous node
+			// if, at the last node, we dont have a size yet, it *must* be the previous node
 			// unless `font: menu` (system font), because then there's simply no size
-			if (!font_size && !font_family[0] && item.prev) {
-				font_size = stringifyNode(item.prev.data)
+			if (!font_size && !font_family[0] && prev) {
+				font_size = stringifyNode(prev)
 			}
 
 			return
@@ -120,15 +107,18 @@ export function destructure(value, stringifyNode) {
 	return {
 		font_size,
 		line_height,
-		font_family: (font_family[0] || font_family[1]) ? stringifyNode({
-			loc: {
-				start: {
-					offset: (font_family[0] || font_family[1]).loc.start.offset
-				},
-				end: {
-					offset: font_family[1].loc.end.offset
-				}
-			}
-		}) : null,
+		font_family:
+			font_family[0] || font_family[1]
+				? stringifyNode({
+					loc: {
+						start: {
+							offset: (font_family[0] || font_family[1]).loc.start.offset,
+						},
+						end: {
+							offset: font_family[1].loc.end.offset,
+						},
+					},
+				})
+				: null,
 	}
 }

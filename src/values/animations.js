@@ -24,32 +24,30 @@ const TIMING_FUNCTION_VALUES = new KeywordSet([
 export function analyzeAnimation(children, cb) {
   let durationFound = false
 
-  children.forEach(child => {
+  for (let child of children) {
     let type = child.type
     let name = child.name
 
     // Right after a ',' we start over again
     if (type === Operator) {
-      return durationFound = false
-    }
-    if (type === Dimension && durationFound === false) {
+      durationFound = false
+    } else if (type === Dimension && durationFound === false) {
+      // The first Dimension is the duration, the second is the delay
       durationFound = true
-      return cb({
+      cb({
         type: 'duration',
         value: child,
       })
-    }
-    if (type === Identifier && TIMING_KEYWORDS.has(name)) {
-      return cb({
+    } else if (type === Identifier && TIMING_KEYWORDS.has(name)) {
+      cb({
+        type: 'fn',
+        value: child,
+      })
+    } else if (type === Func && TIMING_FUNCTION_VALUES.has(name)) {
+      cb({
         type: 'fn',
         value: child,
       })
     }
-    if (type === Func && TIMING_FUNCTION_VALUES.has(name)) {
-      return cb({
-        type: 'fn',
-        value: child,
-      })
-    }
-  })
+  }
 }

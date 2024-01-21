@@ -1,12 +1,4 @@
 /**
- * @param {string} str
- * @param {number} at
- */
-function charCodeAt(str, at) {
-  return str.charCodeAt(at)
-}
-
-/**
  * Case-insensitive compare two character codes
  * @param {string} referenceCode
  * @param {string} testCode
@@ -38,7 +30,7 @@ export function strEquals(base, maybe) {
   if (len !== maybe.length) return false
 
   for (let i = 0; i < len; i++) {
-    if (compareChar(charCodeAt(base, i), charCodeAt(maybe, i)) === false) {
+    if (compareChar(base.charCodeAt(i), maybe.charCodeAt(i)) === false) {
       return false
     }
   }
@@ -66,7 +58,7 @@ export function endsWith(base, maybe) {
   }
 
   for (let i = len - 1; i >= offset; i--) {
-    if (compareChar(charCodeAt(base, i - offset), charCodeAt(maybe, i)) === false) {
+    if (compareChar(base.charCodeAt(i - offset), maybe.charCodeAt(i)) === false) {
       return false
     }
   }
@@ -76,16 +68,22 @@ export function endsWith(base, maybe) {
 
 /**
  * Case-insensitive testing whether a string starts with a given substring
+ *
+ * @example
+ * startsWith('test', 'my-test') // false
+ * startsWith('test', 'tes') // true
+ * startsWith('test', 'test-me') // true
+ *
  * @param {string} base
  * @param {string} maybe
- * @returns {boolean} true if `test` starts with `base`, false otherwise
+ * @returns {boolean} true if `base` starts with `maybe`, false otherwise
  */
 export function startsWith(base, maybe) {
   let len = base.length
   if (maybe.length < len) return false
 
   for (let i = 0; i < len; i++) {
-    if (compareChar(charCodeAt(base, i), charCodeAt(maybe, i)) === false) {
+    if (compareChar(base.charCodeAt(i), maybe.charCodeAt(i)) === false) {
       return false
     }
   }

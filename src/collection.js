@@ -78,7 +78,7 @@ export class Collection {
 
 		items.forEach((list, key) => {
 			if (useLocations) {
-				let nodes = list.map(index => {
+				let nodes = list.map(function (index) {
 					let position = index * 4
 					/** @type {CssLocation} */
 					return {
@@ -89,8 +89,9 @@ export class Collection {
 					}
 				})
 				uniqueWithLocations.set(key, nodes)
+			} else {
+				unique[key] = list.length
 			}
-			unique[key] = list.length
 		})
 
 		let total = this._total
