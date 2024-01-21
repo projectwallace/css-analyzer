@@ -1,28 +1,28 @@
-import { KeywordSet } from "../keyword-set.js"
-import { Identifier, Nr, Dimension, Operator } from "../css-tree-node-types.js"
+import { KeywordSet } from '../keyword-set.js'
+import { Identifier, Nr, Operator } from '../css-tree-node-types.js'
 
 const SYSTEM_FONTS = new KeywordSet([
-	"caption",
-	"icon",
-	"menu",
-	"message-box",
-	"small-caption",
-	"status-bar",
+	'caption',
+	'icon',
+	'menu',
+	'message-box',
+	'small-caption',
+	'status-bar',
 ])
 
 const SIZE_KEYWORDS = new KeywordSet([
 	/* <absolute-size> values */
-	"xx-small",
-	"x-small",
-	"small",
-	"medium",
-	"large",
-	"x-large",
-	"xx-large",
-	"xxx-large",
+	'xx-small',
+	'x-small',
+	'small',
+	'medium',
+	'large',
+	'x-large',
+	'xx-large',
+	'xxx-large',
 	/* <relative-size> values */
-	"smaller",
-	"larger",
+	'smaller',
+	'larger',
 ])
 
 const COMMA = 44 // ','.charCodeAt(0) === 44
