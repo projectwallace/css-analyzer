@@ -21,10 +21,8 @@ const TIMING_FUNCTION_VALUES = new KeywordSet([
   'steps'
 ])
 
-export function analyzeAnimation(children, stringifyNode) {
+export function analyzeAnimation(children, cb) {
   let durationFound = false
-  let durations = []
-  let timingFunctions = []
 
   children.forEach(child => {
     let type = child.type
@@ -36,15 +34,22 @@ export function analyzeAnimation(children, stringifyNode) {
     }
     if (type === Dimension && durationFound === false) {
       durationFound = true
-      return durations.push(stringifyNode(child))
+      return cb({
+        type: 'duration',
+        value: child,
+      })
     }
     if (type === Identifier && TIMING_KEYWORDS.has(name)) {
-      return timingFunctions.push(stringifyNode(child))
+      return cb({
+        type: 'fn',
+        value: child,
+      })
     }
     if (type === Func && TIMING_FUNCTION_VALUES.has(name)) {
-      return timingFunctions.push(stringifyNode(child))
+      return cb({
+        type: 'fn',
+        value: child,
+      })
     }
   })
-
-  return [durations, timingFunctions]
 }
