@@ -541,13 +541,7 @@ export function analyze(css, options = {}) {
                 return this.skip
               }
 
-              if (namedColors.has(nodeName)) {
-                let stringified = stringifyNode(valueNode)
-                colors.push(stringified, property, loc)
-                colorFormats.p('named', loc)
-                return
-              }
-
+              // A keyword is most likely to be 'transparent' or 'currentColor'
               if (colorKeywords.has(nodeName)) {
                 let stringified = stringifyNode(valueNode)
                 colors.push(stringified, property, loc)
@@ -555,6 +549,15 @@ export function analyze(css, options = {}) {
                 return
               }
 
+              // Or it can be a named color
+              if (namedColors.has(nodeName)) {
+                let stringified = stringifyNode(valueNode)
+                colors.push(stringified, property, loc)
+                colorFormats.p('named', loc)
+                return
+              }
+
+              // Or it can be a system color
               if (systemColors.has(nodeName)) {
                 let stringified = stringifyNode(valueNode)
                 colors.push(stringified, property, loc)
@@ -569,6 +572,7 @@ export function analyze(css, options = {}) {
                 return this.skip
               }
 
+              // rgb(a), hsl(a), color(), hwb(), lch(), lab(), oklab(), oklch()
               if (colorFunctions.has(nodeName)) {
                 colors.push(stringifyNode(valueNode), property, valueNode.loc)
                 colorFormats.p(nodeName.toLowerCase(), valueNode.loc)
