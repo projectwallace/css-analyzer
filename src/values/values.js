@@ -1,14 +1,14 @@
 import { KeywordSet } from "../keyword-set.js"
 import { Identifier } from "../css-tree-node-types.js"
 
-const keywords = new KeywordSet([
+export const keywords = new KeywordSet([
   'auto',
+  'none', // for `text-shadow`, `box-shadow` and `background`
   'inherit',
   'initial',
   'unset',
   'revert',
   'revert-layer',
-  'none', // for `text-shadow`, `box-shadow` and `background`
 ])
 
 /**

@@ -5,7 +5,7 @@ import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isAccessibility, isPrefixed } from './selectors/utils.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
 import { destructure, isSystemFont } from './values/destructure-font-shorthand.js'
-import { isValueKeyword } from './values/values.js'
+import { isValueKeyword, keywords } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
 import { ContextCollection } from './context-collection.js'
@@ -536,6 +536,9 @@ export function analyze(css, options = {}) {
               // Bail out if it can't be a color name
               // 20 === 'lightgoldenrodyellow'.length
               // 3 === 'red'.length
+              if (keywords.has(nodeName)) {
+                console.log(property, nodeName)
+              }
               let nodeLen = nodeName.length
               if (nodeLen > 20 || nodeLen < 3) {
                 return this.skip
