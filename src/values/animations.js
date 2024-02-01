@@ -1,4 +1,5 @@
 import { KeywordSet } from "../keyword-set.js"
+import { keywords } from "./values.js"
 import {
   Operator,
   Dimension,
@@ -38,11 +39,18 @@ export function analyzeAnimation(children, cb) {
         type: 'duration',
         value: child,
       })
-    } else if (type === Identifier && TIMING_KEYWORDS.has(name)) {
-      cb({
-        type: 'fn',
-        value: child,
-      })
+    } else if (type === Identifier) {
+      if (TIMING_KEYWORDS.has(name)) {
+        cb({
+          type: 'fn',
+          value: child,
+        })
+      } else if (keywords.has(name)) {
+        cb({
+          type: 'keyword',
+          value: child,
+        })
+      }
     } else if (type === Func && TIMING_FUNCTION_VALUES.has(name)) {
       cb({
         type: 'fn',
