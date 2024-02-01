@@ -33714,6 +33714,18 @@
       "median": 1,
       "range": 1,
       "sum": 5964
+    },
+    "keywords": {
+      "total": 663,
+      "totalUnique": 5,
+      "unique": {
+        "auto": 116,
+        "none": 429,
+        "inherit": 43,
+        "initial": 13,
+        "unset": 62
+      },
+      "uniquenessRatio": 0.007541478129713424
     }
   }
 }

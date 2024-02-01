@@ -1,4 +1,5 @@
 import { KeywordSet } from '../keyword-set.js'
+import { keywords } from './values.js'
 import { Identifier, Nr, Operator } from '../css-tree-node-types.js'
 
 const SYSTEM_FONTS = new KeywordSet([
@@ -38,7 +39,7 @@ export function isSystemFont(node) {
  * @param {import('css-tree').Value} value
  * @param {*} stringifyNode
  */
-export function destructure(value, stringifyNode) {
+export function destructure(value, stringifyNode, cb) {
 	let font_family = Array.from({ length: 2 })
 	let font_size
 	let line_height
@@ -46,6 +47,13 @@ export function destructure(value, stringifyNode) {
 	value.children.forEach(function (node, item) {
 		let prev = item.prev ? item.prev.data : undefined
 		let next = item.next ? item.next.data : undefined
+
+		if (node.type === Identifier && keywords.has(node.name)) {
+			cb({
+				type: 'keyword',
+				value: node.name,
+			})
+		}
 
 		// any node that comes before the '/' is the font-size
 		if (next && next.type === Operator && next.value.charCodeAt(0) === SLASH) {

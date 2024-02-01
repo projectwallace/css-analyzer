@@ -460,7 +460,13 @@ Api("handles empty input gracefully", () => {
         median: 0,
         range: 0,
         sum: 0,
-      }
+      },
+      keywords: {
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
+      },
     },
   }
 

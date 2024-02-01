@@ -5,7 +5,7 @@ import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isAccessibility, isPrefixed } from './selectors/utils.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
 import { destructure, isSystemFont } from './values/destructure-font-shorthand.js'
-import { isValueKeyword } from './values/values.js'
+import { isValueKeyword, keywords } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
 import { ContextCollection } from './context-collection.js'
@@ -175,6 +175,7 @@ export function analyze(css, options = {}) {
   let colorFormats = new Collection(useLocations)
   let units = new ContextCollection(useLocations)
   let gradients = new Collection(useLocations)
+  let valueKeywords = new Collection(useLocations)
 
   walk(ast, function (node) {
     switch (node.type) {
@@ -412,6 +413,7 @@ export function analyze(css, options = {}) {
       case Value: {
         if (isValueKeyword(node)) {
           valueComplexities.push(1)
+          valueKeywords.p(stringifyNode(node), node.loc)
           break
         }
 
@@ -450,7 +452,11 @@ export function analyze(css, options = {}) {
         } else if (isProperty('font', property)) {
           if (isSystemFont(node)) return
 
-          let { font_size, line_height, font_family } = destructure(node, stringifyNode)
+          let { font_size, line_height, font_family } = destructure(node, stringifyNode, function (item) {
+            if (item.type === 'keyword') {
+              valueKeywords.p(item.value, loc)
+            }
+          })
 
           if (font_family) {
             fontFamilies.p(font_family, loc)
@@ -481,6 +487,8 @@ export function analyze(css, options = {}) {
               timingFunctions.p(stringifyNode(item.value), loc)
             } else if (item.type === 'duration') {
               durations.p(stringifyNode(item.value), loc)
+            } else if (item.type === 'keyword') {
+              valueKeywords.p(stringifyNode(item.value), loc)
             }
           })
           break
@@ -533,6 +541,10 @@ export function analyze(css, options = {}) {
               return this.skip
             }
             case Identifier: {
+              if (keywords.has(nodeName)) {
+                valueKeywords.p(nodeName, loc)
+              }
+
               // Bail out if it can't be a color name
               // 20 === 'lightgoldenrodyellow'.length
               // 3 === 'red'.length
@@ -870,6 +882,7 @@ export function analyze(css, options = {}) {
       browserhacks: valueBrowserhacks.c(),
       units: units.count(),
       complexity: valueComplexity,
+      keywords: valueKeywords.c(),
     },
     __meta__: {
       parseTime: startAnalysis - startParse,

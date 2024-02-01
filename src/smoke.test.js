@@ -30,7 +30,6 @@ Object.entries({
   const expected = JSON.parse(json)
 
   // writeFileSync(`./src/__fixtures__/${fileName}.json`, JSON.stringify(actual, null, 2))
-
   Smoke(`${name} - Stylesheet`, () => assert.equal(actual.stylesheet, expected.stylesheet))
   Smoke(`${name} - Atrules`, () => assert.equal(actual.atrules, expected.atrules))
   Smoke(`${name} - Rules`, () => assert.equal(actual.rules, expected.rules))
