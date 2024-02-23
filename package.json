@@ -19,7 +19,8 @@
   "unpkg": "./dist/analyzer.umd.js",
   "exports": {
     "require": "./dist/analyzer.cjs",
-    "default": "./dist/analyzer.modern.js"
+    "default": "./dist/analyzer.modern.js",
+    "types": "./dist/index.d.ts"
   },
   "types": "./dist/index.d.ts",
   "engines": {
