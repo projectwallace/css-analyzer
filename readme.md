@@ -415,5 +415,3 @@ const isSpecificityEqual = compareSpecificity(
 - [Constyble](https://github.com/projectwallace/constyble) - CSS Complexity linter
 - [Color Sorter](https://github.com/projectwallace/color-sorter) - Sort CSS colors
   by hue, saturation, lightness and opacity
-- [CSS Diff Github Action](https://github.com/projectwallace/css-diff-action) - A
-  GitHub action that comments on your PR to tell you how your code quality has changed
