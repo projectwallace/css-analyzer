@@ -38,7 +38,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - run: npm install --ignore-scripts --no-audit
+      - run: npm install --ignore-scripts --no-audit --no-fund
       - run: npm test
 
   lint-package:
@@ -52,7 +52,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - run: npm install --ignore-scripts --no-audit
+      - run: npm install --ignore-scripts --no-audit --no-fund
       - name: Build package
         run: npm run build
       - name: Lint package
