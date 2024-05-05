@@ -18,9 +18,9 @@
   "module": "./dist/analyzer.module.js",
   "unpkg": "./dist/analyzer.umd.js",
   "exports": {
+    "types": "./dist/index.d.ts",
     "require": "./dist/analyzer.cjs",
-    "default": "./dist/analyzer.modern.js",
-    "types": "./dist/index.d.ts"
+    "default": "./dist/analyzer.modern.js"
   },
   "types": "./dist/index.d.ts",
   "engines": {
