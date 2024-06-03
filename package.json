@@ -27,7 +27,7 @@
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
   },
   "scripts": {
-    "test": "uvu",
+    "test": "c8 --reporter=lcov uvu",
     "lint": "oxlint",
     "build": "microbundle"
   },
@@ -53,6 +53,8 @@
     "css-tree": "^2.3.1"
   },
   "devDependencies": {
+    "@codecov/vite-plugin": "^0.0.1-beta.8",
+    "c8": "^9.1.0",
     "microbundle": "^0.15.1",
     "oxlint": "^0.0.22",
     "uvu": "^0.5.6"
