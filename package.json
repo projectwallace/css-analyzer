@@ -4,7 +4,7 @@
   "author": "Bart Veneman",
   "repository": {
     "type": "git",
-    "url": "https://github.com/projectwallace/css-analyzer"
+    "url": "git+https://github.com/projectwallace/css-analyzer.git"
   },
   "homepage": "https://www.projectwallace.com/oss",
   "issues": "https://github.com/projectwallace/css-analyzer/issues",
