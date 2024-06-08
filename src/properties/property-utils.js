@@ -43,3 +43,15 @@ export function isProperty(basename, property) {
   if (isCustom(property)) return false
   return endsWith(basename, property)
 }
+
+/**
+ * Get the basename for a property with a vendor prefix
+ * @param {string} property
+ * @returns {string} The property name without vendor prefix
+ */
+export function basename(property) {
+  if (hasVendorPrefix(property)) {
+    return property.slice(property.indexOf('-', 2) + 1)
+  }
+  return property
+}

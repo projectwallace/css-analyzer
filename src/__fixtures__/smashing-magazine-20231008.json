@@ -50757,6 +50757,110 @@
       },
       "uniquenessRatio": 0.5789473684210527
     },
+    "borderRadiuses": {
+      "total": 253,
+      "totalUnique": 28,
+      "unique": {
+        "0": 42,
+        "11px": 143,
+        ".883em": 2,
+        "1.2em": 2,
+        "5.5px": 3,
+        ".694rem": 2,
+        "50%": 11,
+        "2px": 5,
+        ".125rem": 1,
+        "6px": 1,
+        "4px": 2,
+        "0 11px 11px 0": 4,
+        "20px": 1,
+        "0 100% 100% 0": 1,
+        "50% 0 0 50%": 1,
+        "11px 11px 0 0": 7,
+        "0 0 11px 11px": 1,
+        "3px": 4,
+        "22px": 2,
+        "11px 0 0 0": 2,
+        "0 11px 0 0": 2,
+        "100px": 1,
+        "1.125em": 1,
+        "1.125em 0 0 1.125em": 1,
+        "11px 0 0 11px": 6,
+        ".5em": 2,
+        "0 1em 1em 0": 1,
+        "8px": 2
+      },
+      "uniquenessRatio": 0.11067193675889328,
+      "itemsPerContext": {
+        "border-radius": {
+          "total": 231,
+          "totalUnique": 28,
+          "unique": {
+            "0": 20,
+            "11px": 143,
+            ".883em": 2,
+            "1.2em": 2,
+            "5.5px": 3,
+            ".694rem": 2,
+            "50%": 11,
+            "2px": 5,
+            ".125rem": 1,
+            "6px": 1,
+            "4px": 2,
+            "0 11px 11px 0": 4,
+            "20px": 1,
+            "0 100% 100% 0": 1,
+            "50% 0 0 50%": 1,
+            "11px 11px 0 0": 7,
+            "0 0 11px 11px": 1,
+            "3px": 4,
+            "22px": 2,
+            "11px 0 0 0": 2,
+            "0 11px 0 0": 2,
+            "100px": 1,
+            "1.125em": 1,
+            "1.125em 0 0 1.125em": 1,
+            "11px 0 0 11px": 6,
+            ".5em": 2,
+            "0 1em 1em 0": 1,
+            "8px": 2
+          },
+          "uniquenessRatio": 0.12121212121212122
+        },
+        "border-top-left-radius": {
+          "total": 6,
+          "totalUnique": 1,
+          "unique": {
+            "0": 6
+          },
+          "uniquenessRatio": 0.16666666666666666
+        },
+        "border-bottom-left-radius": {
+          "total": 6,
+          "totalUnique": 1,
+          "unique": {
+            "0": 6
+          },
+          "uniquenessRatio": 0.16666666666666666
+        },
+        "border-top-right-radius": {
+          "total": 5,
+          "totalUnique": 1,
+          "unique": {
+            "0": 5
+          },
+          "uniquenessRatio": 0.2
+        },
+        "border-bottom-right-radius": {
+          "total": 5,
+          "totalUnique": 1,
+          "unique": {
+            "0": 5
+          },
+          "uniquenessRatio": 0.2
+        }
+      }
+    },
     "animations": {
       "durations": {
         "total": 297,

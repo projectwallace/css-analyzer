@@ -16,6 +16,7 @@ import { hasVendorPrefix } from './vendor-prefix.js'
 import { isCustom, isHack, isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
+import { basename } from './properties/property-utils.js'
 import {
   Atrule,
   Selector,
@@ -29,8 +30,21 @@ import {
   Func,
   Operator
 } from './css-tree-node-types.js'
+import { KeywordSet } from './keyword-set.js'
 
 /** @typedef {[number, number, number]} Specificity */
+
+let border_radius_properties = new KeywordSet([
+  'border-radius',
+  'border-top-left-radius',
+  'border-top-right-radius',
+  'border-bottom-right-radius',
+  'border-bottom-left-radius',
+  'border-start-start-radius',
+  'border-start-end-radius',
+  'border-end-end-radius',
+  'border-end-start-radius',
+])
 
 function ratio(part, total) {
   if (total === 0) return 0
@@ -176,6 +190,7 @@ export function analyze(css, options = {}) {
   let units = new ContextCollection(useLocations)
   let gradients = new Collection(useLocations)
   let valueKeywords = new Collection(useLocations)
+  let borderRadiuses = new ContextCollection(useLocations)
 
   walk(ast, function (node) {
     switch (node.type) {
@@ -512,6 +527,11 @@ export function analyze(css, options = {}) {
             })
           } else {
             timingFunctions.p(stringifyNode(node), loc)
+          }
+          break
+        } else if (border_radius_properties.has(basename(property))) {
+          if (!isValueKeyword(node)) {
+            borderRadiuses.push(stringifyNode(node), property, loc)
           }
           break
         } else if (isProperty('text-shadow', property)) {
@@ -874,6 +894,7 @@ export function analyze(css, options = {}) {
       zindexes: zindex.c(),
       textShadows: textShadows.c(),
       boxShadows: boxShadows.c(),
+      borderRadiuses: borderRadiuses.count(),
       animations: {
         durations: durations.c(),
         timingFunctions: timingFunctions.c(),
