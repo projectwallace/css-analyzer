@@ -57706,6 +57706,111 @@
       },
       "uniquenessRatio": 0.5535714285714286
     },
+    "borderRadiuses": {
+      "total": 179,
+      "totalUnique": 36,
+      "unique": {
+        "0": 10,
+        ".25rem": 22,
+        "5px": 16,
+        "50%": 30,
+        "4px": 28,
+        "12px": 2,
+        "4px 4px 0 0": 1,
+        "8px 8px 8px 8px": 1,
+        "0 20px 20px 0": 3,
+        "20px 0 0 20px": 1,
+        "20px": 14,
+        "5px 5px 0 0": 1,
+        "1.25rem": 4,
+        "2px": 4,
+        "30px": 2,
+        "100%": 11,
+        "8px": 3,
+        "1.25rem 1.25rem 0 0": 1,
+        "10px": 4,
+        "6px": 1,
+        "1000px": 1,
+        ".25rem .25rem 0 0": 1,
+        "0 .25rem .25rem 0": 1,
+        "3px": 2,
+        ".625rem": 1,
+        ".125rem": 3,
+        ".1875rem": 1,
+        "50px": 1,
+        ".3125rem": 1,
+        ".75rem": 1,
+        ".5rem": 1,
+        "1.5625rem": 1,
+        ".3125rem .3125rem 0 0": 1,
+        "24px": 2,
+        "16px": 1,
+        "21px": 1
+      },
+      "uniquenessRatio": 0.2011173184357542,
+      "itemsPerContext": {
+        "border-radius": {
+          "total": 176,
+          "totalUnique": 36,
+          "unique": {
+            "0": 10,
+            ".25rem": 21,
+            "5px": 16,
+            "50%": 30,
+            "4px": 28,
+            "12px": 2,
+            "4px 4px 0 0": 1,
+            "8px 8px 8px 8px": 1,
+            "0 20px 20px 0": 3,
+            "20px 0 0 20px": 1,
+            "20px": 14,
+            "5px 5px 0 0": 1,
+            "1.25rem": 4,
+            "2px": 4,
+            "30px": 2,
+            "100%": 11,
+            "8px": 3,
+            "1.25rem 1.25rem 0 0": 1,
+            "10px": 4,
+            "6px": 1,
+            "1000px": 1,
+            ".25rem .25rem 0 0": 1,
+            "0 .25rem .25rem 0": 1,
+            "3px": 2,
+            ".625rem": 1,
+            ".125rem": 1,
+            ".1875rem": 1,
+            "50px": 1,
+            ".3125rem": 1,
+            ".75rem": 1,
+            ".5rem": 1,
+            "1.5625rem": 1,
+            ".3125rem .3125rem 0 0": 1,
+            "24px": 2,
+            "16px": 1,
+            "21px": 1
+          },
+          "uniquenessRatio": 0.20454545454545456
+        },
+        "border-bottom-right-radius": {
+          "total": 2,
+          "totalUnique": 2,
+          "unique": {
+            ".25rem": 1,
+            ".125rem": 1
+          },
+          "uniquenessRatio": 1
+        },
+        "border-top-right-radius": {
+          "total": 1,
+          "totalUnique": 1,
+          "unique": {
+            ".125rem": 1
+          },
+          "uniquenessRatio": 1
+        }
+      }
+    },
     "animations": {
       "durations": {
         "total": 50,

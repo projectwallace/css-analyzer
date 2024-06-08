@@ -13958,6 +13958,88 @@
       },
       "uniquenessRatio": 0.6842105263157895
     },
+    "borderRadiuses": {
+      "total": 92,
+      "totalUnique": 15,
+      "unique": {
+        "0": 5,
+        "8px": 45,
+        "50%": 3,
+        "4px": 21,
+        ".5em": 1,
+        "5px": 2,
+        "16px": 2,
+        "2px": 4,
+        "15px": 1,
+        "1rem": 1,
+        "10px": 2,
+        "12px": 2,
+        "0 0 4px 4px": 1,
+        "1px": 1,
+        "9999px": 1
+      },
+      "uniquenessRatio": 0.16304347826086957,
+      "itemsPerContext": {
+        "border-radius": {
+          "total": 80,
+          "totalUnique": 15,
+          "unique": {
+            "0": 5,
+            "8px": 37,
+            "50%": 3,
+            "4px": 17,
+            ".5em": 1,
+            "5px": 2,
+            "16px": 2,
+            "2px": 4,
+            "15px": 1,
+            "1rem": 1,
+            "10px": 2,
+            "12px": 2,
+            "0 0 4px 4px": 1,
+            "1px": 1,
+            "9999px": 1
+          },
+          "uniquenessRatio": 0.1875
+        },
+        "border-bottom-right-radius": {
+          "total": 4,
+          "totalUnique": 2,
+          "unique": {
+            "4px": 1,
+            "8px": 3
+          },
+          "uniquenessRatio": 0.5
+        },
+        "border-bottom-left-radius": {
+          "total": 4,
+          "totalUnique": 2,
+          "unique": {
+            "4px": 1,
+            "8px": 3
+          },
+          "uniquenessRatio": 0.5
+        },
+        "border-top-right-radius": {
+          "total": 2,
+          "totalUnique": 2,
+          "unique": {
+            "4px": 1,
+            "8px": 1
+          },
+          "uniquenessRatio": 1
+        },
+        "border-top-left-radius": {
+          "total": 2,
+          "totalUnique": 2,
+          "unique": {
+            "4px": 1,
+            "8px": 1
+          },
+          "uniquenessRatio": 1
+        }
+      }
+    },
     "animations": {
       "durations": {
         "total": 32,

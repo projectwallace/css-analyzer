@@ -89408,6 +89408,163 @@
       },
       "uniquenessRatio": 0.55
     },
+    "borderRadiuses": {
+      "total": 348,
+      "totalUnique": 35,
+      "unique": {
+        "0": 79,
+        "6px": 19,
+        "4px": 53,
+        "50%": 22,
+        "3px": 54,
+        "4px 4px 0 0": 3,
+        "1px": 1,
+        "15px": 4,
+        ".25em": 1,
+        "10px": 12,
+        "5px 5px 0 0": 1,
+        "2px": 29,
+        "18px": 5,
+        "20px": 2,
+        "32px": 3,
+        "30px": 4,
+        "5px": 10,
+        "0 0 4px 4px": 2,
+        "8px": 2,
+        "100%": 10,
+        "50px": 1,
+        "24px": 2,
+        "3px 0 0 0": 1,
+        "16px": 11,
+        "100px": 1,
+        "64px": 2,
+        "0 0 16px 16px": 1,
+        "16.5px": 1,
+        ".4rem": 1,
+        ".33333rem": 2,
+        ".7rem": 1,
+        "0 0 .75em .75em": 1,
+        "20%": 1,
+        "0 0 19px 19px": 2,
+        ".125em": 4
+      },
+      "uniquenessRatio": 0.10057471264367816,
+      "itemsPerContext": {
+        "border-radius": {
+          "total": 226,
+          "totalUnique": 34,
+          "unique": {
+            "0": 27,
+            "6px": 13,
+            "4px": 35,
+            "50%": 22,
+            "3px": 22,
+            "4px 4px 0 0": 3,
+            "1px": 1,
+            "15px": 2,
+            ".25em": 1,
+            "10px": 12,
+            "5px 5px 0 0": 1,
+            "2px": 29,
+            "18px": 5,
+            "20px": 2,
+            "32px": 3,
+            "30px": 2,
+            "5px": 8,
+            "0 0 4px 4px": 2,
+            "8px": 2,
+            "100%": 10,
+            "50px": 1,
+            "24px": 2,
+            "3px 0 0 0": 1,
+            "16px": 7,
+            "100px": 1,
+            "64px": 2,
+            "0 0 16px 16px": 1,
+            "16.5px": 1,
+            ".4rem": 1,
+            ".33333rem": 2,
+            ".7rem": 1,
+            "0 0 .75em .75em": 1,
+            "20%": 1,
+            "0 0 19px 19px": 2
+          },
+          "uniquenessRatio": 0.1504424778761062
+        },
+        "border-top-right-radius": {
+          "total": 31,
+          "totalUnique": 5,
+          "unique": {
+            "0": 16,
+            "4px": 5,
+            "6px": 2,
+            "3px": 7,
+            ".125em": 1
+          },
+          "uniquenessRatio": 0.16129032258064516
+        },
+        "border-bottom-right-radius": {
+          "total": 25,
+          "totalUnique": 6,
+          "unique": {
+            "0": 10,
+            "4px": 4,
+            "6px": 1,
+            "3px": 7,
+            "16px": 2,
+            ".125em": 1
+          },
+          "uniquenessRatio": 0.24
+        },
+        "border-top-left-radius": {
+          "total": 31,
+          "totalUnique": 5,
+          "unique": {
+            "0": 16,
+            "4px": 5,
+            "6px": 2,
+            "3px": 7,
+            ".125em": 1
+          },
+          "uniquenessRatio": 0.16129032258064516
+        },
+        "border-bottom-left-radius": {
+          "total": 25,
+          "totalUnique": 6,
+          "unique": {
+            "0": 10,
+            "4px": 4,
+            "6px": 1,
+            "3px": 7,
+            "16px": 2,
+            ".125em": 1
+          },
+          "uniquenessRatio": 0.24
+        },
+        "-webkit-border-radius": {
+          "total": 5,
+          "totalUnique": 4,
+          "unique": {
+            "15px": 1,
+            "30px": 1,
+            "5px": 1,
+            "3px": 2
+          },
+          "uniquenessRatio": 0.8
+        },
+        "-moz-border-radius": {
+          "total": 5,
+          "totalUnique": 4,
+          "unique": {
+            "15px": 1,
+            "30px": 1,
+            "5px": 1,
+            "3px": 2
+          },
+          "uniquenessRatio": 0.8
+        }
+      }
+    },
     "animations": {
       "durations": {
         "total": 340,

@@ -11164,6 +11164,42 @@
       },
       "uniquenessRatio": 0.4444444444444444
     },
+    "borderRadiuses": {
+      "total": 38,
+      "totalUnique": 10,
+      "unique": {
+        "0": 2,
+        "0.2rem": 1,
+        "0.3rem": 13,
+        "0.3rem 0.3rem 0 0": 1,
+        "3px": 1,
+        "0.25rem": 1,
+        "0.3rem 0 0 0.3rem": 1,
+        "0.5rem": 13,
+        "4px": 2,
+        "50%": 3
+      },
+      "uniquenessRatio": 0.2631578947368421,
+      "itemsPerContext": {
+        "border-radius": {
+          "total": 38,
+          "totalUnique": 10,
+          "unique": {
+            "0": 2,
+            "0.2rem": 1,
+            "0.3rem": 13,
+            "0.3rem 0.3rem 0 0": 1,
+            "3px": 1,
+            "0.25rem": 1,
+            "0.3rem 0 0 0.3rem": 1,
+            "0.5rem": 13,
+            "4px": 2,
+            "50%": 3
+          },
+          "uniquenessRatio": 0.2631578947368421
+        }
+      }
+    },
     "animations": {
       "durations": {
         "total": 107,

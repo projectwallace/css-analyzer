@@ -419,6 +419,13 @@ Api("handles empty input gracefully", () => {
         unique: {},
         uniquenessRatio: 0,
       },
+      borderRadiuses: {
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        itemsPerContext: {},
+        uniquenessRatio: 0,
+      },
       animations: {
         durations: {
           total: 0,

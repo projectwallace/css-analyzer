@@ -32743,6 +32743,40 @@
       },
       "uniquenessRatio": 1
     },
+    "borderRadiuses": {
+      "total": 39,
+      "totalUnique": 9,
+      "unique": {
+        "0": 1,
+        "5px": 3,
+        "50%": 15,
+        "4px": 13,
+        "100%": 1,
+        "50px": 1,
+        "8px": 3,
+        "34px": 1,
+        "16px": 1
+      },
+      "uniquenessRatio": 0.23076923076923078,
+      "itemsPerContext": {
+        "border-radius": {
+          "total": 39,
+          "totalUnique": 9,
+          "unique": {
+            "0": 1,
+            "5px": 3,
+            "50%": 15,
+            "4px": 13,
+            "100%": 1,
+            "50px": 1,
+            "8px": 3,
+            "34px": 1,
+            "16px": 1
+          },
+          "uniquenessRatio": 0.23076923076923078
+        }
+      }
+    },
     "animations": {
       "durations": {
         "total": 86,
