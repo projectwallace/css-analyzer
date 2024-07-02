@@ -29,7 +29,8 @@
   "scripts": {
     "test": "uvu",
     "lint": "oxlint",
-    "build": "microbundle"
+    "build": "microbundle",
+    "benchmark": "node benchmark/benchmark.js"
   },
   "keywords": [
     "projectwallace",
@@ -54,8 +55,10 @@
   },
   "devDependencies": {
     "@codecov/vite-plugin": "^0.0.1-beta.8",
+    "@codspeed/tinybench-plugin": "^3.1.0",
     "c8": "^9.1.0",
     "microbundle": "^0.15.1",
+    "tinybench": "^2.8.0",
     "uvu": "^0.5.6"
   },
   "mangle": {
