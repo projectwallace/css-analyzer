@@ -6,7 +6,7 @@ import { analyze } from '../src/index.js'
 let filelist = fs.readdirSync('./src/__fixtures__')
 let files = filelist
   .filter(filename => filename.endsWith('.css'))
-  .filter(filename => filename.includes('github') || filename.includes('css-tricks'))
+  .filter(filename => filename.includes('css-tricks'))
   .reduce((acc, filename) => {
     let css = fs.readFileSync(`./src/__fixtures__/${filename}`, 'utf8')
     acc.set(filename, css)
