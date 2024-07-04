@@ -26,10 +26,11 @@ function compareChar(referenceCode, testCode) {
  * @returns {boolean} true if the two strings are the same, false otherwise
  */
 export function strEquals(base, maybe) {
+  if (base === maybe) return true
+
   let len = base.length;
   if (len !== maybe.length) return false
 
-  if (base === maybe) return true
 
   for (let i = 0; i < len; i++) {
     if (compareChar(base.charCodeAt(i), maybe.charCodeAt(i)) === false) {
@@ -52,6 +53,8 @@ export function strEquals(base, maybe) {
  * @returns {boolean} true if `test` ends with `base`, false otherwise
  */
 export function endsWith(base, maybe) {
+  if (base === maybe) return true
+
   let len = maybe.length
   let offset = len - base.length
 
@@ -81,6 +84,8 @@ export function endsWith(base, maybe) {
  * @returns {boolean} true if `base` starts with `maybe`, false otherwise
  */
 export function startsWith(base, maybe) {
+  if (base === maybe) return true
+
   let len = base.length
   if (maybe.length < len) return false
 
