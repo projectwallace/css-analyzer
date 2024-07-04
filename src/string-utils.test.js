@@ -19,6 +19,7 @@ StringUtils('endsWith', () => {
   assert.ok(endsWith('keyframes', '-webkit-keyframes'))
   assert.ok(endsWith('keyframes', 'testkeyframes'))
   assert.ok(endsWith('keyframes', 'testKeyframes'))
+  assert.ok(endsWith('test', 'test'))
 
   assert.not.ok(endsWith('keyframes', ''))
   assert.not.ok(endsWith('keyframes', 'test'))
@@ -30,6 +31,7 @@ StringUtils('startsWith', () => {
   assert.ok(startsWith('animation', 'animation'))
   assert.ok(startsWith('animation', 'animation-duration'))
   assert.ok(startsWith('animation', 'Animation'))
+  assert.ok(startsWith('test', 'test'))
 
   assert.not.ok(startsWith('data:', 'nope'))
   assert.not.ok(startsWith('test', ''))

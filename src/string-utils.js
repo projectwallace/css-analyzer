@@ -29,6 +29,8 @@ export function strEquals(base, maybe) {
   let len = base.length;
   if (len !== maybe.length) return false
 
+  if (base === maybe) return true
+
   for (let i = 0; i < len; i++) {
     if (compareChar(base.charCodeAt(i), maybe.charCodeAt(i)) === false) {
       return false
