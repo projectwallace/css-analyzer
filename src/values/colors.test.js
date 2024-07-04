@@ -767,6 +767,9 @@ Colors('does not report false positives for color keywords', () => {
       /* Not the black color keyword */
       font-family: Arial Black, Arial Bold, Gadget, sans-serif;
       font: 1em/1 Black;
+
+      /* not a color keyword */
+      -ms-overflow-style: scrollbar;
     }
   `).values.colors
   const expected = {
