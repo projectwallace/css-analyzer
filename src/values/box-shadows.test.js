@@ -61,6 +61,23 @@ BoxShadows('finds vendor prefixed values', () => {
   assert.equal(actual, expected)
 })
 
+BoxShadows.skip('does not report var() fallback values as separate values', () => {
+  const fixture = `
+    with-fallback {
+      box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  }`
+  const actual = analyze(fixture).values.boxShadows
+  const expected = {
+    total: 1,
+    unique: {
+      'var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)': 1,
+    },
+    totalUnique: 1,
+    uniquenessRatio: 1
+  }
+  assert.equal(actual, expected)
+})
+
 BoxShadows('ignores keywords', () => {
   const fixture = `
     box-shadows-keyword {
