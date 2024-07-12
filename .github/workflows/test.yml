@@ -22,21 +22,11 @@ jobs:
   test:
     name: Unit tests
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version:
-          - 14.13.0
-          - 16
-          - 18
-          - 20
-
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm install --ignore-scripts --no-audit --no-fund
       - run: npm test
@@ -47,10 +37,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm install --ignore-scripts --no-audit --no-fund
       - name: Build package
