@@ -133,17 +133,6 @@ Complexity('calculates the complexity mode', () => {
   assert.equal(actual, 1)
 })
 
-Complexity('calculates the complexity median', () => {
-  const fixture = `
-    #test,
-    .me,
-    now,
-    [crazy] ~ .selector > check {}
-  `
-  const actual = analyze(fixture).selectors.complexity.median
-  assert.equal(actual, 1)
-})
-
 Complexity('calculates total complexity', () => {
   const fixture = `
     #test,

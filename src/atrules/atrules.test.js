@@ -58,7 +58,6 @@ AtRules('calculates complexity', () => {
     max: 2,
     mean: 14 / 10,
     mode: 1,
-    median: 1,
     range: 1,
     sum: 14,
   })

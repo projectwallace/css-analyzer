@@ -27,7 +27,6 @@ Rules('should handle CSS without rules', () => {
       max: 0,
       mean: 0,
       mode: 0,
-      median: 0,
       range: 0,
       sum: 0,
       items: [],
@@ -41,7 +40,6 @@ Rules('should handle CSS without rules', () => {
       max: 0,
       mean: 0,
       mode: 0,
-      median: 0,
       range: 0,
       sum: 0,
       items: [],
@@ -55,7 +53,6 @@ Rules('should handle CSS without rules', () => {
       max: 0,
       mean: 0,
       mode: 0,
-      median: 0,
       range: 0,
       sum: 0,
       items: [],
@@ -102,7 +99,6 @@ Rules('counts sizes of rules', () => {
     max: 6,
     mean: 3.75,
     mode: 3.75,
-    median: 3.5,
     range: 4,
     sum: 15,
     items: [2, 4, 6, 3],
@@ -160,14 +156,6 @@ Rules('calculate the mean of selectors', () => {
     a,
     b {}
   `).rules.selectors.mean, 1.5)
-})
-
-Rules('calculate the median of selectors', () => {
-  assert.is(analyze(`
-    html {}
-    a,
-    b {}
-  `).rules.selectors.median, 1.5)
 })
 
 Rules('calculate the range of selectors', () => {
@@ -253,23 +241,6 @@ Rules('calculate the mean of declarations', () => {
       c: 3;
     }
   `).rules.declarations.mean, 2)
-})
-
-Rules('calculate the median of declarations', () => {
-  assert.is(analyze(`
-    html {
-      a: 1;
-    }
-    a {
-      a: 1;
-      b: 2;
-    }
-    b {
-      a: 1;
-      b: 2;
-      c: 3;
-    }
-  `).rules.declarations.median, 2)
 })
 
 Rules('calculate the range of declarations', () => {

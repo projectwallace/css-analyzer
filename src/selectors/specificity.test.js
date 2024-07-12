@@ -224,17 +224,6 @@ Specificity('calculates the mode value', () => {
   assert.equal(actual, [0, 0, 0.5])
 })
 
-Specificity('calculates the median value', () => {
-  const fixture = `
-    #test,
-    .me,
-    now,
-    [crazy] ~ .selector > check {}
-  `
-  const actual = analyze(fixture).selectors.specificity.median
-  assert.equal(actual, [0, 0.5, 0.5])
-})
-
 Specificity('calculates total specificity', () => {
   const fixture = `
     #test,

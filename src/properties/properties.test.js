@@ -148,7 +148,6 @@ Properties('calculates property complexity', () => {
 
   assert.is(actual.max, 2)
   assert.is(actual.mean, 1.75)
-  assert.is(actual.median, 2)
   assert.is(actual.min, 1)
   assert.is(actual.mode, 2)
   assert.is(actual.range, 1)

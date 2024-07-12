@@ -18,7 +18,6 @@ CollectionSuite('aggregates correctly', () => {
     min: 1,
     range: 24,
     mean: 39 / 6,
-    median: 3.5,
     mode: 4,
     sum: 39,
   }
@@ -37,7 +36,6 @@ CollectionSuite('handles collections without values', () => {
     min: 0,
     range: 0,
     mean: 0,
-    median: 0,
     mode: 0,
     sum: 0,
   })

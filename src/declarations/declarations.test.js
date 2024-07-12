@@ -140,7 +140,6 @@ Declarations('should count complexity', () => {
     max: 3,
     mean: 2,
     mode: 2,
-    median: 2,
     range: 2,
     sum: 6,
   }
