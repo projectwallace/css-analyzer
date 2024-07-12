@@ -20,7 +20,6 @@ test('calculates value complexity', () => {
 		max: 3,
 		mean: 10 / 5,
 		mode: 2,
-		median: 2,
 		range: 2,
 		sum: 10,
 	}

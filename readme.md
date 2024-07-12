@@ -22,9 +22,9 @@ A <b>CSS analyzer</b> that goes through your CSS to find all kinds of relevant s
 
 ## Features
 
-* Extremely **detailed** (150+ metrics)
-* Super **[fast](/benchmark)**
-* Supports both NodeJS and browsers
+- Extremely **detailed** (150+ metrics)
+- Super **[fast](/benchmark)**
+- Supports both NodeJS and browsers
 
 ## Install
 
@@ -37,7 +37,7 @@ npm install @projectwallace/css-analyzer
 ### Analyzing CSS
 
 ```js
-import { analyze } from '@projectwallace/css-analyzer'
+import { analyze } from "@projectwallace/css-analyzer";
 
 const result = analyze(`
 	p {
@@ -48,8 +48,9 @@ const result = analyze(`
 	.component[data-state="loading"] {
 		background-color: whitesmoke;
 	}
-`)
+`);
 ```
+
 <details>
   <summary>More examples output can be found in <a href="src/__fixtures__">the fixtures folder</a> and looks roughly like this:</summary>
 
@@ -126,26 +127,18 @@ const result = analyze(`
       "max": 1,
       "mean": 1,
       "mode": 1,
-      "median": 1,
       "range": 0,
       "sum": 2,
-      "items": [
-        1,
-        1
-      ]
+      "items": [1, 1]
     },
     "declarations": {
       "min": 1,
       "max": 2,
       "mean": 1.5,
       "mode": 1.5,
-      "median": 1.5,
       "range": 1,
       "sum": 3,
-      "items": [
-        2,
-        1
-      ]
+      "items": [2, 1]
     }
   },
   "selectors": {
@@ -153,47 +146,14 @@ const result = analyze(`
     "totalUnique": 2,
     "uniquenessRatio": 1,
     "specificity": {
-      "sum": [
-        0,
-        2,
-        1
-      ],
-      "min": [
-        0,
-        0,
-        1
-      ],
-      "max": [
-        0,
-        2,
-        0
-      ],
-      "mean": [
-        0,
-        1,
-        0.5
-      ],
-      "mode": [
-        0,
-        1,
-        0.5
-      ],
-      "median": [
-        0,
-        1,
-        0.5
-      ],
+      "sum": [0, 2, 1],
+      "min": [0, 0, 1],
+      "max": [0, 2, 0],
+      "mean": [0, 1, 0.5],
+      "mode": [0, 1, 0.5],
       "items": [
-        [
-          0,
-          0,
-          1
-        ],
-        [
-          0,
-          2,
-          0
-        ]
+        [0, 0, 1],
+        [0, 2, 0]
       ]
     },
     "complexity": {
@@ -201,7 +161,6 @@ const result = analyze(`
       "max": 3,
       "mean": 2,
       "mode": 2,
-      "median": 2,
       "range": 2,
       "sum": 4,
       "total": 2,
@@ -211,10 +170,7 @@ const result = analyze(`
         "3": 1
       },
       "uniquenessRatio": 1,
-      "items": [
-        1,
-        3
-      ]
+      "items": [1, 3]
     },
     "id": {
       "total": 0,
@@ -379,18 +335,19 @@ const result = analyze(`
   }
 }
 ```
+
 </details>
 
 ### Comparing specificity
 
 ```js
-import { compareSpecificity } from '@projectwallace/css-analyzer'
+import { compareSpecificity } from "@projectwallace/css-analyzer";
 
 const result = [
-  [0,1,1],
-  [2,0,0],
-  [0,0,1],
-].sort((a, b) => compareSpecificity(a, b))
+  [0, 1, 1],
+  [2, 0, 0],
+  [0, 0, 1],
+].sort((a, b) => compareSpecificity(a, b));
 
 // => result:
 // [
@@ -399,16 +356,13 @@ const result = [
 //   [0,0,1],
 // ]
 
-const isSpecificityEqual = compareSpecificity(
-  [0,1,0],
-  [0,1,0]
-) === 0
+const isSpecificityEqual = compareSpecificity([0, 1, 0], [0, 1, 0]) === 0;
 // => isSpecificityEqual: true
 ```
 
 ## Related projects
 
-- [CSS Code Quality Analyzer](https://github.com/projectwallace/css-code-quality) - 
+- [CSS Code Quality Analyzer](https://github.com/projectwallace/css-code-quality) -
   A Code Quality analyzer that tells you how maintainable, complex and performant your CSS is
 - [Wallace CLI](https://github.com/projectwallace/wallace-cli) - CLI tool for
   @projectwallace/css-analyzer

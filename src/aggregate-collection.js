@@ -33,23 +33,6 @@ function Mode(arr) {
   return sum / maxOccurenceCount
 }
 
-/**
- * Find the middle number in an Array of Numbers
- * Returns the average of 2 numbers if the Array length is an even number
- * @see https://github.com/angus-c/just/blob/684af9ca0c7808bc78543ec89379b1fdfce502b1/packages/array-median/index.js
- * @param {Array} arr - A sorted Array
- * @returns {Number} - The array's Median
- */
-function Median(arr) {
-  let middle = arr.length / 2
-  let lowerMiddleRank = Math.floor(middle)
-
-  if (middle !== lowerMiddleRank) {
-    return arr[lowerMiddleRank]
-  }
-  return (arr[lowerMiddleRank] + arr[lowerMiddleRank - 1]) / 2
-}
-
 class AggregateCollection {
   constructor() {
     /** @type number[] */
@@ -79,7 +62,6 @@ class AggregateCollection {
         max: 0,
         mean: 0,
         mode: 0,
-        median: 0,
         range: 0,
         sum: 0,
       }
@@ -92,7 +74,6 @@ class AggregateCollection {
     let max = sorted[len - 1]
 
     let mode = Mode(sorted)
-    let median = Median(sorted)
     let sum = this._sum
 
     return {
@@ -100,7 +81,6 @@ class AggregateCollection {
       max,
       mean: sum / len,
       mode,
-      median,
       range: max - min,
       sum: sum,
     }

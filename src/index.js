@@ -805,7 +805,6 @@ export function analyze(css, options = {}) {
           /** @type Specificity */
           mode: [specificitiesA.mode, specificitiesB.mode, specificitiesC.mode],
           /** @type Specificity */
-          median: [specificitiesA.median, specificitiesB.median, specificitiesC.median],
           items: specificities,
         },
         uniqueSpecificities.c(),
