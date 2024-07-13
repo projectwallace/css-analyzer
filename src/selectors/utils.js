@@ -90,11 +90,6 @@ export function isPrefixed(selector) {
         isPrefixed = true
         return this.break
       }
-    } else if (type === AttributeSelector) {
-      if (hasVendorPrefix(node.name.name)) {
-        isPrefixed = true
-        return this.break
-      }
     }
   })
 
@@ -126,9 +121,6 @@ export function getComplexity(selector) {
 
     if (type === AttributeSelector) {
       if (node.value) {
-        complexity++
-      }
-      if (hasVendorPrefix(node.name.name)) {
         complexity++
       }
       return this.skip
