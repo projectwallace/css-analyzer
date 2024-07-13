@@ -942,10 +942,6 @@ export {
 } from './atrules/atrules.js'
 
 export {
-  isBrowserhack as isValueBrowserhack
-} from './values/browserhacks.js'
-
-export {
   isHack as isPropertyHack,
 } from './properties/property-utils.js'
 
