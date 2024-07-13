@@ -8,7 +8,6 @@ import {
   isSelectorPrefixed,
   isMediaBrowserhack,
   isSupportsBrowserhack,
-  isValueBrowserhack,
   isPropertyHack,
   isValuePrefixed,
   hasVendorPrefix,
@@ -42,10 +41,6 @@ Api('exposes the "isMediaBrowserhack" method', () => {
 
 Api('exposes the "isSupportsBrowserhack" method', () => {
   assert.is(typeof isSupportsBrowserhack, "function")
-})
-
-Api('exposes the "isValueBrowserhack" method', () => {
-  assert.is(typeof isValueBrowserhack, "function")
 })
 
 Api('exposes the "isPropertyHack" method', () => {
