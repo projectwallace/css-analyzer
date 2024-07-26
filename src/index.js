@@ -1,5 +1,8 @@
+// @ts-expect-error No types for sub-export `parse` and `walk`
 import parse from 'css-tree/parser'
+// @ts-expect-error No types for sub-export `parse` and `walk`
 import walk from 'css-tree/walker'
+// @ts-expect-error No types for sub-export `core`
 import { calculate } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isAccessibility, isPrefixed } from './selectors/utils.js'
@@ -46,6 +49,12 @@ let border_radius_properties = new KeywordSet([
   'border-end-start-radius',
 ])
 
+/**
+ * Safe ratio calculation to avoid division by zero errors
+ * @param {number} part
+ * @param {number} total
+ * @returns {number}
+ */
 function ratio(part, total) {
   if (total === 0) return 0
   return part / total
@@ -79,7 +88,9 @@ export function analyze(css, options = {}) {
     return stringifyNodePlain(node).trim()
   }
 
+  /** @param {import('css-tree').CssNode} node */
   function stringifyNodePlain(node) {
+    /** @type {import('css-tree').CssNode as NonNullable<import('css-tree').CssNode['loc']>} */
     let loc = node.loc
     return css.substring(loc.start.offset, loc.end.offset)
   }
@@ -192,7 +203,7 @@ export function analyze(css, options = {}) {
   let valueKeywords = new Collection(useLocations)
   let borderRadiuses = new ContextCollection(useLocations)
 
-  walk(ast, function (node) {
+  walk(ast, function (/** @type {import('css-tree').CssNode} */node) {
     switch (node.type) {
       case Atrule: {
         totalAtRules++
@@ -203,10 +214,10 @@ export function analyze(css, options = {}) {
           let descriptors = {}
 
           if (useLocations) {
-            fontfaces_with_loc.p(node.loc.start.offset, node.loc)
+            fontfaces_with_loc.p(node.loc?.start.offset, node.loc)
           }
 
-          node.block.children.forEach(descriptor => {
+          node.block?.children.forEach(descriptor => {
             // Ignore 'Raw' nodes in case of CSS syntax errors
             if (descriptor.type === Declaration) {
               descriptors[descriptor.property] = stringifyNode(descriptor.value)
@@ -228,7 +239,7 @@ export function analyze(css, options = {}) {
 
           if (atRuleName === 'media') {
             medias.p(preludeStr, loc)
-            if (isMediaBrowserhack(prelude)) {
+            if (prelude.type === 'AtrulePrelude' && isMediaBrowserhack(prelude)) {
               mediaBrowserhacks.p(preludeStr, loc)
               complexity++
             }
@@ -236,7 +247,7 @@ export function analyze(css, options = {}) {
             supports.p(preludeStr, loc)
             // TODO: analyze vendor prefixes in @supports
             // TODO: analyze complexity of @supports 'declaration'
-            if (isSupportsBrowserhack(prelude)) {
+            if (prelude.type === 'AtrulePrelude' && isSupportsBrowserhack(prelude)) {
               supportsBrowserhacks.p(preludeStr, loc)
               complexity++
             }
@@ -276,7 +287,7 @@ export function analyze(css, options = {}) {
       case Rule: {
         let prelude = node.prelude
         let block = node.block
-        let preludeChildren = prelude.children
+        let preludeChildren = prelude.type === 'SelectorList' ? prelude.children : new Set()
         let blockChildren = block.children
         let numSelectors = preludeChildren ? preludeChildren.size : 0
         let numDeclarations = blockChildren ? blockChildren.size : 0
@@ -355,7 +366,7 @@ export function analyze(css, options = {}) {
           ids.p(selector, node.loc)
         }
 
-        getCombinators(node, function onCombinator(combinator) {
+        getCombinators(node, function onCombinator(/** @type {import('css-tree').Combinator} */ combinator) {
           combinators.p(combinator.name, combinator.loc)
         })
 
@@ -546,7 +557,7 @@ export function analyze(css, options = {}) {
           // no break here: potentially contains colors
         }
 
-        walk(node, function (valueNode) {
+        walk(node, function (/** @type {import('css-tree').CssNode} */ valueNode) {
           let nodeName = valueNode.name
 
           switch (valueNode.type) {

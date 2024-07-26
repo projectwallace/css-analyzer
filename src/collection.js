@@ -15,13 +15,13 @@ export class Collection {
 	}
 
 	/**
-	 * @param {string} item
-	 * @param {import('css-tree').CssLocation} node_location
+	 * @param {string | number} item
+	 * @param {import('css-tree').CssLocation | undefined} node_location
 	 */
 	p(item, node_location) {
 		let index = this._total
 
-		if (this._useLocations) {
+		if (this._useLocations && node_location) {
 			let start = node_location.start
 			let start_offset = start.offset
 			let position = index * 4
