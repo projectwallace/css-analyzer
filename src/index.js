@@ -660,19 +660,19 @@ export function analyze(css, options = {}) {
 
         properties.p(property, propertyLoc)
 
-        if (hasVendorPrefix(property)) {
-          propertyVendorPrefixes.p(property, propertyLoc)
-          propertyComplexities.push(2)
-        } else if (isHack(property)) {
-          propertyHacks.p(property, propertyLoc)
-          propertyComplexities.push(2)
-        } else if (isCustom(property)) {
+        if (isCustom(property)) {
           customProperties.p(property, propertyLoc)
           propertyComplexities.push(node.important ? 3 : 2)
 
           if (node.important === true) {
             importantCustomProperties.p(property, propertyLoc)
           }
+        } else if (hasVendorPrefix(property)) {
+          propertyVendorPrefixes.p(property, propertyLoc)
+          propertyComplexities.push(2)
+        } else if (isHack(property)) {
+          propertyHacks.p(property, propertyLoc)
+          propertyComplexities.push(2)
         } else {
           propertyComplexities.push(1)
         }
