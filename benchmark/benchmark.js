@@ -2,6 +2,7 @@ import { Bench } from "tinybench"
 import { withCodSpeed } from "@codspeed/tinybench-plugin"
 import * as fs from "fs"
 import { analyze } from '../src/index.js'
+import { namedColors, systemColors, colorKeywords } from "../src/values/colors.js"
 
 let filelist = fs.readdirSync('./src/__fixtures__')
 let files = filelist
@@ -257,6 +258,15 @@ bench.add('slice of nerdy.dev', () => {
 		}
 	}
     `)
+})
+
+bench.add('KeywordSet', () => {
+  namedColors.has('rebeccapurple')
+  namedColors.has('Highlight')
+  systemColors.has('Highlight')
+  systemColors.has('currentColor')
+  namedColors.has('not-a-color')
+  colorKeywords.has('currentColor')
 })
 
 await bench.warmup()
