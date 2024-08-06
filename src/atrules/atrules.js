@@ -73,23 +73,23 @@ export function isMediaBrowserhack(prelude) {
         returnValue = true
         return this.break
       }
-      else if (strEquals('-moz-images-in-menus', name)
-        || strEquals('min--moz-device-pixel-ratio', name)
-        || strEquals('-ms-high-contrast', name)
+      else if ('-moz-images-in-menus' === name
+        || 'min--moz-device-pixel-ratio' === name
+        || '-ms-high-contrast' === name
       ) {
         returnValue = true
         return this.break
       }
-      else if (strEquals('min-resolution', name)
-        && strEquals('.001', value.value)
-        && strEquals('dpcm', value.unit)
+      else if ('min-resolution' === name
+        && '.001' === value.value
+        && 'dpcm' === value.unit
       ) {
         returnValue = true
         return this.break
       }
-      else if (strEquals('-webkit-min-device-pixel-ratio', name)) {
+      else if ('-webkit-min-device-pixel-ratio' === name) {
         let val = value.value
-        if ((strEquals('0', val) || strEquals('10000', val))) {
+        if ('0' === val || '10000' === val) {
           returnValue = true
           return this.break
         }
