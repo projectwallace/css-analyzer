@@ -1,7 +1,7 @@
 import { Bench } from "tinybench"
 import { withCodSpeed } from "@codspeed/tinybench-plugin"
 import * as fs from "fs"
-import { analyze } from '../src/index.js'
+import { analyze } from '../dist/analyze-css.js'
 import { namedColors, systemColors, colorKeywords } from "../src/values/colors.js"
 
 let filelist = fs.readdirSync('./src/__fixtures__')
