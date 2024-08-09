@@ -49,7 +49,7 @@
     "code"
   ],
   "dependencies": {
-    "@bramus/specificity": "^2.3.0",
+    "@bramus/specificity": "github:bartveneman/specificity#be1f89dea482a366b9ed5bd49ef3e8af4d9ccb34",
     "css-tree": "^2.3.1"
   },
   "devDependencies": {
