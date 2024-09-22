@@ -28,8 +28,7 @@
   },
   "scripts": {
     "test": "uvu",
-    "build": "vite build",
-    "benchmark": "npm run build && node benchmark/benchmark.js"
+    "build": "vite build"
   },
   "keywords": [
     "projectwallace",
@@ -54,9 +53,7 @@
   },
   "devDependencies": {
     "@codecov/vite-plugin": "^0.0.1-beta.8",
-    "@codspeed/tinybench-plugin": "^3.1.0",
     "c8": "^9.1.0",
-    "tinybench": "^2.8.0",
     "uvu": "^0.5.6",
     "vite": "^5.4.6",
     "vite-plugin-dts": "^3.9.1"
