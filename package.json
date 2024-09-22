@@ -52,11 +52,11 @@
     "css-tree": "^2.3.1"
   },
   "devDependencies": {
-    "@codecov/vite-plugin": "^0.0.1-beta.8",
+    "@codecov/vite-plugin": "^1.2.0",
     "c8": "^9.1.0",
     "uvu": "^0.5.6",
-    "vite": "^5.4.6",
-    "vite-plugin-dts": "^3.9.1"
+    "vite": "^5.4.7",
+    "vite-plugin-dts": "^4.2.1"
   },
   "mangle": {
     "regex": "^_[^_]"
