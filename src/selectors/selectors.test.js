@@ -70,6 +70,12 @@ Selectors('handles CSS without selectors', () => {
       uniquenessRatio: 0,
       ratio: 0,
     },
+    pseudoClasses: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+    },
     accessibility: {
       total: 0,
       totalUnique: 0,
@@ -312,6 +318,12 @@ Selectors('handles emoji selectors', () => {
       unique: {},
       uniquenessRatio: 0,
       ratio: 0,
+    },
+    pseudoClasses: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
     },
     accessibility: {
       total: 0,

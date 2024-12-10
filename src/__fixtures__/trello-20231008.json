@@ -10428,6 +10428,27 @@
       "uniquenessRatio": 1,
       "ratio": 0.003469210754553339
     },
+    "pseudoClasses": {
+      "total": 493,
+      "totalUnique": 14,
+      "unique": {
+        "hover": 85,
+        "focus": 120,
+        "not": 44,
+        "focus-visible": 40,
+        "disabled": 4,
+        "root": 1,
+        "last-child": 170,
+        "active": 17,
+        "last-of-type": 2,
+        "nth-child": 3,
+        "-ms-input-placeholder": 2,
+        "after": 1,
+        "before": 1,
+        "first-child": 3
+      },
+      "uniquenessRatio": 0.028397565922920892
+    },
     "accessibility": {
       "total": 0,
       "totalUnique": 0,
