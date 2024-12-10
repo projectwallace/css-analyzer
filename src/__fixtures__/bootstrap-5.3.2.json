@@ -25889,6 +25889,37 @@
       "uniquenessRatio": 0,
       "ratio": 0
     },
+    "pseudoClasses": {
+      "total": 467,
+      "totalUnique": 24,
+      "unique": {
+        "root": 3,
+        "hover": 47,
+        "not": 145,
+        "focus": 66,
+        "focus-visible": 11,
+        "disabled": 27,
+        "last-child": 34,
+        "first-child": 36,
+        "nth-of-type": 1,
+        "nth-child": 2,
+        "-moz-focusring": 1,
+        "active": 11,
+        "checked": 13,
+        "indeterminate": 1,
+        "-moz-placeholder-shown": 4,
+        "placeholder-shown": 4,
+        "-webkit-autofill": 3,
+        "focus-within": 7,
+        "nth-last-child": 5,
+        "valid": 17,
+        "invalid": 17,
+        "empty": 6,
+        "first-of-type": 3,
+        "last-of-type": 3
+      },
+      "uniquenessRatio": 0.05139186295503212
+    },
     "accessibility": {
       "total": 1,
       "totalUnique": 1,

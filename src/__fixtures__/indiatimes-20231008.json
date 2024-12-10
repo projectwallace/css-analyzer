@@ -56553,6 +56553,29 @@
       "uniquenessRatio": 0.90625,
       "ratio": 0.003918207420105302
     },
+    "pseudoClasses": {
+      "total": 1081,
+      "totalUnique": 16,
+      "unique": {
+        "first-of-type": 13,
+        "after": 108,
+        "last-child": 255,
+        "checked": 3,
+        "first-child": 20,
+        "before": 294,
+        "last-of-type": 40,
+        "focus": 8,
+        "not": 110,
+        "hover": 103,
+        "nth-child": 119,
+        "nth-last-child": 3,
+        "active": 1,
+        "empty": 2,
+        "root": 1,
+        "Georgia": 1
+      },
+      "uniquenessRatio": 0.014801110083256245
+    },
     "accessibility": {
       "total": 0,
       "totalUnique": 0,

@@ -2,7 +2,7 @@ import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
 import { calculate } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
-import { getCombinators, getComplexity, isAccessibility, isPrefixed } from './selectors/utils.js'
+import { getCombinators, getComplexity, isAccessibility, isPrefixed, hasPseudoClass } from './selectors/utils.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
 import { destructure, isSystemFont } from './values/destructure-font-shorthand.js'
 import { isValueKeyword, keywords } from './values/values.js'
@@ -156,6 +156,7 @@ export function analyze(css, options = {}) {
   let specificities = []
   let ids = new Collection(useLocations)
   let a11y = new Collection(useLocations)
+  let pseudoClasses = new Collection(useLocations)
   let combinators = new Collection(useLocations)
 
   // Declarations
@@ -305,6 +306,13 @@ export function analyze(css, options = {}) {
 
         if (isAccessibility(node)) {
           a11y.p(selector, node.loc)
+        }
+
+        let pseudos = hasPseudoClass(node)
+        if (pseudos !== false) {
+          for (let pseudo of pseudos) {
+            pseudoClasses.p(pseudo, node.loc)
+          }
         }
 
         let complexity = getComplexity(node)
@@ -820,6 +828,7 @@ export function analyze(css, options = {}) {
         ids.c(), {
         ratio: ratio(ids.size(), totalSelectors),
       }),
+      pseudoClasses: pseudoClasses.c(),
       accessibility: assign(
         a11y.c(), {
         ratio: ratio(a11y.size(), totalSelectors),

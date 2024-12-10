@@ -31271,6 +31271,33 @@
       "uniquenessRatio": 1,
       "ratio": 0.0004955401387512388
     },
+    "pseudoClasses": {
+      "total": 2476,
+      "totalUnique": 20,
+      "unique": {
+        "root": 6,
+        "hover": 301,
+        "after": 113,
+        "not": 1363,
+        "last-child": 67,
+        "has": 76,
+        "first-child": 178,
+        "nth-child": 107,
+        "before": 127,
+        "active": 34,
+        "focus": 49,
+        "empty": 10,
+        "only-child": 9,
+        "is": 1,
+        "first-of-type": 13,
+        "last-of-type": 6,
+        "-ms-input-placeholder": 2,
+        "checked": 10,
+        "disabled": 2,
+        "nth-of-type": 2
+      },
+      "uniquenessRatio": 0.008077544426494346
+    },
     "accessibility": {
       "total": 4,
       "totalUnique": 4,

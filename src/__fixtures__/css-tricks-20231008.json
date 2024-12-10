@@ -12512,6 +12512,31 @@
       "uniquenessRatio": 0.8913043478260869,
       "ratio": 0.030223390275952694
     },
+    "pseudoClasses": {
+      "total": 386,
+      "totalUnique": 18,
+      "unique": {
+        "after": 19,
+        "before": 75,
+        "not": 130,
+        "nth-child": 2,
+        "first-child": 12,
+        "last-child": 17,
+        "focus": 47,
+        "hover": 46,
+        "is": 2,
+        "target": 6,
+        "first-of-type": 8,
+        "empty": 1,
+        "first-letter": 1,
+        "nth-of-type": 1,
+        "focus-within": 3,
+        "active": 2,
+        "root": 2,
+        "where": 12
+      },
+      "uniquenessRatio": 0.046632124352331605
+    },
     "accessibility": {
       "total": 2,
       "totalUnique": 2,

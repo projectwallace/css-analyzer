@@ -97,6 +97,26 @@ export function isPrefixed(selector) {
 }
 
 /**
+ * @param {import('css-tree').Selector} selector
+ * @returns {string[] | false} The pseudo-class name if it exists, otherwise false
+ */
+export function hasPseudoClass(selector) {
+  let pseudos = []
+
+  walk(selector, function (node) {
+    if (node.type === PseudoClassSelector) {
+      pseudos.push(node.name)
+    }
+  })
+
+  if (pseudos.length === 0) {
+    return false
+  }
+
+  return pseudos;
+}
+
+/**
  * Get the Complexity for the AST of a Selector Node
  * @param {import('css-tree').Selector} selector - AST Node for a Selector
  * @return {number} - The numeric complexity of the Selector and whether it's prefixed or not
