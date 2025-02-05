@@ -52,12 +52,12 @@ function ratio(part, total) {
 }
 
 let defaults = {
-  useUnstableLocations: false
+  useLocations: false
 }
 
 /**
  * @typedef Options
- * @property {boolean} useUnstableLocations **WARNING: EXPERIMENTAL!** Use Locations (`{ 'item': [{ line, column, offset, length }] }`) instead of a regular count per occurrence (`{ 'item': 3 }`)
+ * @property {boolean} useLocations Use Locations (`{ 'item': [{ line, column, offset, length }] }`) instead of a regular count per occurrence (`{ 'item': 3 }`)
  */
 
 /**
@@ -67,7 +67,7 @@ let defaults = {
  */
 export function analyze(css, options = {}) {
   let settings = Object.assign({}, defaults, options)
-  let useLocations = settings.useUnstableLocations === true
+  let useLocations = settings.useLocations === true
   let start = Date.now()
 
   /**
@@ -91,7 +91,7 @@ export function analyze(css, options = {}) {
   let embedSize = 0
   let embedTypes = {
     total: 0,
-    /** @type {Map<string, { size: number, count: number } & ({ __unstable__uniqueWithLocations?: undefined } | ({ __unstable__uniqueWithLocations: { offset: number, line: number, column: number, length: number }[] })) }>} */
+    /** @type {Map<string, { size: number, count: number } & ({ uniqueWithLocations?: undefined } | ({ uniqueWithLocations: { offset: number, line: number, column: number, length: number }[] })) }>} */
     unique: new Map()
   }
 
@@ -415,7 +415,7 @@ export function analyze(css, options = {}) {
             item.size += size
             embedTypes.unique.set(type, item)
             if (useLocations) {
-              item.__unstable__uniqueWithLocations.push(loc)
+              item.uniqueWithLocations.push(loc)
             }
           } else {
             let item = {
@@ -423,7 +423,7 @@ export function analyze(css, options = {}) {
               size
             }
             if (useLocations) {
-              item.__unstable__uniqueWithLocations = [loc]
+              item.uniqueWithLocations = [loc]
             }
             embedTypes.unique.set(type, item)
           }
@@ -694,7 +694,7 @@ export function analyze(css, options = {}) {
   })
 
   let embeddedContent = embeds.c()
-  delete embeddedContent.__unstable__uniqueWithLocations
+  delete embeddedContent.uniqueWithLocations
 
   let totalUniqueDeclarations = uniqueDeclarations.size
 
@@ -742,7 +742,7 @@ export function analyze(css, options = {}) {
         unique: fontfaces,
         uniquenessRatio: fontFacesCount === 0 ? 0 : 1,
       }, useLocations ? {
-        __unstable__uniqueWithLocations: fontfaces_with_loc.c().__unstable__uniqueWithLocations,
+        uniqueWithLocations: fontfaces_with_loc.c().uniqueWithLocations,
       } : {}),
       import: imports.c(),
       media: assign(

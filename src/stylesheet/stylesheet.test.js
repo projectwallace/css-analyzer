@@ -178,7 +178,7 @@ Stylesheet('measures base64 contents - with locations', () => {
     }
   `
 
-  const actual = analyze(fixture, { useUnstableLocations: true }).stylesheet.embeddedContent
+  const actual = analyze(fixture, { useLocations: true }).stylesheet.embeddedContent
   const expected = {
     total: 5,
     totalUnique: 5,
@@ -202,7 +202,7 @@ Stylesheet('measures base64 contents - with locations', () => {
         'image/gif': {
           count: 1,
           size: 310,
-          __unstable__uniqueWithLocations: [
+          uniqueWithLocations: [
             {
               line: 5,
               column: 9,
@@ -214,7 +214,7 @@ Stylesheet('measures base64 contents - with locations', () => {
         'image/svg+xml': {
           count: 4,
           size: 2027,
-          __unstable__uniqueWithLocations: [
+          uniqueWithLocations: [
             {
               line: 13,
               column: 19,

@@ -424,11 +424,11 @@ Selectors('tracks combinator locations', () => {
     a[attr] b {}
   `
   let result = analyze(css, {
-    useUnstableLocations: true
+    useLocations: true
   })
   let actual = result.selectors.combinators
 
-  assert.equal(actual.__unstable__uniqueWithLocations, {
+  assert.equal(actual.uniqueWithLocations, {
     ' ': [
       {
         line: 2,
@@ -465,7 +465,7 @@ Selectors('tracks combinator locations', () => {
     ]
   })
 
-  let as_strings = actual.__unstable__uniqueWithLocations[' ']
+  let as_strings = actual.uniqueWithLocations[' ']
     .map(loc => css.substring(loc.offset, loc.offset + loc.length))
   assert.equal(as_strings, [
     ' ',
@@ -491,7 +491,7 @@ Selectors('Can keep track of selector locations if we ask it to do so', () => {
       }
     }
   `
-  let actual = analyze(fixture, { useUnstableLocations: true }).selectors.complexity.__unstable__uniqueWithLocations
+  let actual = analyze(fixture, { useLocations: true }).selectors.complexity.uniqueWithLocations
   let expected = {
     '1': [
       {

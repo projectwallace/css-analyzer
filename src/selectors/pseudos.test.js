@@ -33,8 +33,8 @@ test('logs the whole parent selector when using locations', () => {
 	let actual = analyze(`
 		a:hover,
 		a:lang(en) {}`,
-		{ useUnstableLocations: true }
-	).selectors.pseudoClasses.__unstable__uniqueWithLocations
+		{ useLocations: true }
+	).selectors.pseudoClasses.uniqueWithLocations
 	let expected = {
 		'hover': [
 			{
