@@ -427,9 +427,6 @@ export function analyze(css, options = {}) {
             }
             embedTypes.unique.set(type, item)
           }
-
-          // @deprecated
-          embeds.p(embed, node.loc)
         }
         break
       }
@@ -693,9 +690,6 @@ export function analyze(css, options = {}) {
     }
   })
 
-  let embeddedContent = embeds.c()
-  delete embeddedContent.uniqueWithLocations
-
   let totalUniqueDeclarations = uniqueDeclarations.size
 
   let totalSelectors = selectorComplexities.size()
@@ -722,7 +716,7 @@ export function analyze(css, options = {}) {
         total: totalComments,
         size: commentsSize,
       },
-      embeddedContent: assign(embeddedContent, {
+      embeddedContent: {
         size: {
           total: embedSize,
           ratio: ratio(embedSize, cssLen),
@@ -733,7 +727,7 @@ export function analyze(css, options = {}) {
           uniquenessRatio: ratio(embedTypes.unique.size, embedTypes.total),
           unique: Object.fromEntries(embedTypes.unique),
         },
-      }),
+      },
     },
     atrules: {
       fontface: assign({
@@ -849,11 +843,6 @@ export function analyze(css, options = {}) {
       total: totalDeclarations,
       totalUnique: totalUniqueDeclarations,
       uniquenessRatio: ratio(totalUniqueDeclarations, totalDeclarations),
-      // @TODO: deprecated, remove in next major version
-      unique: {
-        total: totalUniqueDeclarations,
-        ratio: ratio(totalUniqueDeclarations, totalDeclarations),
-      },
       importants: {
         total: importantDeclarations,
         ratio: ratio(importantDeclarations, totalDeclarations),

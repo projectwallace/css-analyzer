@@ -73,10 +73,6 @@ Api("handles empty input gracefully", () => {
         size: 0,
       },
       embeddedContent: {
-        total: 0,
-        totalUnique: 0,
-        unique: {},
-        uniquenessRatio: 0,
         size: {
           total: 0,
           ratio: 0,
@@ -293,10 +289,6 @@ Api("handles empty input gracefully", () => {
       total: 0,
       totalUnique: 0,
       uniquenessRatio: 0,
-      unique: {
-        total: 0,
-        ratio: 0,
-      },
       importants: {
         total: 0,
         ratio: 0,

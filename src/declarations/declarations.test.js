@@ -48,8 +48,8 @@ Declarations('should be counted', () => {
   const actual = analyze(fixture).declarations
 
   assert.is(actual.total, 6)
-  assert.is(actual.unique.total, 5)
-  assert.is(actual.unique.ratio, 5 / 6)
+  assert.is(actual.totalUnique, 5)
+  assert.is(actual.uniquenessRatio, 5 / 6)
 })
 
 Declarations('should count !importants', () => {
