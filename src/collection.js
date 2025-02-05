@@ -61,9 +61,9 @@ export class Collection {
 	 * 	uniquenessRatio: number;
 	 * 	unique: Record<string, number>;
 	 * } & ({
-	 * 	__unstable__uniqueWithLocations: Record<string, CssLocation[]>
+	 * 	uniqueWithLocations: Record<string, CssLocation[]>
 	 * } | {
-	 * 	__unstable__uniqueWithLocations?: undefined
+	 * 	uniqueWithLocations?: undefined
 	 * })}
 	 */
 	c() {
@@ -103,7 +103,7 @@ export class Collection {
 		}
 
 		if (useLocations) {
-			data.__unstable__uniqueWithLocations = Object.fromEntries(uniqueWithLocations)
+			data.uniqueWithLocations = Object.fromEntries(uniqueWithLocations)
 		}
 
 		return data

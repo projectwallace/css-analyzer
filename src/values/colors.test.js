@@ -1063,9 +1063,9 @@ Colors('Lists locations when unstable flag is set', () => {
       background-color: red;
     }
   `
-  let actual = analyze(css, { useUnstableLocations: true })
+  let actual = analyze(css, { useLocations: true })
 
-  assert.equal(actual.values.colors.__unstable__uniqueWithLocations, {
+  assert.equal(actual.values.colors.uniqueWithLocations, {
     'red': [
       {
         line: 3,
