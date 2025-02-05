@@ -444,6 +444,7 @@ export function analyze(css, options = {}) {
         let { property, important } = declaration
         let complexity = 1
 
+        // i.e. `background-image: -webkit-linear-gradient()`
         if (isValuePrefixed(node)) {
           vendorPrefixedValues.p(stringifyNode(node), node.loc)
           complexity++
@@ -484,9 +485,11 @@ export function analyze(css, options = {}) {
           if (font_family) {
             fontFamilies.p(font_family, loc)
           }
+
           if (font_size) {
             fontSizes.p(font_size, loc)
           }
+
           if (line_height) {
             lineHeights.p(line_height, loc)
           }

@@ -41,9 +41,12 @@ export function isSystemFont(node) {
  */
 export function destructure(value, stringifyNode, cb) {
 	let font_family = Array.from({ length: 2 })
+	/** @type {string | undefined} */
 	let font_size
+	/** @type {string | undefined} */
 	let line_height
 
+	// FIXME: in case of a var(--my-stack, fam1, fam2, fam3) this forEach also loops over all children of the var()
 	value.children.forEach(function (node, item) {
 		let prev = item.prev ? item.prev.data : undefined
 		let next = item.next ? item.next.data : undefined
@@ -76,7 +79,7 @@ export function destructure(value, stringifyNode, cb) {
 		) {
 			font_family[0] = node
 
-			if (!font_size && prev !== null) {
+			if (!font_size && prev) {
 				font_size = stringifyNode(prev)
 			}
 
@@ -112,21 +115,22 @@ export function destructure(value, stringifyNode, cb) {
 		}
 	})
 
+	let family = (font_family[0] || font_family[1])
+		? stringifyNode({
+			loc: {
+				start: {
+					offset: (font_family[0] || font_family[1]).loc.start.offset,
+				},
+				end: {
+					offset: font_family[1].loc.end.offset,
+				},
+			},
+		})
+		: null
+
 	return {
 		font_size,
 		line_height,
-		font_family:
-			font_family[0] || font_family[1]
-				? stringifyNode({
-					loc: {
-						start: {
-							offset: (font_family[0] || font_family[1]).loc.start.offset,
-						},
-						end: {
-							offset: font_family[1].loc.end.offset,
-						},
-					},
-				})
-				: null,
+		font_family: family,
 	}
 }
