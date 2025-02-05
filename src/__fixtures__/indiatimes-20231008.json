@@ -9,10 +9,6 @@
       "size": 0
     },
     "embeddedContent": {
-      "total": 0,
-      "totalUnique": 0,
-      "unique": {},
-      "uniquenessRatio": 0,
       "size": {
         "total": 0,
         "ratio": 0
@@ -56623,10 +56619,6 @@
     "total": 6144,
     "totalUnique": 1910,
     "uniquenessRatio": 0.3108723958333333,
-    "unique": {
-      "total": 1910,
-      "ratio": 0.3108723958333333
-    },
     "importants": {
       "total": 0,
       "ratio": 0,
