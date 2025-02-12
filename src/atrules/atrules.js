@@ -69,7 +69,7 @@ export function isMediaBrowserhack(prelude) {
         return this.break
       }
     } else if (node.type === MediaFeature) {
-      if (value !== null && value.unit === '\\0') {
+      if (value && value.unit && value.unit === '\\0') {
         returnValue = true
         return this.break
       }
@@ -81,15 +81,14 @@ export function isMediaBrowserhack(prelude) {
         return this.break
       }
       else if (strEquals('min-resolution', name)
-        && strEquals('.001', value.value)
+        && value && strEquals('.001', value.value)
         && strEquals('dpcm', value.unit)
       ) {
         returnValue = true
         return this.break
       }
       else if (strEquals('-webkit-min-device-pixel-ratio', name)) {
-        let val = value.value
-        if ((strEquals('0', val) || strEquals('10000', val))) {
+        if (value && value.value && (strEquals('0', value.value) || strEquals('10000', value.value))) {
           returnValue = true
           return this.break
         }
