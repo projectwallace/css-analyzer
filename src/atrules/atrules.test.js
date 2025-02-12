@@ -580,6 +580,19 @@ AtRules('finds @media browserhacks', () => {
   assert.equal(actual, expected)
 })
 
+AtRules('does not crash on incomplete @media queries', () => {
+  let css = `
+    @media (min-width) {}
+    @media (-moz-images-in-menus) {}
+    @media (min--moz-device-pixel-ratio) {}
+    @media (-ms-high-contrast), (-ms-high-contrast) {}
+    @media (min-resolution) {}
+    @media (-webkit-min-device-pixel-ratio) {}
+  `
+
+  assert.not.throws(() => analyze(css))
+})
+
 AtRules('analyzes @keyframes', () => {
   const fixture = `
     @keyframes one {}
