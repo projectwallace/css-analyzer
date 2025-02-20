@@ -1,6 +1,6 @@
 import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
-import { calculate } from '@bramus/specificity/core'
+import { calculateForAST } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isAccessibility, isPrefixed, hasPseudoClass } from './selectors/utils.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
@@ -326,7 +326,7 @@ export function analyze(css, options = {}) {
         uniqueSelectorComplexities.p(complexity, node.loc)
 
         // #region specificity
-        let [{ value: specificityObj }] = calculate(node)
+        let { value: specificityObj } = calculateForAST(node)
         let sa = specificityObj.a
         let sb = specificityObj.b
         let sc = specificityObj.c
