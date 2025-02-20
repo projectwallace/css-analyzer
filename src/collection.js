@@ -15,7 +15,7 @@ export class Collection {
 	}
 
 	/**
-	 * @param {string} item
+	 * @param {string | number} item
 	 * @param {import('css-tree').CssLocation} node_location
 	 */
 	p(item, node_location) {

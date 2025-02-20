@@ -326,15 +326,10 @@ export function analyze(css, options = {}) {
         uniqueSelectorComplexities.p(complexity, node.loc)
 
         // #region specificity
-        let { value: specificityObj } = calculateForAST(node)
-        let sa = specificityObj.a
-        let sb = specificityObj.b
-        let sc = specificityObj.c
+        let specificity = calculateForAST(node).toArray()
+        let [sa, sb, sc] = specificity
 
-        /** @type {Specificity} */
-        let specificity = [sa, sb, sc]
-
-        uniqueSpecificities.p(sa + ',' + sb + ',' + sc, node.loc)
+        uniqueSpecificities.p(specificity.toString(), node.loc)
 
         specificityA.push(sa)
         specificityB.push(sb)
