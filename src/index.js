@@ -87,7 +87,6 @@ export function analyze(css, options = {}) {
   // Stylesheet
   let totalComments = 0
   let commentsSize = 0
-  let embeds = new Collection(false)
   let embedSize = 0
   let embedTypes = {
     total: 0,
