@@ -1,5 +1,4 @@
-import { test } from "uvu"
-import * as assert from "uvu/assert"
+import { expect, test } from 'vitest'
 import { Collection } from './new-collection.js'
 
 test('simple count', () => {
@@ -12,7 +11,7 @@ test('simple count', () => {
 	collection.add('three', loc)
 
 	const result = Array.from(collection.list())
-	assert.equal(result, [
+	expect(result).toEqual([
 		{ name: 'one', count: 2 },
 		{ name: 'two', count: 2 },
 		{ name: 'three', count: 1 }
@@ -25,17 +24,17 @@ test('counts "0" as a string', () => {
 	collection.add('0', loc)
 
 	const result = Array.from(collection.list())
-	assert.equal(result, [
+	expect(result).toEqual([
 		{ name: '0', count: 1 }
 	])
-	assert.equal(collection.total, 1)
-	assert.ok(collection.has('0'))
+	expect(collection.total).toBe(1)
+	expect(collection.has('0')).toBeTruthy()
 })
 
 test('empty list', () => {
 	const collection = new Collection()
 	const result = Array.from(collection.list())
-	assert.equal(result, [])
+	expect(result).toEqual([])
 })
 
 test('unique', () => {
@@ -47,12 +46,12 @@ test('unique', () => {
 	collection.add('two', loc)
 	collection.add('three', loc)
 
-	assert.is(collection.total_unique, 3)
+	expect(collection.total_unique).toBe(3)
 })
 
 test('empty unique', () => {
 	const collection = new Collection()
-	assert.is(collection.total_unique, 0)
+	expect(collection.total_unique).toBe(0)
 })
 
 test('locations', () => {
@@ -61,7 +60,7 @@ test('locations', () => {
 	collection.add('one', { start: { offset: 3, line: 2, column: 1 }, end: { offset: 4, line: 2, column: 2 } })
 
 	const result = Array.from(collection.locations('one'))
-	assert.equal(result, [
+	expect(result).toEqual([
 		{ start: 1, end: 2, line: 1, column: 1 },
 		{ start: 3, end: 4, line: 2, column: 1 }
 	])
@@ -70,8 +69,8 @@ test('locations', () => {
 test('has', () => {
 	const collection = new Collection()
 	collection.add('one', { start: { offset: 1, line: 1, column: 1 }, end: { offset: 2, line: 1, column: 2 } })
-	assert.ok(collection.has('one'))
-	assert.not(collection.has('two'))
+	expect(collection.has('one')).toBeTruthy()
+	expect(collection.has('two')).toBeFalsy()
 })
 
 test('JSON.stringify', () => {
@@ -81,7 +80,7 @@ test('JSON.stringify', () => {
 	collection.add('two', { start: { offset: 5, line: 3, column: 1 }, end: { offset: 6, line: 3, column: 2 } })
 
 	const result = JSON.stringify(collection)
-	assert.is(result, '[{"name":"one","count":2,"locations":[{"line":1,"column":1,"start":1,"end":2},{"line":2,"column":1,"start":3,"end":4}]},{"name":"two","count":1,"locations":[{"line":3,"column":1,"start":5,"end":6}]}]')
+	expect(result).toBe('[{"name":"one","count":2,"locations":[{"line":1,"column":1,"start":1,"end":2},{"line":2,"column":1,"start":3,"end":4}]},{"name":"two","count":1,"locations":[{"line":3,"column":1,"start":5,"end":6}]}]')
 })
 
 test('toJSON', () => {
@@ -91,7 +90,7 @@ test('toJSON', () => {
 	collection.add('two', { start: { offset: 5, line: 3, column: 1 }, end: { offset: 6, line: 3, column: 2 } })
 
 	const result = collection.toJSON()
-	assert.equal(result, [
+	expect(result).toEqual([
 		{ name: 'one', count: 2, locations: [{ start: 1, end: 2, line: 1, column: 1 }, { start: 3, end: 4, line: 2, column: 1 }] },
 		{ name: 'two', count: 1, locations: [{ start: 5, end: 6, line: 3, column: 1 }] }
 	])
@@ -103,12 +102,12 @@ test('total', () => {
 	collection.add('one', { start: { offset: 3, line: 2, column: 1 }, end: { offset: 4, line: 2, column: 2 } })
 	collection.add('two', { start: { offset: 5, line: 3, column: 1 }, end: { offset: 6, line: 3, column: 2 } })
 
-	assert.is(collection.total, 3)
+	expect(collection.total).toBe(3)
 })
 
 test('empty total', () => {
 	const collection = new Collection()
-	assert.is(collection.total, 0)
+	expect(collection.total).toBe(0)
 })
 
 test('unique ratio', () => {
@@ -117,12 +116,11 @@ test('unique ratio', () => {
 	collection.add('one', { start: { offset: 3, line: 2, column: 1 }, end: { offset: 4, line: 2, column: 2 } })
 	collection.add('two', { start: { offset: 5, line: 3, column: 1 }, end: { offset: 6, line: 3, column: 2 } })
 
-	assert.is(collection.uniqueness_ratio, 2 / 3)
+	expect(collection.uniqueness_ratio).toBe(2 / 3)
 })
 
 test('empty unique ratio', () => {
 	const collection = new Collection()
-	assert.is(collection.uniqueness_ratio, 0)
+	expect(collection.uniqueness_ratio).toBe(0)
 })
 
-test.run()

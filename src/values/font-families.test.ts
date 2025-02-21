@@ -1,10 +1,7 @@
-import { suite } from 'uvu';
-import * as assert from 'uvu/assert';
+import { describe, expect, test } from 'vitest'
 import { analyze } from '../index.js'
 
-const FontFamilies = suite('FontFamilies')
-
-FontFamilies('recognizes a font-family', () => {
+test('recognizes a font-family', () => {
   const fixture = `
     test {
       font-family: "Droid Sans", serif;
@@ -21,9 +18,9 @@ FontFamilies('recognizes a font-family', () => {
     }
   `
   const actual = analyze(fixture).values.fontFamilies
-  assert.equal(actual.total, 7)
-  assert.equal(actual.total_unique, 7)
-  assert.equal(Array.from(actual.list()), [
+  expect(actual.total).toBe(7)
+  expect(actual.total_unique).toBe(7)
+  expect(Array.from(actual.list())).toEqual([
     { name: '"Droid Sans", serif', count: 1 },
     { name: 'sans-serif', count: 1 },
     { name: `"Arial Black", 'Arial Bold', Gadget, sans-serif`, count: 1 },
@@ -34,7 +31,7 @@ FontFamilies('recognizes a font-family', () => {
   ])
 })
 
-FontFamilies('extracts the `font` shorthand', () => {
+test('extracts the `font` shorthand', () => {
   const fixture = `
     test {
       font: large 'Noto Sans';
@@ -56,9 +53,9 @@ FontFamilies('extracts the `font` shorthand', () => {
     }
   `
   const actual = analyze(fixture).values.fontFamilies
-  assert.equal(actual.total, 12)
-  assert.equal(actual.total_unique, 8)
-  assert.equal(Array.from(actual.list()), [
+  expect(actual.total).toBe(12)
+  expect(actual.total_unique).toBe(8)
+  expect(Array.from(actual.list())).toEqual([
     { name: `'Noto Sans'`, count: 1 },
     { name: `"Source Sans Pro", serif`, count: 1 },
     { name: 'serif', count: 5 },
@@ -71,18 +68,18 @@ FontFamilies('extracts the `font` shorthand', () => {
   ])
 })
 
-FontFamilies('does not crash on `12px var(...)', () => {
+test('does not crash on `12px var(...)', () => {
   const fixture = `
     test {
       font: 12px var(--fontStack-monospace, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace);
     }
   `
-  assert.not.throws(() => {
+  expect(() => {
     analyze(fixture).values.fontFamilies
-  })
+  }).not.toThrow()
 })
 
-FontFamilies('handles system fonts', () => {
+test('handles system fonts', () => {
   // Source: https://drafts.csswg.org/css-fonts-3/#font-prop
   const fixture = `
     test {
@@ -91,14 +88,14 @@ FontFamilies('handles system fonts', () => {
     }
   `
   const actual = analyze(fixture).values.fontFamilies
-  assert.equal(actual.total, 1)
-  assert.equal(actual.total_unique, 1)
-  assert.equal(Array.from(actual.list()), [
+  expect(actual.total).toBe(1)
+  expect(actual.total_unique).toBe(1)
+  expect(Array.from(actual.list())).toEqual([
     { name: 'menu', count: 1 },
   ])
 })
 
-FontFamilies('ignores keywords and global values', () => {
+test('ignores keywords and global values', () => {
   const fixture = `
     test {
       /* Global values */
@@ -116,8 +113,6 @@ FontFamilies('ignores keywords and global values', () => {
     }
   `
   const actual = analyze(fixture).values.fontFamilies
-  assert.equal(actual.total, 0)
-  assert.equal(actual.total_unique, 0)
+  expect(actual.total).toBe(0)
+  expect(actual.total_unique).toBe(0)
 })
-
-FontFamilies.run()

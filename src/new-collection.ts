@@ -1,15 +1,22 @@
-/**
- * @description A loosened version of the CssLocation type from css-tree
- * @typedef {Object} CssLocation
- * @property {string | undefined | null} source
- * @property {{ offset: number; line: number; column: number }} start
- * @property {{ offset: number; line: number | undefined; column: number | undefined }} end
- */
+type CssLocation = {
+	source?: string
+	start: {
+		offset: number
+		line: number
+		column: number
+	}
+	end: {
+		offset: number
+		line?: number
+		column?: number
+	}
+}
 
-/**
- * @param {CssLocation} location
- */
-function location_to_array(location) {
+type CssLocationArray = Uint32Array
+
+type Item = string | number
+
+function location_to_array(location: CssLocation) {
 	return new Uint32Array([
 		location.start.line,
 		location.start.column,
@@ -18,10 +25,7 @@ function location_to_array(location) {
 	])
 }
 
-/**
- * @param {ReturnType<typeof location_to_array>} array
- */
-function array_to_location(array) {
+function array_to_location(array: CssLocationArray) {
 	return {
 		line: array[0],
 		column: array[1],
@@ -31,20 +35,15 @@ function array_to_location(array) {
 }
 
 export class Collection {
-	/** @type {Map<string | number, Array<ReturnType<location_to_array>>>} */
-	#collection
-	#total
+	#collection: Map<Item, Array<CssLocationArray>>
+	#total: number
 
 	constructor() {
 		this.#collection = new Map()
 		this.#total = 0
 	}
 
-	/**
-	 * @param {string | number} item
-	 * @param {import('css-tree').CssLocation} location
-	 */
-	add(item, location) {
+	add(item: Item, location: CssLocation) {
 		let match = this.#collection.get(item)
 		let location_as_array = location_to_array(location)
 		if (match) {
@@ -74,8 +73,7 @@ export class Collection {
 		}
 	}
 
-	/** @param {string} name */
-	* locations(name) {
+	* locations(name: string) {
 		let match = this.#collection.get(name)
 		if (match) {
 			for (let location of match) {
@@ -84,8 +82,7 @@ export class Collection {
 		}
 	}
 
-	/** @param {string} name */
-	has(name) {
+	has(name: string) {
 		return this.#collection.has(name)
 	}
 

@@ -1,6 +1,6 @@
 import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
-import { calculateForAST } from '@bramus/specificity/core'
+import { calculateForAST } from '@bramus/specificity'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isAccessibility, isPrefixed, hasPseudoClass } from './selectors/utils.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
@@ -46,6 +46,12 @@ let border_radius_properties = new KeywordSet([
   'border-end-start-radius',
 ])
 
+/**
+ * Calculate the ratio of part to total (safe division)
+ * @param {number} part
+ * @param {number} total
+ * @returns
+ */
 function ratio(part, total) {
   if (total === 0) return 0
   return part / total
@@ -94,7 +100,7 @@ export function analyze(css) {
     },
   })
 
-  let linesOfCode = ast.loc.end.line - ast.loc.start.line + 1
+  let linesOfCode = ast.loc ? ast.loc.end.line - ast.loc.start.line + 1 : 0
 
   // Atrules
   let totalAtRules = 0
@@ -853,7 +859,7 @@ export function analyze(css) {
       }),
     values: {
       colors: assign(
-        colors.count(),
+        colors,
         {
           formats: colorFormats,
         },
@@ -865,14 +871,14 @@ export function analyze(css) {
       zindexes: zindex,
       textShadows: textShadows,
       boxShadows: boxShadows,
-      borderRadiuses: borderRadiuses.count(),
+      borderRadiuses: borderRadiuses,
       animations: {
         durations: durations,
         timingFunctions: timingFunctions,
       },
       prefixes: vendorPrefixedValues,
       browserhacks: valueBrowserhacks,
-      units: units.count(),
+      units: units,
       complexity: valueComplexity,
       keywords: valueKeywords,
     },

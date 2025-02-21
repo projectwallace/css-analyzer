@@ -1,10 +1,7 @@
-import { suite } from 'uvu'
-import * as assert from 'uvu/assert'
+import { describe, test, expect } from 'vitest'
 import { analyze } from '../index.js'
 
-const VendorPrefix = suite('VendorPrefixedValue')
-
-VendorPrefix('finds simple prefixes', () => {
+test('finds simple prefixes', () => {
   const fixture = `
     value-vendor-prefix-simple {
       width: -moz-max-content;
@@ -30,25 +27,20 @@ VendorPrefix('finds simple prefixes', () => {
     }
   `
   const actual = analyze(fixture).values.prefixes
-  const expected = {
-    total: 9,
-    totalUnique: 7,
-    unique: {
-      '-moz-max-content': 1,
-      '-webkit-max-content': 1,
-      '0 0 0 3px -moz-mac-focusring': 1,
-      '-webkit-sticky': 2,
-      '-webkit-transform 0.3s ease-out': 1,
-      '-moz-transform 0.3s ease-out': 1,
-      '-o-transform 0.3s ease-out': 2,
-    },
-    uniquenessRatio: 7 / 9,
-  }
-
-  assert.equal(actual, expected)
+  expect(actual.total).toBe(9)
+  expect(actual.total_unique).toBe(7)
+  expect(Array.from(actual.list())).toEqual([
+    { name: '-moz-max-content', count: 1 },
+    { name: '-webkit-max-content', count: 1 },
+    { name: '0 0 0 3px -moz-mac-focusring', count: 1 },
+    { name: '-webkit-sticky', count: 2 },
+    { name: '-webkit-transform 0.3s ease-out', count: 1 },
+    { name: '-moz-transform 0.3s ease-out', count: 1 },
+    { name: '-o-transform 0.3s ease-out', count: 2 },
+  ])
 })
 
-VendorPrefix('finds nested prefixes', () => {
+test('finds nested prefixes', () => {
   const fixture = `
     value-vendor-prefix-nested {
       background-image: -khtml-linear-gradient(90deg, red, green);
@@ -62,37 +54,25 @@ VendorPrefix('finds nested prefixes', () => {
     }
   `
   const actual = analyze(fixture).values.prefixes
-  const expected = {
-    total: 3,
-    totalUnique: 3,
-    unique: {
-      '-khtml-linear-gradient(90deg, red, green)': 1,
-      'red,\n        -webkit-linear-gradient(transparent, transparent),\n        -moz-linear-gradient(transparent, transparent),\n        -ms-linear-gradient(transparent, transparent),\n        -o-linear-gradient(transparent, transparent)': 1,
-      'repeat(3, max(-webkit-max-content, 100vw))': 1,
-    },
-    uniquenessRatio: 1
-  }
-
-  assert.equal(actual, expected)
+  expect(actual.total).toBe(3)
+  expect(actual.total_unique).toBe(3)
+  expect(Array.from(actual.list())).toEqual([
+    { name: '-khtml-linear-gradient(90deg, red, green)', count: 1 },
+    { name: 'red,\n        -webkit-linear-gradient(transparent, transparent),\n        -moz-linear-gradient(transparent, transparent),\n        -ms-linear-gradient(transparent, transparent),\n        -o-linear-gradient(transparent, transparent)', count: 1 },
+    { name: 'repeat(3, max(-webkit-max-content, 100vw))', count: 1 },
+  ])
 })
 
-VendorPrefix.skip('finds DEEPLY nested prefixes', () => {
+test.skip('finds DEEPLY nested prefixes', () => {
   const fixture = `
     value-vendor-prefix-deeply-nested {
       width: var(--test, -webkit-max-content);
     }
   `
   const actual = analyze(fixture).values.prefixes
-  const expected = {
-    total: 1,
-    totalUnique: 1,
-    unique: {
-      'var(--test, -webkit-max-content)': 1,
-    },
-    uniquenessRatio: 1
-  }
-
-  assert.equal(actual, expected)
+  expect(actual.total).toBe(1)
+  expect(actual.total_unique).toBe(1)
+  expect(Array.from(actual.list())).toEqual([
+    { name: 'var(--test, -webkit-max-content)', count: 1 },
+  ])
 })
-
-VendorPrefix.run()
