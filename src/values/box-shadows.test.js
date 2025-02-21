@@ -11,16 +11,11 @@ BoxShadows('finds simple values', () => {
     }
   `
   const actual = analyze(fixture).values.boxShadows
-  const expected = {
-    total: 1,
-    unique: {
-      '1px 1px 2px black': 1,
-    },
-    totalUnique: 1,
-    uniquenessRatio: 1
-  }
-
-  assert.equal(actual, expected)
+  assert.equal(actual.total, 1)
+  assert.equal(actual.total_unique, 1)
+  assert.equal(Array.from(actual.list()), [
+    { name: '1px 1px 2px black', count: 1 }
+  ])
 })
 
 BoxShadows('finds complex values', () => {
@@ -30,16 +25,11 @@ BoxShadows('finds complex values', () => {
     }
   `
   const actual = analyze(fixture).values.boxShadows
-  const expected = {
-    total: 1,
-    unique: {
-      '1px 1px 1px black,inset 2px 3px 5px rgba(0,0,0,0.3),inset -2px -3px 5px rgba(255,255,255,0.5)': 1,
-    },
-    totalUnique: 1,
-    uniquenessRatio: 1
-  }
-
-  assert.equal(actual, expected)
+  assert.equal(actual.total, 1)
+  assert.equal(actual.total_unique, 1)
+  assert.equal(Array.from(actual.list()), [
+    { name: '1px 1px 1px black,inset 2px 3px 5px rgba(0,0,0,0.3),inset -2px -3px 5px rgba(255,255,255,0.5)', count: 1 }
+  ])
 })
 
 BoxShadows('finds vendor prefixed values', () => {
@@ -49,16 +39,11 @@ BoxShadows('finds vendor prefixed values', () => {
     }
   `
   const actual = analyze(fixture).values.boxShadows
-  const expected = {
-    total: 1,
-    unique: {
-      '1px 1px 2px black': 1,
-    },
-    totalUnique: 1,
-    uniquenessRatio: 1
-  }
-
-  assert.equal(actual, expected)
+  assert.equal(actual.total, 1)
+  assert.equal(actual.total_unique, 1)
+  assert.equal(Array.from(actual.list()), [
+    { name: '1px 1px 2px black', count: 1 }
+  ])
 })
 
 BoxShadows.skip('does not report var() fallback values as separate values', () => {
@@ -67,15 +52,11 @@ BoxShadows.skip('does not report var() fallback values as separate values', () =
       box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   }`
   const actual = analyze(fixture).values.boxShadows
-  const expected = {
-    total: 1,
-    unique: {
-      'var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)': 1,
-    },
-    totalUnique: 1,
-    uniquenessRatio: 1
-  }
-  assert.equal(actual, expected)
+  assert.equal(actual.total, 1)
+  assert.equal(actual.total_unique, 1)
+  assert.equal(Array.from(actual.list()), [
+    { name: 'var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)', count: 1 }
+  ])
 })
 
 BoxShadows('ignores keywords', () => {
@@ -92,14 +73,9 @@ BoxShadows('ignores keywords', () => {
     }
   `
   const actual = analyze(fixture).values.boxShadows
-  const expected = {
-    total: 0,
-    unique: {},
-    totalUnique: 0,
-    uniquenessRatio: 0
-  }
-
-  assert.equal(actual, expected)
+  assert.equal(actual.total, 0)
+  assert.equal(actual.total_unique, 0)
+  assert.equal(Array.from(actual.list()), [])
 })
 
 BoxShadows.run()

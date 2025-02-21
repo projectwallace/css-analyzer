@@ -14,17 +14,13 @@ Animations('finds simple durations', () => {
     }
   `
   const actual = analyze(fixture).values.animations.durations
-  const expected = {
-    total: 3,
-    totalUnique: 3,
-    unique: {
-      '1s': 1,
-      '2ms': 1,
-      '300ms': 1,
-    },
-    uniquenessRatio: 3 / 3
-  }
-  assert.equal(actual, expected)
+  assert.equal(actual.total, 3)
+  assert.equal(actual.total_unique, 3)
+  assert.equal(Array.from(actual.list()), [
+    { name: '1s', count: 1 },
+    { name: '2ms', count: 1 },
+    { name: '300ms', count: 1 },
+  ])
 })
 
 Animations('finds duration lists', () => {
@@ -35,17 +31,13 @@ Animations('finds duration lists', () => {
     }
   `
   const actual = analyze(fixture).values.animations.durations
-  const expected = {
-    total: 4,
-    totalUnique: 3,
-    unique: {
-      '1s': 2,
-      '300ms': 1,
-      '400ms': 1,
-    },
-    uniquenessRatio: 3 / 4
-  }
-  assert.equal(actual, expected)
+  assert.equal(actual.total, 4)
+  assert.equal(actual.total_unique, 3)
+  assert.equal(Array.from(actual.list()), [
+    { name: '1s', count: 2 },
+    { name: '300ms', count: 1 },
+    { name: '400ms', count: 1 },
+  ])
 })
 
 Animations('finds simple timing functions', () => {
@@ -62,17 +54,13 @@ Animations('finds simple timing functions', () => {
     }
   `
   const actual = analyze(fixture).values.animations.timingFunctions
-  const expected = {
-    total: 4,
-    totalUnique: 3,
-    unique: {
-      'linear': 1,
-      'cubic-bezier(0, 1, 0, 1)': 2,
-      'steps(3)': 1,
-    },
-    uniquenessRatio: 3 / 4
-  }
-  assert.equal(actual, expected)
+  assert.equal(actual.total, 4)
+  assert.equal(actual.total_unique, 3)
+  assert.equal(Array.from(actual.list()), [
+    { name: 'linear', count: 1 },
+    { name: 'cubic-bezier(0, 1, 0, 1)', count: 2 },
+    { name: 'steps(3)', count: 1 },
+  ])
 })
 
 Animations('finds timing functions in value lists', () => {
@@ -82,17 +70,13 @@ Animations('finds timing functions in value lists', () => {
     }
   `
   const actual = analyze(fixture).values.animations.timingFunctions
-  const expected = {
-    total: 3,
-    totalUnique: 3,
-    unique: {
-      'ease': 1,
-      'step-start': 1,
-      'cubic-bezier(0.1, 0.7, 1, 0.1)': 1,
-    },
-    uniquenessRatio: 1
-  }
-  assert.equal(actual, expected)
+  assert.equal(actual.total, 3)
+  assert.equal(actual.total_unique, 3)
+  assert.equal(Array.from(actual.list()), [
+    { name: 'ease', count: 1 },
+    { name: 'step-start', count: 1 },
+    { name: 'cubic-bezier(0.1, 0.7, 1, 0.1)', count: 1 },
+  ])
 })
 
 Animations('finds shorthand durations', () => {
@@ -110,19 +94,15 @@ Animations('finds shorthand durations', () => {
     }
   `
   const actual = analyze(fixture).values.animations.durations
-  const expected = {
-    total: 5,
-    totalUnique: 5,
-    unique: {
-      '1s': 1,
-      '2s': 1,
-      '3s': 1,
-      '4s': 1,
-      '5s': 1,
-    },
-    uniquenessRatio: 5 / 5
-  }
-  assert.equal(actual, expected)
+  assert.equal(actual.total, 5)
+  assert.equal(actual.total_unique, 5)
+  assert.equal(Array.from(actual.list()), [
+    { name: '1s', count: 1 },
+    { name: '2s', count: 1 },
+    { name: '3s', count: 1 },
+    { name: '4s', count: 1 },
+    { name: '5s', count: 1 },
+  ])
 })
 
 Animations('finds shorthand timing functions', () => {
@@ -142,17 +122,13 @@ Animations('finds shorthand timing functions', () => {
     }
   `
   const actual = analyze(fixture).values.animations.timingFunctions
-  const expected = {
-    total: 5,
-    totalUnique: 3,
-    unique: {
-      'linear': 2,
-      'cubic-bezier(0,1,0,1)': 2,
-      'Cubic-Bezier(0,1,0,1)': 1,
-    },
-    uniquenessRatio: 3 / 5
-  }
-  assert.equal(actual, expected)
+  assert.equal(actual.total, 5)
+  assert.equal(actual.total_unique, 3)
+  assert.equal(Array.from(actual.list()), [
+    { name: 'linear', count: 2 },
+    { name: 'cubic-bezier(0,1,0,1)', count: 2 },
+    { name: 'Cubic-Bezier(0,1,0,1)', count: 1 },
+  ])
 })
 
 Animations('analyzes animations/transitions with value lists', () => {
@@ -167,42 +143,33 @@ Animations('analyzes animations/transitions with value lists', () => {
     }
   `
   const actual = analyze(fixture).values.animations
-  const expected = {
-    durations: {
-      total: 14,
-      totalUnique: 14,
-      unique: {
-        '1s': 1,
-        '2s': 1,
-        '3s': 1,
-        '4s': 1,
-        '5s': 1,
-        '6s': 1,
-        '7s': 1,
-        '8s': 1,
-        '9s': 1,
-        '10s': 1,
-        '11s': 1,
-        '12s': 1,
-        '13ms': 1,
-        '0.0014s': 1,
-      },
-      uniquenessRatio: 14 / 14
-    },
-    timingFunctions: {
-      total: 8,
-      totalUnique: 5,
-      unique: {
-        'linear': 3,
-        'ease': 2,
-        'ease-in-out': 1,
-        'steps(4, step-end)': 1,
-        'steps(2)': 1,
-      },
-      uniquenessRatio: 5 / 8
-    }
-  }
-  assert.equal(actual, expected)
+  assert.equal(actual.durations.total, 14)
+  assert.equal(actual.durations.total_unique, 14)
+  assert.equal(Array.from(actual.durations.list()), [
+    { name: '1s', count: 1 },
+    { name: '2s', count: 1 },
+    { name: '3s', count: 1 },
+    { name: '4s', count: 1 },
+    { name: '5s', count: 1 },
+    { name: '6s', count: 1 },
+    { name: '7s', count: 1 },
+    { name: '8s', count: 1 },
+    { name: '9s', count: 1 },
+    { name: '10s', count: 1 },
+    { name: '11s', count: 1 },
+    { name: '12s', count: 1 },
+    { name: '13ms', count: 1 },
+    { name: '0.0014s', count: 1 },
+  ])
+  assert.equal(actual.timingFunctions.total, 8)
+  assert.equal(actual.timingFunctions.total_unique, 5)
+  assert.equal(Array.from(actual.timingFunctions.list()), [
+    { name: 'linear', count: 3 },
+    { name: 'ease', count: 2 },
+    { name: 'ease-in-out', count: 1 },
+    { name: 'steps(4, step-end)', count: 1 },
+    { name: 'steps(2)', count: 1 },
+  ])
 })
 
 Animations.run()

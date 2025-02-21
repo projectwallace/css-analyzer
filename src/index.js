@@ -9,7 +9,7 @@ import { isValueKeyword, keywords } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
 import { ContextCollection } from './context-collection.js'
-import { Collection } from './collection.js'
+import { Collection } from './new-collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
 import { strEquals, startsWith, endsWith } from './string-utils.js'
 import { hasVendorPrefix } from './vendor-prefix.js'
@@ -51,25 +51,11 @@ function ratio(part, total) {
   return part / total
 }
 
-let defaults = {
-  useLocations: false
-}
-
-/**
- * @typedef Options
- * @property {boolean} useLocations Use Locations (`{ 'item': [{ line, column, offset, length }] }`) instead of a regular count per occurrence (`{ 'item': 3 }`)
- */
-
 /**
  * Analyze CSS
  * @param {string} css
- * @param {Options} options
  */
-export function analyze(css, options = {}) {
-  let settings = Object.assign({}, defaults, options)
-  let useLocations = settings.useLocations === true
-  let start = Date.now()
-
+export function analyze(css) {
   /**
    * Recreate the authored CSS from a CSSTree node
    * @param {import('css-tree').CssNode} node - Node from CSSTree AST to stringify
@@ -79,8 +65,12 @@ export function analyze(css, options = {}) {
     return stringifyNodePlain(node).trim()
   }
 
+  /** @param {import('css-tree').CssNode} node */
   function stringifyNodePlain(node) {
     let loc = node.loc
+    if (!loc) {
+      return ''
+    }
     return css.substring(loc.start.offset, loc.end.offset)
   }
 
@@ -94,8 +84,6 @@ export function analyze(css, options = {}) {
     unique: new Map()
   }
 
-  let startParse = Date.now()
-
   let ast = parse(css, {
     parseCustomProperty: true, // To find font-families, colors, etc.
     positions: true, // So we can use stringifyNode()
@@ -106,7 +94,6 @@ export function analyze(css, options = {}) {
     },
   })
 
-  let startAnalysis = Date.now()
   let linesOfCode = ast.loc.end.line - ast.loc.start.line + 1
 
   // Atrules
@@ -114,18 +101,18 @@ export function analyze(css, options = {}) {
   let atRuleComplexities = new AggregateCollection()
   /** @type {Record<string, string>[]} */
   let fontfaces = []
-  let fontfaces_with_loc = new Collection(useLocations)
-  let layers = new Collection(useLocations)
-  let imports = new Collection(useLocations)
-  let medias = new Collection(useLocations)
-  let mediaBrowserhacks = new Collection(useLocations)
-  let charsets = new Collection(useLocations)
-  let supports = new Collection(useLocations)
-  let supportsBrowserhacks = new Collection(useLocations)
-  let keyframes = new Collection(useLocations)
-  let prefixedKeyframes = new Collection(useLocations)
-  let containers = new Collection(useLocations)
-  let registeredProperties = new Collection(useLocations)
+  let fontfaces_with_loc = new Collection()
+  let layers = new Collection()
+  let imports = new Collection()
+  let medias = new Collection()
+  let mediaBrowserhacks = new Collection()
+  let charsets = new Collection()
+  let supports = new Collection()
+  let supportsBrowserhacks = new Collection()
+  let keyframes = new Collection()
+  let prefixedKeyframes = new Collection()
+  let containers = new Collection()
+  let registeredProperties = new Collection()
 
   // Rules
   let totalRules = 0
@@ -133,14 +120,14 @@ export function analyze(css, options = {}) {
   let ruleSizes = new AggregateCollection()
   let selectorsPerRule = new AggregateCollection()
   let declarationsPerRule = new AggregateCollection()
-  let uniqueRuleSize = new Collection(useLocations)
-  let uniqueSelectorsPerRule = new Collection(useLocations)
-  let uniqueDeclarationsPerRule = new Collection(useLocations)
+  let uniqueRuleSize = new Collection()
+  let uniqueSelectorsPerRule = new Collection()
+  let uniqueDeclarationsPerRule = new Collection()
 
   // Selectors
-  let keyframeSelectors = new Collection(useLocations)
+  let keyframeSelectors = new Collection()
   let uniqueSelectors = new Set()
-  let prefixedSelectors = new Collection(useLocations)
+  let prefixedSelectors = new Collection()
   /** @type {Specificity} */
   let maxSpecificity
   /** @type {Specificity} */
@@ -148,15 +135,15 @@ export function analyze(css, options = {}) {
   let specificityA = new AggregateCollection()
   let specificityB = new AggregateCollection()
   let specificityC = new AggregateCollection()
-  let uniqueSpecificities = new Collection(useLocations)
+  let uniqueSpecificities = new Collection()
   let selectorComplexities = new AggregateCollection()
-  let uniqueSelectorComplexities = new Collection(useLocations)
+  let uniqueSelectorComplexities = new Collection()
   /** @type {Specificity[]} */
   let specificities = []
-  let ids = new Collection(useLocations)
-  let a11y = new Collection(useLocations)
-  let pseudoClasses = new Collection(useLocations)
-  let combinators = new Collection(useLocations)
+  let ids = new Collection()
+  let a11y = new Collection()
+  let pseudoClasses = new Collection()
+  let combinators = new Collection()
 
   // Declarations
   let uniqueDeclarations = new Set()
@@ -164,33 +151,33 @@ export function analyze(css, options = {}) {
   let declarationComplexities = new AggregateCollection()
   let importantDeclarations = 0
   let importantsInKeyframes = 0
-  let importantCustomProperties = new Collection(useLocations)
+  let importantCustomProperties = new Collection()
 
   // Properties
-  let properties = new Collection(useLocations)
-  let propertyHacks = new Collection(useLocations)
-  let propertyVendorPrefixes = new Collection(useLocations)
-  let customProperties = new Collection(useLocations)
+  let properties = new Collection()
+  let propertyHacks = new Collection()
+  let propertyVendorPrefixes = new Collection()
+  let customProperties = new Collection()
   let propertyComplexities = new AggregateCollection()
 
   // Values
   let valueComplexities = new AggregateCollection()
-  let vendorPrefixedValues = new Collection(useLocations)
-  let valueBrowserhacks = new Collection(useLocations)
-  let zindex = new Collection(useLocations)
-  let textShadows = new Collection(useLocations)
-  let boxShadows = new Collection(useLocations)
-  let fontFamilies = new Collection(useLocations)
-  let fontSizes = new Collection(useLocations)
-  let lineHeights = new Collection(useLocations)
-  let timingFunctions = new Collection(useLocations)
-  let durations = new Collection(useLocations)
-  let colors = new ContextCollection(useLocations)
-  let colorFormats = new Collection(useLocations)
-  let units = new ContextCollection(useLocations)
-  let gradients = new Collection(useLocations)
-  let valueKeywords = new Collection(useLocations)
-  let borderRadiuses = new ContextCollection(useLocations)
+  let vendorPrefixedValues = new Collection()
+  let valueBrowserhacks = new Collection()
+  let zindex = new Collection()
+  let textShadows = new Collection()
+  let boxShadows = new Collection()
+  let fontFamilies = new Collection()
+  let fontSizes = new Collection()
+  let lineHeights = new Collection()
+  let timingFunctions = new Collection()
+  let durations = new Collection()
+  let colors = new ContextCollection()
+  let colorFormats = new Collection()
+  let units = new ContextCollection()
+  let gradients = new Collection()
+  let valueKeywords = new Collection()
+  let borderRadiuses = new ContextCollection()
 
   walk(ast, function (node) {
     switch (node.type) {
@@ -201,10 +188,7 @@ export function analyze(css, options = {}) {
 
         if (atRuleName === 'font-face') {
           let descriptors = {}
-
-          if (useLocations) {
-            fontfaces_with_loc.p(node.loc.start.offset, node.loc)
-          }
+          fontfaces_with_loc.add(node.loc.start.offset, node.loc)
 
           node.block.children.forEach(descriptor => {
             // Ignore 'Raw' nodes in case of CSS syntax errors
@@ -227,46 +211,46 @@ export function analyze(css, options = {}) {
           let loc = prelude.loc
 
           if (atRuleName === 'media') {
-            medias.p(preludeStr, loc)
+            medias.add(preludeStr, loc)
             if (isMediaBrowserhack(prelude)) {
-              mediaBrowserhacks.p(preludeStr, loc)
+              mediaBrowserhacks.add(preludeStr, loc)
               complexity++
             }
           } else if (atRuleName === 'supports') {
-            supports.p(preludeStr, loc)
+            supports.add(preludeStr, loc)
             // TODO: analyze vendor prefixes in @supports
             // TODO: analyze complexity of @supports 'declaration'
             if (isSupportsBrowserhack(prelude)) {
-              supportsBrowserhacks.p(preludeStr, loc)
+              supportsBrowserhacks.add(preludeStr, loc)
               complexity++
             }
           } else if (endsWith('keyframes', atRuleName)) {
             let name = '@' + atRuleName + ' ' + preludeStr
             if (hasVendorPrefix(atRuleName)) {
-              prefixedKeyframes.p(name, loc)
+              prefixedKeyframes.add(name, loc)
               complexity++
             }
-            keyframes.p(name, loc)
+            keyframes.add(name, loc)
           } else if (atRuleName === 'import') {
-            imports.p(preludeStr, loc)
+            imports.add(preludeStr, loc)
             // TODO: analyze complexity of media queries, layers and supports in @import
             // see https://github.com/projectwallace/css-analyzer/issues/326
           } else if (atRuleName === 'charset') {
-            charsets.p(preludeStr, loc)
+            charsets.add(preludeStr, loc)
           } else if (atRuleName === 'container') {
-            containers.p(preludeStr, loc)
+            containers.add(preludeStr, loc)
             // TODO: calculate complexity of container 'declaration'
           } else if (atRuleName === 'layer') {
             preludeStr
               .split(',')
-              .forEach(name => layers.p(name.trim(), loc))
+              .forEach(name => layers.add(name.trim(), loc))
           } else if (atRuleName === 'property') {
-            registeredProperties.p(preludeStr, loc)
+            registeredProperties.add(preludeStr, loc)
             // TODO: add complexity for descriptors
           }
         } else {
           if (atRuleName === 'layer') {
-            layers.p('<anonymous>', node.loc)
+            layers.add('<anonymous>', node.loc)
             complexity++
           }
         }
@@ -282,11 +266,11 @@ export function analyze(css, options = {}) {
         let numDeclarations = blockChildren ? blockChildren.size : 0
 
         ruleSizes.push(numSelectors + numDeclarations)
-        uniqueRuleSize.p(numSelectors + numDeclarations, node.loc)
+        uniqueRuleSize.add(numSelectors + numDeclarations, node.loc)
         selectorsPerRule.push(numSelectors)
-        uniqueSelectorsPerRule.p(numSelectors, prelude.loc)
+        uniqueSelectorsPerRule.add(numSelectors, prelude.loc)
         declarationsPerRule.push(numDeclarations)
-        uniqueDeclarationsPerRule.p(numDeclarations, block.loc)
+        uniqueDeclarationsPerRule.add(numDeclarations, block.loc)
 
         totalRules++
 
@@ -299,36 +283,36 @@ export function analyze(css, options = {}) {
         let selector = stringifyNode(node)
 
         if (this.atrule && endsWith('keyframes', this.atrule.name)) {
-          keyframeSelectors.p(selector, node.loc)
+          keyframeSelectors.add(selector, node.loc)
           return this.skip
         }
 
         if (isAccessibility(node)) {
-          a11y.p(selector, node.loc)
+          a11y.add(selector, node.loc)
         }
 
         let pseudos = hasPseudoClass(node)
         if (pseudos !== false) {
           for (let pseudo of pseudos) {
-            pseudoClasses.p(pseudo, node.loc)
+            pseudoClasses.add(pseudo, node.loc)
           }
         }
 
         let complexity = getComplexity(node)
 
         if (isPrefixed(node)) {
-          prefixedSelectors.p(selector, node.loc)
+          prefixedSelectors.add(selector, node.loc)
         }
 
         uniqueSelectors.add(selector)
         selectorComplexities.push(complexity)
-        uniqueSelectorComplexities.p(complexity, node.loc)
+        uniqueSelectorComplexities.add(complexity, node.loc)
 
         // #region specificity
         let specificity = calculateForAST(node).toArray()
         let [sa, sb, sc] = specificity
 
-        uniqueSpecificities.p(specificity.toString(), node.loc)
+        uniqueSpecificities.add(specificity.toString(), node.loc)
 
         specificityA.push(sa)
         specificityB.push(sb)
@@ -354,11 +338,11 @@ export function analyze(css, options = {}) {
         // #endregion
 
         if (sa > 0) {
-          ids.p(selector, node.loc)
+          ids.add(selector, node.loc)
         }
 
         getCombinators(node, function onCombinator(combinator) {
-          combinators.p(combinator.name, combinator.loc)
+          combinators.add(combinator.name, combinator.loc)
         })
 
         // Avoid deeper walking of selectors to not mess with
@@ -407,19 +391,14 @@ export function analyze(css, options = {}) {
             let item = embedTypes.unique.get(type)
             item.count++
             item.size += size
+            item.uniqueWithLocations.push(loc)
             embedTypes.unique.set(type, item)
-            if (useLocations) {
-              item.uniqueWithLocations.push(loc)
-            }
           } else {
-            let item = {
+            embedTypes.unique.set(type, {
               count: 1,
-              size
-            }
-            if (useLocations) {
-              item.uniqueWithLocations = [loc]
-            }
-            embedTypes.unique.set(type, item)
+              size,
+              uniqueWithLocations: [loc]
+            })
           }
         }
         break
@@ -427,7 +406,7 @@ export function analyze(css, options = {}) {
       case Value: {
         if (isValueKeyword(node)) {
           valueComplexities.push(1)
-          valueKeywords.p(stringifyNode(node), node.loc)
+          valueKeywords.add(stringifyNode(node), node.loc)
           break
         }
 
@@ -437,19 +416,19 @@ export function analyze(css, options = {}) {
 
         // i.e. `background-image: -webkit-linear-gradient()`
         if (isValuePrefixed(node)) {
-          vendorPrefixedValues.p(stringifyNode(node), node.loc)
+          vendorPrefixedValues.add(stringifyNode(node), node.loc)
           complexity++
         }
 
         // i.e. `property: value !ie`
         if (typeof important === 'string') {
-          valueBrowserhacks.p(stringifyNodePlain(node) + '!' + important, node.loc)
+          valueBrowserhacks.add(stringifyNodePlain(node) + '!' + important, node.loc)
           complexity++
         }
 
         // i.e. `property: value\9`
         if (isIe9Hack(node)) {
-          valueBrowserhacks.p(stringifyNode(node), node.loc)
+          valueBrowserhacks.add(stringifyNode(node), node.loc)
           complexity++
         }
 
@@ -462,50 +441,50 @@ export function analyze(css, options = {}) {
         // Process properties first that don't have colors,
         // so we can avoid further walking them;
         if (isProperty('z-index', property)) {
-          zindex.p(stringifyNode(node), loc)
+          zindex.add(stringifyNode(node), loc)
           return this.skip
         } else if (isProperty('font', property)) {
           if (isSystemFont(node)) return
 
           let { font_size, line_height, font_family } = destructure(node, stringifyNode, function (item) {
             if (item.type === 'keyword') {
-              valueKeywords.p(item.value, loc)
+              valueKeywords.add(item.value, loc)
             }
           })
 
           if (font_family) {
-            fontFamilies.p(font_family, loc)
+            fontFamilies.add(font_family, loc)
           }
 
           if (font_size) {
-            fontSizes.p(font_size, loc)
+            fontSizes.add(font_size, loc)
           }
 
           if (line_height) {
-            lineHeights.p(line_height, loc)
+            lineHeights.add(line_height, loc)
           }
 
           break
         } else if (isProperty('font-size', property)) {
           if (!isSystemFont(node)) {
-            fontSizes.p(stringifyNode(node), loc)
+            fontSizes.add(stringifyNode(node), loc)
           }
           break
         } else if (isProperty('font-family', property)) {
           if (!isSystemFont(node)) {
-            fontFamilies.p(stringifyNode(node), loc)
+            fontFamilies.add(stringifyNode(node), loc)
           }
           break
         } else if (isProperty('line-height', property)) {
-          lineHeights.p(stringifyNode(node), loc)
+          lineHeights.add(stringifyNode(node), loc)
         } else if (isProperty('transition', property) || isProperty('animation', property)) {
           analyzeAnimation(children, function (item) {
             if (item.type === 'fn') {
-              timingFunctions.p(stringifyNode(item.value), loc)
+              timingFunctions.add(stringifyNode(item.value), loc)
             } else if (item.type === 'duration') {
-              durations.p(stringifyNode(item.value), loc)
+              durations.add(stringifyNode(item.value), loc)
             } else if (item.type === 'keyword') {
-              valueKeywords.p(stringifyNode(item.value), loc)
+              valueKeywords.add(stringifyNode(item.value), loc)
             }
           })
           break
@@ -513,22 +492,22 @@ export function analyze(css, options = {}) {
           if (children && children.size > 1) {
             children.forEach(child => {
               if (child.type !== Operator) {
-                durations.p(stringifyNode(child), loc)
+                durations.add(stringifyNode(child), loc)
               }
             })
           } else {
-            durations.p(stringifyNode(node), loc)
+            durations.add(stringifyNode(node), loc)
           }
           break
         } else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
           if (children && children.size > 1) {
             children.forEach(child => {
               if (child.type !== Operator) {
-                timingFunctions.p(stringifyNode(child), loc)
+                timingFunctions.add(stringifyNode(child), loc)
               }
             })
           } else {
-            timingFunctions.p(stringifyNode(node), loc)
+            timingFunctions.add(stringifyNode(node), loc)
           }
           break
         } else if (border_radius_properties.has(basename(property))) {
@@ -538,12 +517,12 @@ export function analyze(css, options = {}) {
           break
         } else if (isProperty('text-shadow', property)) {
           if (!isValueKeyword(node)) {
-            textShadows.p(stringifyNode(node), loc)
+            textShadows.add(stringifyNode(node), loc)
           }
           // no break here: potentially contains colors
         } else if (isProperty('box-shadow', property)) {
           if (!isValueKeyword(node)) {
-            boxShadows.p(stringifyNode(node), loc)
+            boxShadows.add(stringifyNode(node), loc)
           }
           // no break here: potentially contains colors
         }
@@ -558,13 +537,13 @@ export function analyze(css, options = {}) {
                 hexLength = hexLength - 2
               }
               colors.push('#' + valueNode.value, property, loc)
-              colorFormats.p(`hex` + hexLength, loc)
+              colorFormats.add(`hex` + hexLength, loc)
 
               return this.skip
             }
             case Identifier: {
               if (keywords.has(nodeName)) {
-                valueKeywords.p(nodeName, loc)
+                valueKeywords.add(nodeName, loc)
               }
 
               // Bail out if it can't be a color name
@@ -579,7 +558,7 @@ export function analyze(css, options = {}) {
               if (colorKeywords.has(nodeName)) {
                 let stringified = stringifyNode(valueNode)
                 colors.push(stringified, property, loc)
-                colorFormats.p(nodeName.toLowerCase(), loc)
+                colorFormats.add(nodeName.toLowerCase(), loc)
                 return
               }
 
@@ -587,7 +566,7 @@ export function analyze(css, options = {}) {
               if (namedColors.has(nodeName)) {
                 let stringified = stringifyNode(valueNode)
                 colors.push(stringified, property, loc)
-                colorFormats.p('named', loc)
+                colorFormats.add('named', loc)
                 return
               }
 
@@ -595,7 +574,7 @@ export function analyze(css, options = {}) {
               if (systemColors.has(nodeName)) {
                 let stringified = stringifyNode(valueNode)
                 colors.push(stringified, property, loc)
-                colorFormats.p('system', loc)
+                colorFormats.add('system', loc)
                 return
               }
               return this.skip
@@ -609,12 +588,12 @@ export function analyze(css, options = {}) {
               // rgb(a), hsl(a), color(), hwb(), lch(), lab(), oklab(), oklch()
               if (colorFunctions.has(nodeName)) {
                 colors.push(stringifyNode(valueNode), property, valueNode.loc)
-                colorFormats.p(nodeName.toLowerCase(), valueNode.loc)
+                colorFormats.add(nodeName.toLowerCase(), valueNode.loc)
                 return
               }
 
               if (endsWith('gradient', nodeName)) {
-                gradients.p(stringifyNode(valueNode), valueNode.loc)
+                gradients.add(stringifyNode(valueNode), valueNode.loc)
                 return
               }
               // No this.skip here intentionally,
@@ -660,20 +639,20 @@ export function analyze(css, options = {}) {
           }
         }
 
-        properties.p(property, propertyLoc)
+        properties.add(property, propertyLoc)
 
         if (hasVendorPrefix(property)) {
-          propertyVendorPrefixes.p(property, propertyLoc)
+          propertyVendorPrefixes.add(property, propertyLoc)
           propertyComplexities.push(2)
         } else if (isHack(property)) {
-          propertyHacks.p(property, propertyLoc)
+          propertyHacks.add(property, propertyLoc)
           propertyComplexities.push(2)
         } else if (isCustom(property)) {
-          customProperties.p(property, propertyLoc)
+          customProperties.add(property, propertyLoc)
           propertyComplexities.push(node.important ? 3 : 2)
 
           if (node.important === true) {
-            importantCustomProperties.p(property, propertyLoc)
+            importantCustomProperties.add(property, propertyLoc)
           }
         } else {
           propertyComplexities.push(1)
@@ -702,7 +681,7 @@ export function analyze(css, options = {}) {
 
   return {
     stylesheet: {
-      sourceLinesOfCode: totalAtRules + totalSelectors + totalDeclarations + keyframeSelectors.size(),
+      sourceLinesOfCode: totalAtRules + totalSelectors + totalDeclarations + keyframeSelectors.total,
       linesOfCode,
       size: cssLen,
       complexity: atRuleComplexity.sum + selectorComplexity.sum + declarationComplexity.sum + propertyComplexity.sum + valueComplexity.sum,
@@ -729,33 +708,31 @@ export function analyze(css, options = {}) {
         totalUnique: fontFacesCount,
         unique: fontfaces,
         uniquenessRatio: fontFacesCount === 0 ? 0 : 1,
-      }, useLocations ? {
-        uniqueWithLocations: fontfaces_with_loc.c().uniqueWithLocations,
-      } : {}),
-      import: imports.c(),
+      }, fontfaces_with_loc),
+      import: imports,
       media: assign(
-        medias.c(),
+        medias,
         {
-          browserhacks: mediaBrowserhacks.c(),
+          browserhacks: mediaBrowserhacks,
         }
       ),
-      charset: charsets.c(),
+      charset: charsets,
       supports: assign(
-        supports.c(),
+        supports,
         {
-          browserhacks: supportsBrowserhacks.c(),
+          browserhacks: supportsBrowserhacks,
         },
       ),
       keyframes: assign(
-        keyframes.c(), {
+        keyframes, {
         prefixed: assign(
-          prefixedKeyframes.c(), {
-          ratio: ratio(prefixedKeyframes.size(), keyframes.size())
+          prefixedKeyframes, {
+          ratio: ratio(prefixedKeyframes.total, keyframes.total)
         }),
       }),
-      container: containers.c(),
-      layer: layers.c(),
-      property: registeredProperties.c(),
+      container: containers,
+      layer: layers,
+      property: registeredProperties,
       total: totalAtRules,
       complexity: atRuleComplexity
     },
@@ -770,21 +747,21 @@ export function analyze(css, options = {}) {
         {
           items: ruleSizes.toArray(),
         },
-        uniqueRuleSize.c(),
+        uniqueRuleSize,
       ),
       selectors: assign(
         selectorsPerRule.aggregate(),
         {
           items: selectorsPerRule.toArray(),
         },
-        uniqueSelectorsPerRule.c(),
+        uniqueSelectorsPerRule,
       ),
       declarations: assign(
         declarationsPerRule.aggregate(),
         {
           items: declarationsPerRule.toArray(),
         },
-        uniqueDeclarationsPerRule.c(),
+        uniqueDeclarationsPerRule,
       ),
     },
     selectors: {
@@ -806,32 +783,32 @@ export function analyze(css, options = {}) {
           /** @type Specificity */
           items: specificities,
         },
-        uniqueSpecificities.c(),
+        uniqueSpecificities,
       ),
       complexity: assign(
         selectorComplexity,
-        uniqueSelectorComplexities.c(),
+        uniqueSelectorComplexities,
         {
           items: selectorComplexities.toArray(),
         }
       ),
       id: assign(
-        ids.c(), {
-        ratio: ratio(ids.size(), totalSelectors),
+        ids, {
+        ratio: ratio(ids.total, totalSelectors),
       }),
-      pseudoClasses: pseudoClasses.c(),
+      pseudoClasses: pseudoClasses,
       accessibility: assign(
-        a11y.c(), {
-        ratio: ratio(a11y.size(), totalSelectors),
+        a11y, {
+        ratio: ratio(a11y.total, totalSelectors),
       }),
-      keyframes: keyframeSelectors.c(),
+      keyframes: keyframeSelectors,
       prefixed: assign(
-        prefixedSelectors.c(),
+        prefixedSelectors,
         {
-          ratio: ratio(prefixedSelectors.size(), totalSelectors),
+          ratio: ratio(prefixedSelectors.total, totalSelectors),
         },
       ),
-      combinators: combinators.c(),
+      combinators: combinators,
     },
     declarations: {
       total: totalDeclarations,
@@ -848,29 +825,29 @@ export function analyze(css, options = {}) {
       complexity: declarationComplexity,
     },
     properties: assign(
-      properties.c(),
+      properties,
       {
         prefixed: assign(
-          propertyVendorPrefixes.c(),
+          propertyVendorPrefixes,
           {
-            ratio: ratio(propertyVendorPrefixes.size(), properties.size()),
+            ratio: ratio(propertyVendorPrefixes.total, properties.total),
           },
         ),
         custom: assign(
-          customProperties.c(),
+          customProperties,
           {
-            ratio: ratio(customProperties.size(), properties.size()),
+            ratio: ratio(customProperties.total, properties.total),
             importants: assign(
-              importantCustomProperties.c(),
+              importantCustomProperties,
               {
-                ratio: ratio(importantCustomProperties.size(), customProperties.size()),
+                ratio: ratio(importantCustomProperties.total, customProperties.total),
               }
             ),
           },
         ),
         browserhacks: assign(
-          propertyHacks.c(), {
-          ratio: ratio(propertyHacks.size(), properties.size()),
+          propertyHacks, {
+          ratio: ratio(propertyHacks.total, properties.total),
         }),
         complexity: propertyComplexity,
       }),
@@ -878,32 +855,27 @@ export function analyze(css, options = {}) {
       colors: assign(
         colors.count(),
         {
-          formats: colorFormats.c(),
+          formats: colorFormats,
         },
       ),
-      gradients: gradients.c(),
-      fontFamilies: fontFamilies.c(),
-      fontSizes: fontSizes.c(),
-      lineHeights: lineHeights.c(),
-      zindexes: zindex.c(),
-      textShadows: textShadows.c(),
-      boxShadows: boxShadows.c(),
+      gradients: gradients,
+      fontFamilies: fontFamilies,
+      fontSizes: fontSizes,
+      lineHeights: lineHeights,
+      zindexes: zindex,
+      textShadows: textShadows,
+      boxShadows: boxShadows,
       borderRadiuses: borderRadiuses.count(),
       animations: {
-        durations: durations.c(),
-        timingFunctions: timingFunctions.c(),
+        durations: durations,
+        timingFunctions: timingFunctions,
       },
-      prefixes: vendorPrefixedValues.c(),
-      browserhacks: valueBrowserhacks.c(),
+      prefixes: vendorPrefixedValues,
+      browserhacks: valueBrowserhacks,
       units: units.count(),
       complexity: valueComplexity,
-      keywords: valueKeywords.c(),
+      keywords: valueKeywords,
     },
-    __meta__: {
-      parseTime: startAnalysis - startParse,
-      analyzeTime: Date.now() - startAnalysis,
-      total: Date.now() - start
-    }
   }
 }
 

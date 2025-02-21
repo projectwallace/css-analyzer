@@ -14,18 +14,14 @@ Browserhacks('finds hacks', () => {
     }
   `
   const actual = analyze(fixture).values.browserhacks
-  const expected = {
-    total: 4,
-    totalUnique: 4,
-    unique: {
-      'value !ie': 1,
-      'value !test': 1,
-      'value!nospace': 1,
-      "value\\9": 1,
-    },
-    uniquenessRatio: 4 / 4
-  }
-  assert.equal(actual, expected)
+  assert.equal(actual.total, 4)
+  assert.equal(actual.total_unique, 4)
+  assert.equal(Array.from(actual.list()), [
+    { name: 'value !ie', count: 1 },
+    { name: 'value !test', count: 1 },
+    { name: 'value!nospace', count: 1 },
+    { name: 'value\\9', count: 1 },
+  ])
 })
 
 Browserhacks('reports no false positives', () => {
@@ -37,13 +33,9 @@ Browserhacks('reports no false positives', () => {
     }
   `
   const actual = analyze(fixture).values.browserhacks
-  const expected = {
-    total: 0,
-    totalUnique: 0,
-    unique: {},
-    uniquenessRatio: 0,
-  }
-  assert.equal(actual, expected)
+  assert.equal(actual.total, 0)
+  assert.equal(actual.total_unique, 0)
+  assert.equal(Array.from(actual.list()), [])
 })
 
 Browserhacks.run()

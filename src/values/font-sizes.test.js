@@ -18,19 +18,14 @@ FontSizes('recognizes a font-size', () => {
     }
   `
   const actual = analyze(fixture).values.fontSizes
-  const expected = {
-    total: 4,
-    totalUnique: 4,
-    unique: {
-      '10px': 1,
-      'small': 1,
-      '1em': 1,
-      'calc(3vw + 1em)': 1,
-    },
-    uniquenessRatio: 4 / 4
-  }
-
-  assert.equal(actual, expected)
+  assert.equal(actual.total, 4)
+  assert.equal(actual.total_unique, 4)
+  assert.equal(Array.from(actual.list()), [
+    { name: '10px', count: 1 },
+    { name: 'small', count: 1 },
+    { name: '1em', count: 1 },
+    { name: 'calc(3vw + 1em)', count: 1 },
+  ])
 })
 
 FontSizes('extracts the `font` shorthand', () => {
@@ -56,23 +51,19 @@ FontSizes('extracts the `font` shorthand', () => {
     }
   `
   const actual = analyze(fixture).values.fontSizes
-  const expected = {
-    total: 13,
-    totalUnique: 9,
-    unique: {
-      '0': 1,
-      'large': 1,
-      '1em': 4,
-      '1.2em': 1,
-      '1.3em': 1,
-      '2em': 1,
-      '11px': 2,
-      '10PX': 1,
-      '12px': 1,
-    },
-    uniquenessRatio: 9 / 13
-  }
-  assert.equal(actual, expected)
+  assert.equal(actual.total, 13)
+  assert.equal(actual.total_unique, 9)
+  assert.equal(Array.from(actual.list()), [
+    { name: 'large', count: 1 },
+    { name: '1em', count: 4 },
+    { name: '1.2em', count: 1 },
+    { name: '1.3em', count: 1 },
+    { name: '2em', count: 1 },
+    { name: '11px', count: 2 },
+    { name: '0', count: 1 },
+    { name: '10PX', count: 1 },
+    { name: '12px', count: 1 },
+  ])
 })
 
 FontSizes('handles system fonts', () => {
@@ -84,16 +75,11 @@ FontSizes('handles system fonts', () => {
     }
   `
   const actual = analyze(fixture).values.fontSizes
-  const expected = {
-    total: 1,
-    totalUnique: 1,
-    unique: {
-      'large': 1,
-    },
-    uniquenessRatio: 1
-  }
-
-  assert.equal(actual, expected)
+  assert.equal(actual.total, 1)
+  assert.equal(actual.total_unique, 1)
+  assert.equal(Array.from(actual.list()), [
+    { name: 'large', count: 1 },
+  ])
 })
 
 FontSizes('ignores keywords and global values', () => {
@@ -114,14 +100,7 @@ FontSizes('ignores keywords and global values', () => {
     }
   `
   const actual = analyze(fixture).values.fontSizes
-  const expected = {
-    total: 0,
-    totalUnique: 0,
-    unique: {},
-    uniquenessRatio: 0
-  }
-
-  assert.equal(actual, expected)
+  assert.equal(actual.total, 0)
 })
 
 FontSizes.run()
