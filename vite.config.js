@@ -13,7 +13,11 @@ export default defineConfig({
 		rollupOptions: {
 			// make sure to externalize deps that shouldn't be bundled
 			// into your library
-			external: ["css-tree/parser", "css-tree/walker"],
+			external: [
+				"css-tree/parser",
+				"css-tree/walker",
+				"@bramus/specificity/core"
+			],
 		},
 	},
 	plugins: [
