@@ -16,8 +16,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: "npm"
+      - run: npm install --ignore-scripts --no-audit --no-fund
       - name: Lint JS
-        run: npx oxlint@latest -D perf
+        run: npm run lint
 
   test:
     name: Unit tests
@@ -44,10 +49,24 @@ jobs:
       - run: npm install --ignore-scripts --no-audit --no-fund
       - name: Build package
         run: npm run build
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Lint package
         run: npx publint
+
+  code-coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: "npm"
+      - run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Build package
+        run: npm run build
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - run: npx c8 --reporter=lcov npm test
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4
