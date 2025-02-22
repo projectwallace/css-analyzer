@@ -318,7 +318,7 @@ export function analyze(css) {
         let specificity = calculateForAST(node).toArray()
         let [sa, sb, sc] = specificity
 
-        uniqueSpecificities.add(specificity.toString(), node.loc)
+        uniqueSpecificities.add(specificity.join(','), node.loc)
 
         specificityA.push(sa)
         specificityB.push(sb)
