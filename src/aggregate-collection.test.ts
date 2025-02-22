@@ -1,10 +1,7 @@
-import { suite } from 'uvu';
-import * as assert from 'uvu/assert';
+import { test, expect } from 'vitest'
 import { AggregateCollection } from './aggregate-collection.js'
 
-const CollectionSuite = suite('AggregateCollection')
-
-CollectionSuite('aggregates correctly', () => {
+test('aggregates correctly', () => {
   const fixture = new AggregateCollection()
   fixture.push(1)
   fixture.push(2)
@@ -22,16 +19,16 @@ CollectionSuite('aggregates correctly', () => {
     sum: 39,
   }
 
-  assert.equal(actual, expected)
-  assert.equal(fixture.toArray(), [1, 2, 25, 3, 4, 4])
+  expect(actual).toEqual(expected)
+  expect(fixture.toArray()).toEqual([1, 2, 25, 3, 4, 4])
 })
 
-CollectionSuite('handles collections without values', () => {
+test('handles collections without values', () => {
   const fixture = new AggregateCollection()
   const aggregate = fixture.aggregate()
   const items = fixture.toArray()
 
-  assert.equal(aggregate, {
+  expect(aggregate).toEqual({
     max: 0,
     min: 0,
     range: 0,
@@ -39,7 +36,5 @@ CollectionSuite('handles collections without values', () => {
     mode: 0,
     sum: 0,
   })
-  assert.equal(items, [])
+  expect(items).toEqual([])
 })
-
-CollectionSuite.run()

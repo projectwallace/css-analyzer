@@ -1,10 +1,7 @@
-import { suite } from 'uvu';
-import * as assert from 'uvu/assert';
+import { describe, expect, test } from 'vitest'
 import { analyze } from '../index.js'
 
-const FontFamilies = suite('FontFamilies')
-
-FontFamilies('recognizes a font-family', () => {
+test('recognizes a font-family', () => {
   const fixture = `
     test {
       font-family: "Droid Sans", serif;
@@ -21,25 +18,20 @@ FontFamilies('recognizes a font-family', () => {
     }
   `
   const actual = analyze(fixture).values.fontFamilies
-  const expected = {
-    total: 7,
-    totalUnique: 7,
-    unique: {
-      '"Droid Sans", serif': 1,
-      'sans-serif': 1,
-      [`"Arial Black", 'Arial Bold', Gadget, sans-serif`]: 1,
-      'Brush Script MT, cursive': 1,
-      'monospace': 1,
-      'Consolas, "Liberation Mono", Menlo, Courier, monospace': 1,
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"': 1,
-    },
-    uniquenessRatio: 7 / 7
-  }
-
-  assert.equal(actual, expected)
+  expect(actual.total).toBe(7)
+  expect(actual.total_unique).toBe(7)
+  expect(Array.from(actual.list())).toEqual([
+    { name: '"Droid Sans", serif', count: 1 },
+    { name: 'sans-serif', count: 1 },
+    { name: `"Arial Black", 'Arial Bold', Gadget, sans-serif`, count: 1 },
+    { name: 'Brush Script MT, cursive', count: 1 },
+    { name: 'monospace', count: 1 },
+    { name: 'Consolas, "Liberation Mono", Menlo, Courier, monospace', count: 1 },
+    { name: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"', count: 1 },
+  ])
 })
 
-FontFamilies('extracts the `font` shorthand', () => {
+test('extracts the `font` shorthand', () => {
   const fixture = `
     test {
       font: large 'Noto Sans';
@@ -61,37 +53,33 @@ FontFamilies('extracts the `font` shorthand', () => {
     }
   `
   const actual = analyze(fixture).values.fontFamilies
-  const expected = {
-    total: 12,
-    totalUnique: 8,
-    unique: {
-      [`'Noto Sans'`]: 1,
-      '"Source Sans Pro", serif': 1,
-      'serif': 5,
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"': 1,
-      'Consolas, "Liberation Mono", Menlo, Courier, monospace': 1,
-      'a': 1,
-      'var(--fontStack-monospace, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace)': 1,
-      // This entry exists due to a ??bug?? in CSSTree, but it's better than not counting the value above this as well
-      'ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace': 1,
-    },
-    uniquenessRatio: 8 / 12
-  }
-  assert.equal(actual, expected)
+  expect(actual.total).toBe(12)
+  expect(actual.total_unique).toBe(8)
+  expect(Array.from(actual.list())).toEqual([
+    { name: `'Noto Sans'`, count: 1 },
+    { name: `"Source Sans Pro", serif`, count: 1 },
+    { name: 'serif', count: 5 },
+    { name: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"', count: 1 },
+    { name: 'Consolas, "Liberation Mono", Menlo, Courier, monospace', count: 1 },
+    { name: 'a', count: 1 },
+    { name: 'var(--fontStack-monospace, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace)', count: 1 },
+    // This entry exists due to a ??bug?? in CSSTree, but it's better than not counting the value above this as well
+    { name: 'ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace', count: 1 },
+  ])
 })
 
-FontFamilies('does not crash on `12px var(...)', () => {
+test('does not crash on `12px var(...)', () => {
   const fixture = `
     test {
       font: 12px var(--fontStack-monospace, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace);
     }
   `
-  assert.not.throws(() => {
+  expect(() => {
     analyze(fixture).values.fontFamilies
-  })
+  }).not.toThrow()
 })
 
-FontFamilies('handles system fonts', () => {
+test('handles system fonts', () => {
   // Source: https://drafts.csswg.org/css-fonts-3/#font-prop
   const fixture = `
     test {
@@ -100,19 +88,14 @@ FontFamilies('handles system fonts', () => {
     }
   `
   const actual = analyze(fixture).values.fontFamilies
-  const expected = {
-    total: 1,
-    totalUnique: 1,
-    unique: {
-      'menu': 1
-    },
-    uniquenessRatio: 1 / 1
-  }
-
-  assert.equal(actual, expected)
+  expect(actual.total).toBe(1)
+  expect(actual.total_unique).toBe(1)
+  expect(Array.from(actual.list())).toEqual([
+    { name: 'menu', count: 1 },
+  ])
 })
 
-FontFamilies('ignores keywords and global values', () => {
+test('ignores keywords and global values', () => {
   const fixture = `
     test {
       /* Global values */
@@ -130,14 +113,6 @@ FontFamilies('ignores keywords and global values', () => {
     }
   `
   const actual = analyze(fixture).values.fontFamilies
-  const expected = {
-    total: 0,
-    totalUnique: 0,
-    unique: {},
-    uniquenessRatio: 0
-  }
-
-  assert.equal(actual, expected)
+  expect(actual.total).toBe(0)
+  expect(actual.total_unique).toBe(0)
 })
-
-FontFamilies.run()

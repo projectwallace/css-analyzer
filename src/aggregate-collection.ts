@@ -3,10 +3,8 @@
  * Takes the mean/average of multiple values if multiple values occur the same amount of times.
  *
  * @see https://github.com/angus-c/just/blob/684af9ca0c7808bc78543ec89379b1fdfce502b1/packages/array-mode/index.js
- * @param {Array} arr - Array to find the mode value for
- * @returns {Number} mode - The `mode` value of `arr`
  */
-function Mode(arr) {
+function get_mode(arr: number[]): number {
   let frequencies = new Map()
   let maxOccurrences = -1
   let maxOccurenceCount = 0
@@ -14,7 +12,7 @@ function Mode(arr) {
   let len = arr.length
 
   for (let i = 0; i < len; i++) {
-    let element = arr[i]
+    let element = arr[i]!
     let updatedCount = (frequencies.get(element) || 0) + 1
     frequencies.set(element, updatedCount)
 
@@ -34,17 +32,15 @@ function Mode(arr) {
 }
 
 class AggregateCollection {
+  _items: number[]
+  _sum: number
+
   constructor() {
-    /** @type number[] */
     this._items = []
     this._sum = 0
   }
 
-  /**
-   * Add a new Integer at the end of this AggregateCollection
-   * @param {number} item - The item to add
-   */
-  push(item) {
+  push(item: number) {
     this._items.push(item)
     this._sum += item
   }
@@ -68,12 +64,11 @@ class AggregateCollection {
     }
 
     // TODO: can we avoid this sort()? It's slow
-    /** @type Number[] */
     let sorted = this._items.slice().sort((a, b) => a - b)
-    let min = sorted[0]
-    let max = sorted[len - 1]
+    let min = sorted.at(0)!
+    let max = sorted.at(-1)!
 
-    let mode = Mode(sorted)
+    let mode = get_mode(sorted)
     let sum = this._sum
 
     return {
