@@ -1,4 +1,4 @@
-import { Collection } from './new-collection.js'
+import { Collection } from './collection.js'
 
 class ContextCollection {
   constructor() {

@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { Collection } from './new-collection.js'
+import { Collection } from './collection.js'
 
 test('simple count', () => {
 	const collection = new Collection()
