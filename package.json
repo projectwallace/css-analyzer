@@ -1,6 +1,6 @@
 {
   "name": "@projectwallace/css-analyzer",
-  "version": "6.0.0",
+  "version": "7.0.0-aplha.0",
   "author": "Bart Veneman",
   "repository": {
     "type": "git",
@@ -13,16 +13,12 @@
   "files": [
     "dist"
   ],
-  "source": "./src/index.js",
+  "main": "./dist/analyze-css.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     "types": "./dist/index.d.ts",
-    "require": "./dist/analyze-css.umd.cjs",
     "default": "./dist/analyze-css.js"
   },
-  "types": "./dist/index.d.ts",
-  "main": "./dist/analyze-css.umd.cjs",
-  "module": "./dist/analyze-css.js",
-  "unpkg": "./dist/analyze-css.umd.cjs",
   "engines": {
     "node": ">=18.0.0"
   },
