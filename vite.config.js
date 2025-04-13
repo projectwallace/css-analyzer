@@ -7,13 +7,16 @@ export default defineConfig({
 	build: {
 		lib: {
 			entry: resolve(__dirname, "src/index.js"),
-			name: "analyzeCss",
-			fileName: "analyze-css",
+			formats: ['es'],
 		},
 		rollupOptions: {
 			// make sure to externalize deps that shouldn't be bundled
 			// into your library
-			external: ["css-tree/parser", "css-tree/walker"],
+			external: [
+				"css-tree/parser",
+				"css-tree/walker",
+				"@bramus/specificity/core",
+			],
 		},
 	},
 	plugins: [
