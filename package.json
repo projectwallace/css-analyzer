@@ -13,11 +13,11 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/analyze-css.js",
+  "main": "./dist/css-analyzer.js",
   "types": "./dist/index.d.ts",
   "exports": {
     "types": "./dist/index.d.ts",
-    "default": "./dist/analyze-css.js"
+    "default": "./dist/css-analyzer.js"
   },
   "engines": {
     "node": ">=18.0.0"
