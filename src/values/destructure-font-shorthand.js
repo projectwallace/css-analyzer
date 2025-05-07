@@ -122,7 +122,9 @@ export function destructure(value, stringifyNode, cb) {
 					offset: (font_family[0] || font_family[1]).loc.start.offset,
 				},
 				end: {
-					offset: font_family[1].loc.end.offset,
+					// Either the node we detected as the last node, or the end of the whole value
+					// It's never 0 because the first node is always a font-size or font-style
+					offset: font_family[1]?.loc.end.offset || value.loc.end.offset,
 				},
 			},
 		})
