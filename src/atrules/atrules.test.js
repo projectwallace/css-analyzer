@@ -67,6 +67,11 @@ AtRules('finds @layer', () => {
   // Fixture is pretty much a straight copy from all code examples from
   // https://css-tricks.com/css-cascade-layers/
   const fixture = `
+    @import url('test.css') layer;
+    @import url('test.css') layer();
+    @import url('test.css') layer(test);
+    @import url('test.css') layer(test.abc);
+
     /* establish a layer order up-front, from lowest to highest priority */
     @layer reset, defaults, patterns, components, utilities, overrides;
 
@@ -143,9 +148,11 @@ AtRules('finds @layer', () => {
   `
   const actual = analyze(fixture).atrules.layer
   const expected = {
-    total: 48,
-    totalUnique: 26,
+    total: 50,
+    totalUnique: 28,
     unique: {
+      "test": 1,
+      "test.abc": 1,
       "defaults": 5,
       "layer-1": 1,
       "layer-2": 1,
@@ -173,7 +180,7 @@ AtRules('finds @layer', () => {
       "overrides": 1,
       "<anonymous>": 2,
     },
-    uniquenessRatio: 26 / 48
+    uniquenessRatio: 28 / 50
   }
 
   assert.equal(actual, expected)
@@ -389,13 +396,18 @@ AtRules('finds @imports', () => {
 
     @import url('remedy.css') layer(reset.remedy);
 
+    @import 'test.css' supports((display: grid));
+    @import 'test.css' supports(not (display: grid));
+    @import 'test.css' supports(selector(a:has(b)));
+    /*@import "test.css" supports((selector(h2 > p) and (font-tech(color-COLRv1))));*/
+
     /* @import without prelude */
     @import;
   `
-  const actual = analyze(fixture).atrules.import
+  const actual = analyze(fixture).atrules
   const expected = {
-    total: 7,
-    totalUnique: 7,
+    total: 10,
+    totalUnique: 10,
     unique: {
       '"https://example.com/without-url"': 1,
       'url("https://example.com/with-url")': 1,
@@ -403,12 +415,44 @@ AtRules('finds @imports', () => {
       'url("https://example.com/with-multiple-media-queries") screen, projection': 1,
       'url(\'example.css\') layer(named-layer)': 1,
       'url(\'../example.css\') layer': 1,
-      'url(\'remedy.css\') layer(reset.remedy)': 1,
+      "url('remedy.css') layer(reset.remedy)": 1,
+      "'test.css' supports((display: grid))": 1,
+      "'test.css' supports(not (display: grid))": 1,
+      "'test.css' supports(selector(a:has(b)))": 1,
     },
     uniquenessRatio: 1,
   }
 
-  assert.equal(actual, expected)
+  assert.equal(actual.import, expected)
+
+  const expected_supports = {
+    total: 3,
+    totalUnique: 3,
+    unique: {
+      "(display: grid)": 1,
+      "not (display: grid)": 1,
+      "selector(a:has(b))": 1,
+    },
+    uniquenessRatio: 1,
+    browserhacks: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+    },
+  }
+  assert.equal(actual.supports, expected_supports)
+
+  const expected_layers = {
+    total: 2,
+    totalUnique: 2,
+    unique: {
+      "named-layer": 1,
+      'reset.remedy': 1,
+    },
+    uniquenessRatio: 1,
+  }
+  assert.equal(actual.layer, expected_layers)
 })
 
 AtRules('finds @charsets', () => {

@@ -46,7 +46,7 @@
   ],
   "dependencies": {
     "@bramus/specificity": "^2.4.1",
-    "css-tree": "^2.3.1"
+    "css-tree": "^3.1.0"
   },
   "devDependencies": {
     "@codecov/vite-plugin": "^1.9.0",
@@ -54,8 +54,5 @@
     "uvu": "^0.5.6",
     "vite": "^6.3.4",
     "vite-plugin-dts": "^4.5.0"
-  },
-  "mangle": {
-    "regex": "^_[^_]"
   }
 }
