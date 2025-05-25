@@ -264,10 +264,6 @@ export function analyze(css, options = {}) {
           } else if (atRuleName === 'container') {
             containers.p(preludeStr, loc)
             // TODO: calculate complexity of container 'declaration'
-            // } else if (atRuleName === 'layer') {
-            //   preludeStr
-            //     .split(',')
-            //     .forEach(name => layers.p(name.trim(), loc))
           } else if (atRuleName === 'property') {
             registeredProperties.p(preludeStr, loc)
             // TODO: add complexity for descriptors
