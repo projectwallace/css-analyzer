@@ -248,6 +248,19 @@ export function analyze(css, options = {}) {
             }
             keyframes.p(name, loc)
           } else if (atRuleName === 'import') {
+            walk(node, function (prelude_node) {
+              if (prelude_node.type === 'Condition' && prelude_node.kind === 'supports') {
+                let prelude = stringifyNode(prelude_node)
+
+                supports.p(prelude, prelude_node.loc)
+
+                if (isSupportsBrowserhack(prelude_node)) {
+                  supportsBrowserhacks.p(prelude, prelude_node.loc)
+                  complexity++
+                }
+                return this.break
+              }
+            })
             imports.p(preludeStr, loc)
             // TODO: analyze complexity of media queries, layers and supports in @import
             // see https://github.com/projectwallace/css-analyzer/issues/326
@@ -256,10 +269,10 @@ export function analyze(css, options = {}) {
           } else if (atRuleName === 'container') {
             containers.p(preludeStr, loc)
             // TODO: calculate complexity of container 'declaration'
-          } else if (atRuleName === 'layer') {
-            preludeStr
-              .split(',')
-              .forEach(name => layers.p(name.trim(), loc))
+            // } else if (atRuleName === 'layer') {
+            //   preludeStr
+            //     .split(',')
+            //     .forEach(name => layers.p(name.trim(), loc))
           } else if (atRuleName === 'property') {
             registeredProperties.p(preludeStr, loc)
             // TODO: add complexity for descriptors
@@ -271,6 +284,12 @@ export function analyze(css, options = {}) {
           }
         }
         atRuleComplexities.push(complexity)
+        break
+      }
+      case 'Layer': {
+        if (node.name !== null) {
+          layers.p(node.name, node.loc)
+        }
         break
       }
       case Rule: {

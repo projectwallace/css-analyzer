@@ -54,21 +54,16 @@ export function isMediaBrowserhack(prelude) {
   let returnValue = false
 
   walk(prelude, function (node) {
-    let children = node.children
     let name = node.name
     let value = node.value
 
-    if (node.type === MediaQuery
-      && children.size === 1
-      && children.first.type === Identifier
-    ) {
-      let n = children.first.name
+    if (node.type === MediaQuery && node.mediaType !== null) {
       // Note: CSSTree adds a trailing space to \\9
-      if (startsWith('\\0', n) || endsWith('\\9 ', n)) {
+      if (startsWith('\\0', node.mediaType) || endsWith('\\9 ', node.mediaType)) {
         returnValue = true
         return this.break
       }
-    } else if (node.type === MediaFeature) {
+    } else if (node.type === 'Feature' && node.kind === 'media') {
       if (value && value.unit && value.unit === '\\0') {
         returnValue = true
         return this.break
