@@ -3,7 +3,6 @@ import walk from 'css-tree/walker'
 import {
   Identifier,
   MediaQuery,
-  MediaFeature,
   Declaration,
 } from '../css-tree-node-types.js'
 

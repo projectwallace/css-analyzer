@@ -253,11 +253,6 @@ export function analyze(css, options = {}) {
                 let prelude = stringifyNode(prelude_node)
 
                 supports.p(prelude, prelude_node.loc)
-
-                if (isSupportsBrowserhack(prelude_node)) {
-                  supportsBrowserhacks.p(prelude, prelude_node.loc)
-                  complexity++
-                }
                 return this.break
               }
             })
