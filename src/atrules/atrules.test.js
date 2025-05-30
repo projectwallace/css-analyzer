@@ -792,7 +792,85 @@ AtRules('analyzes container queries', () => {
       'card (inline-size > 30em) and (--responsive = true)': 1,
       'type(inline-size)': 1,
     },
-    uniquenessRatio: 7 / 7
+    uniquenessRatio: 7 / 7,
+    names: {
+      total: 3,
+      totalUnique: 3,
+      unique: {
+        'card': 1,
+        'page-layout': 1,
+        'component-library': 1,
+      },
+      uniquenessRatio: 1 / 1,
+    },
+  }
+
+  assert.equal(actual, expected)
+})
+
+AtRules('finds named containers in @container', () => {
+  const fixture = `
+    @container test1 (inline-size > 30em) {}
+    @container test2 (inline-size > 30em) and style(--responsive: true) {}
+    @container style(--responsive: true) {}
+  `
+  const actual = analyze(fixture).atrules.container.names
+  const TOTAL = 2
+  const UNIQUE = 2
+  const expected = {
+    total: TOTAL,
+    totalUnique: TOTAL,
+    unique: {
+      'test1': 1,
+      'test2': 1,
+    },
+    uniquenessRatio: UNIQUE / TOTAL,
+  }
+
+  assert.equal(actual, expected)
+})
+
+AtRules('finds named containers in the `container-name` property', () => {
+  const fixture = `
+    a {
+      container-name: my-layout;
+      container-name: my-component;
+    }
+  `
+  const actual = analyze(fixture).atrules.container.names
+  const TOTAL = 2
+  const UNIQUE = 2
+  const expected = {
+    total: TOTAL,
+    totalUnique: TOTAL,
+    unique: {
+      'my-layout': 1,
+      'my-component': 1,
+    },
+    uniquenessRatio: UNIQUE / TOTAL,
+  }
+
+  assert.equal(actual, expected)
+})
+
+AtRules('finds named containers in the `container` shorthand', () => {
+  const fixture = `
+    a {
+      container: my-layout / size;
+      container: my-component / inline-size;
+    }
+  `
+  const actual = analyze(fixture).atrules.container.names
+  const TOTAL = 2
+  const UNIQUE = 2
+  const expected = {
+    total: TOTAL,
+    totalUnique: TOTAL,
+    unique: {
+      'my-layout': 1,
+      'my-component': 1,
+    },
+    uniquenessRatio: UNIQUE / TOTAL,
   }
 
   assert.equal(actual, expected)

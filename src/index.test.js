@@ -153,6 +153,12 @@ Api("handles empty input gracefully", () => {
         totalUnique: 0,
         unique: {},
         uniquenessRatio: 0,
+        names: {
+          total: 0,
+          totalUnique: 0,
+          unique: {},
+          uniquenessRatio: 0,
+        },
       },
       layer: {
         total: 0,
