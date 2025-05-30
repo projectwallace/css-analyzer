@@ -126,6 +126,7 @@ export function analyze(css, options = {}) {
   let keyframes = new Collection(useLocations)
   let prefixedKeyframes = new Collection(useLocations)
   let containers = new Collection(useLocations)
+  let containerNames = new Collection(useLocations)
   let registeredProperties = new Collection(useLocations)
 
   // Rules
@@ -264,6 +265,12 @@ export function analyze(css, options = {}) {
             charsets.p(preludeStr, loc)
           } else if (atRuleName === 'container') {
             containers.p(preludeStr, loc)
+
+            if (prelude.children.first?.type === 'Identifier') {
+              let containerName = prelude.children.first.name
+              console.log(containerName)
+              containerNames.p(containerName, loc)
+            }
             // TODO: calculate complexity of container 'declaration'
           } else if (atRuleName === 'property') {
             registeredProperties.p(preludeStr, loc)
@@ -546,7 +553,18 @@ export function analyze(css, options = {}) {
             timingFunctions.p(stringifyNode(node), loc)
           }
           break
-        } else if (border_radius_properties.has(basename(property))) {
+        }
+        else if (isProperty('container-name', property)) {
+          containerNames.p(stringifyNode(node), loc)
+        }
+        else if (isProperty('container', property)) {
+          // The first identifier is the container name
+          // Example: container: my-layout / inline-size;
+          if (children.first?.type === 'Identifier') {
+            containerNames.p(children.first.name, loc)
+          }
+        }
+        else if (border_radius_properties.has(basename(property))) {
           if (!isValueKeyword(node)) {
             borderRadiuses.push(stringifyNode(node), property, loc)
           }
@@ -769,7 +787,12 @@ export function analyze(css, options = {}) {
           ratio: ratio(prefixedKeyframes.size(), keyframes.size())
         }),
       }),
-      container: containers.c(),
+      container: assign(
+        containers.c(),
+        {
+          names: containerNames.c(),
+        }
+      ),
       layer: layers.c(),
       property: registeredProperties.c(),
       total: totalAtRules,
