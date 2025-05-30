@@ -624,6 +624,38 @@ AtRules('finds @media browserhacks', () => {
   assert.equal(actual, expected)
 })
 
+AtRules('finds Media Features', () => {
+  const fixture = `
+    @media (min-width: 0) {}
+    @media (max-width: 0) {}
+    @media (hover) {}
+    @media (forced-colors: none) {}
+    @media (prefers-color-scheme: dark) {}
+    @media (prefers-reduced-motion: reduce) {}
+    @media (prefers-contrast: more) {}
+
+    @media screen and (50px <= width <= 100px), (min-height: 100px) {}
+    `
+  const actual = analyze(fixture).atrules.media.features
+  const expected = {
+    total: 8,
+    totalUnique: 8,
+    unique: {
+      'min-width': 1,
+      'max-width': 1,
+      'hover': 1,
+      'forced-colors': 1,
+      'prefers-color-scheme': 1,
+      'prefers-reduced-motion': 1,
+      'prefers-contrast': 1,
+      'min-height': 1,
+    },
+    uniquenessRatio: 8 / 8,
+  }
+
+  assert.equal(actual, expected)
+})
+
 AtRules('does not crash on incomplete @media queries', () => {
   let css = `
     @media (min-width) {}

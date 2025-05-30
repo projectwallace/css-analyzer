@@ -119,6 +119,7 @@ export function analyze(css, options = {}) {
   let imports = new Collection(useLocations)
   let medias = new Collection(useLocations)
   let mediaBrowserhacks = new Collection(useLocations)
+  let mediaFeatures = new Collection(useLocations)
   let charsets = new Collection(useLocations)
   let supports = new Collection(useLocations)
   let supportsBrowserhacks = new Collection(useLocations)
@@ -281,6 +282,10 @@ export function analyze(css, options = {}) {
         if (node.name !== null) {
           layers.p(node.name, node.loc)
         }
+        break
+      }
+      case 'Feature': {
+        mediaFeatures.p(node.name, node.loc)
         break
       }
       case Rule: {
@@ -747,6 +752,7 @@ export function analyze(css, options = {}) {
         medias.c(),
         {
           browserhacks: mediaBrowserhacks.c(),
+          features: mediaFeatures.c(),
         }
       ),
       charset: charsets.c(),
