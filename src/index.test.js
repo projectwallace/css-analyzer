@@ -110,6 +110,12 @@ Api("handles empty input gracefully", () => {
           unique: {},
           uniquenessRatio: 0,
         },
+        features: {
+          total: 0,
+          totalUnique: 0,
+          unique: {},
+          uniquenessRatio: 0,
+        },
       },
       charset: {
         total: 0,
