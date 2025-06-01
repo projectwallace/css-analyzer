@@ -56,4 +56,16 @@ test('logs the whole parent selector when using locations', () => {
 	assert.equal(actual, expected)
 })
 
+test('does not crash on @bramus/specificity edge cases', () => {
+	assert.not.throws(() => {
+		analyze(`
+			a:nth-child() {}
+
+			html::view-transition-new() {
+				animation-name: -ua-view-transition-fade-in;
+			}
+		`)
+	})
+})
+
 test.run()

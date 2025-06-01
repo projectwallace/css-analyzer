@@ -1,6 +1,6 @@
 import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
-import { calculateForAST } from '@bramus/specificity/core'
+import { calculateForAST } from '../node_modules/@bramus/specificity/src/core/calculate.js'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isAccessibility, isPrefixed, hasPseudoClass } from './selectors/utils.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
