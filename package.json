@@ -1,7 +1,7 @@
 {
   "name": "@projectwallace/css-analyzer",
   "description": "The best CSS analyzer out there. Check design tokens, complexity, specificity, performance and more.",
-  "version": "7.1.0",
+  "version": "7.1.1",
   "author": "Bart Veneman",
   "repository": {
     "type": "git",
