@@ -268,7 +268,6 @@ export function analyze(css, options = {}) {
 
             if (prelude.children.first?.type === 'Identifier') {
               let containerName = prelude.children.first.name
-              console.log(containerName)
               containerNames.p(containerName, loc)
             }
             // TODO: calculate complexity of container 'declaration'

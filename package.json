@@ -45,7 +45,7 @@
     "code"
   ],
   "dependencies": {
-    "@bramus/specificity": "^2.4.1",
+    "@bramus/specificity": "^2.4.2",
     "css-tree": "^3.1.0"
   },
   "devDependencies": {
