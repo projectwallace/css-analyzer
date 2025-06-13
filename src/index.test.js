@@ -470,6 +470,12 @@ Api("handles empty input gracefully", () => {
         unique: {},
         uniquenessRatio: 0,
       },
+      resets: {
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
+      },
     },
   }
 

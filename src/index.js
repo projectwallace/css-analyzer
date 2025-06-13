@@ -5,7 +5,7 @@ import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isAccessibility, isPrefixed, hasPseudoClass } from './selectors/utils.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
 import { destructure, isSystemFont } from './values/destructure-font-shorthand.js'
-import { isValueKeyword, keywords } from './values/values.js'
+import { isValueKeyword, keywords, isValueReset } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
 import { ContextCollection } from './context-collection.js'
@@ -193,6 +193,7 @@ export function analyze(css, options = {}) {
   let gradients = new Collection(useLocations)
   let valueKeywords = new Collection(useLocations)
   let borderRadiuses = new ContextCollection(useLocations)
+  let resets = new Collection(useLocations)
 
   walk(ast, function (node) {
     switch (node.type) {
@@ -452,6 +453,7 @@ export function analyze(css, options = {}) {
           break
         }
 
+        /** @type {import('css-tree').Declaration} */
         let declaration = this.declaration
         let { property, important } = declaration
         let complexity = 1
@@ -482,10 +484,31 @@ export function analyze(css, options = {}) {
 
         // Process properties first that don't have colors,
         // so we can avoid further walking them;
-        if (isProperty('z-index', property)) {
+        if (
+          isProperty('margin', property) ||
+          isProperty('margin-block', property) ||
+          isProperty('margin-inline', property) ||
+          isProperty('margin-top', property) ||
+          isProperty('margin-right', property) ||
+          isProperty('margin-bottom', property) ||
+          isProperty('margin-left', property) ||
+          isProperty('padding', property) ||
+          isProperty('padding-block', property) ||
+          isProperty('padding-inline', property) ||
+          isProperty('padding-top', property) ||
+          isProperty('padding-right', property) ||
+          isProperty('padding-bottom', property) ||
+          isProperty('padding-left', property)
+        ) {
+          if (isValueReset(node)) {
+            resets.p(property, declaration.loc)
+          }
+        }
+        else if (isProperty('z-index', property)) {
           zindex.p(stringifyNode(node), loc)
           return this.skip
-        } else if (isProperty('font', property)) {
+        }
+        else if (isProperty('font', property)) {
           if (isSystemFont(node)) return
 
           let { font_size, line_height, font_family } = destructure(node, stringifyNode, function (item) {
@@ -507,48 +530,58 @@ export function analyze(css, options = {}) {
           }
 
           break
-        } else if (isProperty('font-size', property)) {
+        }
+        else if (isProperty('font-size', property)) {
           if (!isSystemFont(node)) {
             fontSizes.p(stringifyNode(node), loc)
           }
           break
-        } else if (isProperty('font-family', property)) {
+        }
+        else if (isProperty('font-family', property)) {
           if (!isSystemFont(node)) {
             fontFamilies.p(stringifyNode(node), loc)
           }
           break
-        } else if (isProperty('line-height', property)) {
+        }
+        else if (isProperty('line-height', property)) {
           lineHeights.p(stringifyNode(node), loc)
-        } else if (isProperty('transition', property) || isProperty('animation', property)) {
+        }
+        else if (isProperty('transition', property) || isProperty('animation', property)) {
           analyzeAnimation(children, function (item) {
             if (item.type === 'fn') {
               timingFunctions.p(stringifyNode(item.value), loc)
-            } else if (item.type === 'duration') {
+            }
+            else if (item.type === 'duration') {
               durations.p(stringifyNode(item.value), loc)
-            } else if (item.type === 'keyword') {
+            }
+            else if (item.type === 'keyword') {
               valueKeywords.p(stringifyNode(item.value), loc)
             }
           })
           break
-        } else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
+        }
+        else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
           if (children && children.size > 1) {
             children.forEach(child => {
               if (child.type !== Operator) {
                 durations.p(stringifyNode(child), loc)
               }
             })
-          } else {
+          }
+          else {
             durations.p(stringifyNode(node), loc)
           }
           break
-        } else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
+        }
+        else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
           if (children && children.size > 1) {
             children.forEach(child => {
               if (child.type !== Operator) {
                 timingFunctions.p(stringifyNode(child), loc)
               }
             })
-          } else {
+          }
+          else {
             timingFunctions.p(stringifyNode(node), loc)
           }
           break
@@ -568,12 +601,14 @@ export function analyze(css, options = {}) {
             borderRadiuses.push(stringifyNode(node), property, loc)
           }
           break
-        } else if (isProperty('text-shadow', property)) {
+        }
+        else if (isProperty('text-shadow', property)) {
           if (!isValueKeyword(node)) {
             textShadows.p(stringifyNode(node), loc)
           }
           // no break here: potentially contains colors
-        } else if (isProperty('box-shadow', property)) {
+        }
+        else if (isProperty('box-shadow', property)) {
           if (!isValueKeyword(node)) {
             boxShadows.p(stringifyNode(node), loc)
           }
@@ -936,6 +971,7 @@ export function analyze(css, options = {}) {
       units: units.count(),
       complexity: valueComplexity,
       keywords: valueKeywords.c(),
+      resets: resets.c(),
     },
     __meta__: {
       parseTime: startAnalysis - startParse,
