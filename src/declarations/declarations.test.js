@@ -146,4 +146,45 @@ Declarations('should count complexity', () => {
   assert.equal(actual, expected)
 })
 
+Declarations('tracks nesting depth', () => {
+  const fixture = `
+    a {
+      color: red;
+    }
+
+    b {
+      color: green;
+
+      &:hover {
+        color: blue;
+      }
+
+      color: deepskyblue;
+
+      @container (width > 400px) {
+        color: rebeccapurple
+      }
+    }
+
+    @media print {
+      @supports (display: grid) {
+        c {
+          color: orange;
+        }
+      }
+    }
+  `
+  const actual = analyze(fixture).declarations.nesting
+  const expected = {
+    min: 0,
+    max: 2,
+    mean: 0.6666666666666666,
+    mode: 0,
+    range: 2,
+    sum: 4,
+    items: [0, 0, 1, 0, 1, 2]
+  }
+  assert.equal(actual, expected)
+})
+
 Declarations.run()

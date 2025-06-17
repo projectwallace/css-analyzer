@@ -102,6 +102,15 @@ Selectors('handles CSS without selectors', () => {
       unique: {},
       uniquenessRatio: 0,
     },
+    nesting: {
+      min: 0,
+      max: 0,
+      mean: 0,
+      mode: 0,
+      range: 0,
+      sum: 0,
+      items: [],
+    },
   }
   assert.equal(actual, expected)
 })
@@ -351,6 +360,15 @@ Selectors('handles emoji selectors', () => {
       unique: {},
       uniquenessRatio: 0,
     },
+    nesting: {
+      min: 0,
+      max: 0,
+      mean: 0,
+      mode: 0,
+      range: 0,
+      sum: 0,
+      items: [0],
+    },
   }
   assert.equal(actual, expected)
 })
@@ -473,6 +491,47 @@ Selectors('tracks combinator locations', () => {
     ' ',
     ' '
   ])
+})
+
+Selectors('tracks nesting depth', () => {
+  const fixture = `
+    a {
+      color: red;
+    }
+
+    b {
+      color: green;
+
+      &:hover {
+        color: blue;
+      }
+
+      color: deepskyblue;
+
+      @container (width > 400px) {
+        color: rebeccapurple
+      }
+    }
+
+    @media print {
+      @supports (display: grid) {
+        c {
+          color: orange;
+        }
+      }
+    }
+  `
+  const actual = analyze(fixture).selectors.nesting
+  const expected = {
+    min: 0,
+    max: 2,
+    mean: 0.75,
+    mode: 0,
+    range: 2,
+    sum: 3,
+    items: [0, 0, 1, 2]
+  }
+  assert.equal(actual, expected)
 })
 
 Selectors('Can keep track of selector locations if we ask it to do so', () => {

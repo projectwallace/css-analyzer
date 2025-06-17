@@ -61,6 +61,15 @@ Rules('should handle CSS without rules', () => {
       totalUnique: 0,
       uniquenessRatio: 0,
     },
+    nesting: {
+      min: 0,
+      max: 0,
+      mean: 0,
+      mode: 0,
+      range: 0,
+      sum: 0,
+      items: [],
+    }
   }
   assert.equal(actual.rules, expected)
 })
@@ -392,6 +401,49 @@ Rules('counts unique numbers of declarations per rule', () => {
   })
   assert.is(result.totalUnique, 3)
   assert.is(result.uniquenessRatio, 3 / 4)
+})
+
+
+
+Rules('tracks nesting depth', () => {
+  const fixture = `
+    a {
+      color: red;
+    }
+
+    b {
+      color: green;
+
+      &:hover {
+        color: blue;
+      }
+
+      color: deepskyblue;
+
+      @container (width > 400px) {
+        color: rebeccapurple;
+      }
+    }
+
+    @media print {
+      @supports (display: grid) {
+        c {
+          color: orange;
+        }
+      }
+    }
+  `
+  const actual = analyze(fixture).rules.nesting
+  const expected = {
+    min: 0,
+    max: 2,
+    mean: 0.75,
+    mode: 0,
+    range: 2,
+    sum: 3,
+    items: [0, 0, 1, 2]
+  }
+  assert.equal(actual, expected)
 })
 
 Rules.run()
