@@ -69,6 +69,10 @@ Rules('should handle CSS without rules', () => {
       range: 0,
       sum: 0,
       items: [],
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
     }
   }
   assert.equal(actual.rules, expected)
@@ -441,7 +445,15 @@ Rules('tracks nesting depth', () => {
     mode: 0,
     range: 2,
     sum: 3,
-    items: [0, 0, 1, 2]
+    items: [0, 0, 1, 2],
+    total: 4,
+    totalUnique: 3,
+    unique: {
+      0: 2,
+      1: 1,
+      2: 1,
+    },
+    uniquenessRatio: 3 / 4,
   }
   assert.equal(actual, expected)
 })

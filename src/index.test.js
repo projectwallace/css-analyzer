@@ -189,6 +189,10 @@ Api("handles empty input gracefully", () => {
         range: 0,
         sum: 0,
         items: [],
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
       }
     },
     rules: {
@@ -218,6 +222,10 @@ Api("handles empty input gracefully", () => {
         range: 0,
         sum: 0,
         items: [],
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
       },
       selectors: {
         min: 0,
@@ -283,6 +291,10 @@ Api("handles empty input gracefully", () => {
         range: 0,
         sum: 0,
         items: [],
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
       },
       id: {
         total: 0,
@@ -352,6 +364,10 @@ Api("handles empty input gracefully", () => {
         range: 0,
         sum: 0,
         items: [],
+        total: 0,
+        totalUnique: 0,
+        unique: {},
+        uniquenessRatio: 0,
       }
     },
     properties: {

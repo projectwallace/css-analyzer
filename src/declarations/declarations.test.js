@@ -182,7 +182,15 @@ Declarations('tracks nesting depth', () => {
     mode: 0,
     range: 2,
     sum: 4,
-    items: [0, 0, 1, 0, 1, 2]
+    items: [0, 0, 1, 0, 1, 2],
+    total: 6,
+    totalUnique: 3,
+    unique: {
+      0: 3,
+      1: 2,
+      2: 1,
+    },
+    uniquenessRatio: 3 / 6,
   }
   assert.equal(actual, expected)
 })
