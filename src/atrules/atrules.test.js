@@ -944,4 +944,45 @@ AtRules('analyzes @property', () => {
   assert.equal(actual, expected)
 })
 
+AtRules('tracks nesting depth', () => {
+  const fixture = `
+    a {
+      color: red;
+    }
+
+    b {
+      color: green;
+
+      &:hover {
+        color: blue;
+      }
+
+      color: deepskyblue;
+
+      @container (width > 400px) {
+        color: rebeccapurple
+      }
+    }
+
+    @media print {
+      @supports (display: grid) {
+        c {
+          color: orange;
+        }
+      }
+    }
+  `
+  const actual = analyze(fixture).atrules.nesting
+  const expected = {
+    min: 0,
+    max: 1,
+    mean: 0.6666666666666666,
+    mode: 1,
+    range: 1,
+    sum: 2,
+    items: [1, 0, 1]
+  }
+  assert.equal(actual, expected)
+})
+
 AtRules.run()

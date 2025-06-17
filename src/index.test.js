@@ -180,6 +180,15 @@ Api("handles empty input gracefully", () => {
         mode: 0,
         range: 0,
         sum: 0,
+      },
+      nesting: {
+        min: 0,
+        max: 0,
+        mean: 0,
+        mode: 0,
+        range: 0,
+        sum: 0,
+        items: [],
       }
     },
     rules: {
@@ -200,6 +209,15 @@ Api("handles empty input gracefully", () => {
         total: 0,
         totalUnique: 0,
         uniquenessRatio: 0,
+      },
+      nesting: {
+        min: 0,
+        max: 0,
+        mean: 0,
+        mode: 0,
+        range: 0,
+        sum: 0,
+        items: [],
       },
       selectors: {
         min: 0,
@@ -255,6 +273,15 @@ Api("handles empty input gracefully", () => {
         totalUnique: 0,
         unique: {},
         uniquenessRatio: 0,
+        items: [],
+      },
+      nesting: {
+        min: 0,
+        max: 0,
+        mean: 0,
+        mode: 0,
+        range: 0,
+        sum: 0,
         items: [],
       },
       id: {
@@ -316,6 +343,15 @@ Api("handles empty input gracefully", () => {
         mode: 0,
         range: 0,
         sum: 0,
+      },
+      nesting: {
+        min: 0,
+        max: 0,
+        mean: 0,
+        mode: 0,
+        range: 0,
+        sum: 0,
+        items: [],
       }
     },
     properties: {
