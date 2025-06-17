@@ -980,7 +980,14 @@ AtRules('tracks nesting depth', () => {
     mode: 1,
     range: 1,
     sum: 2,
-    items: [1, 0, 1]
+    items: [1, 0, 1],
+    total: 3,
+    totalUnique: 2,
+    unique: {
+      0: 1,
+      1: 2,
+    },
+    uniquenessRatio: 2 / 3,
   }
   assert.equal(actual, expected)
 })

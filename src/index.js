@@ -129,6 +129,7 @@ export function analyze(css, options = {}) {
   let containerNames = new Collection(useLocations)
   let registeredProperties = new Collection(useLocations)
   let atruleNesting = new AggregateCollection()
+  let uniqueAtruleNesting = new Collection(useLocations)
 
   // Rules
   let totalRules = 0
@@ -140,6 +141,7 @@ export function analyze(css, options = {}) {
   let uniqueSelectorsPerRule = new Collection(useLocations)
   let uniqueDeclarationsPerRule = new Collection(useLocations)
   let ruleNesting = new AggregateCollection()
+  let uniqueRuleNesting = new Collection(useLocations)
 
   // Selectors
   let keyframeSelectors = new Collection(useLocations)
@@ -162,6 +164,7 @@ export function analyze(css, options = {}) {
   let pseudoClasses = new Collection(useLocations)
   let combinators = new Collection(useLocations)
   let selectorNesting = new AggregateCollection()
+  let uniqueSelectorNesting = new Collection(useLocations)
 
   // Declarations
   let uniqueDeclarations = new Set()
@@ -171,6 +174,7 @@ export function analyze(css, options = {}) {
   let importantsInKeyframes = 0
   let importantCustomProperties = new Collection(useLocations)
   let declarationNesting = new AggregateCollection()
+  let uniqueDeclarationNesting = new Collection(useLocations)
 
   // Properties
   let properties = new Collection(useLocations)
@@ -207,6 +211,7 @@ export function analyze(css, options = {}) {
         case Atrule: {
           totalAtRules++
           atruleNesting.push(nestingDepth)
+          uniqueAtruleNesting.p(nestingDepth, node.loc)
 
           let atRuleName = node.name
 
@@ -318,6 +323,7 @@ export function analyze(css, options = {}) {
           declarationsPerRule.push(numDeclarations)
           uniqueDeclarationsPerRule.p(numDeclarations, block.loc)
           ruleNesting.push(nestingDepth)
+          uniqueRuleNesting.p(nestingDepth, node.loc)
 
           totalRules++
 
@@ -355,6 +361,7 @@ export function analyze(css, options = {}) {
           selectorComplexities.push(complexity)
           uniqueSelectorComplexities.p(complexity, node.loc)
           selectorNesting.push(nestingDepth - 1)
+          uniqueSelectorNesting.p(nestingDepth - 1, node.loc)
 
           // #region specificity
           let specificity = calculateForAST(node).toArray()
@@ -713,6 +720,7 @@ export function analyze(css, options = {}) {
 
           uniqueDeclarations.add(stringifyNode(node))
           declarationNesting.push(nestingDepth - 1)
+          uniqueDeclarationNesting.p(nestingDepth - 1, node.loc)
 
           if (node.important === true) {
             importantDeclarations++
@@ -856,7 +864,8 @@ export function analyze(css, options = {}) {
         atruleNesting.aggregate(),
         {
           items: atruleNesting.toArray(),
-        }
+        },
+        uniqueAtruleNesting.c(),
       ),
     },
     rules: {
@@ -876,7 +885,8 @@ export function analyze(css, options = {}) {
         ruleNesting.aggregate(),
         {
           items: ruleNesting.toArray(),
-        }
+        },
+        uniqueRuleNesting.c(),
       ),
       selectors: assign(
         selectorsPerRule.aggregate(),
@@ -925,7 +935,8 @@ export function analyze(css, options = {}) {
         selectorNesting.aggregate(),
         {
           items: selectorNesting.toArray(),
-        }
+        },
+        uniqueSelectorNesting.c(),
       ),
       id: assign(
         ids.c(), {
@@ -962,7 +973,8 @@ export function analyze(css, options = {}) {
         declarationNesting.aggregate(),
         {
           items: declarationNesting.toArray(),
-        }
+        },
+        uniqueDeclarationNesting.c(),
       ),
     },
     properties: assign(
