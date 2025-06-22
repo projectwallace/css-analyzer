@@ -87,6 +87,10 @@ Api("handles empty input gracefully", () => {
       complexity: 0,
     },
     atrules: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
       fontface: {
         total: 0,
         totalUnique: 0,
@@ -172,7 +176,6 @@ Api("handles empty input gracefully", () => {
         unique: {},
         uniquenessRatio: 0,
       },
-      total: 0,
       complexity: {
         min: 0,
         max: 0,
