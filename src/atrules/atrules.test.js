@@ -18,8 +18,16 @@ AtRules('counts total atrules', () => {
       a {}
     }
   `
-  let actual = analyze(css).atrules.total
-  assert.is(actual, 4)
+  let actual = analyze(css).atrules
+  assert.is(actual.total, 4)
+  assert.is(actual.totalUnique, 4)
+  assert.equal(actual.unique, {
+    'import': 1,
+    'layer': 1,
+    'media': 1,
+    'supports': 1,
+  })
+  assert.equal(actual.uniquenessRatio, 4 / 4)
 })
 
 AtRules('calculates complexity', () => {

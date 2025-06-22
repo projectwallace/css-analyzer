@@ -110,7 +110,7 @@ export function analyze(css, options = {}) {
   let linesOfCode = ast.loc.end.line - ast.loc.start.line + 1
 
   // Atrules
-  let totalAtRules = 0
+  let atrules = new Collection(useLocations)
   let atRuleComplexities = new AggregateCollection()
   /** @type {Record<string, string>[]} */
   let fontfaces = []
@@ -209,7 +209,7 @@ export function analyze(css, options = {}) {
     enter(node) {
       switch (node.type) {
         case Atrule: {
-          totalAtRules++
+          atrules.p(node.name, node.loc)
           atruleNesting.push(nestingDepth)
           uniqueAtruleNesting.p(nestingDepth, node.loc)
 
@@ -795,10 +795,11 @@ export function analyze(css, options = {}) {
   let declarationComplexity = declarationComplexities.aggregate()
   let propertyComplexity = propertyComplexities.aggregate()
   let valueComplexity = valueComplexities.aggregate()
+  let atruleCount = atrules.c()
 
   return {
     stylesheet: {
-      sourceLinesOfCode: totalAtRules + totalSelectors + totalDeclarations + keyframeSelectors.size(),
+      sourceLinesOfCode: atruleCount.total + totalSelectors + totalDeclarations + keyframeSelectors.size(),
       linesOfCode,
       size: cssLen,
       complexity: atRuleComplexity.sum + selectorComplexity.sum + declarationComplexity.sum + propertyComplexity.sum + valueComplexity.sum,
@@ -819,55 +820,57 @@ export function analyze(css, options = {}) {
         },
       },
     },
-    atrules: {
-      fontface: assign({
-        total: fontFacesCount,
-        totalUnique: fontFacesCount,
-        unique: fontfaces,
-        uniquenessRatio: fontFacesCount === 0 ? 0 : 1,
-      }, useLocations ? {
-        uniqueWithLocations: fontfaces_with_loc.c().uniqueWithLocations,
-      } : {}),
-      import: imports.c(),
-      media: assign(
-        medias.c(),
-        {
-          browserhacks: mediaBrowserhacks.c(),
-          features: mediaFeatures.c(),
-        }
-      ),
-      charset: charsets.c(),
-      supports: assign(
-        supports.c(),
-        {
-          browserhacks: supportsBrowserhacks.c(),
-        },
-      ),
-      keyframes: assign(
-        keyframes.c(), {
-        prefixed: assign(
-          prefixedKeyframes.c(), {
-          ratio: ratio(prefixedKeyframes.size(), keyframes.size())
+    atrules: assign(
+      atruleCount,
+      {
+        fontface: assign({
+          total: fontFacesCount,
+          totalUnique: fontFacesCount,
+          unique: fontfaces,
+          uniquenessRatio: fontFacesCount === 0 ? 0 : 1,
+        }, useLocations ? {
+          uniqueWithLocations: fontfaces_with_loc.c().uniqueWithLocations,
+        } : {}),
+        import: imports.c(),
+        media: assign(
+          medias.c(),
+          {
+            browserhacks: mediaBrowserhacks.c(),
+            features: mediaFeatures.c(),
+          }
+        ),
+        charset: charsets.c(),
+        supports: assign(
+          supports.c(),
+          {
+            browserhacks: supportsBrowserhacks.c(),
+          },
+        ),
+        keyframes: assign(
+          keyframes.c(), {
+          prefixed: assign(
+            prefixedKeyframes.c(), {
+            ratio: ratio(prefixedKeyframes.size(), keyframes.size())
+          }),
         }),
-      }),
-      container: assign(
-        containers.c(),
-        {
-          names: containerNames.c(),
-        }
-      ),
-      layer: layers.c(),
-      property: registeredProperties.c(),
-      total: totalAtRules,
-      complexity: atRuleComplexity,
-      nesting: assign(
-        atruleNesting.aggregate(),
-        {
-          items: atruleNesting.toArray(),
-        },
-        uniqueAtruleNesting.c(),
-      ),
-    },
+        container: assign(
+          containers.c(),
+          {
+            names: containerNames.c(),
+          }
+        ),
+        layer: layers.c(),
+        property: registeredProperties.c(),
+        complexity: atRuleComplexity,
+        nesting: assign(
+          atruleNesting.aggregate(),
+          {
+            items: atruleNesting.toArray(),
+          },
+          uniqueAtruleNesting.c(),
+        ),
+      }
+    ),
     rules: {
       total: totalRules,
       empty: {
