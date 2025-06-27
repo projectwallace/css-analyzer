@@ -197,3 +197,35 @@ export const colorKeywords = new KeywordSet([
   'transparent',
   'currentcolor',
 ])
+
+const rgbSpaces = new KeywordSet([
+  'srgb',
+  'srgb-linear',
+  'xyz',
+  'xyz-d50',
+  'xyz-d65',
+])
+
+const colorSpaces = new KeywordSet([
+  'display-p3',
+  'a98-rgb',
+  'rec2020',
+  'prophoto-rgb',
+  ...rgbSpaces,
+])
+
+/** @param {string} space */
+export function colorSpace(space) {
+  if (rgbSpaces.has(space)) {
+    return 'rgb'
+  }
+  if (cielabSpaces.has(space)) {
+    return 'cielab'
+  }
+  if (xyzSpaces.has(space)) {
+    return 'xyz'
+  }
+  if (colorSpaces.has(space)) {
+    return space
+  }
+}

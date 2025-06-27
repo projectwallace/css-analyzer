@@ -3,7 +3,7 @@ import walk from 'css-tree/walker'
 import { calculateForAST } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isAccessibility, isPrefixed, hasPseudoClass } from './selectors/utils.js'
-import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
+import { colorFunctions, colorKeywords, colorSpace, namedColors, systemColors } from './values/colors.js'
 import { destructure, isSystemFont } from './values/destructure-font-shorthand.js'
 import { isValueKeyword, keywords, isValueReset } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
@@ -197,6 +197,7 @@ export function analyze(css, options = {}) {
   let durations = new Collection(useLocations)
   let colors = new ContextCollection(useLocations)
   let colorFormats = new Collection(useLocations)
+  let colorSpaces = new Collection(useLocations)
   let units = new ContextCollection(useLocations)
   let gradients = new Collection(useLocations)
   let valueKeywords = new Collection(useLocations)
@@ -643,6 +644,7 @@ export function analyze(css, options = {}) {
                 }
                 colors.push('#' + valueNode.value, property, loc)
                 colorFormats.p(`hex` + hexLength, loc)
+                colorSpaces.p('srgb', loc)
 
                 return this.skip
               }
@@ -664,6 +666,7 @@ export function analyze(css, options = {}) {
                   let stringified = stringifyNode(valueNode)
                   colors.push(stringified, property, loc)
                   colorFormats.p(nodeName.toLowerCase(), loc)
+                  colorSpaces.p('srgb', loc)
                   return
                 }
 
@@ -672,6 +675,7 @@ export function analyze(css, options = {}) {
                   let stringified = stringifyNode(valueNode)
                   colors.push(stringified, property, loc)
                   colorFormats.p('named', loc)
+                  colorSpaces.p('srgb', loc)
                   return
                 }
 
@@ -680,6 +684,7 @@ export function analyze(css, options = {}) {
                   let stringified = stringifyNode(valueNode)
                   colors.push(stringified, property, loc)
                   colorFormats.p('system', loc)
+                  colorSpaces.p('srgb', loc)
                   return
                 }
                 return this.skip
@@ -692,8 +697,41 @@ export function analyze(css, options = {}) {
 
                 // rgb(a), hsl(a), color(), hwb(), lch(), lab(), oklab(), oklch()
                 if (colorFunctions.has(nodeName)) {
-                  colors.push(stringifyNode(valueNode), property, valueNode.loc)
-                  colorFormats.p(nodeName.toLowerCase(), valueNode.loc)
+                  let loc = valueNode.loc
+                  colors.push(stringifyNode(valueNode), property, loc)
+                  colorFormats.p(nodeName.toLowerCase(), loc)
+
+                  if (new KeywordSet(['rgb', 'rgba', 'hsl', 'hsla', 'hwb']).has(nodeName)) {
+                    colorSpaces.p('srgb', loc)
+                  } else if (nodeName.toLowerCase() === 'oklch') {
+                    colorSpaces.p('oklch', loc)
+                  } else if (new KeywordSet(['lab', 'lch']).has(nodeName)) {
+                    colorSpaces.p('lab', loc)
+                  } else if (nodeName.toLowerCase() === 'oklab') {
+                    colorSpaces.p('oklab', loc)
+                  } else if (nodeName.toLowerCase() === 'color') {
+                    // Determine color space from the color value
+                    // color(space ...) -> space
+                    // color(from X Y ...) -> Y
+                    let space_or_from = valueNode.children.first
+                    if (space_or_from.type === 'Identifier') {
+                      if (space_or_from.name.toLowerCase() === 'from') {
+                        // Take the next identifier as the color space
+                        let next = space_or_from.next
+                        if (next?.type === 'Identifier') {
+                          let space = colorSpace(next.name)
+                          if (space) {
+                            colorSpaces.p(space, loc)
+                          }
+                        }
+                      } else {
+                        let space = colorSpace(space_or_from.name)
+                        if (space) {
+                          colorSpaces.p(space, loc)
+                        }
+                      }
+                    }
+                  }
                   return
                 }
 
@@ -1012,6 +1050,7 @@ export function analyze(css, options = {}) {
         colors.count(),
         {
           formats: colorFormats.c(),
+          spaces: colorSpaces.c(),
         },
       ),
       gradients: gradients.c(),

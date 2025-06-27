@@ -116,6 +116,14 @@ Colors('finds hex colors', () => {
         hex8: 1,
       },
       "uniquenessRatio": 4 / 10,
+    },
+    spaces: {
+      total: 10,
+      totalUnique: 1,
+      unique: {
+        srgb: 10,
+      },
+      uniquenessRatio: 1 / 10,
     }
   }
   assert.equal(actual, expected)
@@ -151,6 +159,14 @@ Colors('Counts hex format correctly when combined with a browserhack', () => {
         hex3: 1,
       },
       uniquenessRatio: 1,
+    },
+    spaces: {
+      total: 1,
+      totalUnique: 1,
+      unique: {
+        srgb: 1,
+      },
+      uniquenessRatio: 1 / 1,
     }
   }
   assert.equal(actual.values.colors, expected);
@@ -303,6 +319,14 @@ Colors('finds hsl(a) colors', () => {
       },
       uniquenessRatio: 2 / 24,
     },
+    spaces: {
+      total: 24,
+      totalUnique: 1,
+      unique: {
+        srgb: 24,
+      },
+      uniquenessRatio: 1 / 24,
+    }
   }
   assert.equal(actual, expected)
 })
@@ -433,6 +457,14 @@ Colors('finds rgb(a) colors', () => {
       },
       uniquenessRatio: 2 / 17,
     },
+    spaces: {
+      total: 17,
+      totalUnique: 1,
+      unique: {
+        srgb: 17,
+      },
+      uniquenessRatio: 1 / 17,
+    }
   }
   assert.equal(actual, expected)
 })
@@ -498,6 +530,14 @@ Colors('finds LCH() colors', () => {
       },
       uniquenessRatio: 1 / 8,
     },
+    spaces: {
+      total: 8,
+      totalUnique: 1,
+      unique: {
+        lab: 8,
+      },
+      uniquenessRatio: 1 / 8,
+    }
   }
 
   assert.equal(actual.values.colors, expected)
@@ -573,6 +613,14 @@ Colors('finds LAB() colors', () => {
       },
       uniquenessRatio: 1 / 11,
     },
+    spaces: {
+      total: 11,
+      totalUnique: 1,
+      unique: {
+        lab: 11,
+      },
+      uniquenessRatio: 1 / 11,
+    }
   }
 
   assert.equal(actual.values.colors, expected)
@@ -631,6 +679,14 @@ Colors('finds hwb() colors', () => {
       },
       uniquenessRatio: 1 / 7,
     },
+    spaces: {
+      total: 7,
+      totalUnique: 1,
+      unique: {
+        srgb: 7,
+      },
+      uniquenessRatio: 1 / 7,
+    }
   }
 
   assert.equal(actual.values.colors, expected)
@@ -641,7 +697,7 @@ Colors('finds color() colors', () => {
     .colors {
       color: color(rec2020 0.42053 0.979780 0.00579);
       color: color(display-p3 -0.6112 1.0079 -0.2192);
-      color: color(profoto-rgb 0.4835 0.9167 0.2188);
+      color: color(prophoto-rgb 0.4835 0.9167 0.2188);
       color: color(xyz-d50 0.2005 0.14089 0.4472);
     }
   `)
@@ -651,7 +707,7 @@ Colors('finds color() colors', () => {
     unique: {
       'color(rec2020 0.42053 0.979780 0.00579)': 1,
       'color(display-p3 -0.6112 1.0079 -0.2192)': 1,
-      'color(profoto-rgb 0.4835 0.9167 0.2188)': 1,
+      'color(prophoto-rgb 0.4835 0.9167 0.2188)': 1,
       'color(xyz-d50 0.2005 0.14089 0.4472)': 1,
     },
     uniquenessRatio: 1,
@@ -662,7 +718,7 @@ Colors('finds color() colors', () => {
         unique: {
           'color(rec2020 0.42053 0.979780 0.00579)': 1,
           'color(display-p3 -0.6112 1.0079 -0.2192)': 1,
-          'color(profoto-rgb 0.4835 0.9167 0.2188)': 1,
+          'color(prophoto-rgb 0.4835 0.9167 0.2188)': 1,
           'color(xyz-d50 0.2005 0.14089 0.4472)': 1
         },
         uniquenessRatio: 1
@@ -676,6 +732,17 @@ Colors('finds color() colors', () => {
       },
       uniquenessRatio: 1 / 4,
     },
+    spaces: {
+      total: 4,
+      totalUnique: 4,
+      unique: {
+        'rec2020': 1,
+        'display-p3': 1,
+        'rgb': 1,
+        'xyz': 1,
+      },
+      uniquenessRatio: 4 / 4,
+    }
   }
 
   assert.equal(actual.values.colors, expected)
@@ -742,6 +809,14 @@ Colors('finds color keywords', () => {
       },
       uniquenessRatio: 1 / 5,
     },
+    spaces: {
+      total: 5,
+      totalUnique: 1,
+      unique: {
+        srgb: 5,
+      },
+      uniquenessRatio: 1 / 5,
+    }
   }
   assert.equal(actual, expected)
 })
@@ -784,6 +859,12 @@ Colors('does not report false positives for color keywords', () => {
       unique: {},
       uniquenessRatio: 0,
     },
+    spaces: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+    },
   }
 
   assert.equal(actual, expected)
@@ -805,6 +886,12 @@ Colors.skip('ignores color names that are not actual colors', () => {
     uniquenessRatio: 0,
     itemsPerContext: {},
     formats: {
+      total: 0,
+      totalUnique: 0,
+      unique: {},
+      uniquenessRatio: 0,
+    },
+    spaces: {
       total: 0,
       totalUnique: 0,
       unique: {},
@@ -880,6 +967,14 @@ Colors('finds colors in var() as fallback values', () => {
         rgba: 1,
       },
       uniquenessRatio: 2 / 4,
+    },
+    spaces: {
+      total: 4,
+      totalUnique: 1,
+      unique: {
+        srgb: 4,
+      },
+      uniquenessRatio: 1 / 4,
     }
   }
 
@@ -944,6 +1039,14 @@ Colors('ignores CSS keywords', () => {
         rgb: 1,
       },
       "uniquenessRatio": 3 / 4,
+    },
+    spaces: {
+      total: 4,
+      totalUnique: 1,
+      unique: {
+        srgb: 4,
+      },
+      uniquenessRatio: 1 / 4,
     }
   }
 
@@ -1035,6 +1138,14 @@ Colors('finds System Colors', () => {
         system: 17
       },
       uniquenessRatio: 1 / 17,
+    },
+    spaces: {
+      total: 17,
+      totalUnique: 1,
+      unique: {
+        srgb: 17,
+      },
+      uniquenessRatio: 1 / 17,
     }
   }
 
@@ -1054,7 +1165,63 @@ Colors('insane color mode', () => {
   assert.not.throws(() => analyze(fixture))
 })
 
-Colors('Lists locations when unstable flag is set', () => {
+Colors('analyzes color spaces', () => {
+  const fixture = `
+    .color-spaces {
+      color: color(srgb 0.2 0.3 0.4);
+      color: color(srgb-linear 0.2 0.3 0.4);
+      color: color(display-p3 0.2 0.3 0.4);
+      color: color(a98-rgb 0.2 0.3 0.4);
+      color: color(prophoto-rgb 0.2 0.3 0.4);
+      color: color(rec2020 0.2 0.3 0.4);
+      color: color(xyz 0.2 0.3 0.4);
+      color: color(xyz-d50 0.2 0.3 0.4);
+      color: color(xyz-d65 0.2 0.3 0.4);
+    }
+  `
+  const result = analyze(fixture)
+  const actual = result.values.colors.spaces
+  const expected = {
+    total: 9,
+    totalUnique: 5,
+    unique: {
+      srgb: 4,
+      'display-p3': 1,
+      'a98-rgb': 1,
+      'prophoto-rgb': 1,
+      'rec2020': 1,
+    },
+    uniquenessRatio: 5 / 9,
+  }
+
+  assert.equal(actual, expected)
+})
+
+Colors('analyzes relative colors', () => {
+  const fixture = `
+    .relative {
+      color: color(from green srgb r g b / 0.5);
+      color: color(from #0000FF xyz calc(x + 0.75) y calc(z - 0.35));
+      color: color(from rgb(0.2 0.3 0.4) xyz-d50 0.2 0.3 0.4);
+    }
+  `
+  const result = analyze(fixture)
+  const actual = result.values.colors.spaces
+  const expected = {
+    total: 3,
+    totalUnique: 3,
+    unique: {
+      srgb: 1,
+      xyz: 1,
+      'xyz-d50': 1,
+    },
+    uniquenessRatio: 3 / 3,
+  }
+
+  assert.equal(actual, expected)
+})
+
+Colors('Lists locations when flag is set', () => {
   let css = `
     thing {
       color: red;

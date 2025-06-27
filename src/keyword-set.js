@@ -13,4 +13,9 @@ export class KeywordSet {
 	has(item) {
 		return this.set.has(item.toLowerCase())
 	}
+
+	/** @returns {Iterator<string>} */
+	[Symbol.iterator]() {
+		return this.set[Symbol.iterator]()
+	}
 }
