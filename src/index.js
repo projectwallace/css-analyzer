@@ -528,12 +528,17 @@ export function analyze(css, options = {}) {
           else if (isProperty('font', property)) {
             if (isSystemFont(node)) return
 
-            let { font_size, line_height, font_family } = destructure(node, stringifyNode, function (item) {
+            let result = destructure(node, stringifyNode, function (item) {
               if (item.type === 'keyword') {
                 valueKeywords.p(item.value, loc)
               }
             })
 
+            if (!result) {
+              return this.skip
+            }
+
+            let { font_size, line_height, font_family } = result
             if (font_family) {
               fontFamilies.p(font_family, loc)
             }

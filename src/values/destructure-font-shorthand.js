@@ -40,13 +40,18 @@ export function isSystemFont(node) {
  * @param {*} stringifyNode
  */
 export function destructure(value, stringifyNode, cb) {
-	let font_family = Array.from({ length: 2 })
+	/** @type {Array<import('css-tree').CssNode | undefined>} */
+	let font_family = [,]
 	/** @type {string | undefined} */
 	let font_size
 	/** @type {string | undefined} */
 	let line_height
 
-	// FIXME: in case of a var(--my-stack, fam1, fam2, fam3) this forEach also loops over all children of the var()
+	// Bail out if the value is a single var()
+	if (value.children.first.type === 'Function' && value.children.first.name.toLowerCase() === 'var') {
+		return null
+	}
+
 	value.children.forEach(function (node, item) {
 		let prev = item.prev ? item.prev.data : undefined
 		let next = item.next ? item.next.data : undefined
