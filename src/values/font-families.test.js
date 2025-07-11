@@ -109,6 +109,17 @@ FontFamilies('does not crash on 14px "Inter Var", sans-serif, 700', () => {
   })
 })
 
+FontFamilies('does not crash on var(--x, )', () => {
+  const fixture = `
+    a {
+      font: var(--x, );
+    }
+  `
+  assert.not.throws(() => {
+    analyze(fixture).values.fontFamilies
+  })
+})
+
 FontFamilies('handles system fonts', () => {
   // Source: https://drafts.csswg.org/css-fonts-3/#font-prop
   const fixture = `
