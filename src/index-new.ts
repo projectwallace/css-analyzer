@@ -7,7 +7,7 @@ import { endsWith } from './string-utils.js'
 import { getComplexity, isAccessibility, isPrefixed } from "./selectors/utils.js"
 // @ts-expect-error
 import { calculateForAST } from '@bramus/specificity/core'
-import type { CssNode } from 'css-tree'
+import type { CssNode, Selector } from 'css-tree'
 
 /**
  * Analyze CSS
@@ -41,7 +41,7 @@ export function analyze(css: string) {
 		positions: true, // So we can use stringifyNode()
 	})
 
-	function walk_selectors(is_scanning = false, on_selector: (selector_ast: CssNode, nesting_depth: number, pseudos: string[] | undefined, combinators: string[] | undefined) => void) {
+	function walk_selectors(is_scanning = false, on_selector: (selector_ast: Selector, nesting_depth: number, pseudos: string[] | undefined, combinators: string[] | undefined) => void) {
 		let nestingDepth = 0
 		walk(ast, {
 			enter(node: CssNode) {
