@@ -1,4 +1,3 @@
-// @ts-expect-error CSS Tree types are incomplete
 import walk from 'css-tree/walker'
 import { startsWith, strEquals } from '../string-utils.js'
 import { hasVendorPrefix } from '../vendor-prefix.js'

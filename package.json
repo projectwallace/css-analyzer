@@ -26,7 +26,8 @@
   "scripts": {
     "test": "uvu",
     "vitest": "vitest run",
-    "build": "vite build"
+    "build": "vite build",
+    "check": "tsc --noEmit"
   },
   "keywords": [
     "projectwallace",

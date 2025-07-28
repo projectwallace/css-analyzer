@@ -1,10 +1,8 @@
 /**
  * Case-insensitive compare two character codes
- * @param {string} referenceCode
- * @param {string} testCode
  * @see https://github.com/csstree/csstree/blob/41f276e8862d8223eeaa01a3d113ab70bb13d2d9/lib/tokenizer/utils.js#L22
  */
-function compareChar(referenceCode, testCode) {
+function compareChar(referenceCode: number, testCode: number): boolean {
   // if uppercase
   if (testCode >= 0x0041 && testCode <= 0x005A) {
     // shifting the 6th bit makes a letter lowercase
@@ -21,11 +19,11 @@ function compareChar(referenceCode, testCode) {
  * strEquals('test', 'TesT') // true
  * strEquals('test', 'derp') // false
  *
- * @param {string} base The string to check against
- * @param {string} maybe The test string, possibly containing uppercased characters
- * @returns {boolean} true if the two strings are the same, false otherwise
+ * @param base The string to check against
+ * @param maybe The test string, possibly containing uppercased characters
+ * @returns true if the two strings are the same, false otherwise
  */
-export function strEquals(base, maybe) {
+export function strEquals(base: string, maybe: string): boolean {
   if (base === maybe) return true
 
   let len = base.length;
@@ -48,11 +46,11 @@ export function strEquals(base, maybe) {
  * endsWith('test', 'my-test') // true
  * endsWith('test', 'est') // false
  *
- * @param {string} base e.g. '-webkit-transform'
- * @param {string} maybe e.g. 'transform'
- * @returns {boolean} true if `test` ends with `base`, false otherwise
+ * @param base e.g. '-webkit-transform'
+ * @param maybe e.g. 'transform'
+ * @returns true if `test` ends with `base`, false otherwise
  */
-export function endsWith(base, maybe) {
+export function endsWith(base: string, maybe: string): boolean {
   if (base === maybe) return true
 
   let len = maybe.length
@@ -79,11 +77,11 @@ export function endsWith(base, maybe) {
  * startsWith('test', 'tes') // true
  * startsWith('test', 'test-me') // true
  *
- * @param {string} base
- * @param {string} maybe
- * @returns {boolean} true if `base` starts with `maybe`, false otherwise
+ * @param base
+ * @param maybe
+ * @returns true if `base` starts with `maybe`, false otherwise
  */
-export function startsWith(base, maybe) {
+export function startsWith(base: string, maybe: string): boolean {
   if (base === maybe) return true
 
   let len = base.length

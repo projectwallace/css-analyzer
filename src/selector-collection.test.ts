@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { SelectorCollection } from '../selector-collection.js'
+import { SelectorCollection } from './selector-collection.js'
 
 test('empty selector collection', () => {
 	let collection = new SelectorCollection(0)
