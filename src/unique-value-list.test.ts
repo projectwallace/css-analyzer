@@ -11,7 +11,7 @@ test('empty unique value list', () => {
 })
 
 test('adding unique strings', () => {
-	let list = new UniqueValueList()
+	let list = new UniqueValueList<string>()
 	list.add('selector1', 0)
 	list.add('selector2', 1)
 	list.add('selector1', 2) // duplicate
@@ -23,7 +23,7 @@ test('adding unique strings', () => {
 })
 
 test('adding unique numbers', () => {
-	let list = new UniqueValueList()
+	let list = new UniqueValueList<number>()
 	list.add(2, 0)
 	list.add(0, 1)
 	list.add(0, 2) // duplicate
@@ -35,7 +35,7 @@ test('adding unique numbers', () => {
 })
 
 test('iterating over unique strings', () => {
-	let list = new UniqueValueList()
+	let list = new UniqueValueList<string>()
 	list.add('selector1', 0)
 	list.add('selector2', 1)
 	list.add('selector1', 2) // duplicate
@@ -56,7 +56,7 @@ test('iterating over unique strings', () => {
 })
 
 test('iterating over unique numbers', () => {
-	let list = new UniqueValueList()
+	let list = new UniqueValueList<number>()
 	list.add(1, 0)
 	list.add(2, 1)
 	list.add(1, 2) // duplicate
