@@ -29,7 +29,19 @@ jobs:
         with:
           cache: "npm"
       - run: npm install --ignore-scripts --no-audit --no-fund
-      - run: npm test
+      - run: npm run vitest
+
+  check:
+    name: Check types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: "npm"
+      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: npm run check
 
   code-coverage:
     name: Code coverage
