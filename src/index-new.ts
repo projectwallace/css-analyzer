@@ -1,11 +1,8 @@
-// @ts-expect-error
 import parse from 'css-tree/parser'
-// @ts-expect-error
 import walk from 'css-tree/walker'
 import { SelectorCollection } from './selector-collection.js'
 import { endsWith } from './string-utils.js'
 import { getComplexity, isAccessibility, isPrefixed } from "./selectors/utils.js"
-// @ts-expect-error
 import { calculateForAST } from '@bramus/specificity/core'
 import type { CssNode, Selector } from 'css-tree'
 
@@ -44,10 +41,10 @@ export function analyze(css: string) {
 	function walk_selectors(is_scanning = false, on_selector: (selector_ast: Selector, nesting_depth: number, pseudos: string[] | undefined, combinators: string[] | undefined) => void) {
 		let nestingDepth = 0
 		walk(ast, {
-			enter(node: CssNode) {
+			enter: function (node: CssNode) {
 				if (node.type === 'Selector') {
 					if (this.atrule && endsWith('keyframes', this.atrule.name)) {
-						return this.skip
+						return walk.skip
 					}
 
 					let pseudos: string[] | undefined = undefined
@@ -78,7 +75,7 @@ export function analyze(css: string) {
 					// our specificity calculations in case of a selector
 					// with :where() or :is() that contain SelectorLists
 					// as children
-					return this.skip
+					return walk.skip
 				}
 
 				else if (node.type === 'Rule' || node.type === 'Atrule') {

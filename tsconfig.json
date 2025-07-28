@@ -4,11 +4,15 @@
 		"skipLibCheck": true,
 		"target": "es2022",
 		"verbatimModuleSyntax": true,
-		"allowJs": false,
+		"allowJs": true,
 		"moduleDetection": "force",
+		"noErrorTruncation": true,
+		"useDefineForClassFields": true,
+		"isolatedModules": true,
 		// Strictness
 		"strict": true,
 		"noUncheckedIndexedAccess": true,
+		"forceConsistentCasingInFileNames": true,
 		// Type checking, not transpiling
 		"module": "ESNext",
 		"moduleResolution": "bundler",
@@ -22,7 +26,8 @@
 		],
 	},
 	"include": [
-		"src/index-new.ts"
+		"src/index-new.ts",
+		"src/app.d.ts",
 	],
 	"exclude": [
 		"node_modules"
