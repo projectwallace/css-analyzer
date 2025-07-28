@@ -4,25 +4,27 @@
 		"skipLibCheck": true,
 		"target": "es2022",
 		"verbatimModuleSyntax": true,
-		"allowJs": true,
-		"checkJs": true,
+		"allowJs": false,
 		"moduleDetection": "force",
-
 		// Strictness
 		"strict": true,
 		"noUncheckedIndexedAccess": true,
-
 		// Type checking, not transpiling
 		"module": "ESNext",
 		"moduleResolution": "bundler",
 		"allowSyntheticDefaultImports": true,
 		"noEmit": true,
-
 		// Code runs in the DOM
-		"lib": ["ES2022", "DOM", "DOM.Iterable"],
+		"lib": [
+			"ES2022",
+			"DOM",
+			"DOM.Iterable"
+		],
 	},
 	"include": [
-		"src/index.js"
+		"src/index-new.ts"
 	],
-	"exclude": ["node_modules"]
+	"exclude": [
+		"node_modules"
+	]
 }

@@ -6,7 +6,7 @@ import { codecovVitePlugin } from "@codecov/vite-plugin"
 export default defineConfig({
 	build: {
 		lib: {
-			entry: resolve(__dirname, "src/index.js"),
+			entry: resolve(__dirname, "src/index-new.ts"),
 			formats: ['es'],
 		},
 		rollupOptions: {
@@ -27,4 +27,7 @@ export default defineConfig({
 			uploadToken: process.env.CODECOV_TOKEN,
 		}),
 	],
+	test: {
+		include: ['**/*.test.ts'],
+	}
 })
