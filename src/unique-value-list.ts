@@ -25,7 +25,8 @@ export class UniqueValueList<T> {
 			if (this.#max === 0) {
 				this.#max = 1
 			}
-		} else {
+		}
+		else {
 			item.push(location_index)
 
 			if (item.length > this.#max) {
@@ -69,6 +70,25 @@ export class UniqueValueList<T> {
 				value,
 				count: location_indexes.length,
 				location_indexes
+			}
+		}
+	}
+
+	*desc(limit: number = Infinity) {
+		let max = this.#max
+
+		for (; max > 0; max--) {
+			for (let [value, location_indexes] of this.#items) {
+				if (location_indexes.length === max) {
+					yield {
+						value,
+						count: location_indexes.length,
+						location_indexes
+					}
+					if (--limit === 0) {
+						return
+					}
+				}
 			}
 		}
 	}

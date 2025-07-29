@@ -75,3 +75,17 @@ test('iterating over unique numbers', () => {
 	// There should be no more items
 	expect(unique.next().done).toBeTruthy()
 })
+
+test('desc', () => {
+	let list = new UniqueValueList<number>()
+	list.add(1, 0)
+	list.add(2, 1)
+	list.add(2, 2) // duplicate
+
+	let desc = list.desc(1)
+	let result = Array.from(desc)
+	expect(result.length).toBe(1)
+	expect(result[0].value).toBe(2)
+	expect(result[0].count).toBe(2)
+	expect(Array.from(result[0].location_indexes)).toEqual([1, 2])
+})

@@ -13,7 +13,7 @@ import { Collection } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
 import { strEquals, startsWith, endsWith } from './string-utils.js'
 import { hasVendorPrefix } from './vendor-prefix.js'
-import { isCustom, isHack, isProperty } from './properties/property-utils.js'
+import { is_custom, is_browserhack, is_property } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
 import { basename } from './properties/property-utils.js'
@@ -502,30 +502,30 @@ export function analyze(css, options = {}) {
           // Process properties first that don't have colors,
           // so we can avoid further walking them;
           if (
-            isProperty('margin', property) ||
-            isProperty('margin-block', property) ||
-            isProperty('margin-inline', property) ||
-            isProperty('margin-top', property) ||
-            isProperty('margin-right', property) ||
-            isProperty('margin-bottom', property) ||
-            isProperty('margin-left', property) ||
-            isProperty('padding', property) ||
-            isProperty('padding-block', property) ||
-            isProperty('padding-inline', property) ||
-            isProperty('padding-top', property) ||
-            isProperty('padding-right', property) ||
-            isProperty('padding-bottom', property) ||
-            isProperty('padding-left', property)
+            is_property('margin', property) ||
+            is_property('margin-block', property) ||
+            is_property('margin-inline', property) ||
+            is_property('margin-top', property) ||
+            is_property('margin-right', property) ||
+            is_property('margin-bottom', property) ||
+            is_property('margin-left', property) ||
+            is_property('padding', property) ||
+            is_property('padding-block', property) ||
+            is_property('padding-inline', property) ||
+            is_property('padding-top', property) ||
+            is_property('padding-right', property) ||
+            is_property('padding-bottom', property) ||
+            is_property('padding-left', property)
           ) {
             if (isValueReset(node)) {
               resets.p(property, declaration.loc)
             }
           }
-          else if (isProperty('z-index', property)) {
+          else if (is_property('z-index', property)) {
             zindex.p(stringifyNode(node), loc)
             return this.skip
           }
-          else if (isProperty('font', property)) {
+          else if (is_property('font', property)) {
             if (isSystemFont(node)) return
 
             let result = destructure(node, stringifyNode, function (item) {
@@ -553,22 +553,22 @@ export function analyze(css, options = {}) {
 
             break
           }
-          else if (isProperty('font-size', property)) {
+          else if (is_property('font-size', property)) {
             if (!isSystemFont(node)) {
               fontSizes.p(stringifyNode(node), loc)
             }
             break
           }
-          else if (isProperty('font-family', property)) {
+          else if (is_property('font-family', property)) {
             if (!isSystemFont(node)) {
               fontFamilies.p(stringifyNode(node), loc)
             }
             break
           }
-          else if (isProperty('line-height', property)) {
+          else if (is_property('line-height', property)) {
             lineHeights.p(stringifyNode(node), loc)
           }
-          else if (isProperty('transition', property) || isProperty('animation', property)) {
+          else if (is_property('transition', property) || is_property('animation', property)) {
             analyzeAnimation(children, function (item) {
               if (item.type === 'fn') {
                 timingFunctions.p(stringifyNode(item.value), loc)
@@ -582,7 +582,7 @@ export function analyze(css, options = {}) {
             })
             break
           }
-          else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
+          else if (is_property('animation-duration', property) || is_property('transition-duration', property)) {
             if (children && children.size > 1) {
               children.forEach(child => {
                 if (child.type !== Operator) {
@@ -595,7 +595,7 @@ export function analyze(css, options = {}) {
             }
             break
           }
-          else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
+          else if (is_property('transition-timing-function', property) || is_property('animation-timing-function', property)) {
             if (children && children.size > 1) {
               children.forEach(child => {
                 if (child.type !== Operator) {
@@ -608,10 +608,10 @@ export function analyze(css, options = {}) {
             }
             break
           }
-          else if (isProperty('container-name', property)) {
+          else if (is_property('container-name', property)) {
             containerNames.p(stringifyNode(node), loc)
           }
-          else if (isProperty('container', property)) {
+          else if (is_property('container', property)) {
             // The first identifier is the container name
             // Example: container: my-layout / inline-size;
             if (children.first?.type === 'Identifier') {
@@ -624,13 +624,13 @@ export function analyze(css, options = {}) {
             }
             break
           }
-          else if (isProperty('text-shadow', property)) {
+          else if (is_property('text-shadow', property)) {
             if (!isValueKeyword(node)) {
               textShadows.p(stringifyNode(node), loc)
             }
             // no break here: potentially contains colors
           }
-          else if (isProperty('box-shadow', property)) {
+          else if (is_property('box-shadow', property)) {
             if (!isValueKeyword(node)) {
               boxShadows.p(stringifyNode(node), loc)
             }
@@ -756,10 +756,10 @@ export function analyze(css, options = {}) {
           if (hasVendorPrefix(property)) {
             propertyVendorPrefixes.p(property, propertyLoc)
             propertyComplexities.push(2)
-          } else if (isHack(property)) {
+          } else if (is_browserhack(property)) {
             propertyHacks.p(property, propertyLoc)
             propertyComplexities.push(2)
-          } else if (isCustom(property)) {
+          } else if (is_custom(property)) {
             customProperties.p(property, propertyLoc)
             propertyComplexities.push(node.important ? 3 : 2)
 
@@ -1076,7 +1076,7 @@ export {
 } from './atrules/atrules.js'
 
 export {
-  isHack as isPropertyHack,
+  is_browserhack as isPropertyHack,
 } from './properties/property-utils.js'
 
 export {

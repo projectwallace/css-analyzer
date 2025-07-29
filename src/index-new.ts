@@ -1,10 +1,13 @@
 import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
 import { SelectorCollection } from './selector-collection.js'
+import { PropertyCollection } from './property-collection.js'
 import { endsWith } from './string-utils.js'
 import { getComplexity, isAccessibility, isPrefixed } from "./selectors/utils.js"
 import { calculateForAST } from '@bramus/specificity/core'
-import type { CssNode, Selector } from 'css-tree'
+import type { CssNode, Declaration, Selector } from 'css-tree'
+import { hasVendorPrefix } from './vendor-prefix.js'
+import { is_browserhack, is_custom as is_custom_property, is_shorthand as is_shorthand_property } from './properties/property-utils.js'
 
 /**
  * Analyze CSS
@@ -90,6 +93,19 @@ export function analyze(css: string) {
 		})
 	}
 
+	function walk_declarations(on_declaration: (declaration_ast: Declaration) => void) {
+		walk(ast, {
+			visit: 'Declaration',
+			enter(node) {
+				if (this.atrule && endsWith('keyframes', this.atrule.name)) {
+					return walk.skip
+				}
+
+				on_declaration(node)
+			}
+		})
+	}
+
 	return {
 		get selectors() {
 			let total_selectors = 0
@@ -116,6 +132,51 @@ export function analyze(css: string) {
 					hash(start.offset, end),
 					pseudos,
 					combinators
+				)
+			})
+			return collection
+		},
+		get properties() {
+			let total_declarations = 0
+			walk_declarations(() => total_declarations++)
+
+			let collection = new PropertyCollection(total_declarations)
+			walk_declarations(function on_declaration(declaration_ast: Declaration) {
+				let property = declaration_ast.property
+				let start = declaration_ast.loc!.start
+				let end = start.offset + property.length
+				let hash_value = hash(start.offset, end)
+				let complexity = 1
+				let is_custom = is_custom_property(property)
+				let is_prefixed = hasVendorPrefix(property)
+				let is_hack = is_browserhack(property)
+				let is_shorthand = is_shorthand_property(property)
+
+				if (is_custom) {
+					complexity++
+				}
+				if (is_prefixed) {
+					complexity++
+				}
+				if (is_hack) {
+					complexity++
+				}
+				if (is_shorthand) {
+					complexity++
+				}
+
+				collection.add(
+					start.line,
+					start.column,
+					start.offset,
+					end,
+					hash_value,
+					complexity,
+					is_custom,
+					is_shorthand,
+					is_prefixed,
+					is_hack,
+					property
 				)
 			})
 			return collection
