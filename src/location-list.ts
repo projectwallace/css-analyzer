@@ -1,8 +1,6 @@
 import { AutoSizeUintArray } from './auto-size-uintarray.js'
 
 export class LocationList {
-	// TODO: we can probably store more than one integer in a single Uint32Array
-	// e.g. line and length could be stored in a single Uint32Array
 	#size = 0;
 	#lines: AutoSizeUintArray;
 	#columns: AutoSizeUintArray;

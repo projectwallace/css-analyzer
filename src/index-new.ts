@@ -41,7 +41,7 @@ export function analyze(css: string) {
 		positions: true, // So we can use stringifyNode()
 	})
 
-	function walk_selectors(is_scanning = false, on_selector: (selector_ast: Selector, nesting_depth: number, pseudos: string[] | undefined, combinators: string[] | undefined) => void) {
+	function walk_selectors(on_selector: (selector_ast: Selector, nesting_depth: number, pseudos: string[] | undefined, combinators: string[] | undefined) => void) {
 		let nestingDepth = 0
 		walk(ast, {
 			enter: function (node: CssNode) {
@@ -53,25 +53,23 @@ export function analyze(css: string) {
 
 					let pseudos: string[] | undefined = undefined
 					let combinators: string[] | undefined = undefined
-					// Avoid filling up memory while doing a size scan
-					if (!is_scanning) {
-						walk(node, function (child: CssNode) {
-							if (child.type === 'PseudoClassSelector') {
-								if (pseudos === undefined) {
-									pseudos = [child.name]
-								} else {
-									pseudos.push(child.name)
-								}
+
+					walk(node, function (child: CssNode) {
+						if (child.type === 'PseudoClassSelector') {
+							if (pseudos === undefined) {
+								pseudos = [child.name]
+							} else {
+								pseudos.push(child.name)
 							}
-							else if (child.type === 'Combinator') {
-								if (combinators === undefined) {
-									combinators = [child.name]
-								} else {
-									combinators.push(child.name)
-								}
+						}
+						else if (child.type === 'Combinator') {
+							if (combinators === undefined) {
+								combinators = [child.name]
+							} else {
+								combinators.push(child.name)
 							}
-						})
-					}
+						}
+					})
 
 					on_selector(node, nestingDepth, pseudos, combinators)
 
@@ -110,7 +108,7 @@ export function analyze(css: string) {
 	return {
 		get selectors() {
 			let collection = new SelectorCollection()
-			walk_selectors(false, function on_selector(selector_ast, nesting_depth: number, pseudos: string[] | undefined, combinators: string[] | undefined) {
+			walk_selectors(function on_selector(selector_ast, nesting_depth: number, pseudos: string[] | undefined, combinators: string[] | undefined) {
 				let specificity = calculateForAST(selector_ast)
 				let start = selector_ast.loc!.start
 				let end = selector_ast.loc!.end.offset
