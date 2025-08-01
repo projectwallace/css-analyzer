@@ -59,8 +59,6 @@ test('counts unique properties', () => {
 	])
 })
 
-
-
 test('allows limiting unique properties', () => {
 	let result = analyze(`
 		a {

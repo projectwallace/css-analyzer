@@ -1,36 +1,36 @@
 import { test, expect } from 'vitest'
-import { strEquals, endsWith, startsWith } from './string-utils.js'
+import { str_equals, ends_with, starts_with } from './string-utils.js'
 
 test('strEquals', () => {
-  expect(strEquals('keyframes', 'keyframes')).toBeTruthy()
-  expect(strEquals('blue', 'BLUE')).toBeTruthy()
-  expect(strEquals('test-me', 'TEST-me')).toBeTruthy()
+  expect(str_equals('keyframes', 'keyframes')).toBeTruthy()
+  expect(str_equals('blue', 'BLUE')).toBeTruthy()
+  expect(str_equals('test-me', 'TEST-me')).toBeTruthy()
 
-  expect(strEquals('-webkit-keyframes', 'keyframes')).toBeFalsy()
-  expect(strEquals('abc', 'abcd')).toBeFalsy()
-  expect(strEquals('abc', '')).toBeFalsy()
+  expect(str_equals('-webkit-keyframes', 'keyframes')).toBeFalsy()
+  expect(str_equals('abc', 'abcd')).toBeFalsy()
+  expect(str_equals('abc', '')).toBeFalsy()
 })
 
 test('endsWith', () => {
-  expect(endsWith('keyframes', 'keyframes')).toBeTruthy()
-  expect(endsWith('keyframes', '-webkit-keyframes')).toBeTruthy()
-  expect(endsWith('keyframes', 'testkeyframes')).toBeTruthy()
-  expect(endsWith('keyframes', 'testKeyframes')).toBeTruthy()
-  expect(endsWith('test', 'test')).toBeTruthy()
+  expect(ends_with('keyframes', 'keyframes')).toBeTruthy()
+  expect(ends_with('keyframes', '-webkit-keyframes')).toBeTruthy()
+  expect(ends_with('keyframes', 'testkeyframes')).toBeTruthy()
+  expect(ends_with('keyframes', 'testKeyframes')).toBeTruthy()
+  expect(ends_with('test', 'test')).toBeTruthy()
 
-  expect(endsWith('keyframes', '')).toBeFalsy()
-  expect(endsWith('keyframes', 'test')).toBeFalsy()
-  expect(endsWith('keyframes', 'eyframes')).toBeFalsy()
+  expect(ends_with('keyframes', '')).toBeFalsy()
+  expect(ends_with('keyframes', 'test')).toBeFalsy()
+  expect(ends_with('keyframes', 'eyframes')).toBeFalsy()
 })
 
 test('startsWith', () => {
-  expect(startsWith('data:', 'data:<xml>')).toBeTruthy()
-  expect(startsWith('animation', 'animation')).toBeTruthy()
-  expect(startsWith('animation', 'animation-duration')).toBeTruthy()
-  expect(startsWith('animation', 'Animation')).toBeTruthy()
-  expect(startsWith('test', 'test')).toBeTruthy()
+  expect(starts_with('data:', 'data:<xml>')).toBeTruthy()
+  expect(starts_with('animation', 'animation')).toBeTruthy()
+  expect(starts_with('animation', 'animation-duration')).toBeTruthy()
+  expect(starts_with('animation', 'Animation')).toBeTruthy()
+  expect(starts_with('test', 'test')).toBeTruthy()
 
-  expect(startsWith('data:', 'nope')).toBeFalsy()
-  expect(startsWith('test', '')).toBeFalsy()
-  expect(startsWith('test-test', 'test')).toBeFalsy()
+  expect(starts_with('data:', 'nope')).toBeFalsy()
+  expect(starts_with('test', '')).toBeFalsy()
+  expect(starts_with('test-test', 'test')).toBeFalsy()
 })

@@ -1,12 +1,12 @@
-import { hasVendorPrefix } from '../vendor-prefix.js'
-import { endsWith } from '../string-utils.js'
+import { has_vendor_prefix } from '../vendor-prefix.js'
+import { ends_with } from '../string-utils.js'
 import { KeywordSet } from '../keyword-set.js'
 
 /**
  * @see https://github.com/csstree/csstree/blob/master/lib/utils/names.js#L69
  */
 export function is_browserhack(property: string): boolean {
-  if (is_custom(property) || hasVendorPrefix(property)) return false
+  if (is_custom(property) || has_vendor_prefix(property)) return false
 
   let code = property.charCodeAt(0)
 
@@ -39,7 +39,7 @@ export function is_custom(property: string): boolean {
  */
 export function is_property(basename: string, property: string): boolean {
   if (is_custom(property)) return false
-  return endsWith(basename, property)
+  return ends_with(basename, property)
 }
 
 /**
@@ -47,7 +47,7 @@ export function is_property(basename: string, property: string): boolean {
  * @returns The property name without vendor prefix
  */
 export function basename(property: string): string {
-  if (hasVendorPrefix(property)) {
+  if (has_vendor_prefix(property)) {
     return property.slice(property.indexOf('-', 2) + 1)
   }
   return property

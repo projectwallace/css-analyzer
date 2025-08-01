@@ -2,11 +2,11 @@ import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
 import { SelectorCollection } from './selector-collection.js'
 import { PropertyCollection } from './property-collection.js'
-import { endsWith } from './string-utils.js'
+import { ends_with } from './string-utils.js'
 import { getComplexity, isAccessibility, isPrefixed } from "./selectors/utils.js"
 import { calculateForAST } from '@bramus/specificity/core'
 import type { CssNode, Declaration, Selector } from 'css-tree'
-import { hasVendorPrefix } from './vendor-prefix.js'
+import { has_vendor_prefix } from './vendor-prefix.js'
 import { is_browserhack, is_custom as is_custom_property, is_shorthand as is_shorthand_property } from './properties/property-utils.js'
 
 /**
@@ -46,7 +46,8 @@ export function analyze(css: string) {
 		walk(ast, {
 			enter: function (node: CssNode) {
 				if (node.type === 'Selector') {
-					if (this.atrule && endsWith('keyframes', this.atrule.name)) {
+					// @ts-expect-error `this.atrule` is the nearest ancestor Atrule node, if present. Null otherwise.
+					if (this.atrule && ends_with('keyframes', this.atrule.name)) {
 						return walk.skip
 					}
 
@@ -97,7 +98,7 @@ export function analyze(css: string) {
 		walk(ast, {
 			visit: 'Declaration',
 			enter(node) {
-				if (this.atrule && endsWith('keyframes', this.atrule.name)) {
+				if (this.atrule && ends_with('keyframes', this.atrule.name)) {
 					return walk.skip
 				}
 
@@ -148,7 +149,7 @@ export function analyze(css: string) {
 				let hash_value = hash(start.offset, end)
 				let complexity = 1
 				let is_custom = is_custom_property(property)
-				let is_prefixed = hasVendorPrefix(property)
+				let is_prefixed = has_vendor_prefix(property)
 				let is_hack = is_browserhack(property)
 				let is_shorthand = is_shorthand_property(property)
 

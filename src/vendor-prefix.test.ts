@@ -1,18 +1,18 @@
 import { test, expect } from 'vitest'
-import { hasVendorPrefix } from './vendor-prefix.js'
+import { has_vendor_prefix } from './vendor-prefix.js'
 
 test('happy path', () => {
-	expect(hasVendorPrefix('-webkit-animation')).toBeTruthy()
-	expect(hasVendorPrefix('-moz-animation')).toBeTruthy()
-	expect(hasVendorPrefix('-ms-animation')).toBeTruthy()
-	expect(hasVendorPrefix('-o-animation')).toBeTruthy()
+	expect(has_vendor_prefix('-webkit-animation')).toBeTruthy()
+	expect(has_vendor_prefix('-moz-animation')).toBeTruthy()
+	expect(has_vendor_prefix('-ms-animation')).toBeTruthy()
+	expect(has_vendor_prefix('-o-animation')).toBeTruthy()
 })
 
 test('custom properties are not prefixed', () => {
-	expect(hasVendorPrefix('--custom-property')).toBeFalsy()
+	expect(has_vendor_prefix('--custom-property')).toBeFalsy()
 })
 
 test('no prefix', () => {
-	expect(hasVendorPrefix('animation')).toBeFalsy()
-	expect(hasVendorPrefix('webkit-test')).toBeFalsy()
+	expect(has_vendor_prefix('animation')).toBeFalsy()
+	expect(has_vendor_prefix('webkit-test')).toBeFalsy()
 })

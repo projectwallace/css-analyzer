@@ -85,7 +85,8 @@ export class UniqueValueList<T> {
 						count: location_indexes.length,
 						location_indexes
 					}
-					if (--limit === 0) {
+					limit--
+					if (limit === 0) {
 						return
 					}
 				}

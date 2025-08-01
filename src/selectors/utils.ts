@@ -1,6 +1,6 @@
 import walk from 'css-tree/walker'
-import { startsWith, strEquals } from '../string-utils.js'
-import { hasVendorPrefix } from '../vendor-prefix.js'
+import { starts_with, str_equals } from '../string-utils.js'
+import { has_vendor_prefix } from '../vendor-prefix.js'
 import { KeywordSet } from '../keyword-set.js'
 import type { SelectorList, Selector as CssTreeSelector, CssNode, PseudoClassSelector, TypeSelector, PseudoElementSelector, AttributeSelector, ListItem } from 'css-tree'
 
@@ -34,7 +34,7 @@ export function isAccessibility(selector: CssTreeSelector) {
   walk(selector, function (node: CssNode) {
     if (node.type === 'AttributeSelector') {
       let name = node.name.name
-      if (strEquals('role', name) || startsWith('aria-', name)) {
+      if (str_equals('role', name) || starts_with('aria-', name)) {
         isA11y = true
         return walk.break
       }
@@ -70,7 +70,7 @@ export function isPrefixed(selector: CssTreeSelector): boolean {
       || type === 'TypeSelector'
       || type === 'PseudoClassSelector'
     ) {
-      if (hasVendorPrefix((node as PseudoElementSelector | TypeSelector | PseudoClassSelector).name)) {
+      if (has_vendor_prefix((node as PseudoElementSelector | TypeSelector | PseudoClassSelector).name)) {
         isPrefixed = true
         return walk.break
       }
@@ -116,7 +116,7 @@ export function getComplexity(selector: CssTreeSelector) {
       || type === 'TypeSelector'
       || type === 'PseudoClassSelector'
     ) {
-      if (hasVendorPrefix((node as PseudoClassSelector | TypeSelector | PseudoElementSelector).name)) {
+      if (has_vendor_prefix((node as PseudoClassSelector | TypeSelector | PseudoElementSelector).name)) {
         complexity++
       }
     }
