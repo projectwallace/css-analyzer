@@ -1,5 +1,6 @@
 import { LocationList } from './location-list.js'
 import { UniqueValueList } from './unique-value-list.js'
+import { AutoSizeUintArray } from './auto-size-uintarray.js'
 
 function pack(is_custom: boolean, is_shorthand: boolean, is_prefixed: boolean, is_browserhack: boolean, complexity: number): number {
 	return ((is_custom ? 1 : 0) << 7) |
@@ -34,7 +35,7 @@ export class PropertyCollection {
 	// Bit 3 = is_prefixed
 	// Bit 4 = is_browserhack
 	// Remaining bits = complexity (max (2^4-1=) 15, but in practice usually 1, max 4)
-	#complexities_and_flags: Uint8Array
+	#complexities_and_flags: AutoSizeUintArray
 	#total_custom = 0
 	#unique_customs: Set<number>
 	#total_shorthand = 0
@@ -44,10 +45,10 @@ export class PropertyCollection {
 	#total_browserhack = 0
 	#unique_browserhacks: Set<number>
 
-	constructor(size: number) {
-		this.#locations = new LocationList(size)
+	constructor() {
+		this.#locations = new LocationList()
 		this.#unique = new UniqueValueList<string>()
-		this.#complexities_and_flags = new Uint8Array(size)
+		this.#complexities_and_flags = new AutoSizeUintArray(undefined, Uint8Array)
 		this.#unique_customs = new Set()
 		this.#unique_shorthands = new Set()
 		this.#unique_prefixed = new Set()
@@ -57,7 +58,7 @@ export class PropertyCollection {
 	add(line: number, column: number, start: number, end: number, hash: number, complexity: number, is_custom: boolean, is_shorthand: boolean, is_prefixed: boolean, is_browserhack: boolean, property: string) {
 		let location_index = this.#locations.add(line, column, start, end)
 		this.#unique.add(property, location_index)
-		this.#complexities_and_flags[location_index] = pack(is_custom, is_shorthand, is_prefixed, is_browserhack, complexity)
+		this.#complexities_and_flags.set(location_index, pack(is_custom, is_shorthand, is_prefixed, is_browserhack, complexity))
 
 		if (is_custom) {
 			this.#total_custom++
@@ -95,7 +96,7 @@ export class PropertyCollection {
 		let unique = this.#unique
 		for (let { value, count, location_indexes } of unique.desc(limit)) {
 			let locations = this.#locations
-			let complexities_and_flags = this.#complexities_and_flags[location_indexes.at(0)]!
+			let complexities_and_flags = this.#complexities_and_flags.at(location_indexes.at(0))
 			yield {
 				value,
 				count,

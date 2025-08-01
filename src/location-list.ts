@@ -1,25 +1,27 @@
+import { AutoSizeUintArray } from './auto-size-uintarray.js'
+
 export class LocationList {
 	// TODO: we can probably store more than one integer in a single Uint32Array
 	// e.g. line and length could be stored in a single Uint32Array
 	#size = 0;
-	#lines: Uint32Array;
-	#columns: Uint32Array;
-	#starts: Uint32Array;
-	#lengths: Uint16Array;
+	#lines: AutoSizeUintArray;
+	#columns: AutoSizeUintArray;
+	#starts: AutoSizeUintArray;
+	#lengths: AutoSizeUintArray;
 
-	constructor(size: number) {
-		this.#lines = new Uint32Array(size)
-		this.#columns = new Uint32Array(size)
-		this.#starts = new Uint32Array(size)
-		this.#lengths = new Uint16Array(size)
+	constructor(size?: number) {
+		this.#lines = new AutoSizeUintArray(size, Uint32Array)
+		this.#columns = new AutoSizeUintArray(size, Uint32Array)
+		this.#starts = new AutoSizeUintArray(size, Uint32Array)
+		this.#lengths = new AutoSizeUintArray(size, Uint16Array)
 	}
 
 	add(line: number, column: number, start: number, end: number) {
 		let location_index = this.#size
-		this.#lines[location_index] = line
-		this.#columns[location_index] = column
-		this.#starts[location_index] = start
-		this.#lengths[location_index] = end - start
+		this.#lines.set(location_index, line)
+		this.#columns.set(location_index, column)
+		this.#starts.set(location_index, start)
+		this.#lengths.set(location_index, end - start)
 
 		this.#size++
 		return location_index

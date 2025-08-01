@@ -1,6 +1,7 @@
 import { UniqueValueList } from './unique-value-list.js'
 import { Specificity } from './specificity.js'
 import { LocationList } from './location-list.js'
+import { AutoSizeUintArray } from './auto-size-uintarray.js'
 
 /**
  * Packs specificity and complexity into a single Uint32.
@@ -36,8 +37,8 @@ function unpack_complexity(encoded: number): number {
 export class SelectorCollection {
 	#size = 0;
 	#locations: LocationList;
-	#depths: Uint8Array;
-	#specificities_and_complexities: Uint32Array;
+	#depths: AutoSizeUintArray;
+	#specificities_and_complexities: AutoSizeUintArray;
 	#prefixed: UniqueValueList<string>;
 	#accessibility: UniqueValueList<string>;
 	#id: UniqueValueList<string>;
@@ -45,10 +46,10 @@ export class SelectorCollection {
 	#combinators: UniqueValueList<string>;
 	#unique: Set<number>;
 
-	constructor(size: number) {
-		this.#locations = new LocationList(size)
-		this.#depths = new Uint8Array(size)
-		this.#specificities_and_complexities = new Uint32Array(size)
+	constructor() {
+		this.#locations = new LocationList()
+		this.#depths = new AutoSizeUintArray(undefined, Uint8Array)
+		this.#specificities_and_complexities = new AutoSizeUintArray(undefined, Uint32Array)
 		this.#prefixed = new UniqueValueList()
 		this.#accessibility = new UniqueValueList()
 		this.#id = new UniqueValueList()
@@ -77,7 +78,7 @@ export class SelectorCollection {
 	add(line: number, column: number, start: number, end: number, complexity: number, is_prefixed: boolean, is_accessibility: boolean, specificity_a: number, specificity_b: number, specificity_c: number, stringify_selector: { (): string; }, nesting_depth: number, hashed: number, pseudos: string[] | undefined, combinators: string[] | undefined) {
 		let location_index = this.#locations.add(line, column, start, end)
 
-		this.#specificities_and_complexities[location_index] = pack_specificity_and_complexity(specificity_a, specificity_b, specificity_c, complexity)
+		this.#specificities_and_complexities.push(pack_specificity_and_complexity(specificity_a, specificity_b, specificity_c, complexity))
 
 		if (specificity_a > 0) {
 			this.#id.add(stringify_selector(), location_index)
@@ -89,7 +90,7 @@ export class SelectorCollection {
 			this.#prefixed.add(stringify_selector(), location_index)
 		}
 
-		this.#depths[location_index] = nesting_depth - 1
+		this.#depths.push(nesting_depth - 1)
 
 		if (pseudos !== undefined) {
 			for (let pseudo of pseudos) {

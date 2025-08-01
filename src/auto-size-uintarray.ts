@@ -1,16 +1,20 @@
+type BufferType = Uint8ArrayConstructor | Uint16ArrayConstructor | Uint32ArrayConstructor;
+
 export class AutoSizeUintArray {
-	#buffer: Uint16Array;
+	#buffer_type: BufferType;
+	#buffer: Uint8Array | Uint16Array | Uint32Array;
 	#cursor: number;
 
-	constructor(initial_size: number) {
-		this.#buffer = new Uint16Array(initial_size)
+	constructor(initial_size: number = 16, TypedArray: BufferType = Uint16Array) {
+		this.#buffer = new TypedArray(initial_size)
+		this.#buffer_type = TypedArray
 		this.#cursor = 0
 		return this
 	}
 
 	#grow() {
 		let new_size = this.#buffer.length * 2
-		let new_buffer = new Uint16Array(new_size)
+		let new_buffer = new this.#buffer_type(new_size)
 		for (let i = 0; i < this.#buffer.length; i++) {
 			new_buffer[i] = this.#buffer[i]!
 		}
@@ -25,6 +29,10 @@ export class AutoSizeUintArray {
 		this.#cursor++
 	}
 
+	set(index: number, n: number) {
+		this.#buffer[index] = n
+	}
+
 	at(index: number): number {
 		return this.#buffer[index]!
 	}
@@ -35,7 +43,7 @@ export class AutoSizeUintArray {
 
 	*[Symbol.iterator]() {
 		for (let i = 0; i < this.#cursor; i++) {
-			yield this.#buffer[i]
+			yield this.#buffer[i]!
 		}
 	}
 

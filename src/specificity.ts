@@ -15,6 +15,7 @@ function compare_specificity(a1: number, b1: number, c1: number, a2: number, b2:
 
 export class Specificity {
 	// Uint8Array allows specificity values to be between 0 and 255
+	// Uses less memory than 3 seperate numbers (Uint8Array is 3 bytes, 3 numbers would be 3*8=24 bytes)
 	#value: Uint8Array;
 
 	constructor(a: number, b: number, c: number) {

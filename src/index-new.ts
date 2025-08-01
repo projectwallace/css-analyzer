@@ -109,10 +109,7 @@ export function analyze(css: string) {
 
 	return {
 		get selectors() {
-			let total_selectors = 0
-			walk_selectors(true, () => total_selectors++)
-
-			let collection = new SelectorCollection(total_selectors)
+			let collection = new SelectorCollection()
 			walk_selectors(false, function on_selector(selector_ast, nesting_depth: number, pseudos: string[] | undefined, combinators: string[] | undefined) {
 				let specificity = calculateForAST(selector_ast)
 				let start = selector_ast.loc!.start
@@ -138,10 +135,7 @@ export function analyze(css: string) {
 			return collection
 		},
 		get properties() {
-			let total_declarations = 0
-			walk_declarations(() => total_declarations++)
-
-			let collection = new PropertyCollection(total_declarations)
+			let collection = new PropertyCollection()
 			walk_declarations(function on_declaration(declaration_ast: Declaration) {
 				let property = declaration_ast.property
 				let start = declaration_ast.loc!.start
