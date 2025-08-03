@@ -168,6 +168,7 @@ export function analyze(css: string) {
 				}
 
 				else if (node.type === 'Declaration') {
+					// Do not walk declaration in places like `@supports (display: grid)`
 					// @ts-expect-error `this.atrule` is the nearest ancestor Atrule node, if present. Null otherwise.
 					if (this.atrulePrelude !== null) {
 						return walk_tree.skip
