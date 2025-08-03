@@ -1,7 +1,8 @@
 import parse from 'css-tree/parser'
-import walk from 'css-tree/walker'
+import walk_tree from 'css-tree/walker'
 import { SelectorCollection } from './selector-collection.js'
 import { PropertyCollection } from './property-collection.js'
+import { DeclarationCollection } from './declaration-collection.js'
 import { ends_with } from './string-utils.js'
 import { getComplexity, isAccessibility, isPrefixed } from "./selectors/utils.js"
 import { calculateForAST } from '@bramus/specificity/core'
@@ -38,23 +39,105 @@ export function analyze(css: string) {
 
 	let ast = parse(css, {
 		// parseCustomProperty: true, // To find font-families, colors, etc.
-		positions: true, // So we can use stringifyNode()
+		positions: true, // So we can use stringifyNode() and hash()
 	})
 
-	function walk_selectors(on_selector: (selector_ast: Selector, nesting_depth: number, pseudos: string[] | undefined, combinators: string[] | undefined) => void) {
-		let nestingDepth = 0
-		walk(ast, {
+	let selectors = new SelectorCollection()
+	let properties = new PropertyCollection()
+	let declarations = new DeclarationCollection()
+
+	function on_selector(selector_ast: Selector, nesting_depth: number, pseudos: string[] | undefined, combinators: string[] | undefined) {
+		let specificity = calculateForAST(selector_ast)
+		let start = selector_ast.loc!.start
+		let end = selector_ast.loc!.end.offset
+		selectors.add(
+			start.line,
+			start.column,
+			start.offset,
+			end,
+			getComplexity(selector_ast),
+			isPrefixed(selector_ast),
+			isAccessibility(selector_ast),
+			specificity.a,
+			specificity.b,
+			specificity.c,
+			() => stringifyNode(selector_ast),
+			nesting_depth,
+			hash(start.offset, end),
+			pseudos,
+			combinators
+		)
+	}
+
+	function on_declaration(declaration_ast: Declaration, is_in_keyframes: boolean, nesting_depth: number) {
+		let property = declaration_ast.property
+		let start = declaration_ast.loc!.start
+		let property_end = start.offset + property.length
+		let is_custom = is_custom_property(property)
+		let is_prefixed = has_vendor_prefix(property)
+		let is_hack = is_browserhack(property)
+		let is_shorthand = is_shorthand_property(property)
+		let property_complexity = 1
+
+		if (is_custom) {
+			property_complexity++
+		}
+		if (is_prefixed) {
+			property_complexity++
+		}
+		if (is_hack) {
+			property_complexity++
+		}
+		if (is_shorthand) {
+			property_complexity++
+		}
+
+		properties.add(
+			start.line,
+			start.column,
+			start.offset,
+			property_end,
+			hash(start.offset, property_end),
+			property_complexity,
+			is_custom,
+			is_shorthand,
+			is_prefixed,
+			is_hack,
+			property
+		)
+
+		let is_important = declaration_ast.important !== false
+		let declaration_complexity = 1
+		if (is_important) {
+			declaration_complexity++
+		}
+		declarations.add(
+			start.line,
+			start.column,
+			start.offset,
+			declaration_ast.loc!.end.offset,
+			hash(start.offset, declaration_ast.loc!.end.offset),
+			declaration_complexity,
+			nesting_depth - 1,
+			is_important,
+			is_in_keyframes,
+		)
+	}
+
+	function walk() {
+		let nesting_depth = 0
+		walk_tree(ast, {
 			enter: function (node: CssNode) {
 				if (node.type === 'Selector') {
 					// @ts-expect-error `this.atrule` is the nearest ancestor Atrule node, if present. Null otherwise.
 					if (this.atrule && ends_with('keyframes', this.atrule.name)) {
-						return walk.skip
+						return walk_tree.skip
 					}
 
 					let pseudos: string[] | undefined = undefined
 					let combinators: string[] | undefined = undefined
 
-					walk(node, function (child: CssNode) {
+					walk_tree(node, function (child: CssNode) {
 						if (child.type === 'PseudoClassSelector') {
 							if (pseudos === undefined) {
 								pseudos = [child.name]
@@ -71,108 +154,48 @@ export function analyze(css: string) {
 						}
 					})
 
-					on_selector(node, nestingDepth, pseudos, combinators)
+					on_selector(node, nesting_depth, pseudos, combinators)
 
 					// Avoid deeper walking of selectors to not mess with
 					// our specificity calculations in case of a selector
 					// with :where() or :is() that contain SelectorLists
 					// as children
-					return walk.skip
+					return walk_tree.skip
 				}
 
 				else if (node.type === 'Rule' || node.type === 'Atrule') {
-					nestingDepth++
+					nesting_depth++
+				}
+
+				else if (node.type === 'Declaration') {
+					// @ts-expect-error `this.atrule` is the nearest ancestor Atrule node, if present. Null otherwise.
+					if (this.atrulePrelude !== null) {
+						return walk_tree.skip
+					}
+
+					// @ts-expect-error `this.atrule` is the nearest ancestor Atrule node, if present. Null otherwise.
+					on_declaration(node, this.atrule !== null && ends_with('keyframes', this.atrule.name), nesting_depth)
 				}
 			},
 			leave(node: CssNode) {
 				if (node.type === 'Rule' || node.type === 'Atrule') {
-					nestingDepth--
+					nesting_depth--
 				}
 			}
 		})
 	}
 
-	function walk_declarations(on_declaration: (declaration_ast: Declaration) => void) {
-		walk(ast, {
-			visit: 'Declaration',
-			enter(node) {
-				if (this.atrule && ends_with('keyframes', this.atrule.name)) {
-					return walk.skip
-				}
-
-				on_declaration(node)
-			}
-		})
-	}
+	walk()
 
 	return {
 		get selectors() {
-			let collection = new SelectorCollection()
-			walk_selectors(function on_selector(selector_ast, nesting_depth: number, pseudos: string[] | undefined, combinators: string[] | undefined) {
-				let specificity = calculateForAST(selector_ast)
-				let start = selector_ast.loc!.start
-				let end = selector_ast.loc!.end.offset
-				collection.add(
-					start.line,
-					start.column,
-					start.offset,
-					end,
-					getComplexity(selector_ast),
-					isPrefixed(selector_ast),
-					isAccessibility(selector_ast),
-					specificity.a,
-					specificity.b,
-					specificity.c,
-					() => stringifyNode(selector_ast),
-					nesting_depth,
-					hash(start.offset, end),
-					pseudos,
-					combinators
-				)
-			})
-			return collection
+			return selectors
+		},
+		get declarations() {
+			return declarations
 		},
 		get properties() {
-			let collection = new PropertyCollection()
-			walk_declarations(function on_declaration(declaration_ast: Declaration) {
-				let property = declaration_ast.property
-				let start = declaration_ast.loc!.start
-				let end = start.offset + property.length
-				let hash_value = hash(start.offset, end)
-				let complexity = 1
-				let is_custom = is_custom_property(property)
-				let is_prefixed = has_vendor_prefix(property)
-				let is_hack = is_browserhack(property)
-				let is_shorthand = is_shorthand_property(property)
-
-				if (is_custom) {
-					complexity++
-				}
-				if (is_prefixed) {
-					complexity++
-				}
-				if (is_hack) {
-					complexity++
-				}
-				if (is_shorthand) {
-					complexity++
-				}
-
-				collection.add(
-					start.line,
-					start.column,
-					start.offset,
-					end,
-					hash_value,
-					complexity,
-					is_custom,
-					is_shorthand,
-					is_prefixed,
-					is_hack,
-					property
-				)
-			})
-			return collection
+			return properties
 		}
 	}
 }

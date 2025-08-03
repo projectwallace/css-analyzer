@@ -47,10 +47,11 @@ export class AutoSizeUintArray {
 		}
 	}
 
-	map<T>(cb: (n: number) => T): T[] {
+	map<T>(cb: (n: number, index: number) => T): T[] {
 		let list: T[] = []
+		let index = 0
 		for (let n of this) {
-			list.push(cb(n!))
+			list.push(cb(n!, index++))
 		}
 		return list
 	}

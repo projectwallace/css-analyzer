@@ -6,8 +6,8 @@ test('empty unique value list', () => {
 	expect(list.total).toBe(0)
 	expect(list.total_unique).toBe(0)
 	expect(list.uniqueness_ratio).toBe(0)
-	expect(list.min).toBe(0)
-	expect(list.max).toBe(0)
+	expect(list.min).toEqual(undefined)
+	expect(list.max).toEqual(undefined)
 })
 
 test('adding unique strings', () => {
@@ -18,8 +18,16 @@ test('adding unique strings', () => {
 	expect(list.total).toBe(3)
 	expect(list.total_unique).toBe(2)
 	expect(list.uniqueness_ratio).toBe(2 / 3)
-	expect(list.min).toBe(1)
-	expect(list.max).toBe(2)
+	expect(list.max).toEqual({
+		value: 'selector1',
+		count: 2
+	})
+	expect(list.min).toEqual({
+		value: 'selector2',
+		count: 1
+	})
+	expect(list.uniqueness_ratio).toBe(2 / 3)
+	expect(list.mode).toBe('selector1')
 })
 
 test('adding unique numbers', () => {
@@ -30,8 +38,15 @@ test('adding unique numbers', () => {
 	expect(list.total).toBe(3)
 	expect(list.total_unique).toBe(2)
 	expect(list.uniqueness_ratio).toBe(2 / 3)
-	expect(list.min).toBe(1)
-	expect(list.max).toBe(2)
+	expect(list.min).toEqual({
+		value: 2,
+		count: 1
+	})
+	expect(list.max).toEqual({
+		value: 0,
+		count: 2
+	})
+	expect(list.mode).toEqual(0)
 })
 
 test('iterating over unique strings', () => {

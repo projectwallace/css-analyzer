@@ -9,8 +9,9 @@ test('compare specificity', () => {
 })
 
 test('to JSON', () => {
-	let result = JSON.stringify(new Specificity(1, 2, 3))
-	expect(result).toEqual('[1,2,3]')
+	let result = new Specificity(1, 2, 3)
+	expect(JSON.stringify(result)).toEqual('[1,2,3]')
+	expect(result.toJSON()).toEqual([1, 2, 3])
 })
 
 test('add', () => {

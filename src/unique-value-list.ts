@@ -1,10 +1,13 @@
 import { AutoSizeUintArray } from './auto-size-uintarray.js'
 
+type MinMax<T> = {
+	value: T
+	count: number
+}
+
 export class UniqueValueList<T> {
 	#items: Map<T, AutoSizeUintArray> = new Map()
 	#total = 0
-	#min = 0
-	#max = 0
 
 	/**
 	 * @param value The value to add to the list
@@ -18,23 +21,9 @@ export class UniqueValueList<T> {
 			let list = new AutoSizeUintArray(4)
 			list.push(location_index)
 			this.#items.set(value, list)
-
-			if (this.#min === 0) {
-				this.#min = 1
-			}
-			if (this.#max === 0) {
-				this.#max = 1
-			}
 		}
 		else {
 			item.push(location_index)
-
-			if (item.length > this.#max) {
-				this.#max = item.length
-			}
-			if (item.length < this.#min) {
-				this.#min = item.length
-			}
 		}
 	}
 
@@ -54,14 +43,38 @@ export class UniqueValueList<T> {
 	 * The lowest count of locations for a value in this list.
 	 */
 	get min() {
-		return this.#min
+		let _min: MinMax<T> | undefined = undefined
+		for (let [value, location_indexes] of this.#items) {
+			let count = location_indexes.length
+			if (_min === undefined || count < _min.count) {
+				_min = {
+					value,
+					count,
+				}
+			}
+		}
+		return _min
 	}
 
 	/**
 	 * The highest count of locations for a value in this list.
 	 */
 	get max() {
-		return this.#max
+		let _max: MinMax<T> | undefined = undefined
+		for (let [value, location_indexes] of this.#items) {
+			let count = location_indexes.length
+			if (_max === undefined || count > _max.count) {
+				_max = {
+					value,
+					count,
+				}
+			}
+		}
+		return _max
+	}
+
+	get mode() {
+		return this.max?.value // The value with the highest count of locations
 	}
 
 	*[Symbol.iterator]() {
@@ -75,9 +88,11 @@ export class UniqueValueList<T> {
 	}
 
 	*desc(limit: number = Infinity) {
-		let max = this.#max
+		if (this.max === undefined) {
+			return
+		}
 
-		for (; max > 0; max--) {
+		for (let max = this.max.count; max > 0; max--) {
 			for (let [value, location_indexes] of this.#items) {
 				if (location_indexes.length === max) {
 					yield {

@@ -3,7 +3,7 @@ import { analyze } from './index-new.js'
 import { PropertyCollection } from './property-collection.js'
 
 test('empty property collection', () => {
-	let collection = new PropertyCollection(0)
+	let collection = new PropertyCollection()
 	expect(collection.total).toBe(0)
 	expect(collection.total_unique).toBe(0)
 	expect(collection.uniqueness_ratio).toBe(0)
