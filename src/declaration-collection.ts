@@ -99,22 +99,21 @@ export class DeclarationCollection {
 	}
 
 	get complexity() {
-		let sum = 0
 		let count_per_complexity = new UniqueValueList<number>()
 		let locations = this.#locations
 
 		let location_index = 0
 		for (let encoded of this.#list) {
 			let { complexity } = this.#decode(encoded)
-			sum += complexity
 			count_per_complexity.add(complexity, location_index++)
 		}
+		let numerics = count_per_complexity.numerics
 
 		return {
-			sum,
-			max: count_per_complexity.max,
-			min: count_per_complexity.min,
-			average: this.total === 0 ? 0 : sum / this.total,
+			sum: numerics.sum,
+			max: numerics.max,
+			min: numerics.min,
+			average: numerics.average,
 			mode: count_per_complexity.mode,
 			*unique() {
 				for (let { value, count, location_indexes } of count_per_complexity) {
@@ -134,20 +133,19 @@ export class DeclarationCollection {
 		let nesting_depths = new UniqueValueList<number>()
 		let locations = this.#locations
 
-		let sum = 0
 		let index = 0
 		for (let encoded of this.#list) {
 			let { depth } = this.#decode(encoded)
 			nesting_depths.add(depth, index++)
-			sum += depth
 		}
+		let numerics = nesting_depths.numerics
 
 		return {
-			sum,
-			max: nesting_depths.max,
-			min: nesting_depths.min,
+			sum: numerics.sum,
+			max: numerics.max,
+			min: numerics.min,
+			average: numerics.average,
 			mode: nesting_depths.mode,
-			average: this.total === 0 ? 0 : sum / this.total,
 			total_unique: nesting_depths.total_unique,
 			uniqueness_ratio: nesting_depths.uniqueness_ratio,
 			*unique() {
@@ -171,6 +169,7 @@ export class DeclarationCollection {
 			uniqueness_ratio: this.uniqueness_ratio,
 			importants: this.importants,
 			complexity: this.complexity,
+			nesting: this.nesting,
 			items: this.items,
 		}
 	}

@@ -27,6 +27,7 @@ export class AutoSizeUintArray {
 		}
 		this.#buffer[this.#cursor] = n
 		this.#cursor++
+		return this
 	}
 
 	set(index: number, n: number) {

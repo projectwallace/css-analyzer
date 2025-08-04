@@ -157,14 +157,8 @@ test('should count complexity', () => {
 	const { total, complexity, items } = analyze(css).declarations
 	expect(total).toBe(3)
 	expect(complexity.sum).toBe(5)
-	expect(complexity.min).toEqual({
-		value: 1,
-		count: 1
-	})
-	expect(complexity.max).toEqual({
-		value: 2,
-		count: 2
-	})
+	expect(complexity.min).toEqual(1)
+	expect(complexity.max).toEqual(2)
 	expect(complexity.average).toBe(5 / 3)
 	expect(complexity.mode).toBe(2)
 	expect(items.map(({ complexity }) => complexity)).toEqual([1, 2, 2])
@@ -204,14 +198,8 @@ test('tracks nesting depth', () => {
 	`
 	const { total, nesting, items } = analyze(fixture).declarations
 	expect(total).toBe(6)
-	expect(nesting.min).toEqual({
-		value: 2,
-		count: 1
-	})
-	expect(nesting.max).toEqual({
-		value: 0,
-		count: 3
-	})
+	expect(nesting.min).toEqual(0)
+	expect(nesting.max).toEqual(2)
 	expect(nesting.sum).toBe(4)
 	expect(nesting.average).toBe(4 / 6)
 	expect(nesting.mode).toBe(0)

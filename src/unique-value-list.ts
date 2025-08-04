@@ -5,7 +5,7 @@ type MinMax<T> = {
 	count: number
 }
 
-export class UniqueValueList<T> {
+export class UniqueValueList<T extends string | number> {
 	#items: Map<T, AutoSizeUintArray> = new Map()
 	#total = 0
 
@@ -25,6 +25,7 @@ export class UniqueValueList<T> {
 		else {
 			item.push(location_index)
 		}
+		return this
 	}
 
 	get total() {
@@ -37,23 +38,6 @@ export class UniqueValueList<T> {
 
 	get uniqueness_ratio() {
 		return this.total_unique === 0 ? 0 : this.total_unique / this.total
-	}
-
-	/**
-	 * The lowest count of locations for a value in this list.
-	 */
-	get min() {
-		let _min: MinMax<T> | undefined = undefined
-		for (let [value, location_indexes] of this.#items) {
-			let count = location_indexes.length
-			if (_min === undefined || count < _min.count) {
-				_min = {
-					value,
-					count,
-				}
-			}
-		}
-		return _min
 	}
 
 	/**
@@ -75,6 +59,32 @@ export class UniqueValueList<T> {
 
 	get mode() {
 		return this.max?.value // The value with the highest count of locations
+	}
+
+	get numerics() {
+		let first = this.#items.keys().next()
+		let min: number | undefined = undefined
+		let max: number | undefined = undefined
+		let sum = 0
+
+		if (typeof first.value === 'number') {
+			for (let [value, list] of this.#items as Map<number, AutoSizeUintArray>) {
+				sum += (value * list.length)
+				if (min === undefined || value < min) {
+					min = value
+				}
+				if (max === undefined || value > max) {
+					max = value
+				}
+			}
+		}
+
+		return {
+			sum,
+			max,
+			min,
+			average: this.total === 0 ? 0 : sum / this.total,
+		}
 	}
 
 	*[Symbol.iterator]() {

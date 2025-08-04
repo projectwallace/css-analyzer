@@ -171,32 +171,21 @@ export class SelectorCollection {
 
 	get complexity() {
 		let specificities_and_complexities = this.#specificities_and_complexities
-		let min = Infinity
-		let max = 0
-		let sum = 0
 		let count_per_complexity = new UniqueValueList<number>()
 		let locations = this.#locations
 
 		let index = 0
 		for (let encoded of specificities_and_complexities) {
 			let complexity = unpack_complexity(encoded)
-			count_per_complexity.add(complexity, index)
-			sum += complexity
-
-			if (complexity < min) {
-				min = complexity
-			}
-			if (complexity > max) {
-				max = complexity
-			}
-			index++
+			count_per_complexity.add(complexity, index++)
 		}
+		let numerics = count_per_complexity.numerics
 
 		return {
-			sum,
-			max,
-			min,
-			average: sum === 0 ? 0 : sum / this.total,
+			sum: numerics.sum,
+			max: numerics.max,
+			min: numerics.min,
+			average: numerics.average,
 			total_unique: count_per_complexity.total_unique,
 			uniqueness_ratio: count_per_complexity.uniqueness_ratio,
 			get items() {
@@ -218,8 +207,8 @@ export class SelectorCollection {
 
 	get specificity() {
 		let specificities_and_complexities = this.#specificities_and_complexities
-		let min = new Specificity(Infinity, Infinity, Infinity)
-		let max = new Specificity(0, 0, 0)
+		let min: Specificity | undefined = undefined
+		let max: Specificity | undefined = new Specificity(0, 0, 0)
 		let sum = new Specificity(0, 0, 0)
 		let location_index = 0
 		let count_per_specificity = new UniqueValueList<number>()
@@ -228,10 +217,10 @@ export class SelectorCollection {
 		for (let encoded of specificities_and_complexities) {
 			let specificity = unpack_specificity(encoded)
 
-			if (specificity.compare(min) > 0) {
+			if (min === undefined || specificity.compare(min) > 0) {
 				min = specificity
 			}
-			else if (specificity.compare(max) < 0) {
+			else if (max === undefined || specificity.compare(max) < 0) {
 				max = specificity
 			}
 
@@ -275,30 +264,21 @@ export class SelectorCollection {
 
 	get nesting() {
 		let depths = this.#depths
-		let min = Infinity
-		let max = 0
-		let sum = 0
 		let count_per_depth = new UniqueValueList<number>()
 		let locations = this.#locations
 
 		let index = 0
 		for (let depth of depths) {
-			count_per_depth.add(depth, index)
-			sum += depth
-			if (depth < min) {
-				min = depth
-			}
-			if (depth > max) {
-				max = depth
-			}
-			index++
+			count_per_depth.add(depth, index++)
 		}
 
+		let numerics = count_per_depth.numerics
+
 		return {
-			sum,
-			max,
-			min,
-			average: sum === 0 ? 0 : sum / this.total,
+			sum: numerics.sum,
+			max: numerics.max,
+			min: numerics.min,
+			average: numerics.average,
 			total_unique: count_per_depth.total_unique,
 			uniqueness_ratio: count_per_depth.uniqueness_ratio,
 			items: depths,
