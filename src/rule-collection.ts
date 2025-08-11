@@ -201,6 +201,9 @@ export class RuleCollection {
 	}
 
 	get empty() {
+		// We're only tracking counts; if we want the actual empty rules we can get them
+		// by iterating over the collection and filtering for declaration_count === 0.
+		// This is a performance optimization to avoid storing all empty rules in memory.
 		return {
 			total: this.#empty_count,
 			ratio: this.total === 0 ? 0 : this.#empty_count / this.total,
