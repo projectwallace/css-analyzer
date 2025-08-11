@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		// Base options:
 		"skipLibCheck": true,
-		"target": "es2022",
+		"target": "esnext",
 		"verbatimModuleSyntax": true,
 		"allowJs": true,
 		"moduleDetection": "force",

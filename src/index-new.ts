@@ -1,12 +1,13 @@
 import parse from 'css-tree/parser'
 import walk_tree from 'css-tree/walker'
+import { RuleCollection } from './rule-collection.js'
 import { SelectorCollection } from './selector-collection.js'
 import { PropertyCollection } from './property-collection.js'
 import { DeclarationCollection } from './declaration-collection.js'
 import { ends_with } from './string-utils.js'
 import { getComplexity, isAccessibility, isPrefixed } from "./selectors/utils.js"
 import { calculateForAST } from '@bramus/specificity/core'
-import type { CssNode, Declaration, Selector } from 'css-tree'
+import type { CssNode, Declaration, Rule, Selector } from 'css-tree'
 import { has_vendor_prefix } from './vendor-prefix.js'
 import { is_browserhack, is_custom as is_custom_property, is_shorthand as is_shorthand_property } from './properties/property-utils.js'
 
@@ -42,6 +43,7 @@ export function analyze(css: string) {
 		positions: true, // So we can use stringifyNode() and hash()
 	})
 
+	let rules = new RuleCollection()
 	let selectors = new SelectorCollection()
 	let properties = new PropertyCollection()
 	let declarations = new DeclarationCollection()
@@ -124,11 +126,54 @@ export function analyze(css: string) {
 		)
 	}
 
+	function on_rule(rule_ast: Rule, nesting_depth: number) {
+		let selector_count = 0
+		let declaration_count = 0
+
+		if (rule_ast.prelude.type === 'SelectorList') {
+			for (let selector of rule_ast.prelude.children) {
+				if (selector.type === 'Selector') {
+					selector_count++
+				}
+			}
+		}
+		if (rule_ast.block.type === 'Block') {
+			for (let child of rule_ast.block.children) {
+				if (child.type === 'Declaration') {
+					declaration_count++
+				}
+			}
+		}
+
+		let { start, end } = rule_ast.loc!
+
+		rules.add(
+			start.line,
+			start.column,
+			start.offset,
+			end.offset,
+			nesting_depth,
+			declaration_count,
+			selector_count
+		)
+	}
+
 	function walk() {
 		let nesting_depth = 0
 		walk_tree(ast, {
 			enter: function (node: CssNode) {
-				if (node.type === 'Selector') {
+				if (node.type === 'Rule' || node.type === 'Atrule') {
+					nesting_depth++
+				}
+
+				if (node.type === 'Rule') {
+					on_rule(node, nesting_depth - 1)
+				}
+
+				else if (node.type === 'Atrule') {
+				}
+
+				else if (node.type === 'Selector') {
 					// @ts-expect-error `this.atrule` is the nearest ancestor Atrule node, if present. Null otherwise.
 					if (this.atrule && ends_with('keyframes', this.atrule.name)) {
 						return walk_tree.skip
@@ -163,10 +208,6 @@ export function analyze(css: string) {
 					return walk_tree.skip
 				}
 
-				else if (node.type === 'Rule' || node.type === 'Atrule') {
-					nesting_depth++
-				}
-
 				else if (node.type === 'Declaration') {
 					// Do not walk declaration in places like `@supports (display: grid)`
 					// @ts-expect-error `this.atrule` is the nearest ancestor Atrule node, if present. Null otherwise.
@@ -189,6 +230,9 @@ export function analyze(css: string) {
 	walk()
 
 	return {
+		get rules() {
+			return rules
+		},
 		get selectors() {
 			return selectors
 		},

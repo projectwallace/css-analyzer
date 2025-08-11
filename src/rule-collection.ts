@@ -5,16 +5,22 @@ import { UniqueValueList } from './unique-value-list'
 export class RuleCollection {
 	#items: AutoSizeUintArray
 	#locations: LocationList
+	#empty_count: number = 0
 
 	constructor() {
 		this.#items = new AutoSizeUintArray(undefined, Uint32Array)
 		this.#locations = new LocationList()
+		this.#empty_count = 0
 	}
 
 	add(line: number, column: number, start: number, end: number, depth: number, declaration_count: number, selector_count: number) {
 		this.#locations.add(line, column, start, end)
 		let item = this.#pack(depth, declaration_count, selector_count)
 		this.#items.push(item)
+
+		if (declaration_count === 0) {
+			this.#empty_count++
+		}
 	}
 
 	#pack(depth: number, declaration_count: number, selector_count: number) {
@@ -33,21 +39,111 @@ export class RuleCollection {
 		return item & 0xff
 	}
 
-	*depths() {
-		for (let item of this.#items) {
-			yield this.#unpack_depth(item)
+	get nesting() {
+		let items = this.#items
+		let count_per_size = new UniqueValueList<number>()
+		let locations = this.#locations
+
+		let index = 0
+		for (let item of items) {
+			let size = this.#unpack_depth(item)
+			count_per_size.add(size, index++)
+		}
+		let numerics = count_per_size.numerics
+
+		return {
+			total: items.length,
+			mode: count_per_size.mode,
+			total_unique: count_per_size.total_unique,
+			uniqueness_ratio: count_per_size.uniqueness_ratio,
+			sum: numerics.sum,
+			max: numerics.max,
+			min: numerics.min,
+			average: numerics.average,
+			items: items.map(size => this.#unpack_depth(size)),
+			unique: function* () {
+				for (let { value, location_indexes } of count_per_size) {
+					yield {
+						value,
+						count: location_indexes.length,
+						get locations() {
+							return location_indexes.map(location_index => locations.at(location_index))
+						}
+					}
+				}
+			}
 		}
 	}
 
-	*declaration_counts() {
-		for (let item of this.#items) {
-			yield this.#unpack_declaration_count(item)
+	get declaration_counts() {
+		let items = this.#items
+		let count_per_size = new UniqueValueList<number>()
+		let locations = this.#locations
+
+		let index = 0
+		for (let item of items) {
+			let size = this.#unpack_declaration_count(item)
+			count_per_size.add(size, index++)
+		}
+		let numerics = count_per_size.numerics
+
+		return {
+			total: items.length,
+			mode: count_per_size.mode,
+			total_unique: count_per_size.total_unique,
+			uniqueness_ratio: count_per_size.uniqueness_ratio,
+			sum: numerics.sum,
+			max: numerics.max,
+			min: numerics.min,
+			average: numerics.average,
+			items: items.map(size => this.#unpack_declaration_count(size)),
+			unique: function* () {
+				for (let { value, location_indexes } of count_per_size) {
+					yield {
+						value,
+						count: location_indexes.length,
+						get locations() {
+							return location_indexes.map(location_index => locations.at(location_index))
+						}
+					}
+				}
+			}
 		}
 	}
 
-	*selector_counts() {
-		for (let item of this.#items) {
-			yield this.#unpack_selector_count(item)
+	get selector_counts() {
+		let items = this.#items
+		let count_per_size = new UniqueValueList<number>()
+		let locations = this.#locations
+
+		let index = 0
+		for (let item of items) {
+			let size = this.#unpack_selector_count(item)
+			count_per_size.add(size, index++)
+		}
+		let numerics = count_per_size.numerics
+
+		return {
+			total: items.length,
+			mode: count_per_size.mode,
+			total_unique: count_per_size.total_unique,
+			uniqueness_ratio: count_per_size.uniqueness_ratio,
+			sum: numerics.sum,
+			max: numerics.max,
+			min: numerics.min,
+			average: numerics.average,
+			items: items.map(size => this.#unpack_selector_count(size)),
+			unique: function* () {
+				for (let { value, location_indexes } of count_per_size) {
+					yield {
+						value,
+						count: location_indexes.length,
+						get locations() {
+							return location_indexes.map(location_index => locations.at(location_index))
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -101,6 +197,13 @@ export class RuleCollection {
 				size: this.#unpack_selector_count(item) + this.#unpack_declaration_count(item),
 				location: this.#locations.at(location_index++),
 			}
+		}
+	}
+
+	get empty() {
+		return {
+			total: this.#empty_count,
+			ratio: this.total === 0 ? 0 : this.#empty_count / this.total,
 		}
 	}
 }

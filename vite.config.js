@@ -5,6 +5,7 @@ import { codecovVitePlugin } from "@codecov/vite-plugin"
 
 export default defineConfig({
 	build: {
+		target: "esnext",
 		lib: {
 			entry: resolve(__dirname, "src/index-new.ts"),
 			formats: ['es'],
