@@ -2,24 +2,21 @@ import { AutoSizeUintArray } from './auto-size-uintarray.js'
 
 export class LocationList {
 	#size = 0;
-	#lines: AutoSizeUintArray;
-	#columns: AutoSizeUintArray;
-	#starts: AutoSizeUintArray;
-	#lengths: AutoSizeUintArray;
+	#items: AutoSizeUintArray;
 
 	constructor(size?: number) {
-		this.#lines = new AutoSizeUintArray(size, Uint32Array)
-		this.#columns = new AutoSizeUintArray(size, Uint32Array)
-		this.#starts = new AutoSizeUintArray(size, Uint32Array)
-		this.#lengths = new AutoSizeUintArray(size, Uint16Array)
+		this.#items = new AutoSizeUintArray(size, Uint32Array)
 	}
 
+	/**
+	 * @returns The index at which the location was inserted
+	 */
 	add(line: number, column: number, start: number, end: number) {
 		let location_index = this.#size
-		this.#lines.set(location_index, line)
-		this.#columns.set(location_index, column)
-		this.#starts.set(location_index, start)
-		this.#lengths.set(location_index, end - start)
+		this.#items.set(location_index * 4, line)
+		this.#items.set(location_index * 4 + 1, column)
+		this.#items.set(location_index * 4 + 2, start)
+		this.#items.set(location_index * 4 + 3, end)
 
 		this.#size++
 		return location_index
@@ -29,13 +26,11 @@ export class LocationList {
 		if (index < 0 || index >= this.#size) {
 			return undefined
 		}
-
-		let start = this.#starts.at(index)
 		return {
-			line: this.#lines.at(index)!,
-			column: this.#columns.at(index)!,
-			start: start!,
-			end: start! + this.#lengths.at(index)!
+			line: this.#items.at(index * 4),
+			column: this.#items.at((index * 4) + 1),
+			start: this.#items.at((index * 4) + 2),
+			end: this.#items.at((index * 4) + 3),
 		}
 	}
 

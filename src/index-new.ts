@@ -1,5 +1,6 @@
 import parse from 'css-tree/parser'
 import walk_tree from 'css-tree/walker'
+import { AtruleCollection } from './atrule-collection.js'
 import { RuleCollection } from './rule-collection.js'
 import { SelectorCollection } from './selector-collection.js'
 import { PropertyCollection } from './property-collection.js'
@@ -7,9 +8,11 @@ import { DeclarationCollection } from './declaration-collection.js'
 import { ends_with } from './string-utils.js'
 import { getComplexity, isAccessibility, isPrefixed } from "./selectors/utils.js"
 import { calculateForAST } from '@bramus/specificity/core'
-import type { CssNode, Declaration, Rule, Selector } from 'css-tree'
+import type { Atrule, CssNode, Declaration, Rule, Selector } from 'css-tree'
 import { has_vendor_prefix } from './vendor-prefix.js'
+import { is_media_browserhack, is_supports_browserhack } from './atrules/atrules.js'
 import { is_browserhack, is_custom as is_custom_property, is_shorthand as is_shorthand_property } from './properties/property-utils.js'
+import { str_equals } from './string-utils.js'
 
 /**
  * Analyze CSS
@@ -43,6 +46,7 @@ export function analyze(css: string) {
 		positions: true, // So we can use stringifyNode() and hash()
 	})
 
+	let atrules = new AtruleCollection()
 	let rules = new RuleCollection()
 	let selectors = new SelectorCollection()
 	let properties = new PropertyCollection()
@@ -158,6 +162,38 @@ export function analyze(css: string) {
 		)
 	}
 
+	function on_atrule(atrule_ast: Atrule, nesting_depth: number) {
+		// default to prelude positions, or the whole rule (in case of @font-face, )
+		let { start, end } = (atrule_ast.prelude || atrule_ast).loc!
+		let is_browserhack = false
+
+		if (str_equals('media', atrule_ast.name)) {
+			is_browserhack = is_media_browserhack(atrule_ast.prelude)
+		}
+		else if (str_equals('supports', atrule_ast.name)) {
+			is_browserhack = is_supports_browserhack(atrule_ast.prelude)
+
+			if (atrule_ast.prelude) {
+				walk_tree(atrule_ast.prelude, {
+					visit: 'Declaration',
+					enter(prelude_node) { }
+				})
+			}
+		}
+		let is_prefixed = has_vendor_prefix(atrule_ast.name)
+
+		atrules.add(
+			start.line,
+			start.column,
+			start.offset,
+			end.offset,
+			nesting_depth,
+			atrule_ast.name,
+			is_browserhack,
+			is_prefixed,
+		)
+	}
+
 	function walk() {
 		let nesting_depth = 0
 		walk_tree(ast, {
@@ -171,6 +207,7 @@ export function analyze(css: string) {
 				}
 
 				else if (node.type === 'Atrule') {
+					on_atrule(node, nesting_depth - 1)
 				}
 
 				else if (node.type === 'Selector') {

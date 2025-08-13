@@ -10,3 +10,7 @@ export function has_vendor_prefix(keyword: string): boolean {
 
   return false
 }
+
+export function basename(keyword: string): string {
+  return keyword.slice(keyword.indexOf('-', 2))
+}
