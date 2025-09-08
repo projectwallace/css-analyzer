@@ -12,6 +12,7 @@ import {
   isValuePrefixed,
   hasVendorPrefix,
   cssKeywords,
+  KeywordSet,
   // Color exports
   namedColors,
   systemColors,
@@ -80,6 +81,11 @@ Api('exposes the colorKeywords KeywordSet', () => {
 Api('exposes CSS keywords KeywordSet', () => {
   assert.ok(cssKeywords.has('Auto'))
   assert.ok(cssKeywords.has('inherit'))
+})
+
+Api('exposes the KeywordSet class', () => {
+  assert.is(typeof KeywordSet, 'function')
+  assert.is((new KeywordSet()).constructor.name, 'KeywordSet')
 })
 
 Api("does not break on CSS Syntax Errors", () => {
