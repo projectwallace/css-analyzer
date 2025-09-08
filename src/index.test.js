@@ -11,6 +11,12 @@ import {
   isPropertyHack,
   isValuePrefixed,
   hasVendorPrefix,
+  cssKeywords,
+  // Color exports
+  namedColors,
+  systemColors,
+  colorFunctions,
+  colorKeywords,
 } from "./index.js"
 
 const Api = suite("Public API")
@@ -53,6 +59,27 @@ Api('exposes the "isValuePrefixed" method', () => {
 
 Api('exposes the "hasVendorPrefix" method', () => {
   assert.is(typeof hasVendorPrefix, "function")
+})
+
+Api('exposes the namedColors KeywordSet', () => {
+  assert.ok(namedColors.has('Red'))
+})
+
+Api('exposes the systemColors KeywordSet', () => {
+  assert.ok(systemColors.has('LinkText'))
+})
+
+Api('exposes the colorFunctions KeywordSet', () => {
+  assert.ok(colorFunctions.has('okLAB'))
+})
+
+Api('exposes the colorKeywords KeywordSet', () => {
+  assert.ok(colorKeywords.has('TRANSPARENT'))
+})
+
+Api('exposes CSS keywords KeywordSet', () => {
+  assert.ok(cssKeywords.has('Auto'))
+  assert.ok(cssKeywords.has('inherit'))
 })
 
 Api("does not break on CSS Syntax Errors", () => {

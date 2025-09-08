@@ -1083,4 +1083,13 @@ export {
   isValuePrefixed
 } from './values/vendor-prefix.js'
 
+export {
+  colorFunctions,
+  colorKeywords,
+  namedColors,
+  systemColors,
+} from './values/colors.js'
+
+export { keywords as cssKeywords } from './values/values.js'
+
 export { hasVendorPrefix } from './vendor-prefix.js'
