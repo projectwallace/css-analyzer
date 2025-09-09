@@ -3,7 +3,7 @@
  */
 export class KeywordSet {
 
-	/** @param {string[]} items */
+	/** @param {Lowercase<string>[]} items */
 	constructor(items) {
 		/** @type {Set<string>} */
 		this.set = new Set(items)
