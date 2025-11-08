@@ -6,7 +6,7 @@ import { codecovVitePlugin } from '@codecov/vite-plugin'
 export default defineConfig({
 	build: {
 		lib: {
-			entry: resolve(__dirname, 'src/index.js'),
+			entry: resolve(__dirname, 'src/index.ts'),
 			formats: ['es'],
 		},
 		rollupOptions: {
@@ -16,7 +16,9 @@ export default defineConfig({
 		},
 	},
 	plugins: [
-		dts(),
+		dts({
+			rollupTypes: true,
+		}),
 		codecovVitePlugin({
 			enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
 			bundleName: 'analyzeCss',

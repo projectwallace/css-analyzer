@@ -43,18 +43,22 @@ function ratio(part: number, total: number): number {
 	return part / total
 }
 
-let defaults = {
-	useLocations: false,
-}
-
-type Options = {
+export type Options = {
 	/** @description Use Locations (`{ 'item': [{ line, column, offset, length }] }`) instead of a regular count per occurrence (`{ 'item': 3 }`) */
 	useLocations?: boolean
 }
 
-export function analyze(css: string, options: Options = {}) {
-	let settings = Object.assign({}, defaults, options)
-	let useLocations = settings.useLocations === true
+export function analyze(css: string, options?: Options & { useLocations?: false | undefined }): ReturnType<typeof analyzeInternal<false>>
+export function analyze(css: string, options: Options & { useLocations: true }): ReturnType<typeof analyzeInternal<true>>
+export function analyze(css: string, options: Options = {}): any {
+	const useLocations = options.useLocations === true
+	if (useLocations) {
+		return analyzeInternal(css, options, true)
+	}
+	return analyzeInternal(css, options, false)
+}
+
+function analyzeInternal<T extends boolean>(css: string, options: Options, useLocations: T) {
 	let start = Date.now()
 
 	/**
@@ -77,8 +81,14 @@ export function analyze(css: string, options: Options = {}) {
 	let embedSize = 0
 	let embedTypes = {
 		total: 0,
-		/** @type {Map<string, { size: number, count: number } & ({ uniqueWithLocations?: undefined } | ({ uniqueWithLocations: { offset: number, line: number, column: number, length: number }[] })) }>} */
-		unique: new Map(),
+		unique: new Map() as Map<
+			string,
+			{
+				size: number
+				count: number
+				uniqueWithLocations?: { offset: number; line: number; column: number; length: number }[]
+			}
+		>,
 	}
 
 	let startParse = Date.now()
@@ -96,7 +106,7 @@ export function analyze(css: string, options: Options = {}) {
 	let linesOfCode = ast.loc.end.line - ast.loc.start.line + 1
 
 	// Atrules
-	let atrules = new Collection(useLocations)
+	let atrules = new Collection(useLocations) as Collection<T>
 	let atRuleComplexities = new AggregateCollection()
 	/** @type {Record<string, string>[]} */
 	let fontfaces: Record<string, string>[] = []
@@ -430,11 +440,11 @@ export function analyze(css: string, options: Options = {}) {
 						}
 
 						if (embedTypes.unique.has(type)) {
-							let item = embedTypes.unique.get(type)
+							let item = embedTypes.unique.get(type)!
 							item.count++
 							item.size += size
 							embedTypes.unique.set(type, item)
-							if (useLocations) {
+							if (useLocations && item.uniqueWithLocations) {
 								item.uniqueWithLocations.push(loc)
 							}
 						} else {
