@@ -1,10 +1,7 @@
-import { suite } from 'uvu'
-import * as assert from 'uvu/assert'
+import { test, expect } from 'vitest'
 import { analyze } from '../index.js'
 
-const Specificity = suite('Specificity')
-
-Specificity('handles the universal selector', () => {
+test('handles the universal selector', () => {
   const fixture = `
     * {}
   test * {}
@@ -14,10 +11,10 @@ Specificity('handles the universal selector', () => {
     [0, 0, 0],
     [0, 0, 1],
   ]
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-Specificity('handles ID selectors', () => {
+test('handles ID selectors', () => {
   const fixture = `
     #id,
     .Foo > .Bar ~ .Baz [type="text"] + span::before #bazz #fizz #buzz #brick #house,
@@ -36,10 +33,10 @@ Specificity('handles ID selectors', () => {
     [1, 0, 0],
     [1, 0, 1],
   ]
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-Specificity('handles class selectors', () => {
+test('handles class selectors', () => {
   const fixture = `
     .class,
     .class.class
@@ -50,10 +47,10 @@ Specificity('handles class selectors', () => {
     [0, 1, 0],
     [0, 2, 0],
   ]
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-Specificity('handles element selectors', () => {
+test('handles element selectors', () => {
   const fixture = `
     element,
     element element
@@ -64,10 +61,10 @@ Specificity('handles element selectors', () => {
     [0, 0, 1],
     [0, 0, 2],
   ]
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-Specificity('handles the :not, :is and :has pseudo classes', () => {
+test('handles the :not, :is and :has pseudo classes', () => {
   const fixture = `
     /* https://drafts.csswg.org/selectors-4/#example-bd54871c */
     :is(em, #foo), /* [1,0,0] like an ID selector (#foo)—when matched against any of <em>, <p id=foo>, or <em id=foo>. */
@@ -85,10 +82,10 @@ Specificity('handles the :not, :is and :has pseudo classes', () => {
     [1, 0, 1],
     [1, 1, 0],
   ]
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-Specificity('handles attribute selectors', () => {
+test('handles attribute selectors', () => {
   const fixture = `
     [attribute],
     .Foo > .Bar ~ .Baz [type="text"] + span::before #bazz #fizz #buzz #brick #house,
@@ -133,10 +130,10 @@ Specificity('handles attribute selectors', () => {
     [0, 1, 0],
     [0, 1, 0],
   ]
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-Specificity('handles the :where pseudo class', () => {
+test('handles the :where pseudo class', () => {
   const fixture = `
     .qux:where(em, #foo#bar#baz) /* [0,1,0] only the .qux outside the :where() contributes to selector specificity.  */
     {}
@@ -145,10 +142,10 @@ Specificity('handles the :where pseudo class', () => {
   const expected = [
     [0, 1, 0]
   ]
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-Specificity('handles pseudo element selectors', () => {
+test('handles pseudo element selectors', () => {
   const fixture = `
     element::before,
     element:before,
@@ -173,14 +170,14 @@ Specificity('handles pseudo element selectors', () => {
     [0, 0, 2],
     [0, 1, 0]
   ]
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
 // TODO: test this whenever CSSTree contains 'native' specificity analysis
 // https://twitter.com/csstree/status/1386799196355825664
-Specificity.skip('handles multiple :where or :is parts')
+test.skip('handles multiple :where or :is parts', () => {})
 
-Specificity('calculates the lowest value', () => {
+test('calculates the lowest value', () => {
   const fixture = `
     #test,
     .me,
@@ -188,10 +185,10 @@ Specificity('calculates the lowest value', () => {
     [crazy] ~ .selector > for [no|="good"] {}
   `
   const actual = analyze(fixture).selectors.specificity.min
-  assert.equal(actual, [0, 0, 1])
+  expect(actual).toEqual([0, 0, 1])
 })
 
-Specificity('calculates the highest value', () => {
+test('calculates the highest value', () => {
   const fixture = `
     #test,
     .me,
@@ -199,10 +196,10 @@ Specificity('calculates the highest value', () => {
     [crazy] ~ .selector > for [no|="good"] {}
   `
   const actual = analyze(fixture).selectors.specificity.max
-  assert.equal(actual, [1, 0, 0])
+  expect(actual).toEqual([1, 0, 0])
 })
 
-Specificity('calculates the mean value', () => {
+test('calculates the mean value', () => {
   const fixture = `
     #test,
     .me,
@@ -210,10 +207,10 @@ Specificity('calculates the mean value', () => {
     [crazy] ~ .selector > for [no|="good"] {}
   `
   const actual = analyze(fixture).selectors.specificity.mean
-  assert.equal(actual, [.25, 1, 0.5])
+  expect(actual).toEqual([.25, 1, 0.5])
 })
 
-Specificity('calculates the mode value', () => {
+test('calculates the mode value', () => {
   const fixture = `
     #test,
     .me,
@@ -221,10 +218,10 @@ Specificity('calculates the mode value', () => {
     [crazy] ~ .selector > for [no|="good"] {}
   `
   const actual = analyze(fixture).selectors.specificity.mode
-  assert.equal(actual, [0, 0, 0.5])
+  expect(actual).toEqual([0, 0, 0.5])
 })
 
-Specificity('calculates total specificity', () => {
+test('calculates total specificity', () => {
   const fixture = `
     #test,
     .me,
@@ -232,10 +229,10 @@ Specificity('calculates total specificity', () => {
     [crazy] ~ .selector > for [no|="good"] {}
   `
   const actual = analyze(fixture).selectors.specificity.sum
-  assert.equal(actual, [1, 4, 2])
+  expect(actual).toEqual([1, 4, 2])
 })
 
-Specificity('calculates specificity uniqueness', () => {
+test('calculates specificity uniqueness', () => {
   const fixture = `
     *,
     * + *,
@@ -252,15 +249,13 @@ Specificity('calculates specificity uniqueness', () => {
   `
   const actual = analyze(fixture).selectors.specificity
 
-  assert.equal(actual.unique, {
+  expect(actual.unique).toEqual({
     '0,0,0': 3,
     '0,0,1': 1,
     '0,0,2': 4,
     '1,0,0': 1,
     '0,1,0': 3,
   })
-  assert.is(actual.totalUnique, 5)
-  assert.is(actual.uniquenessRatio, 5 / 12)
+  expect(actual.totalUnique).toBe(5)
+  expect(actual.uniquenessRatio).toBe(5 / 12)
 })
-
-Specificity.run()
