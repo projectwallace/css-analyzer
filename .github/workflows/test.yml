@@ -14,8 +14,7 @@ jobs:
     name: Lint JS
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Lint JS
         run: npx oxlint@latest -D perf
 
@@ -23,24 +22,22 @@ jobs:
     name: Unit tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          cache: "npm"
-      - run: npm install --ignore-scripts --no-audit --no-fund
+          node-version: 22
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npm test
 
   code-coverage:
     name: Code coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          cache: "npm"
-      - run: npm install --ignore-scripts --no-audit --no-fund
+          node-version: 22
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npx c8 --reporter=lcov npm test
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4
@@ -51,15 +48,12 @@ jobs:
     name: Lint package
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          cache: "npm"
-      - run: npm install --ignore-scripts --no-audit --no-fund
-      - name: Build package
-        run: npm run build
+          node-version: 22
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run build
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Lint package
