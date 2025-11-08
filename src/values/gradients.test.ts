@@ -1,10 +1,8 @@
-import { suite } from 'uvu'
-import * as assert from 'uvu/assert'
+import { test } from 'vitest'
+import { expect } from 'vitest'
 import { analyze } from '../index.js'
 
-const Gradients = suite('Gradients')
-
-Gradients('finds linear-gradient', () => {
+test('finds linear-gradient', () => {
 	const fixture = `
     gradient {
       background-image: -webkit-linear-gradient(to right,#00f 10%,rgba(51,51,255,0) 42%);
@@ -33,13 +31,13 @@ Gradients('finds linear-gradient', () => {
 			'-webkit-gradient(linear,left top,right top,color-stop(50%,#ccc),color-stop(50%,#fff))': 1,
 		},
 		totalUnique: 9,
-		uniquenessRatio: 1
+		uniquenessRatio: 1,
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
-Gradients('finds repeating-linear-gradient', () => {
+test('finds repeating-linear-gradient', () => {
 	const fixture = `
     gradient {
       background-image: repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(0,0,0,.03) 8px,rgba(0,0,0,.03) 10px);
@@ -99,10 +97,10 @@ Gradients('finds repeating-linear-gradient', () => {
 		uniquenessRatio: 1,
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
-Gradients('finds radial gradient', () => {
+test('finds radial gradient', () => {
 	const fixture = `
     radial {
       background-image: -webkit-radial-gradient(0% 100%,circle farthest-corner,rgba(255,255,255,.8) 40%,#e5f4e9 0);
@@ -123,13 +121,13 @@ Gradients('finds radial gradient', () => {
 			'radial-gradient(85.37% 69.72% at 50% 12.59%, rgba(255, 0, 0, 0.8) 3.14%, rgba(178, 1, 1, 0.8) 62.94%, rgba(47, 3, 3, 0.424) 100%)': 1,
 		},
 		totalUnique: 5,
-		uniquenessRatio: 1
+		uniquenessRatio: 1,
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
-Gradients('finds repeating-radial-gradient', () => {
+test('finds repeating-radial-gradient', () => {
 	const fixture = `
     gradient {
       background: repeating-radial-gradient(
@@ -179,13 +177,13 @@ Gradients('finds repeating-radial-gradient', () => {
 			[z]: 1,
 		},
 		totalUnique: 3,
-		uniquenessRatio: 1
+		uniquenessRatio: 1,
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
-Gradients('finds conic gradient', () => {
+test('finds conic gradient', () => {
 	const fixture = `
     conic {
       /* A conic gradient rotated 45 degrees,
@@ -231,13 +229,13 @@ Gradients('finds conic gradient', () => {
 			[wheel]: 1,
 		},
 		totalUnique: 3,
-		uniquenessRatio: 1
+		uniquenessRatio: 1,
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
-Gradients('finds repeating-conic-gradient', () => {
+test('finds repeating-conic-gradient', () => {
 	const fixture = `
     gradient {
 			background: repeating-conic-gradient(
@@ -271,13 +269,13 @@ Gradients('finds repeating-conic-gradient', () => {
 			'repeating-conic-gradient(from -45deg, red 45deg, orange, yellow, green, blue 225deg)': 1,
 		},
 		totalUnique: 4,
-		uniquenessRatio: 1
+		uniquenessRatio: 1,
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
-Gradients('ignores keywords', () => {
+test('ignores keywords', () => {
 	const fixture = `
     keywords {
       background-image: none;
@@ -295,10 +293,8 @@ Gradients('ignores keywords', () => {
 		total: 0,
 		unique: {},
 		totalUnique: 0,
-		uniquenessRatio: 0
+		uniquenessRatio: 0,
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
-
-Gradients.run()

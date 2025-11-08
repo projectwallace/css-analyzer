@@ -1,10 +1,8 @@
-import { suite } from 'uvu';
-import * as assert from 'uvu/assert';
+import { test } from 'vitest'
+import { expect } from 'vitest'
 import { analyze } from '../index.js'
 
-const LineHeights = suite('LineHeights')
-
-LineHeights('recognizes line-height', () => {
+test('recognizes line-height', () => {
 	const fixture = `
     test {
       line-height: 1;
@@ -26,15 +24,15 @@ LineHeights('recognizes line-height', () => {
 			'100%': 1,
 			'calc(1em + 2vh)': 1,
 			'2em': 1,
-			'normal': 1,
+			normal: 1,
 		},
-		uniquenessRatio: 5 / 5
+		uniquenessRatio: 5 / 5,
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
-LineHeights('extracts the `font` shorthand', () => {
+test('extracts the `font` shorthand', () => {
 	const fixture = `
     test {
       font: large 'Noto Sans';
@@ -61,12 +59,12 @@ LineHeights('extracts the `font` shorthand', () => {
 			'1.5': 1,
 			'0': 1,
 		},
-		uniquenessRatio: 3 / 7
+		uniquenessRatio: 3 / 7,
 	}
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
-LineHeights('handles system fonts', () => {
+test('handles system fonts', () => {
 	// Source: https://drafts.csswg.org/css-fonts-3/#font-prop
 	const fixture = `
     test {
@@ -79,13 +77,13 @@ LineHeights('handles system fonts', () => {
 		total: 0,
 		totalUnique: 0,
 		unique: {},
-		uniquenessRatio: 0
+		uniquenessRatio: 0,
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
-LineHeights('ignores keywords and global values', () => {
+test('ignores keywords and global values', () => {
 	const fixture = `
 		test {
 			/* Global values */
@@ -107,10 +105,8 @@ LineHeights('ignores keywords and global values', () => {
 		total: 0,
 		totalUnique: 0,
 		unique: {},
-		uniquenessRatio: 0
+		uniquenessRatio: 0,
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
-
-LineHeights.run()

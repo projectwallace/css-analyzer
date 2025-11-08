@@ -1,10 +1,8 @@
-import { suite } from 'uvu'
-import * as assert from 'uvu/assert'
+import { test } from 'vitest'
+import { expect } from 'vitest'
 import { analyze } from '../index.js'
 
-const Browserhacks = suite('Values - Browserhacks')
-
-Browserhacks('finds hacks', () => {
+test('finds hacks', () => {
   const fixture = `
     value-browserhacks {
       property: value !ie;
@@ -25,10 +23,10 @@ Browserhacks('finds hacks', () => {
     },
     uniquenessRatio: 4 / 4
   }
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-Browserhacks('reports no false positives', () => {
+test('reports no false positives', () => {
   const fixture = `
     value-browserhacks {
       property: value !important;
@@ -43,7 +41,6 @@ Browserhacks('reports no false positives', () => {
     unique: {},
     uniquenessRatio: 0,
   }
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-Browserhacks.run()

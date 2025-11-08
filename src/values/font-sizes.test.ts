@@ -1,11 +1,9 @@
-import { suite } from 'uvu';
-import * as assert from 'uvu/assert';
+import { test } from 'vitest'
+import { expect } from 'vitest'
 import { analyze } from '../index.js'
 
-const FontSizes = suite('FontSizes')
-
-FontSizes('recognizes a font-size', () => {
-  const fixture = `
+test('recognizes a font-size', () => {
+	const fixture = `
     test {
       font-size: 10px;
       font-size: small;
@@ -17,24 +15,24 @@ FontSizes('recognizes a font-size', () => {
       font-family: serif;
     }
   `
-  const actual = analyze(fixture).values.fontSizes
-  const expected = {
-    total: 4,
-    totalUnique: 4,
-    unique: {
-      '10px': 1,
-      'small': 1,
-      '1em': 1,
-      'calc(3vw + 1em)': 1,
-    },
-    uniquenessRatio: 4 / 4
-  }
+	const actual = analyze(fixture).values.fontSizes
+	const expected = {
+		total: 4,
+		totalUnique: 4,
+		unique: {
+			'10px': 1,
+			small: 1,
+			'1em': 1,
+			'calc(3vw + 1em)': 1,
+		},
+		uniquenessRatio: 4 / 4,
+	}
 
-  assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
-FontSizes('extracts the `font` shorthand', () => {
-  const fixture = `
+test('extracts the `font` shorthand', () => {
+	const fixture = `
     test {
       font: large "Noto Sans";
       font: normal normal 1em/1 "Source Sans Pro", serif;
@@ -55,49 +53,49 @@ FontSizes('extracts the `font` shorthand', () => {
       font-family: serif;
     }
   `
-  const actual = analyze(fixture).values.fontSizes
-  const expected = {
-    total: 13,
-    totalUnique: 9,
-    unique: {
-      '0': 1,
-      'large': 1,
-      '1em': 4,
-      '1.2em': 1,
-      '1.3em': 1,
-      '2em': 1,
-      '11px': 2,
-      '10PX': 1,
-      '12px': 1,
-    },
-    uniquenessRatio: 9 / 13
-  }
-  assert.equal(actual, expected)
+	const actual = analyze(fixture).values.fontSizes
+	const expected = {
+		total: 13,
+		totalUnique: 9,
+		unique: {
+			'0': 1,
+			large: 1,
+			'1em': 4,
+			'1.2em': 1,
+			'1.3em': 1,
+			'2em': 1,
+			'11px': 2,
+			'10PX': 1,
+			'12px': 1,
+		},
+		uniquenessRatio: 9 / 13,
+	}
+	expect(actual).toEqual(expected)
 })
 
-FontSizes('handles system fonts', () => {
-  // Source: https://drafts.csswg.org/css-fonts-3/#font-prop
-  const fixture = `
+test('handles system fonts', () => {
+	// Source: https://drafts.csswg.org/css-fonts-3/#font-prop
+	const fixture = `
     test {
       font: menu;        /* use the font settings for system menus */
       font: large menu;  /* use a font family named "menu" */
     }
   `
-  const actual = analyze(fixture).values.fontSizes
-  const expected = {
-    total: 1,
-    totalUnique: 1,
-    unique: {
-      'large': 1,
-    },
-    uniquenessRatio: 1
-  }
+	const actual = analyze(fixture).values.fontSizes
+	const expected = {
+		total: 1,
+		totalUnique: 1,
+		unique: {
+			large: 1,
+		},
+		uniquenessRatio: 1,
+	}
 
-  assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
-FontSizes('ignores keywords and global values', () => {
-  const fixture = `
+test('ignores keywords and global values', () => {
+	const fixture = `
     test {
       /* Global values */
       font-size: inherit;
@@ -113,15 +111,13 @@ FontSizes('ignores keywords and global values', () => {
       font: unset;
     }
   `
-  const actual = analyze(fixture).values.fontSizes
-  const expected = {
-    total: 0,
-    totalUnique: 0,
-    unique: {},
-    uniquenessRatio: 0
-  }
+	const actual = analyze(fixture).values.fontSizes
+	const expected = {
+		total: 0,
+		totalUnique: 0,
+		unique: {},
+		uniquenessRatio: 0,
+	}
 
-  assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
-
-FontSizes.run()

@@ -1,8 +1,6 @@
-import { suite } from 'uvu';
-import * as assert from 'uvu/assert';
+import { test } from 'vitest'
+import { expect } from 'vitest'
 import { analyze } from '../index.js'
-
-const test = suite('Global Keywords')
 
 test('finds global keywords', () => {
 	const fixture = `
@@ -30,12 +28,12 @@ test('finds global keywords', () => {
 			initial: 2,
 			revert: 2,
 			'revert-layer': 2,
-			unset: 2
+			unset: 2,
 		},
-		uniquenessRatio: 5 / 10
+		uniquenessRatio: 5 / 10,
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
 test('finds global keywords in shorthands', () => {
@@ -52,12 +50,12 @@ test('finds global keywords in shorthands', () => {
 		totalUnique: 2,
 		unique: {
 			inherit: 2,
-			auto: 1
+			auto: 1,
 		},
-		uniquenessRatio: 2 / 3
+		uniquenessRatio: 2 / 3,
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
 test('finds global keywords in multi-values', () => {
@@ -75,10 +73,8 @@ test('finds global keywords in multi-values', () => {
 			auto: 1,
 			inherit: 2,
 		},
-		uniquenessRatio: 2 / 3
+		uniquenessRatio: 2 / 3,
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
-
-test.run()

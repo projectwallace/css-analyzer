@@ -1,10 +1,8 @@
-import { suite } from 'uvu'
-import * as assert from 'uvu/assert'
+import { test } from 'vitest'
+import { expect } from 'vitest'
 import { analyze } from '../index.js'
 
-const Animations = suite('Animations')
-
-Animations('finds simple durations', () => {
+test('finds simple durations', () => {
   const fixture = `
     durations {
       animation-duration: 1s;
@@ -24,10 +22,10 @@ Animations('finds simple durations', () => {
     },
     uniquenessRatio: 3 / 3
   }
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-Animations('finds duration lists', () => {
+test('finds duration lists', () => {
   const fixture = `
     durations {
       animation-duration: 1s, 1s;
@@ -45,10 +43,10 @@ Animations('finds duration lists', () => {
     },
     uniquenessRatio: 3 / 4
   }
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-Animations('finds simple timing functions', () => {
+test('finds simple timing functions', () => {
   const fixture = `
     timings {
       animation-timing-function: linear;
@@ -72,10 +70,10 @@ Animations('finds simple timing functions', () => {
     },
     uniquenessRatio: 3 / 4
   }
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-Animations('finds timing functions in value lists', () => {
+test('finds timing functions in value lists', () => {
   const fixture = `
     timings {
       animation-timing-function: ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1);
@@ -92,10 +90,10 @@ Animations('finds timing functions in value lists', () => {
     },
     uniquenessRatio: 1
   }
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-Animations('finds shorthand durations', () => {
+test('finds shorthand durations', () => {
   const fixture = `
     durations {
       animation: 1s ANIMATION_NAME linear;
@@ -122,10 +120,10 @@ Animations('finds shorthand durations', () => {
     },
     uniquenessRatio: 5 / 5
   }
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-Animations('finds shorthand timing functions', () => {
+test('finds shorthand timing functions', () => {
   const fixture = `
     durations {
       animation: 1s ANIMATION_NAME linear;
@@ -152,10 +150,10 @@ Animations('finds shorthand timing functions', () => {
     },
     uniquenessRatio: 3 / 5
   }
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-Animations('analyzes animations/transitions with value lists', () => {
+test('analyzes animations/transitions with value lists', () => {
   const fixture = `
     multi-value {
       animation: 1s ANIMATION_NAME linear, 2s ANIMATION_NAME linear;
@@ -202,7 +200,5 @@ Animations('analyzes animations/transitions with value lists', () => {
       uniquenessRatio: 5 / 8
     }
   }
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
-
-Animations.run()

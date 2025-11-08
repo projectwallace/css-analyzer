@@ -1,8 +1,6 @@
-import { suite } from 'uvu';
-import * as assert from 'uvu/assert';
+import { test } from 'vitest'
+import { expect } from 'vitest'
 import { analyze } from '../index.js'
-
-const test = suite('Value complexity')
 
 test('calculates value complexity', () => {
 	const fixture = `
@@ -24,7 +22,5 @@ test('calculates value complexity', () => {
 		sum: 10,
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
-
-test.run()

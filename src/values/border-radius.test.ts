@@ -1,8 +1,6 @@
-import { suite } from 'uvu'
-import * as assert from 'uvu/assert'
+import { test } from 'vitest'
+import { expect } from 'vitest'
 import { analyze } from '../index.js'
-
-const test = suite('Border Radius')
 
 test('finds simple values', () => {
 	const fixture = `
@@ -70,7 +68,7 @@ test('finds simple values', () => {
 		}
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
 
@@ -110,7 +108,7 @@ test('finds vendor prefixed values', () => {
 		uniquenessRatio: 1,
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
 test('finds non-shorthands, logical properties', () => {
@@ -166,7 +164,7 @@ test('finds non-shorthands, logical properties', () => {
 		uniquenessRatio: 1 / 4,
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
 test('finds non-shorthands, non-logical properties', () => {
@@ -222,7 +220,7 @@ test('finds non-shorthands, non-logical properties', () => {
 		uniquenessRatio: 1 / 4,
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
 test('ignores keywords', () => {
@@ -247,7 +245,6 @@ test('ignores keywords', () => {
 		uniquenessRatio: 0
 	}
 
-	assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
-test.run()

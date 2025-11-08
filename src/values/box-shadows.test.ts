@@ -1,10 +1,8 @@
-import { suite } from 'uvu'
-import * as assert from 'uvu/assert'
+import { test } from 'vitest'
+import { expect } from 'vitest'
 import { analyze } from '../index.js'
 
-const BoxShadows = suite('BoxShadows')
-
-BoxShadows('finds simple values', () => {
+test('finds simple values', () => {
   const fixture = `
     box-shadows-simple {
       box-shadow: 1px 1px 2px black;
@@ -20,10 +18,10 @@ BoxShadows('finds simple values', () => {
     uniquenessRatio: 1
   }
 
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-BoxShadows('finds complex values', () => {
+test('finds complex values', () => {
   const fixture = `
     box-shadows-complex {
       box-shadow: 1px 1px 1px black,inset 2px 3px 5px rgba(0,0,0,0.3),inset -2px -3px 5px rgba(255,255,255,0.5);
@@ -39,10 +37,10 @@ BoxShadows('finds complex values', () => {
     uniquenessRatio: 1
   }
 
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-BoxShadows('finds vendor prefixed values', () => {
+test('finds vendor prefixed values', () => {
   const fixture = `
     box-shadows-vendor-prefixed {
       -webkit-box-shadow: 1px 1px 2px black;
@@ -58,10 +56,10 @@ BoxShadows('finds vendor prefixed values', () => {
     uniquenessRatio: 1
   }
 
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-BoxShadows.skip('does not report var() fallback values as separate values', () => {
+test.skip('does not report var() fallback values as separate values', () => {
   const fixture = `
     with-fallback {
       box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
@@ -75,10 +73,10 @@ BoxShadows.skip('does not report var() fallback values as separate values', () =
     totalUnique: 1,
     uniquenessRatio: 1
   }
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-BoxShadows('ignores keywords', () => {
+test('ignores keywords', () => {
   const fixture = `
     box-shadows-keyword {
       box-shadow: none;
@@ -99,7 +97,6 @@ BoxShadows('ignores keywords', () => {
     uniquenessRatio: 0
   }
 
-  assert.equal(actual, expected)
+  expect(actual).toEqual(expected)
 })
 
-BoxShadows.run()
