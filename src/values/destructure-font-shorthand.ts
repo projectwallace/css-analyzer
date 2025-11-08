@@ -1,15 +1,9 @@
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
 import { Identifier, Nr, Operator } from '../css-tree-node-types.js'
+import type { CssNode, Value } from 'css-tree'
 
-const SYSTEM_FONTS = new KeywordSet([
-	'caption',
-	'icon',
-	'menu',
-	'message-box',
-	'small-caption',
-	'status-bar',
-])
+const SYSTEM_FONTS = new KeywordSet(['caption', 'icon', 'menu', 'message-box', 'small-caption', 'status-bar'])
 
 const SIZE_KEYWORDS = new KeywordSet([
 	/* <absolute-size> values */
@@ -29,7 +23,7 @@ const SIZE_KEYWORDS = new KeywordSet([
 const COMMA = 44 // ','.charCodeAt(0) === 44
 const SLASH = 47 // '/'.charCodeAt(0) === 47
 
-export function isSystemFont(node) {
+export function isSystemFont(node: Value) {
 	let firstChild = node.children.first
 	if (firstChild === null) return false
 	return firstChild.type === Identifier && SYSTEM_FONTS.has(firstChild.name)
@@ -39,16 +33,17 @@ export function isSystemFont(node) {
  * @param {import('css-tree').Value} value
  * @param {*} stringifyNode
  */
-export function destructure(value, stringifyNode, cb) {
-	/** @type {Array<import('css-tree').CssNode | undefined>} */
-	let font_family = [,]
-	/** @type {string | undefined} */
-	let font_size
-	/** @type {string | undefined} */
-	let line_height
+export function destructure(
+	value: Value,
+	stringifyNode: (node: CssNode) => string,
+	cb: ({ type, value }: { type: string; value: string }) => void,
+) {
+	let font_family: (CssNode | undefined)[] = [undefined, undefined]
+	let font_size: string | undefined
+	let line_height: string | undefined
 
 	// Bail out if the value is a single var()
-	if (value.children.first.type === 'Function' && value.children.first.name.toLowerCase() === 'var') {
+	if (value.children.first!.type === 'Function' && value.children.first.name.toLowerCase() === 'var') {
 		return null
 	}
 
@@ -76,12 +71,7 @@ export function destructure(value, stringifyNode, cb) {
 		}
 
 		// any node that's followed by ',' is a font-family
-		if (
-			next &&
-			next.type === Operator &&
-			next.value.charCodeAt(0) === COMMA &&
-			!font_family[0]
-		) {
+		if (next && next.type === Operator && next.value.charCodeAt(0) === COMMA && !font_family[0]) {
 			font_family[0] = node
 
 			if (!font_size && prev) {
@@ -120,20 +110,24 @@ export function destructure(value, stringifyNode, cb) {
 		}
 	})
 
-	let family = (font_family[0] || font_family[1])
-		? stringifyNode({
-			loc: {
-				start: {
-					offset: (font_family[0] || font_family[1]).loc.start.offset,
-				},
-				end: {
-					// Either the node we detected as the last node, or the end of the whole value
-					// It's never 0 because the first node is always a font-size or font-style
-					offset: font_family[1]?.loc.end.offset || value.loc.end.offset,
-				},
-			},
-		})
-		: null
+	let family =
+		font_family[0] || font_family[1]
+			? stringifyNode({
+					loc: {
+						// @ts-expect-error TODO: fix this
+						start: {
+							// @ts-expect-error TODO: fix this
+							offset: (font_family[0] || font_family[1]).loc!.start.offset,
+						},
+						// @ts-expect-error TODO: fix this
+						end: {
+							// Either the node we detected as the last node, or the end of the whole value
+							// It's never 0 because the first node is always a font-size or font-style
+							offset: font_family[1]?.loc!.end.offset || value.loc!.end.offset,
+						},
+					},
+				})
+			: null
 
 	return {
 		font_size,
