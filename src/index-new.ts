@@ -173,10 +173,13 @@ export function analyze(css: string) {
 		else if (str_equals('supports', atrule_ast.name)) {
 			is_browserhack = is_supports_browserhack(atrule_ast.prelude)
 
-			if (atrule_ast.prelude) {
+			if (atrule_ast.prelude !== null && atrule_ast.prelude.type === 'AtrulePrelude') {
 				walk_tree(atrule_ast.prelude, {
 					visit: 'Declaration',
-					enter(prelude_node) { }
+					enter(prelude_node) {
+						let { start, end } = prelude_node.loc!
+						atrules.add_supports_property(start.line, start.column, start.offset, end.offset, hash(start.offset, start.offset + prelude_node.property.length))
+					}
 				})
 			}
 		}
@@ -208,6 +211,19 @@ export function analyze(css: string) {
 
 				else if (node.type === 'Atrule') {
 					on_atrule(node, nesting_depth - 1)
+				}
+
+				// @ts-expect-error CSSTree types are not up-to-date
+				else if (node.type === 'Feature') {
+					// @ts-expect-error CSSTree types are not up-to-date
+					let { start, end } = node.loc!
+					atrules.add_media_feature(
+						start.line,
+						start.column,
+						start.offset,
+						end.offset,
+						hash(start.offset, end.offset)
+					)
 				}
 
 				else if (node.type === 'Selector') {

@@ -58,21 +58,52 @@ function unpack_is_prefixed(value: number) {
 export class AtruleCollection {
 	#locations: LocationList
 	#items: AutoSizeUintArray
+	#media_features: UniqueValueList<number>
+	#media_features_locations: LocationList
+	#supports_properties: UniqueValueList<number>
+	#supports_properties_locations: LocationList
+	#layer_names: UniqueValueList<number>
+	#layer_names_locations: LocationList
+	#container_names: UniqueValueList<number>
+	#container_names_locations: LocationList
 
 	constructor() {
 		this.#locations = new LocationList()
 		this.#items = new AutoSizeUintArray(32, Uint16Array)
+		this.#media_features = new UniqueValueList<number>()
+		this.#media_features_locations = new LocationList(4)
+		this.#supports_properties = new UniqueValueList<number>()
+		this.#supports_properties_locations = new LocationList(4)
+		this.#layer_names = new UniqueValueList<number>()
+		this.#layer_names_locations = new LocationList(8)
+		this.#container_names = new UniqueValueList<number>()
+		this.#container_names_locations = new LocationList(4)
 	}
 
-	add(line: number, column: number, start: number, end: number, nesting_depth: number, atrule_name: AtruleName, is_browserhack: boolean, is_prefixed: boolean) {
+	add(line: number, column: number, start: number, end: number, nesting_depth: number, atrule_name: AtruleName | string, is_browserhack: boolean, is_prefixed: boolean) {
 		let location_index = this.#locations.add(line, column, start, end)
-		// - atrule type (number: font-face=1, media=2, supports, keyframes, container, layer, property, import)
-		// - is_prefixed (boolean: -webkit-keyframes=true)
-		// - is_browserhack (boolean: )
-		// - prelude (string: screen and (min-width: 600px))
-
 		let type = NAMES.get(is_prefixed ? basename(atrule_name) as AtruleName : atrule_name as AtruleName)!
 		this.#items.set(location_index, pack(type, nesting_depth, is_prefixed, is_browserhack))
+	}
+
+	add_media_feature(line: number, column: number, start: number, end: number, hash: number) {
+		let location_index = this.#media_features_locations.add(line, column, start, end)
+		this.#media_features.add(hash, location_index)
+	}
+
+	add_supports_property(line: number, column: number, start: number, end: number, hash: number) {
+		let location_index = this.#supports_properties_locations.add(line, column, start, end)
+		this.#supports_properties.add(hash, location_index)
+	}
+
+	add_layer_name(line: number, column: number, start: number, end: number, hash: number) {
+		let location_index = this.#layer_names_locations.add(line, column, start, end)
+		this.#layer_names.add(hash, location_index)
+	}
+
+	add_container_name(line: number, column: number, start: number, end: number, hash: number) {
+		let location_index = this.#container_names_locations.add(line, column, start, end)
+		this.#container_names.add(hash, location_index)
 	}
 
 	get total() {
@@ -184,7 +215,7 @@ export class AtruleCollection {
 				ratio: 0,
 				*unique() { }
 			},
-			declaration_properties: {
+			properties: {
 				total: 0,
 				total_unique: 0,
 				uniqueness_ratio: 0,

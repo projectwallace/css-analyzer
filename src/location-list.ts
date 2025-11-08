@@ -5,7 +5,7 @@ export class LocationList {
 	#items: AutoSizeUintArray;
 
 	constructor(size?: number) {
-		this.#items = new AutoSizeUintArray(size, Uint32Array)
+		this.#items = new AutoSizeUintArray(size ? size * 4 : undefined, Uint32Array)
 	}
 
 	/**
