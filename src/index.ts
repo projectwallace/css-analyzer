@@ -106,7 +106,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let linesOfCode = ast.loc.end.line - ast.loc.start.line + 1
 
 	// Atrules
-	let atrules = new Collection(useLocations) as Collection<T>
+	let atrules = new Collection(useLocations)
 	let atRuleComplexities = new AggregateCollection()
 	/** @type {Record<string, string>[]} */
 	let fontfaces: Record<string, string>[] = []
