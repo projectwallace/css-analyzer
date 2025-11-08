@@ -1,22 +1,19 @@
-import { suite } from 'uvu'
-import * as assert from 'uvu/assert'
+import { test, expect } from 'vitest'
 import { analyze } from '../index.js'
 
-const Declarations = suite('Declarations')
-
-Declarations('handles empty values', () => {
-  let css = `
+test('handles empty values', () => {
+	let css = `
     thing {
       height:;
       width: ;
     }
   `
 
-  assert.not.throws(() => analyze(css))
+	expect(() => analyze(css)).not.toThrowError()
 })
 
-Declarations('should be counted', () => {
-  const fixture = `
+test('should be counted', () => {
+	const fixture = `
     rule {
       color: green;
       color: orange !important;
@@ -45,15 +42,15 @@ Declarations('should be counted', () => {
       }
     }
   `
-  const actual = analyze(fixture).declarations
+	const actual = analyze(fixture).declarations
 
-  assert.is(actual.total, 6)
-  assert.is(actual.totalUnique, 5)
-  assert.is(actual.uniquenessRatio, 5 / 6)
+	expect(actual.total).toEqual(6)
+	expect(actual.totalUnique).toEqual(5)
+	expect(actual.uniquenessRatio).toEqual(5 / 6)
 })
 
-Declarations('should count !importants', () => {
-  const fixture = `
+test('should count !importants', () => {
+	const fixture = `
     some {
       color: red;
       color: red: !important;
@@ -82,25 +79,25 @@ Declarations('should count !importants', () => {
       }
     }
   `
-  const actual = analyze(fixture).declarations.importants
-  const expected = {
-    total: 4,
-    ratio: 0.5,
-    inKeyframes: {
-      total: 0,
-      ratio: 0
-    }
-  }
+	const actual = analyze(fixture).declarations.importants
+	const expected = {
+		total: 4,
+		ratio: 0.5,
+		inKeyframes: {
+			total: 0,
+			ratio: 0,
+		},
+	}
 
-  assert.equal(actual, expected)
+	expect(actual).toEqual(expected)
 })
 
 /**
  * @see https://drafts.csswg.org/css-animations-1/#keyframes
  * @see https://developer.mozilla.org/en-US/docs/Web/CSS/@keyframes#!important_in_a_keyframe
  */
-Declarations('should calculate !importants within @keyframes', () => {
-  const fixture = `
+test('should calculate !importants within @keyframes', () => {
+	const fixture = `
     test1 {
       color: green !important;
     }
@@ -111,18 +108,18 @@ Declarations('should calculate !importants within @keyframes', () => {
       }
     }
   `
-  const result = analyze(fixture)
-  const actual = result.declarations.importants
+	const result = analyze(fixture)
+	const actual = result.declarations.importants
 
-  assert.is(actual.total, 2)
-  assert.equal(actual.inKeyframes, {
-    total: 1,
-    ratio: 1 / 2
-  })
+	expect(actual.total).toEqual(2)
+	expect(actual.inKeyframes).toEqual({
+		total: 1,
+		ratio: 1 / 2,
+	})
 })
 
-Declarations('should count complexity', () => {
-  const css = `
+test('should count complexity', () => {
+	const css = `
     a {
       color: green;
       color: green !important;
@@ -134,20 +131,20 @@ Declarations('should count complexity', () => {
       }
     }
   `
-  const actual = analyze(css).declarations.complexity
-  const expected = {
-    min: 1,
-    max: 3,
-    mean: 2,
-    mode: 2,
-    range: 2,
-    sum: 6,
-  }
-  assert.equal(actual, expected)
+	const actual = analyze(css).declarations.complexity
+	const expected = {
+		min: 1,
+		max: 3,
+		mean: 2,
+		mode: 2,
+		range: 2,
+		sum: 6,
+	}
+	expect(actual).toEqual(expected)
 })
 
-Declarations('tracks nesting depth', () => {
-  const fixture = `
+test('tracks nesting depth', () => {
+	const fixture = `
     a {
       color: red;
     }
@@ -174,25 +171,23 @@ Declarations('tracks nesting depth', () => {
       }
     }
   `
-  const actual = analyze(fixture).declarations.nesting
-  const expected = {
-    min: 0,
-    max: 2,
-    mean: 0.6666666666666666,
-    mode: 0,
-    range: 2,
-    sum: 4,
-    items: [0, 0, 1, 0, 1, 2],
-    total: 6,
-    totalUnique: 3,
-    unique: {
-      0: 3,
-      1: 2,
-      2: 1,
-    },
-    uniquenessRatio: 3 / 6,
-  }
-  assert.equal(actual, expected)
+	const actual = analyze(fixture).declarations.nesting
+	const expected = {
+		min: 0,
+		max: 2,
+		mean: 0.6666666666666666,
+		mode: 0,
+		range: 2,
+		sum: 4,
+		items: [0, 0, 1, 0, 1, 2],
+		total: 6,
+		totalUnique: 3,
+		unique: {
+			0: 3,
+			1: 2,
+			2: 1,
+		},
+		uniquenessRatio: 3 / 6,
+	}
+	expect(actual).toEqual(expected)
 })
-
-Declarations.run()
