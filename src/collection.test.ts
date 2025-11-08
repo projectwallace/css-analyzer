@@ -1,5 +1,5 @@
 import { test, expect, expectTypeOf } from 'vitest'
-import { Collection } from './collection'
+import { Collection, type UniqueWithLocations } from './collection'
 
 let loc = { start: { line: 1, column: 1, offset: 1 }, end: { offset: 2 } }
 
@@ -44,7 +44,7 @@ test('count with useLocations=false', () => {
 	expectTypeOf(count['uniqueWithLocations']).toBeUndefined()
 })
 
-test('count with useLocations=false', () => {
+test('count with useLocations=true', () => {
 	let collection = new Collection(true)
 	collection.p('a', loc)
 	collection.p('a', loc)
@@ -58,5 +58,5 @@ test('count with useLocations=false', () => {
 		uniquenessRatio: 0.5,
 		uniqueWithLocations: { a: [pos, pos] },
 	})
-	expectTypeOf(count['uniqueWithLocations']).not.toBeUndefined()
+	expectTypeOf(count['uniqueWithLocations']).toMatchObjectType<UniqueWithLocations>()
 })
