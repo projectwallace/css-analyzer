@@ -1,12 +1,12 @@
 import type { CssLocation } from 'css-tree'
-import { Collection } from './collection.js'
+import { Collection, type CollectionCount } from './collection.js'
 
-export class ContextCollection {
-	#list: Collection
-	#contexts: Map<string, Collection>
-	#useLocations: boolean
+export class ContextCollection<UseLocations extends boolean = false> {
+	#list: Collection<UseLocations>
+	#contexts: Map<string, Collection<UseLocations>>
+	#useLocations: UseLocations
 
-	constructor(useLocations: boolean) {
+	constructor(useLocations: UseLocations) {
 		this.#list = new Collection(useLocations)
 		this.#contexts = new Map()
 		this.#useLocations = useLocations
@@ -29,7 +29,7 @@ export class ContextCollection {
 	}
 
 	count() {
-		let itemsPerContext = new Map()
+		let itemsPerContext: Map<string, CollectionCount<UseLocations>> = new Map()
 
 		for (let [context, value] of this.#contexts.entries()) {
 			itemsPerContext.set(context, value.c())

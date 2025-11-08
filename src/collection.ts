@@ -1,12 +1,26 @@
-import type { CssLocation } from 'css-tree'
+export type Location = {
+	line: number
+	column: number
+	offset: number
+	length: number
+}
 
-export class Collection {
+export type UniqueWithLocations = Record<string, Location[]>
+
+export type CollectionCount<WithLocations extends boolean = false> = {
+	total: number
+	totalUnique: number
+	unique: Record<string, number>
+	uniquenessRatio: number
+} & (WithLocations extends true ? { uniqueWithLocations: UniqueWithLocations } : { uniqueWithLocations?: undefined })
+
+export class Collection<UseLocations extends boolean = false> {
 	#items: Map<string | number, number[]>
 	#total: number
 	#nodes: number[] = []
-	#useLocations: boolean
+	#useLocations: UseLocations
 
-	constructor(useLocations = false) {
+	constructor(useLocations: UseLocations = false as UseLocations) {
 		this.#items = new Map()
 		this.#total = 0
 
@@ -46,8 +60,8 @@ export class Collection {
 		return this.#total
 	}
 
-	c() {
-		let uniqueWithLocations: Map<string | number, { line: number; column: number; offset: number; length: number }[]> = new Map()
+	c(): CollectionCount<UseLocations> {
+		let uniqueWithLocations: Map<string | number, Location[]> = new Map()
 		let unique: Record<string, number> = {}
 		let useLocations = this.#useLocations
 		let items = this.#items
@@ -72,14 +86,23 @@ export class Collection {
 		})
 
 		let total = this.#total
-		let data = {
+
+		if (useLocations) {
+			return {
+				total,
+				totalUnique: size,
+				unique,
+				uniquenessRatio: total === 0 ? 0 : size / total,
+				uniqueWithLocations: Object.fromEntries(uniqueWithLocations),
+			} as unknown as CollectionCount<UseLocations>
+		}
+
+		return {
 			total,
 			totalUnique: size,
 			unique,
 			uniquenessRatio: total === 0 ? 0 : size / total,
-			uniqueWithLocations: useLocations ? Object.fromEntries(uniqueWithLocations) : undefined,
-		}
-
-		return data
+			uniqueWithLocations: undefined,
+		} as unknown as CollectionCount<UseLocations>
 	}
 }
