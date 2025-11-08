@@ -22,7 +22,7 @@
 		"lib": ["ES2022", "DOM", "DOM.Iterable"],
 	},
 	"include": [
-		"src/index.js"
+		"src/index.ts"
 	],
 	"exclude": ["node_modules"]
 }
