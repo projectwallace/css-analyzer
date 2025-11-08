@@ -146,7 +146,7 @@ test('calculates property complexity', () => {
 	expect(actual.max).toEqual(2)
 	expect(actual.mean).toEqual(1.75)
 	expect(actual.min).toEqual(1)
-	expect(actual.mode).toEqual(1)
+	expect(actual.mode).toEqual(2)
 	expect(actual.range).toEqual(1)
 	expect(actual.sum).toEqual(7)
 })

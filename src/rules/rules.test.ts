@@ -170,7 +170,7 @@ test('calculate the mode of selectors', () => {
 })
 
 test('calculate the mean of selectors', () => {
-	expext(
+	expect(
 		analyze(`
     html {}
     a,
