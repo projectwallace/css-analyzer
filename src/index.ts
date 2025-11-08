@@ -20,10 +20,11 @@ import { isCustom, isHack, isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
 import { basename } from './properties/property-utils.js'
-import { Atrule, Selector, Dimension, Url, Value, Declaration, Hash, Rule, Identifier, Func, Operator } from './css-tree-node-types.js'
+import { Atrule, Selector, Dimension, Url, Value, Hash, Rule, Identifier, Func, Operator } from './css-tree-node-types.js'
 import { KeywordSet } from './keyword-set.js'
+import type { CssNode, Declaration, SelectorList } from 'css-tree'
 
-/** @typedef {[number, number, number]} Specificity */
+type Specificity = [number, number, number]
 
 let border_radius_properties = new KeywordSet([
 	'border-radius',
@@ -37,7 +38,7 @@ let border_radius_properties = new KeywordSet([
 	'border-end-start-radius',
 ])
 
-function ratio(part, total) {
+function ratio(part: number, total: number): number {
 	if (total === 0) return 0
 	return part / total
 }
@@ -46,17 +47,12 @@ let defaults = {
 	useLocations: false,
 }
 
-/**
- * @typedef Options
- * @property {boolean} useLocations Use Locations (`{ 'item': [{ line, column, offset, length }] }`) instead of a regular count per occurrence (`{ 'item': 3 }`)
- */
+type Options = {
+	/** @description Use Locations (`{ 'item': [{ line, column, offset, length }] }`) instead of a regular count per occurrence (`{ 'item': 3 }`) */
+	useLocations?: boolean
+}
 
-/**
- * Analyze CSS
- * @param {string} css
- * @param {Options} options
- */
-export function analyze(css, options = {}) {
+export function analyze(css: string, options: Options = {}) {
 	let settings = Object.assign({}, defaults, options)
 	let useLocations = settings.useLocations === true
 	let start = Date.now()
@@ -66,12 +62,12 @@ export function analyze(css, options = {}) {
 	 * @param {import('css-tree').CssNode} node - Node from CSSTree AST to stringify
 	 * @returns {string} str - The stringified node
 	 */
-	function stringifyNode(node) {
+	function stringifyNode(node: CssNode) {
 		return stringifyNodePlain(node).trim()
 	}
 
-	function stringifyNodePlain(node) {
-		let loc = node.loc
+	function stringifyNodePlain(node: CssNode) {
+		let loc = node.loc!
 		return css.substring(loc.start.offset, loc.end.offset)
 	}
 
@@ -90,8 +86,7 @@ export function analyze(css, options = {}) {
 	let ast = parse(css, {
 		parseCustomProperty: true, // To find font-families, colors, etc.
 		positions: true, // So we can use stringifyNode()
-		/** @param {string} comment */
-		onComment: function (comment) {
+		onComment: function (comment: string) {
 			totalComments++
 			commentsSize += comment.length
 		},
@@ -104,7 +99,7 @@ export function analyze(css, options = {}) {
 	let atrules = new Collection(useLocations)
 	let atRuleComplexities = new AggregateCollection()
 	/** @type {Record<string, string>[]} */
-	let fontfaces = []
+	let fontfaces: Record<string, string>[] = []
 	let fontfaces_with_loc = new Collection(useLocations)
 	let layers = new Collection(useLocations)
 	let imports = new Collection(useLocations)
@@ -138,18 +133,15 @@ export function analyze(css, options = {}) {
 	let keyframeSelectors = new Collection(useLocations)
 	let uniqueSelectors = new Set()
 	let prefixedSelectors = new Collection(useLocations)
-	/** @type {Specificity} */
-	let maxSpecificity
-	/** @type {Specificity} */
-	let minSpecificity
+	let maxSpecificity: Specificity | undefined
+	let minSpecificity: Specificity | undefined
 	let specificityA = new AggregateCollection()
 	let specificityB = new AggregateCollection()
 	let specificityC = new AggregateCollection()
 	let uniqueSpecificities = new Collection(useLocations)
 	let selectorComplexities = new AggregateCollection()
 	let uniqueSelectorComplexities = new Collection(useLocations)
-	/** @type {Specificity[]} */
-	let specificities = []
+	let specificities: Specificity[] = []
 	let ids = new Collection(useLocations)
 	let a11y = new Collection(useLocations)
 	let pseudoClasses = new Collection(useLocations)
@@ -197,25 +189,25 @@ export function analyze(css, options = {}) {
 	let nestingDepth = 0
 
 	walk(ast, {
-		enter(node) {
+		enter(node: CssNode) {
 			switch (node.type) {
 				case Atrule: {
-					atrules.p(node.name, node.loc)
+					atrules.p(node.name, node.loc!)
 					atruleNesting.push(nestingDepth)
-					uniqueAtruleNesting.p(nestingDepth, node.loc)
+					uniqueAtruleNesting.p(nestingDepth, node.loc!)
 
 					let atRuleName = node.name
 
 					if (atRuleName === 'font-face') {
-						let descriptors = {}
+						let descriptors = Object.create(null)
 
 						if (useLocations) {
-							fontfaces_with_loc.p(node.loc.start.offset, node.loc)
+							fontfaces_with_loc.p(node.loc!.start.offset, node.loc!)
 						}
 
-						node.block.children.forEach((descriptor) => {
+						node.block?.children.forEach((descriptor) => {
 							// Ignore 'Raw' nodes in case of CSS syntax errors
-							if (descriptor.type === Declaration) {
+							if (descriptor.type === 'Declaration') {
 								descriptors[descriptor.property] = stringifyNode(descriptor.value)
 							}
 						})
@@ -231,7 +223,7 @@ export function analyze(css, options = {}) {
 					if (node.prelude !== null) {
 						let prelude = node.prelude
 						let preludeStr = prelude && stringifyNode(node.prelude)
-						let loc = prelude.loc
+						let loc = prelude.loc!
 
 						if (atRuleName === 'media') {
 							medias.p(preludeStr, loc)
@@ -253,14 +245,15 @@ export function analyze(css, options = {}) {
 								prefixedKeyframes.p(name, loc)
 								complexity++
 							}
-							keyframes.p(name, loc)
+							keyframes.p(name, loc!)
 						} else if (atRuleName === 'import') {
-							walk(node, function (prelude_node) {
+							// @ts-expect-error Outdated css-tree types
+							walk(node, (prelude_node) => {
 								if (prelude_node.type === 'Condition' && prelude_node.kind === 'supports') {
 									let prelude = stringifyNode(prelude_node)
 
-									supports.p(prelude, prelude_node.loc)
-									return this.break
+									supports.p(prelude, prelude_node.loc!)
+									return walk.break
 								}
 							})
 							imports.p(preludeStr, loc)
@@ -271,9 +264,11 @@ export function analyze(css, options = {}) {
 						} else if (atRuleName === 'container') {
 							containers.p(preludeStr, loc)
 
-							if (prelude.children.first?.type === 'Identifier') {
-								let containerName = prelude.children.first.name
-								containerNames.p(containerName, loc)
+							if (prelude.type === 'AtrulePrelude') {
+								if (prelude.children.first?.type === 'Identifier') {
+									let containerName = prelude.children.first.name
+									containerNames.p(containerName, loc)
+								}
 							}
 							// TODO: calculate complexity of container 'declaration'
 						} else if (atRuleName === 'property') {
@@ -282,39 +277,45 @@ export function analyze(css, options = {}) {
 						}
 					} else {
 						if (atRuleName === 'layer') {
-							layers.p('<anonymous>', node.loc)
+							layers.p('<anonymous>', node.loc!)
 							complexity++
 						}
 					}
 					atRuleComplexities.push(complexity)
 					break
 				}
+				// @ts-expect-error Oudated css-tree types
 				case 'Layer': {
+					// @ts-expect-error Oudated css-tree types
 					if (node.name !== null) {
+						// @ts-expect-error Oudated css-tree types
 						layers.p(node.name, node.loc)
 					}
 					break
 				}
+				// @ts-expect-error Oudated css-tree types
 				case 'Feature': {
+					// @ts-expect-error Oudated css-tree types
 					mediaFeatures.p(node.name, node.loc)
 					break
 				}
 				case Rule: {
-					let prelude = node.prelude
+					let prelude = node.prelude as SelectorList
 					let block = node.block
+
 					let preludeChildren = prelude.children
 					let blockChildren = block.children
 					let numSelectors = preludeChildren ? preludeChildren.size : 0
 					let numDeclarations = blockChildren ? blockChildren.size : 0
 
 					ruleSizes.push(numSelectors + numDeclarations)
-					uniqueRuleSize.p(numSelectors + numDeclarations, node.loc)
+					uniqueRuleSize.p(numSelectors + numDeclarations, node.loc!)
 					selectorsPerRule.push(numSelectors)
-					uniqueSelectorsPerRule.p(numSelectors, prelude.loc)
+					uniqueSelectorsPerRule.p(numSelectors, prelude.loc!)
 					declarationsPerRule.push(numDeclarations)
-					uniqueDeclarationsPerRule.p(numDeclarations, block.loc)
+					uniqueDeclarationsPerRule.p(numDeclarations, block.loc!)
 					ruleNesting.push(nestingDepth)
-					uniqueRuleNesting.p(nestingDepth, node.loc)
+					uniqueRuleNesting.p(nestingDepth, node.loc!)
 
 					totalRules++
 
@@ -327,38 +328,38 @@ export function analyze(css, options = {}) {
 					let selector = stringifyNode(node)
 
 					if (this.atrule && endsWith('keyframes', this.atrule.name)) {
-						keyframeSelectors.p(selector, node.loc)
+						keyframeSelectors.p(selector, node.loc!)
 						return this.skip
 					}
 
 					if (isAccessibility(node)) {
-						a11y.p(selector, node.loc)
+						a11y.p(selector, node.loc!)
 					}
 
 					let pseudos = hasPseudoClass(node)
 					if (pseudos !== false) {
 						for (let pseudo of pseudos) {
-							pseudoClasses.p(pseudo, node.loc)
+							pseudoClasses.p(pseudo, node.loc!)
 						}
 					}
 
 					let complexity = getComplexity(node)
 
 					if (isPrefixed(node)) {
-						prefixedSelectors.p(selector, node.loc)
+						prefixedSelectors.p(selector, node.loc!)
 					}
 
 					uniqueSelectors.add(selector)
 					selectorComplexities.push(complexity)
-					uniqueSelectorComplexities.p(complexity, node.loc)
+					uniqueSelectorComplexities.p(complexity, node.loc!)
 					selectorNesting.push(nestingDepth - 1)
-					uniqueSelectorNesting.p(nestingDepth - 1, node.loc)
+					uniqueSelectorNesting.p(nestingDepth - 1, node.loc!)
 
 					// #region specificity
 					let specificity = calculateForAST(node).toArray()
 					let [sa, sb, sc] = specificity
 
-					uniqueSpecificities.p(specificity.toString(), node.loc)
+					uniqueSpecificities.p(specificity.toString(), node.loc!)
 
 					specificityA.push(sa)
 					specificityB.push(sb)
@@ -384,7 +385,7 @@ export function analyze(css, options = {}) {
 					// #endregion
 
 					if (sa > 0) {
-						ids.p(selector, node.loc)
+						ids.p(selector, node.loc!)
 					}
 
 					getCombinators(node, function onCombinator(combinator) {
@@ -402,13 +403,12 @@ export function analyze(css, options = {}) {
 						break
 					}
 
-					/** @type {string} */
 					let unit = node.unit
 
 					if (endsWith('\\9', unit)) {
-						units.push(unit.substring(0, unit.length - 2), this.declaration.property, node.loc)
+						units.push(unit.substring(0, unit.length - 2), this.declaration.property, node.loc!)
 					} else {
-						units.push(unit, this.declaration.property, node.loc)
+						units.push(unit, this.declaration.property, node.loc!)
 					}
 
 					return this.skip
@@ -423,14 +423,10 @@ export function analyze(css, options = {}) {
 						embedSize += size
 
 						let loc = {
-							/** @type {number} */
-							line: node.loc.start.line,
-							/** @type {number} */
-							column: node.loc.start.column,
-							/** @type {number} */
-							offset: node.loc.start.offset,
-							/** @type {number} */
-							length: node.loc.end.offset - node.loc.start.offset,
+							line: node.loc!.start.line,
+							column: node.loc!.start.column,
+							offset: node.loc!.start.offset,
+							length: node.loc!.end.offset - node.loc!.start.offset,
 						}
 
 						if (embedTypes.unique.has(type)) {
@@ -445,9 +441,7 @@ export function analyze(css, options = {}) {
 							let item = {
 								count: 1,
 								size,
-							}
-							if (useLocations) {
-								item.uniqueWithLocations = [loc]
+								uniqueWithLocations: useLocations ? [loc] : undefined,
 							}
 							embedTypes.unique.set(type, item)
 						}
@@ -455,37 +449,37 @@ export function analyze(css, options = {}) {
 					break
 				}
 				case Value: {
+					let loc = node.loc!
+
 					if (isValueKeyword(node)) {
 						valueComplexities.push(1)
-						valueKeywords.p(stringifyNode(node), node.loc)
+						valueKeywords.p(stringifyNode(node), loc)
 						break
 					}
 
-					/** @type {import('css-tree').Declaration} */
-					let declaration = this.declaration
+					let declaration: Declaration = this.declaration
 					let { property, important } = declaration
 					let complexity = 1
 
 					// i.e. `background-image: -webkit-linear-gradient()`
 					if (isValuePrefixed(node)) {
-						vendorPrefixedValues.p(stringifyNode(node), node.loc)
+						vendorPrefixedValues.p(stringifyNode(node), loc)
 						complexity++
 					}
 
 					// i.e. `property: value !ie`
 					if (typeof important === 'string') {
-						valueBrowserhacks.p(stringifyNodePlain(node) + '!' + important, node.loc)
+						valueBrowserhacks.p(stringifyNodePlain(node) + '!' + important, loc)
 						complexity++
 					}
 
 					// i.e. `property: value\9`
 					if (isIe9Hack(node)) {
-						valueBrowserhacks.p(stringifyNode(node), node.loc)
+						valueBrowserhacks.p(stringifyNode(node), loc)
 						complexity++
 					}
 
 					let children = node.children
-					let loc = node.loc
 
 					// TODO: should shorthands be counted towards complexity?
 					valueComplexities.push(complexity)
@@ -509,7 +503,7 @@ export function analyze(css, options = {}) {
 						isProperty('padding-left', property)
 					) {
 						if (isValueReset(node)) {
-							resets.p(property, declaration.loc)
+							resets.p(property, declaration.loc!)
 						}
 					} else if (isProperty('z-index', property)) {
 						zindex.p(stringifyNode(node), loc)
@@ -554,7 +548,7 @@ export function analyze(css, options = {}) {
 					} else if (isProperty('line-height', property)) {
 						lineHeights.p(stringifyNode(node), loc)
 					} else if (isProperty('transition', property) || isProperty('animation', property)) {
-						analyzeAnimation(children, function (item) {
+						analyzeAnimation(children, function (item: { type: string; value: CssNode }) {
 							if (item.type === 'fn') {
 								timingFunctions.p(stringifyNode(item.value), loc)
 							} else if (item.type === 'duration') {
@@ -611,7 +605,8 @@ export function analyze(css, options = {}) {
 						// no break here: potentially contains colors
 					}
 
-					walk(node, function (valueNode) {
+					walk(node, function (valueNode: CssNode) {
+						// @ts-expect-error TODO: fix this
 						let nodeName = valueNode.name
 
 						switch (valueNode.type) {
@@ -623,7 +618,7 @@ export function analyze(css, options = {}) {
 								colors.push('#' + valueNode.value, property, loc)
 								colorFormats.p(`hex` + hexLength, loc)
 
-								return this.skip
+								return walk.skip
 							}
 							case Identifier: {
 								if (keywords.has(nodeName)) {
@@ -635,7 +630,7 @@ export function analyze(css, options = {}) {
 								// 3 === 'red'.length
 								let nodeLen = nodeName.length
 								if (nodeLen > 20 || nodeLen < 3) {
-									return this.skip
+									return walk.skip
 								}
 
 								// A keyword is most likely to be 'transparent' or 'currentColor'
@@ -661,33 +656,33 @@ export function analyze(css, options = {}) {
 									colorFormats.p('system', loc)
 									return
 								}
-								return this.skip
+								return walk.skip
 							}
 							case Func: {
 								// Don't walk var() multiple times
 								if (strEquals('var', nodeName)) {
-									return this.skip
+									return walk.skip
 								}
 
 								// rgb(a), hsl(a), color(), hwb(), lch(), lab(), oklab(), oklch()
 								if (colorFunctions.has(nodeName)) {
-									colors.push(stringifyNode(valueNode), property, valueNode.loc)
-									colorFormats.p(nodeName.toLowerCase(), valueNode.loc)
+									colors.push(stringifyNode(valueNode), property, valueNode.loc!)
+									colorFormats.p(nodeName.toLowerCase(), valueNode.loc!)
 									return
 								}
 
 								if (endsWith('gradient', nodeName)) {
-									gradients.p(stringifyNode(valueNode), valueNode.loc)
+									gradients.p(stringifyNode(valueNode), valueNode.loc!)
 									return
 								}
-								// No this.skip here intentionally,
+								// No walk.skip here intentionally,
 								// otherwise we'll miss colors in linear-gradient() etc.
 							}
 						}
 					})
 					break
 				}
-				case Declaration: {
+				case 'Declaration': {
 					// Do not process Declarations in atRule preludes
 					// because we will handle them manually
 					if (this.atrulePrelude !== null) {
@@ -699,7 +694,7 @@ export function analyze(css, options = {}) {
 
 					uniqueDeclarations.add(stringifyNode(node))
 					declarationNesting.push(nestingDepth - 1)
-					uniqueDeclarationNesting.p(nestingDepth - 1, node.loc)
+					uniqueDeclarationNesting.p(nestingDepth - 1, node.loc!)
 
 					if (node.important === true) {
 						importantDeclarations++
@@ -715,6 +710,7 @@ export function analyze(css, options = {}) {
 
 					let {
 						property,
+						// @ts-expect-error TODO: fix this
 						loc: { start },
 					} = node
 					let propertyLoc = {
@@ -755,7 +751,7 @@ export function analyze(css, options = {}) {
 				nestingDepth++
 			}
 		},
-		leave(node) {
+		leave(node: CssNode) {
 			if (node.type === Rule || node.type === Atrule) {
 				nestingDepth--
 			}
@@ -992,11 +988,9 @@ export function analyze(css, options = {}) {
 
 /**
  * Compare specificity A to Specificity B
- * @param {Specificity} a - Specificity A
- * @param {Specificity} b - Specificity B
- * @returns {number} sortIndex - 0 when a==b, 1 when a<b, -1 when a>b
+ * @returns 0 when a==b, 1 when a<b, -1 when a>b
  */
-export function compareSpecificity(a, b) {
+export function compareSpecificity(a: Specificity, b: Specificity): number {
 	if (a[0] === b[0]) {
 		if (a[1] === b[1]) {
 			return b[2] - a[2]

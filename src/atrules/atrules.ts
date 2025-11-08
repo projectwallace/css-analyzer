@@ -1,5 +1,5 @@
 import { strEquals, startsWith, endsWith } from '../string-utils.js'
-import { walk, type AtrulePrelude, type Declaration } from 'css-tree'
+import { type Raw, walk, type AtrulePrelude, type Declaration } from 'css-tree'
 import { Identifier, MediaQuery } from '../css-tree-node-types.js'
 
 /**
@@ -10,6 +10,7 @@ import { Identifier, MediaQuery } from '../css-tree-node-types.js'
  * @returns true if declaratioNode is the given property: value, false otherwise
  */
 function isPropertyValue(node: Declaration, property: string, value: string): boolean {
+	// @ts-expect-error TODO: fix this
 	let firstChild = node.value.children.first
 	return strEquals(property, node.property) && firstChild.type === Identifier && strEquals(value, firstChild.name)
 }
@@ -18,7 +19,7 @@ function isPropertyValue(node: Declaration, property: string, value: string): bo
  * Check if an @supports atRule is a browserhack
  * @returns true if the atrule is a browserhack
  */
-export function isSupportsBrowserhack(prelude: AtrulePrelude): boolean {
+export function isSupportsBrowserhack(prelude: AtrulePrelude | Raw): boolean {
 	let returnValue = false
 
 	walk(prelude, function (node) {
@@ -37,7 +38,7 @@ export function isSupportsBrowserhack(prelude: AtrulePrelude): boolean {
  * Check if a @media atRule is a browserhack
  * @returns true if the atrule is a browserhack
  */
-export function isMediaBrowserhack(prelude: AtrulePrelude): boolean {
+export function isMediaBrowserhack(prelude: AtrulePrelude | Raw): boolean {
 	let returnValue = false
 
 	walk(prelude, function (node) {

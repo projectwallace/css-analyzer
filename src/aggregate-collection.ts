@@ -26,6 +26,7 @@ function Mode(arr: unknown[]): number {
 
 		if (updatedCount >= maxOccurrences) {
 			maxOccurenceCount++
+			// @ts-expect-error TODO: fix this
 			sum += element
 		}
 	}

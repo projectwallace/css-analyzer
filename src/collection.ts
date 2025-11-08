@@ -17,7 +17,7 @@ export class Collection {
 		this.#useLocations = useLocations
 	}
 
-	p(item: string | number, node_location: CssLocation) {
+	p(item: string | number, node_location: { start: { line: number; column: number; offset: number }; end: { offset: number } }) {
 		let index = this.#total
 
 		if (this.#useLocations) {
