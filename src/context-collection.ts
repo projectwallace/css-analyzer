@@ -1,5 +1,5 @@
-import type { CssLocation } from 'css-tree'
 import { Collection, type CollectionCount } from './collection.js'
+import type { CssLocationRange } from '@eslint/css-tree'
 
 export class ContextCollection<UseLocations extends boolean = false> {
 	#list: Collection<UseLocations>
@@ -18,7 +18,7 @@ export class ContextCollection<UseLocations extends boolean = false> {
 	 * @param context Context to push Item to
 	 * @param node_location
 	 */
-	push(item: string, context: string, node_location: CssLocation) {
+	push(item: string, context: string, node_location: CssLocationRange) {
 		this.#list.p(item, node_location)
 
 		if (!this.#contexts.has(context)) {

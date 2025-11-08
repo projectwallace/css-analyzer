@@ -1,7 +1,4 @@
-// @ts-expect-error types missing
-import parse from 'css-tree/parser'
-// @ts-expect-error types missing
-import walk from 'css-tree/walker'
+import { walk, parse, type CssNode, type SelectorList } from '@eslint/css-tree'
 // @ts-expect-error types missing
 import { calculateForAST } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
@@ -22,7 +19,6 @@ import { isIe9Hack } from './values/browserhacks.js'
 import { basename } from './properties/property-utils.js'
 import { Atrule, Selector, Dimension, Url, Value, Hash, Rule, Identifier, Func, Operator } from './css-tree-node-types.js'
 import { KeywordSet } from './keyword-set.js'
-import type { CssNode, Declaration, SelectorList } from 'css-tree'
 
 type Specificity = [number, number, number]
 
@@ -61,16 +57,18 @@ export function analyze(css: string, options: Options = {}): any {
 function analyzeInternal<T extends boolean>(css: string, options: Options, useLocations: T) {
 	let start = Date.now()
 
+	type StringifiableNode = { loc?: null | { start: { offset: number }; end: { offset: number } } }
+
 	/**
 	 * Recreate the authored CSS from a CSSTree node
-	 * @param {import('css-tree').CssNode} node - Node from CSSTree AST to stringify
-	 * @returns {string} str - The stringified node
+	 * @param node - Node from CSSTree AST to stringify
+	 * @returns The stringified node
 	 */
-	function stringifyNode(node: CssNode) {
+	function stringifyNode(node: StringifiableNode) {
 		return stringifyNodePlain(node).trim()
 	}
 
-	function stringifyNodePlain(node: CssNode) {
+	function stringifyNodePlain(node: StringifiableNode) {
 		let loc = node.loc!
 		return css.substring(loc.start.offset, loc.end.offset)
 	}
@@ -103,7 +101,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	})
 
 	let startAnalysis = Date.now()
-	let linesOfCode = ast.loc.end.line - ast.loc.start.line + 1
+	let linesOfCode = ast.loc!.end.line - ast.loc!.start.line + 1
 
 	// Atrules
 	let atrules = new Collection(useLocations)
@@ -257,7 +255,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							}
 							keyframes.p(name, loc!)
 						} else if (atRuleName === 'import') {
-							// @ts-expect-error Outdated css-tree types
 							walk(node, (prelude_node) => {
 								if (prelude_node.type === 'Condition' && prelude_node.kind === 'supports') {
 									let prelude = stringifyNode(prelude_node)
@@ -294,19 +291,14 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					atRuleComplexities.push(complexity)
 					break
 				}
-				// @ts-expect-error Oudated css-tree types
 				case 'Layer': {
-					// @ts-expect-error Oudated css-tree types
 					if (node.name !== null) {
-						// @ts-expect-error Oudated css-tree types
-						layers.p(node.name, node.loc)
+						layers.p(node.name, node.loc!)
 					}
 					break
 				}
-				// @ts-expect-error Oudated css-tree types
 				case 'Feature': {
-					// @ts-expect-error Oudated css-tree types
-					mediaFeatures.p(node.name, node.loc)
+					mediaFeatures.p(node.name, node.loc!)
 					break
 				}
 				case Rule: {
@@ -467,7 +459,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						break
 					}
 
-					let declaration: Declaration = this.declaration
+					let declaration = this.declaration!
 					let { property, important } = declaration
 					let complexity = 1
 

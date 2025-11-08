@@ -1,6 +1,6 @@
 import { KeywordSet } from '../keyword-set.js'
 import { Identifier, Nr, Dimension } from '../css-tree-node-types.js'
-import type { Value } from 'css-tree'
+import type { Value } from '@eslint/css-tree'
 
 export const keywords = new KeywordSet([
 	'auto',

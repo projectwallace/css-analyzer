@@ -1,5 +1,4 @@
-// @ts-expect-error CSS Tree types are incomplete
-import walk from 'css-tree/walker'
+import { walk } from '@eslint/css-tree'
 import { startsWith, strEquals } from '../string-utils.js'
 import { hasVendorPrefix } from '../vendor-prefix.js'
 import { KeywordSet } from '../keyword-set.js'
@@ -7,13 +6,14 @@ import { Combinator, Nth } from '../css-tree-node-types.js'
 import type {
 	AttributeSelector,
 	CssLocation,
+	CssLocationRange,
 	CssNode,
 	ListItem,
 	PseudoClassSelector,
 	PseudoElementSelector,
 	Selector,
 	TypeSelector,
-} from 'css-tree'
+} from '@eslint/css-tree'
 
 /**
  * @returns Analyzed selectors in the selectorList
@@ -22,7 +22,7 @@ function analyzeList(selectorListAst: Selector | PseudoClassSelector, cb: (node:
 	let childSelectors: Selector[] = []
 	walk(selectorListAst, {
 		visit: 'Selector',
-		enter: function (node: Selector) {
+		enter: function (node) {
 			// @ts-expect-error TODO: fix this
 			childSelectors.push(cb(node))
 		},
@@ -69,10 +69,11 @@ export function isAccessibility(selector: Selector | PseudoClassSelector): boole
 export function isPrefixed(selector: Selector): boolean {
 	let isPrefixed = false
 
-	walk(selector, function (node: PseudoElementSelector | PseudoClassSelector | TypeSelector) {
+	walk(selector, function (node) {
 		let type = node.type
 
 		if (type === 'PseudoElementSelector' || type === 'TypeSelector' || type === 'PseudoClassSelector') {
+			// @ts-expect-error TODO: fix this
 			if (hasVendorPrefix(node.name)) {
 				isPrefixed = true
 				return walk.break
@@ -155,7 +156,7 @@ export function getComplexity(selector: Selector): number {
  * alwas a single ` ` (space) character, even though there could be newlines or
  * multiple spaces
  */
-export function getCombinators(node: CssNode, onMatch: ({ name, loc }: { name: string; loc: CssLocation }) => void) {
+export function getCombinators(node: CssNode, onMatch: ({ name, loc }: { name: string; loc: Omit<CssLocationRange, 'source'> }) => void) {
 	walk(node, function (selectorNode: CssNode, item: ListItem<CssNode>) {
 		if (selectorNode.type === Combinator) {
 			let loc = selectorNode.loc
@@ -172,7 +173,6 @@ export function getCombinators(node: CssNode, onMatch: ({ name, loc }: { name: s
 
 				onMatch({
 					name,
-					// @ts-expect-error TODO: fix this
 					loc: {
 						start,
 						end: {

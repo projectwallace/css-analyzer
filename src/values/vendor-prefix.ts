@@ -1,6 +1,6 @@
 import { hasVendorPrefix } from '../vendor-prefix.js'
 import { Func, Identifier } from '../css-tree-node-types.js'
-import type { CssNode, Value } from 'css-tree'
+import type { CssNode, Value } from '@eslint/css-tree'
 
 export function isValuePrefixed(node: Value | CssNode): boolean {
 	// @ts-expect-error TODO: fix this

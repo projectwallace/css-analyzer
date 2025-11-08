@@ -1,7 +1,7 @@
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
 import { Operator, Dimension, Identifier, Func } from '../css-tree-node-types.js'
-import type { CssNode, List } from 'css-tree'
+import type { CssNode, List } from '@eslint/css-tree'
 
 const TIMING_KEYWORDS = new KeywordSet(['linear', 'ease', 'ease-in', 'ease-out', 'ease-in-out', 'step-start', 'step-end'])
 
