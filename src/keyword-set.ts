@@ -2,15 +2,14 @@
  * @description A Set-like construct to search CSS keywords in a case-insensitive way
  */
 export class KeywordSet {
+	set: Set<string>
 
-	/** @param {Lowercase<string>[]} items */
-	constructor(items) {
+	constructor(items: Lowercase<string>[]) {
 		/** @type {Set<string>} */
 		this.set = new Set(items)
 	}
 
-	/** @param {string} item */
-	has(item) {
+	has(item: string): boolean {
 		return this.set.has(item.toLowerCase())
 	}
 }
