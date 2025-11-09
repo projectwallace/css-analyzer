@@ -1,4 +1,4 @@
-import { test, expect } from 'vitest'
+import { test, expect, describe } from 'vitest'
 import {
 	analyze,
 	compareSpecificity,
@@ -17,72 +17,109 @@ import {
 	systemColors,
 	colorFunctions,
 	colorKeywords,
+	type UniqueWithLocations,
+	type Location,
+	type Specificity,
 } from './index.js'
 
-test("exposes the 'analyze' method", () => {
-	expect(typeof analyze).toBe('function')
-})
+describe('Public API', () => {
+	test("exposes the 'analyze' method", () => {
+		expect(typeof analyze).toBe('function')
+	})
 
-test('exposes the "compareSpecificity" method', () => {
-	expect(typeof compareSpecificity).toBe('function')
-})
+	test('exposes the "compareSpecificity" method', () => {
+		expect(typeof compareSpecificity).toBe('function')
+	})
 
-test('exposes the "selectorComplexity" method', () => {
-	expect(typeof selectorComplexity).toBe('function')
-})
+	test('exposes the "selectorComplexity" method', () => {
+		expect(typeof selectorComplexity).toBe('function')
+	})
 
-test('exposes the "isSelectorPrefixed" method', () => {
-	expect(typeof isSelectorPrefixed).toBe('function')
-})
+	test('exposes the "isSelectorPrefixed" method', () => {
+		expect(typeof isSelectorPrefixed).toBe('function')
+	})
 
-test('exposes the "isAccessibilitySelector" method', () => {
-	expect(typeof isAccessibilitySelector).toBe('function')
-})
+	test('exposes the "isAccessibilitySelector" method', () => {
+		expect(typeof isAccessibilitySelector).toBe('function')
+	})
 
-test('exposes the "isMediaBrowserhack" method', () => {
-	expect(typeof isMediaBrowserhack).toBe('function')
-})
+	test('exposes the "isMediaBrowserhack" method', () => {
+		expect(typeof isMediaBrowserhack).toBe('function')
+	})
 
-test('exposes the "isSupportsBrowserhack" method', () => {
-	expect(typeof isSupportsBrowserhack).toBe('function')
-})
+	test('exposes the "isSupportsBrowserhack" method', () => {
+		expect(typeof isSupportsBrowserhack).toBe('function')
+	})
 
-test('exposes the "isPropertyHack" method', () => {
-	expect(typeof isPropertyHack).toBe('function')
-})
+	test('exposes the "isPropertyHack" method', () => {
+		expect(typeof isPropertyHack).toBe('function')
+	})
 
-test('exposes the "isValuePrefixed" method', () => {
-	expect(typeof isValuePrefixed).toBe('function')
-})
+	test('exposes the "isValuePrefixed" method', () => {
+		expect(typeof isValuePrefixed).toBe('function')
+	})
 
-test('exposes the "hasVendorPrefix" method', () => {
-	expect(typeof hasVendorPrefix).toBe('function')
-})
+	test('exposes the "hasVendorPrefix" method', () => {
+		expect(typeof hasVendorPrefix).toBe('function')
+	})
 
-test('exposes the namedColors KeywordSet', () => {
-	expect(namedColors.has('Red')).toBeTruthy()
-})
+	test('exposes the "compareSpecificity" method', () => {
+		expect(typeof compareSpecificity).toBe('function')
+	})
 
-test('exposes the systemColors KeywordSet', () => {
-	expect(systemColors.has('LinkText')).toBeTruthy()
-})
+	test('exposes the namedColors KeywordSet', () => {
+		expect(namedColors.has('Red')).toBeTruthy()
+	})
 
-test('exposes the colorFunctions KeywordSet', () => {
-	expect(colorFunctions.has('okLAB')).toBeTruthy()
-})
+	test('exposes the systemColors KeywordSet', () => {
+		expect(systemColors.has('LinkText')).toBeTruthy()
+	})
 
-test('exposes the colorKeywords KeywordSet', () => {
-	expect(colorKeywords.has('TRANSPARENT')).toBeTruthy()
-})
+	test('exposes the colorFunctions KeywordSet', () => {
+		expect(colorFunctions.has('okLAB')).toBeTruthy()
+	})
 
-test('exposes CSS keywords KeywordSet', () => {
-	expect(cssKeywords.has('Auto')).toBeTruthy()
-	expect(cssKeywords.has('inherit')).toBeTruthy()
-})
+	test('exposes the colorKeywords KeywordSet', () => {
+		expect(colorKeywords.has('TRANSPARENT')).toBeTruthy()
+	})
 
-test('exposes the KeywordSet class', () => {
-	expect(typeof KeywordSet).toBe('function')
-	expect(new KeywordSet([]).constructor.name).toBe('KeywordSet')
+	test('exposes CSS keywords KeywordSet', () => {
+		expect(cssKeywords.has('Auto')).toBeTruthy()
+		expect(cssKeywords.has('inherit')).toBeTruthy()
+	})
+
+	test('exposes the KeywordSet class', () => {
+		expect(typeof KeywordSet).toBe('function')
+		expect(new KeywordSet([]).constructor.name).toBe('KeywordSet')
+	})
+
+	test('exposes Location type', () => {
+		let location: Location = {
+			offset: 0,
+			line: 0,
+			length: 0,
+			column: 0,
+		}
+		expect(location).toHaveProperty('line')
+	})
+
+	test('exposes UniqueWithLocations type', () => {
+		let location: Location = {
+			offset: 0,
+			line: 0,
+			length: 0,
+			column: 0,
+		}
+		let uniqueWithLocations: UniqueWithLocations = {
+			'my-item': [location],
+		}
+		expect(uniqueWithLocations).toHaveProperty('my-item')
+	})
+
+	test('exposes Specificity type', () => {
+		let specificity: Specificity = [1, 1, 1]
+		expect(specificity).toHaveLength(3)
+	})
 })
 
 test('does not break on CSS Syntax Errors', () => {
