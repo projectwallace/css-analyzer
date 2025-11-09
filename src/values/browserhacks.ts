@@ -1,6 +1,6 @@
 import { endsWith } from '../string-utils.js'
 import { Identifier } from '../css-tree-node-types.js'
-import type { Value } from 'css-tree'
+import type { Value } from '@eslint/css-tree'
 
 export function isIe9Hack(node: Value): boolean {
 	let children = node.children

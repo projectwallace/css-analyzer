@@ -1,5 +1,5 @@
 import { strEquals, startsWith, endsWith } from '../string-utils.js'
-import { type Raw, walk, type AtrulePrelude, type Declaration } from 'css-tree'
+import { type Raw, walk, type AtrulePrelude, type Declaration } from '@eslint/css-tree'
 import { Identifier, MediaQuery } from '../css-tree-node-types.js'
 
 /**
@@ -51,7 +51,6 @@ export function isMediaBrowserhack(prelude: AtrulePrelude | Raw): boolean {
 				returnValue = true
 				return this.break
 			}
-			// @ts-expect-error outdated css-tree types
 		} else if (type === 'Feature' && kind === 'media') {
 			if (value && value.unit && value.unit === '\\0') {
 				returnValue = true

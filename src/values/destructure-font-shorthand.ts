@@ -1,7 +1,7 @@
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
 import { Identifier, Nr, Operator } from '../css-tree-node-types.js'
-import type { CssNode, Value } from 'css-tree'
+import type { CssNode, Value } from '@eslint/css-tree'
 
 const SYSTEM_FONTS = new KeywordSet(['caption', 'icon', 'menu', 'message-box', 'small-caption', 'status-bar'])
 
@@ -29,13 +29,9 @@ export function isSystemFont(node: Value) {
 	return firstChild.type === Identifier && SYSTEM_FONTS.has(firstChild.name)
 }
 
-/**
- * @param {import('css-tree').Value} value
- * @param {*} stringifyNode
- */
 export function destructure(
 	value: Value,
-	stringifyNode: (node: CssNode) => string,
+	stringifyNode: (node: { loc?: null | { start: { offset: number }; end: { offset: number } } }) => string,
 	cb: ({ type, value }: { type: string; value: string }) => void,
 ) {
 	let font_family: (CssNode | undefined)[] = [undefined, undefined]
@@ -114,12 +110,10 @@ export function destructure(
 		font_family[0] || font_family[1]
 			? stringifyNode({
 					loc: {
-						// @ts-expect-error TODO: fix this
 						start: {
 							// @ts-expect-error TODO: fix this
 							offset: (font_family[0] || font_family[1]).loc!.start.offset,
 						},
-						// @ts-expect-error TODO: fix this
 						end: {
 							// Either the node we detected as the last node, or the end of the whole value
 							// It's never 0 because the first node is always a font-size or font-style
