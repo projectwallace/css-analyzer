@@ -1,4 +1,4 @@
-import { test, expect, describe, expectTypeOf } from 'vitest'
+import { test, expect, describe } from 'vitest'
 import {
 	analyze,
 	compareSpecificity,
