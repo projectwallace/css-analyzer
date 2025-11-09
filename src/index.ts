@@ -230,6 +230,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					let complexity = 1
 
 					// All the AtRules in here MUST have a prelude, so we can count their names
+					// oxlint-disable-next-line no-negated-condition
 					if (node.prelude !== null) {
 						let prelude = node.prelude
 						let preludeStr = prelude && stringifyNode(node.prelude)

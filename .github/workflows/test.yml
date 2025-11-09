@@ -15,8 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Lint JS
-        run: npx oxlint@latest -D perf
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run lint
 
   test:
     name: Unit tests
@@ -56,5 +59,4 @@ jobs:
       - run: npm run build
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      - name: Lint package
-        run: npx publint
+      - run: npm run lint-package

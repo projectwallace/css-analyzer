@@ -1,0 +1,59 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": [
+		"import",
+		"typescript",
+		"oxc",
+		"unicorn"
+	],
+	"env": {
+		"node": true,
+		"browser": true,
+		"es2024": true
+	},
+	"categories": {
+		"perf": "error",
+		"correctness": "error",
+		"pedantic": "error"
+	},
+	"rules": {
+		"unicorn/no-null": "error",
+		"unicorn/prefer-set-has": "off",
+		"prefer-string-slice": "off",
+		"prefer-code-point": "off",
+		"no-lonely-if": "off",
+		"unicorn/no-lonely-if": "off",
+		"no-unused-vars": "off",
+		"no-await-in-loop": "off",
+		"prefer-query-selector": "off",
+		"max-dependencies": "off",
+		"ban-types": "off",
+		"no-undefined": "off",
+		"no-useless-undefined": "off",
+		"max-classes-per-file": "off",
+		"max-lines-per-function": "off",
+		"prefer-math-trunc": "off",
+		"max-lines": "off",
+		"max-depth": [
+			"warn",
+			{
+				"max": 5
+			}
+		],
+		"explicit-function-return-type": "off",
+		"no-console": "off",
+		"no-optional-chaining": "off",
+		"no-commonjs": "off",
+		"unambiguous": "off",
+		"no-default-export": "off",
+		"no-async-await": "off",
+		"no-non-null-assertion": "off",
+		"no-plusplus": "off",
+		"no-bitwise": "off",
+		"default-case": "off",
+		"no-rest-spread-properties": "off",
+		"require-await": "warn",
+		"no-null": "off",
+		"no-warning-comments": "off"
+	}
+}
