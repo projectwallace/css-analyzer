@@ -12,7 +12,7 @@ import { isValueKeyword, keywords, isValueReset } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
 import { ContextCollection } from './context-collection.js'
-import { Collection, type UniqueWithLocations, type Location } from './collection.js'
+import { Collection, type Location } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
 import { strEquals, startsWith, endsWith } from './string-utils.js'
 import { hasVendorPrefix } from './vendor-prefix.js'
@@ -337,40 +337,41 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				}
 				case Selector: {
 					let selector = stringifyNode(node)
+					let loc = node.loc!
 
 					if (this.atrule && endsWith('keyframes', this.atrule.name)) {
-						keyframeSelectors.p(selector, node.loc!)
+						keyframeSelectors.p(selector, loc)
 						return this.skip
 					}
 
 					if (isAccessibility(node)) {
-						a11y.p(selector, node.loc!)
+						a11y.p(selector, loc)
 					}
 
 					let pseudos = hasPseudoClass(node)
 					if (pseudos !== false) {
 						for (let pseudo of pseudos) {
-							pseudoClasses.p(pseudo, node.loc!)
+							pseudoClasses.p(pseudo, loc)
 						}
 					}
 
 					let complexity = getComplexity(node)
 
 					if (isPrefixed(node)) {
-						prefixedSelectors.p(selector, node.loc!)
+						prefixedSelectors.p(selector, loc)
 					}
 
 					uniqueSelectors.add(selector)
 					selectorComplexities.push(complexity)
-					uniqueSelectorComplexities.p(complexity, node.loc!)
+					uniqueSelectorComplexities.p(complexity, loc)
 					selectorNesting.push(nestingDepth - 1)
-					uniqueSelectorNesting.p(nestingDepth - 1, node.loc!)
+					uniqueSelectorNesting.p(nestingDepth - 1, loc)
 
 					// #region specificity
-					let specificity = calculateForAST(node).toArray()
+					let specificity: Specificity = calculateForAST(node).toArray()
 					let [sa, sb, sc] = specificity
 
-					uniqueSpecificities.p(specificity.toString(), node.loc!)
+					uniqueSpecificities.p(specificity.toString(), loc)
 
 					specificityA.push(sa)
 					specificityB.push(sb)
@@ -396,7 +397,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					// #endregion
 
 					if (sa > 0) {
-						ids.p(selector, node.loc!)
+						ids.p(selector, loc)
 					}
 
 					getCombinators(node, function onCombinator(combinator) {

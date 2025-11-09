@@ -11,6 +11,7 @@
 		// Strictness
 		"strict": true,
 		"noUncheckedIndexedAccess": true,
+		"noImplicitAny": true,
 
 		// Type checking, not transpiling
 		"module": "ESNext",
