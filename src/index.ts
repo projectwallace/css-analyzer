@@ -12,7 +12,7 @@ import { isValueKeyword, keywords, isValueReset } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
 import { ContextCollection } from './context-collection.js'
-import { Collection } from './collection.js'
+import { Collection, type UniqueWithLocations, type Location } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
 import { strEquals, startsWith, endsWith } from './string-utils.js'
 import { hasVendorPrefix } from './vendor-prefix.js'
@@ -24,7 +24,7 @@ import { Atrule, Selector, Dimension, Url, Value, Hash, Rule, Identifier, Func, 
 import { KeywordSet } from './keyword-set.js'
 import type { CssNode, Declaration, SelectorList } from 'css-tree'
 
-type Specificity = [number, number, number]
+export type Specificity = [number, number, number]
 
 let border_radius_properties = new KeywordSet([
 	'border-radius',
@@ -63,14 +63,14 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 	/**
 	 * Recreate the authored CSS from a CSSTree node
-	 * @param {import('css-tree').CssNode} node - Node from CSSTree AST to stringify
-	 * @returns {string} str - The stringified node
+	 * @param node - Node from CSSTree AST to stringify
+	 * @returns The stringified node
 	 */
-	function stringifyNode(node: CssNode) {
+	function stringifyNode(node: CssNode): string {
 		return stringifyNodePlain(node).trim()
 	}
 
-	function stringifyNodePlain(node: CssNode) {
+	function stringifyNodePlain(node: CssNode): string {
 		let loc = node.loc!
 		return css.substring(loc.start.offset, loc.end.offset)
 	}
@@ -86,7 +86,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			{
 				size: number
 				count: number
-				uniqueWithLocations?: { offset: number; line: number; column: number; length: number }[]
+				uniqueWithLocations?: Location[]
 			}
 		>,
 	}
@@ -1032,3 +1032,5 @@ export { keywords as cssKeywords } from './values/values.js'
 export { hasVendorPrefix } from './vendor-prefix.js'
 
 export { KeywordSet } from './keyword-set.js'
+
+export type { Location, UniqueWithLocations } from './collection.js'
