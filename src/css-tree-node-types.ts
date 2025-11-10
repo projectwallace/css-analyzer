@@ -1,21 +1,21 @@
 // Atrule
 export const Atrule = 'Atrule'
 export const MediaQuery = 'MediaQuery'
-export const MediaFeature = 'MediaFeature'
+// export const MediaFeature = 'MediaFeature'
 // Rule
 export const Rule = 'Rule'
 
 // Selector
 export const Selector = 'Selector'
-export const TypeSelector = 'TypeSelector'
-export const PseudoClassSelector = 'PseudoClassSelector'
-export const AttributeSelector = 'AttributeSelector'
-export const IdSelector = 'IdSelector'
-export const ClassSelector = 'ClassSelector'
-export const PseudoElementSelector = 'PseudoElementSelector'
+// export const TypeSelector = 'TypeSelector'
+// export const PseudoClassSelector = 'PseudoClassSelector'
+// export const AttributeSelector = 'AttributeSelector'
+// export const IdSelector = 'IdSelector'
+// export const ClassSelector = 'ClassSelector'
+// export const PseudoElementSelector = 'PseudoElementSelector'
 
 // Declaration
-export const Declaration = 'Declaration'
+// export const Declaration = 'Declaration'
 
 // Values
 export const Value = 'Value'
