@@ -54,6 +54,7 @@
   },
   "devDependencies": {
     "@codecov/vite-plugin": "^1.9.1",
+    "@projectwallace/preset-oxlint": "^0.0.6",
     "@types/css-tree": "^2.3.11",
     "c8": "^10.1.3",
     "knip": "^5.68.0",

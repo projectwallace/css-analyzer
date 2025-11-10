@@ -1,4 +1,4 @@
-import { test, expect, describe } from 'vitest'
+import { test, it, expect, describe } from 'vitest'
 import {
 	analyze,
 	compareSpecificity,
@@ -23,7 +23,7 @@ import {
 } from './index.js'
 
 describe('Public API', () => {
-	test("exposes the 'analyze' method", () => {
+	it("exposes the 'analyze' method", () => {
 		expect(typeof analyze).toBe('function')
 	})
 
