@@ -1,3 +1,5 @@
+import { str_equals } from '@projectwallace/css-parser'
+
 /**
  * Case-insensitive compare two character codes
  * @see https://github.com/csstree/csstree/blob/41f276e8862d8223eeaa01a3d113ab70bb13d2d9/lib/tokenizer/utils.js#L22
@@ -24,18 +26,7 @@ function compareChar(referenceCode: number, testCode: number): boolean {
  * @returns true if the two strings are the same, false otherwise
  */
 export function strEquals(base: string, maybe: string): boolean {
-	if (base === maybe) return true
-
-	let len = base.length
-	if (len !== maybe.length) return false
-
-	for (let i = 0; i < len; i++) {
-		if (compareChar(base.charCodeAt(i), maybe.charCodeAt(i)) === false) {
-			return false
-		}
-	}
-
-	return true
+	return str_equals(base, maybe)
 }
 
 /**
