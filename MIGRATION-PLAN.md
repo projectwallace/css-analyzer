@@ -86,13 +86,114 @@ During migration planning, we discovered that Wallace parser and css-tree have f
 - Plan full migration for a major version bump
 - Risk: Dependency on both parsers
 
-### Recommendation
-Phase 1 (string utilities) provides immediate value with zero risk. For the full parser migration, **Option B (compatibility adapter)** would enable the safest gradual migration path, though it requires implementing the adapter first.
+### Decision: Option C (Dual Parser Approach)
+
+After attempting Option B (compatibility adapter), we discovered a fundamental blocker: the compatibility shim can only intercept imports in files we modify (like index.ts), but other files throughout the codebase (like `selectors/utils.ts`, `atrules/atrules.ts`) import css-tree's walk function directly. When these files receive Wallace nodes, css-tree's walk fails with errors like "ref.reduce is not a function".
+
+**The dual parser approach (Option C) is the safest path forward:**
+1. Keep css-tree for main analysis (current working state)
+2. Add Wallace parser running in parallel to validate results
+3. Gradually migrate analysis logic from css-tree to Wallace
+4. Compare outputs to ensure correctness
+5. Eventually remove css-tree dependency
+
+This approach:
+- ✅ Maintains working system throughout migration
+- ✅ Validates Wallace parser correctness before switching
+- ✅ Allows incremental feature migration
+- ✅ No compatibility layer complexity
+- ✅ Easy rollback at any point
 
 ---
 
-## Phase 2: Small Files - Values (5 steps)
-**Status:** ⏸️ BLOCKED - Requires index.ts migration first
+## Phase 2: Dual Parser Implementation (4 steps)
+**Status:** 🚧 IN PROGRESS
+
+### Step 2.1: Add Wallace parser alongside css-tree
+**File:** `src/index.ts`
+
+Create a parallel Wallace-based analysis function that runs alongside the existing css-tree analysis:
+
+```typescript
+// At top of file, import Wallace
+import { parse as wallaceParse } from '@projectwallace/css-parser'
+
+// Create new function
+function analyzeWithWallace(css: string) {
+	const ast = wallaceParse(css)
+	// Basic structure analysis
+	return {
+		rulesCount: 0, // To be implemented
+		declarations Count: 0,
+		// Add more as we build it out
+	}
+}
+```
+
+**Validation:** `npm run check && npm run lint`
+
+**Commit:** "feat: add Wallace parser running alongside css-tree"
+
+---
+
+### Step 2.2: Compare basic metrics
+**File:** `src/index.ts`
+
+In development/test mode, run both parsers and compare results:
+
+```typescript
+export function analyze(css: string, options?: AnalyzeOptions) {
+	const cssTreeResult = analyzeInternal(css, options)
+
+	if (process.env.NODE_ENV === 'development' || process.env.WALLACE_COMPARE) {
+		const wallaceResult = analyzeWithWallace(css)
+		compareResults(cssTreeResult, wallaceResult)
+	}
+
+	return cssTreeResult
+}
+```
+
+**Validation:** Tests pass, comparison logs show in development
+
+**Commit:** "feat: add dual parser comparison in development mode"
+
+---
+
+### Step 2.3: Migrate first metric (stylesheet.size)
+**File:** `src/index.ts`
+
+Move the simplest metric (stylesheet size) to Wallace parser:
+
+```typescript
+function analyzeWithWallace(css: string) {
+	const ast = wallaceParse(css)
+	return {
+		stylesheet: {
+			size: css.length, // Simple, no parsing needed
+			// ... more to come
+		}
+	}
+}
+```
+
+**Validation:** Comparison shows matching size
+
+**Commit:** "feat: migrate stylesheet.size to Wallace parser"
+
+---
+
+### Step 2.4: Document learnings
+**File:** `parser-improvements.md`
+
+Update with any API issues discovered during dual parser implementation.
+
+**Commit:** "docs: update parser improvements from dual parser work"
+
+---
+
+## Phase 3: Small Files - Values (5 steps)
+**Status:** ⏸️ DEFERRED - Focus on dual parser first
 
 ### Step 2.1: values/browserhacks.ts
 ### Step 2.2: values/values.ts

@@ -2,6 +2,8 @@
 import parse from 'css-tree/parser'
 // @ts-expect-error types missing
 import walk from 'css-tree/walker'
+// Wallace parser for dual-parser migration
+import { parse as wallaceParse, walk as wallaceWalk } from '@projectwallace/css-parser'
 // @ts-expect-error types missing
 import { calculateForAST } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
@@ -52,10 +54,68 @@ export function analyze(css: string, options?: Options & { useLocations?: false 
 export function analyze(css: string, options: Options & { useLocations: true }): ReturnType<typeof analyzeInternal<true>>
 export function analyze(css: string, options: Options = {}): any {
 	const useLocations = options.useLocations === true
+
+	// Dual parser comparison (experimental - for migration validation)
+	if (process.env.WALLACE_COMPARE === 'true') {
+		const wallaceResult = analyzeWithWallace(css)
+		const cssTreeResult = useLocations ? analyzeInternal(css, options, true) : analyzeInternal(css, options, false)
+
+		// Compare basic metrics
+		console.log('[WALLACE_COMPARE] Stylesheet size:', {
+			wallace: wallaceResult.stylesheet.size,
+			cssTree: cssTreeResult.stylesheet.size,
+			match: wallaceResult.stylesheet.size === cssTreeResult.stylesheet.size
+		})
+		console.log('[WALLACE_COMPARE] Rules count:', {
+			wallace: wallaceResult.rules.total,
+			cssTree: cssTreeResult.rules.total,
+			match: wallaceResult.rules.total === cssTreeResult.rules.total
+		})
+		console.log('[WALLACE_COMPARE] Declarations count:', {
+			wallace: wallaceResult.declarations.total,
+			cssTree: cssTreeResult.declarations.total,
+			match: wallaceResult.declarations.total === cssTreeResult.declarations.total
+		})
+
+		return cssTreeResult
+	}
+
 	if (useLocations) {
 		return analyzeInternal(css, options, true)
 	}
 	return analyzeInternal(css, options, false)
+}
+
+/**
+ * Experimental: Analyze CSS with Wallace parser
+ * This runs in parallel with css-tree for validation during migration
+ */
+function analyzeWithWallace(css: string) {
+	const ast = wallaceParse(css)
+
+	let rulesCount = 0
+	let declarationsCount = 0
+
+	// Simple walk to count nodes
+	wallaceWalk(ast, (node: any) => {
+		if (node.type_name === 'Rule') {
+			rulesCount++
+		} else if (node.type_name === 'Declaration') {
+			declarationsCount++
+		}
+	})
+
+	return {
+		stylesheet: {
+			size: css.length,
+		},
+		rules: {
+			total: rulesCount,
+		},
+		declarations: {
+			total: declarationsCount,
+		},
+	}
 }
 
 function analyzeInternal<T extends boolean>(css: string, options: Options, useLocations: T) {
