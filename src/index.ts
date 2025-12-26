@@ -217,6 +217,11 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			}
 		} else if (node.type_name === 'Declaration') {
 			totalDeclarations++
+
+			// Count important declarations
+			if (node.is_important) {
+				importantDeclarations++
+			}
 		}
 
 		// Walk children
@@ -735,7 +740,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					uniqueDeclarationNesting.p(nestingDepth - 1, node.loc!)
 
 					if (node.important === true) {
-						importantDeclarations++
+						// importantDeclarations now counted by Wallace parser
 						complexity++
 
 						if (this.atrule && endsWith('keyframes', this.atrule.name)) {
