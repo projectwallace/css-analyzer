@@ -106,10 +106,10 @@ This approach:
 
 ---
 
-## Phase 2: Incremental Wallace Migration ✅ COMPLETE
-**Status:** Wallace parser now actively handling functionality
+## Phase 2: Incremental Wallace Migration ⚠️ PARTIAL
+**Status:** Wallace parser handling rules and declarations counting
 
-### Step 2.1: Wallace takes over counting ✅
+### Step 2.1: Wallace takes over rules and declarations counting ✅
 **File:** `src/index.ts`
 **Commit:** `ae03e79` - "refactor: Wallace parser takes over rules and declarations counting"
 
@@ -123,6 +123,31 @@ Implemented:
 - ✅ Rules counting: Migrated from css-tree to Wallace
 - ✅ Declarations counting: Migrated from css-tree to Wallace
 - ✅ Identical output - zero behavioral changes
+
+---
+
+### Step 2.2: Attempted selector counting migration ❌ BLOCKED
+**File:** `src/index.ts`
+**Status:** Attempted but reverted due to Wallace parser bug
+
+**Attempt:**
+- Added manual context tracking (`currentAtruleName`, `inSelectorList`)
+- Counted Selector nodes that are direct children of SelectorList
+- Excluded selectors inside @keyframes
+- Avoided counting nested selectors (e.g., inside `:not()`, `:is()`)
+
+**Blocker discovered:** Wallace parser bug with comments in selector lists
+- When a comment appears between comma-separated selectors, Wallace stops parsing
+- Example: 6 selectors in list, but Wallace only parses 4 (stops at comment)
+- Test case: `src/selectors/selectors.test.ts` - "counts Accessibility selectors"
+- See `parser-improvements.md` "Parser Bugs > Comments in Selector Lists" for details
+
+**Resolution:**
+- Reverted selector counting back to css-tree approach: `totalSelectors = selectorComplexities.size()`
+- Simplified Wallace walk to only count Rules and Declarations
+- All 228 tests passing
+
+**Lesson learned:** Wallace parser has parsing bugs that block migration of certain metrics
 
 ---
 

@@ -25,6 +25,35 @@ Issues and enhancement suggestions discovered during css-tree → Wallace parser
 
 **Suggestion:** Provide a css-tree compatibility adapter that wraps Wallace nodes to match css-tree's API, enabling gradual migration.
 
+## Parser Bugs
+
+### Comments in Selector Lists
+**Issue:** When a comment appears inside a selector list (between comma-separated selectors), the Wallace parser stops parsing the selector list and does not include selectors that appear after the comment.
+
+**Example:**
+```css
+[aria-hidden],
+img[role="presentation"],
+.selector:not([role="tablist"]),
+body[role=tabpanel]:focus,
+
+/* comment here */
+img[loading="lazy"],
+[hidden] {}
+```
+
+**Expected behavior:** 6 selectors in the SelectorList
+**Actual behavior:** 4 selectors in the SelectorList (stops at comment)
+
+**Impact:**
+- Selector counting is incorrect when comments exist in selector lists
+- Cannot rely on Wallace for accurate selector metrics
+- Blocks migration of selector-related analysis
+
+**Workaround:** Continue using css-tree for selector counting until fixed.
+
+**Test case:** See `src/selectors/selectors.test.ts` - "counts Accessibility selectors"
+
 ## Type Definition Issues
 _(To be filled during migration)_
 
