@@ -192,9 +192,15 @@ This approach:
 - ⏸️ Selector metrics (blocked by parser bug)
 
 **Blockers:**
-- Location tracking: Wallace location format differs from css-tree
-- Selector counting: Parser bug with comments in selector lists
-- Context tracking: Some metrics need parent context (e.g., importantsInKeyframes)
+- **Invalid CSS / Browser Hacks**: Wallace doesn't parse intentionally invalid CSS (e.g., `*zoom`, `_width`)
+  - Properties with hacks CANNOT be migrated to Wallace
+  - Must keep css-tree for property tracking that needs hack detection
+  - Discovered: Wallace only parses valid CSS declarations
+- **Selector counting**: Parser bug with comments in selector lists
+- **Context tracking**: Some metrics need parent context (e.g., importantsInKeyframes)
+- **Wallace AST Structure**: Blocks appear in BOTH `children` array AND `block` property
+  - Walking both causes double-counting
+  - Solution: Only walk `children`, Block nodes are already there
 
 ---
 
