@@ -203,17 +203,23 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	// Use Wallace parser to count basic structures (migrating from css-tree)
 	let wallaceAst = wallaceParse(css)
 
-	function wallaceWalk(node: CSSNode) {
-		// Count nodes
-		if (node.type_name === 'Rule') {
+	function wallaceWalk(node: CSSNode, depth: number = 0) {
+		// Count nodes and track nesting
+		if (node.type_name === 'Atrule') {
+			atruleNesting.push(depth)
+		} else if (node.type_name === 'Rule') {
 			totalRules++
+			ruleNesting.push(depth)
 
 			// Check if rule is empty (no declarations in block)
 			if (node.block && node.block.is_empty) {
 				emptyRules++
 			}
+		} else if (node.type_name === 'Selector') {
+			selectorNesting.push(depth > 0 ? depth - 1 : 0)
 		} else if (node.type_name === 'Declaration') {
 			totalDeclarations++
+			declarationNesting.push(depth > 0 ? depth - 1 : 0)
 
 			// Count important declarations
 			if (node.is_important) {
@@ -221,10 +227,12 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			}
 		}
 
-		// Walk children
+		// Walk children with increased depth for Rules and Atrules
+		const nextDepth = (node.type_name === 'Rule' || node.type_name === 'Atrule') ? depth + 1 : depth
+
 		if (node.children && Array.isArray(node.children)) {
 			for (const child of node.children) {
-				wallaceWalk(child)
+				wallaceWalk(child, nextDepth)
 			}
 		}
 	}
@@ -236,7 +244,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			switch (node.type) {
 				case Atrule: {
 					atrules.p(node.name, node.loc!)
-					atruleNesting.push(nestingDepth)
+					// atruleNesting now tracked by Wallace parser
 					uniqueAtruleNesting.p(nestingDepth, node.loc!)
 
 					let atRuleName = node.name
@@ -358,7 +366,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					uniqueSelectorsPerRule.p(numSelectors, prelude.loc!)
 					declarationsPerRule.push(numDeclarations)
 					uniqueDeclarationsPerRule.p(numDeclarations, block.loc!)
-					ruleNesting.push(nestingDepth)
+					// ruleNesting now tracked by Wallace parser
 					uniqueRuleNesting.p(nestingDepth, node.loc!)
 
 					// emptyRules now counted by Wallace parser
@@ -393,7 +401,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					uniqueSelectors.add(selector)
 					selectorComplexities.push(complexity)
 					uniqueSelectorComplexities.p(complexity, loc)
-					selectorNesting.push(nestingDepth - 1)
+					// selectorNesting now tracked by Wallace parser
 					uniqueSelectorNesting.p(nestingDepth - 1, loc)
 
 					// #region specificity
@@ -733,7 +741,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					let complexity = 1
 
 					uniqueDeclarations.add(stringifyNode(node))
-					declarationNesting.push(nestingDepth - 1)
+					// declarationNesting now tracked by Wallace parser
 					uniqueDeclarationNesting.p(nestingDepth - 1, node.loc!)
 
 					if (node.important === true) {
