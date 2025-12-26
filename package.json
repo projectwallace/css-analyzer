@@ -50,6 +50,7 @@
   ],
   "dependencies": {
     "@bramus/specificity": "^2.4.2",
+    "@projectwallace/css-parser": "^0.8.6",
     "css-tree": "^3.1.0"
   },
   "devDependencies": {
