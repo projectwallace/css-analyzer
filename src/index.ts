@@ -215,6 +215,40 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			if (node.block && node.block.is_empty) {
 				emptyRules++
 			}
+
+			// Count selectors and declarations in this rule
+			let numSelectors = 0
+			let numDeclarations = 0
+
+			// Find the SelectorList child and count Selector nodes inside it
+			if (node.children && Array.isArray(node.children)) {
+				for (const child of node.children) {
+					if (child.type_name === 'SelectorList') {
+						// Count Selector nodes inside the SelectorList
+						if (child.children && Array.isArray(child.children)) {
+							for (const selector of child.children) {
+								if (selector.type_name === 'Selector') {
+									numSelectors++
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// Count declarations in the block
+			if (node.block && node.block.children && Array.isArray(node.block.children)) {
+				for (const child of node.block.children) {
+					if (child.type_name === 'Declaration') {
+						numDeclarations++
+					}
+				}
+			}
+
+			// Track rule metrics
+			ruleSizes.push(numSelectors + numDeclarations)
+			selectorsPerRule.push(numSelectors)
+			declarationsPerRule.push(numDeclarations)
 		} else if (node.type_name === 'Selector') {
 			selectorNesting.push(depth > 0 ? depth - 1 : 0)
 		} else if (node.type_name === 'Declaration') {
@@ -360,11 +394,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					let numSelectors = preludeChildren ? preludeChildren.size : 0
 					let numDeclarations = blockChildren ? blockChildren.size : 0
 
-					ruleSizes.push(numSelectors + numDeclarations)
+					// ruleSizes, selectorsPerRule, declarationsPerRule now tracked by Wallace parser
 					uniqueRuleSize.p(numSelectors + numDeclarations, node.loc!)
-					selectorsPerRule.push(numSelectors)
 					uniqueSelectorsPerRule.p(numSelectors, prelude.loc!)
-					declarationsPerRule.push(numDeclarations)
 					uniqueDeclarationsPerRule.p(numDeclarations, block.loc!)
 					// ruleNesting now tracked by Wallace parser
 					uniqueRuleNesting.p(nestingDepth, node.loc!)
