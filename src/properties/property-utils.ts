@@ -1,5 +1,6 @@
 import { hasVendorPrefix } from '../vendor-prefix.js'
 import { endsWith } from '../string-utils.js'
+import { is_custom } from '@projectwallace/css-parser'
 
 /**
  * @see https://github.com/csstree/csstree/blob/master/lib/utils/names.js#L69
@@ -21,9 +22,7 @@ export function isHack(property: string): boolean {
 }
 
 export function isCustom(property: string): boolean {
-	if (property.length < 3) return false
-	// 45 === '-'.charCodeAt(0)
-	return property.charCodeAt(0) === 45 && property.charCodeAt(1) === 45
+	return is_custom(property)
 }
 
 /**
