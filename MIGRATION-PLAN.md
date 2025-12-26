@@ -116,6 +116,8 @@ This approach:
 - `ae03e79` - Rules and declarations counting
 - `959ae8d` - Empty rules counting
 - `2ff3cf3` - Important declarations counting
+- `1e53dcc` - Use Wallace is_empty property
+- `b517953` - Nesting depth tracking
 
 **Implemented:**
 - Wallace parse+walk inside `analyzeInternal()`
@@ -124,15 +126,17 @@ This approach:
 - Double parse/walk tradeoff accepted for incremental migration
 
 **Results:** All 228 tests pass - Wallace now handles:
-- ✅ Rules counting
-- ✅ Declarations counting
-- ✅ Empty rules counting (checking `node.block.children` length)
-- ✅ Important declarations counting (using `node.is_important` flag)
+- ✅ Rules counting (`totalRules++`)
+- ✅ Declarations counting (`totalDeclarations++`)
+- ✅ Empty rules counting (`node.block.is_empty`)
+- ✅ Important declarations counting (`node.is_important`)
+- ✅ Nesting depth tracking (atruleNesting, ruleNesting, selectorNesting, declarationNesting)
 
 **Remaining with css-tree:**
 - Selectors (blocked by parser bug)
 - Collections requiring locations (properties, values, etc.)
 - Context-dependent metrics (importantsInKeyframes, etc.)
+- Unique nesting collections (need location format unification)
 
 ---
 
@@ -161,59 +165,28 @@ This approach:
 
 ---
 
-### Step 2.2: Compare basic metrics
-**File:** `src/index.ts`
+### Strategy: Incremental Integration
 
-In development/test mode, run both parsers and compare results:
+**Approach:** Wallace parser gradually takes over more functionality within the existing `analyzeInternal()` function:
+1. Wallace walk runs before css-tree walk
+2. Wallace updates metric variables directly (e.g., `totalRules++`, `emptyRules++`)
+3. Remove corresponding logic from css-tree walk
+4. Tests validate correctness after each migration
+5. No comparison mode - direct replacement with test validation
 
-```typescript
-export function analyze(css: string, options?: AnalyzeOptions) {
-	const cssTreeResult = analyzeInternal(css, options)
+**Next metrics to migrate:**
+- ✅ Basic counting (rules, declarations, empty rules, importants)
+- ✅ Nesting depth tracking (aggregate collections)
+- 🎯 Simple metrics: ruleSizes, selectorsPerRule, declarationsPerRule
+- 🎯 Complexity calculations (atruleComplexities, selectorComplexities, etc.)
+- 🎯 Declaration/selector uniqueness tracking
+- ⏸️ Context-dependent metrics (blocked until locations support)
+- ⏸️ Selector metrics (blocked by parser bug)
 
-	if (process.env.NODE_ENV === 'development' || process.env.WALLACE_COMPARE) {
-		const wallaceResult = analyzeWithWallace(css)
-		compareResults(cssTreeResult, wallaceResult)
-	}
-
-	return cssTreeResult
-}
-```
-
-**Validation:** Tests pass, comparison logs show in development
-
-**Commit:** "feat: add dual parser comparison in development mode"
-
----
-
-### Step 2.3: Migrate first metric (stylesheet.size)
-**File:** `src/index.ts`
-
-Move the simplest metric (stylesheet size) to Wallace parser:
-
-```typescript
-function analyzeWithWallace(css: string) {
-	const ast = wallaceParse(css)
-	return {
-		stylesheet: {
-			size: css.length, // Simple, no parsing needed
-			// ... more to come
-		}
-	}
-}
-```
-
-**Validation:** Comparison shows matching size
-
-**Commit:** "feat: migrate stylesheet.size to Wallace parser"
-
----
-
-### Step 2.4: Document learnings
-**File:** `parser-improvements.md`
-
-Update with any API issues discovered during dual parser implementation.
-
-**Commit:** "docs: update parser improvements from dual parser work"
+**Blockers:**
+- Location tracking: Wallace location format differs from css-tree
+- Selector counting: Parser bug with comments in selector lists
+- Context tracking: Some metrics need parent context (e.g., importantsInKeyframes)
 
 ---
 
