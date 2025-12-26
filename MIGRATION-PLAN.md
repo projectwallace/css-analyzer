@@ -118,6 +118,7 @@ This approach:
 - `2ff3cf3` - Important declarations counting
 - `1e53dcc` - Use Wallace is_empty property
 - `b517953` - Nesting depth tracking
+- `db7115d` - Rule metrics (ruleSizes, selectorsPerRule, declarationsPerRule)
 
 **Implemented:**
 - Wallace parse+walk inside `analyzeInternal()`
@@ -131,12 +132,19 @@ This approach:
 - ✅ Empty rules counting (`node.block.is_empty`)
 - ✅ Important declarations counting (`node.is_important`)
 - ✅ Nesting depth tracking (atruleNesting, ruleNesting, selectorNesting, declarationNesting)
+- ✅ Rule metrics (ruleSizes, selectorsPerRule, declarationsPerRule)
+
+**AST Structure Learning:**
+- Rule has children: `[SelectorList, Block]`
+- SelectorList contains Selector nodes (count these for selectorsPerRule)
+- Block contains Declaration nodes (count these for declarationsPerRule)
 
 **Remaining with css-tree:**
 - Selectors (blocked by parser bug)
 - Collections requiring locations (properties, values, etc.)
 - Context-dependent metrics (importantsInKeyframes, etc.)
 - Unique nesting collections (need location format unification)
+- Complexity calculations (need algorithm porting or context)
 
 ---
 
