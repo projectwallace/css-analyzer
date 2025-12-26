@@ -54,68 +54,10 @@ export function analyze(css: string, options?: Options & { useLocations?: false 
 export function analyze(css: string, options: Options & { useLocations: true }): ReturnType<typeof analyzeInternal<true>>
 export function analyze(css: string, options: Options = {}): any {
 	const useLocations = options.useLocations === true
-
-	// Dual parser comparison (experimental - for migration validation)
-	if (process.env.WALLACE_COMPARE === 'true') {
-		const wallaceResult = analyzeWithWallace(css)
-		const cssTreeResult = useLocations ? analyzeInternal(css, options, true) : analyzeInternal(css, options, false)
-
-		// Compare basic metrics
-		console.log('[WALLACE_COMPARE] Stylesheet size:', {
-			wallace: wallaceResult.stylesheet.size,
-			cssTree: cssTreeResult.stylesheet.size,
-			match: wallaceResult.stylesheet.size === cssTreeResult.stylesheet.size
-		})
-		console.log('[WALLACE_COMPARE] Rules count:', {
-			wallace: wallaceResult.rules.total,
-			cssTree: cssTreeResult.rules.total,
-			match: wallaceResult.rules.total === cssTreeResult.rules.total
-		})
-		console.log('[WALLACE_COMPARE] Declarations count:', {
-			wallace: wallaceResult.declarations.total,
-			cssTree: cssTreeResult.declarations.total,
-			match: wallaceResult.declarations.total === cssTreeResult.declarations.total
-		})
-
-		return cssTreeResult
-	}
-
 	if (useLocations) {
 		return analyzeInternal(css, options, true)
 	}
 	return analyzeInternal(css, options, false)
-}
-
-/**
- * Experimental: Analyze CSS with Wallace parser
- * This runs in parallel with css-tree for validation during migration
- */
-function analyzeWithWallace(css: string) {
-	const ast = wallaceParse(css)
-
-	let rulesCount = 0
-	let declarationsCount = 0
-
-	// Simple walk to count nodes
-	wallaceWalk(ast, (node: any) => {
-		if (node.type_name === 'Rule') {
-			rulesCount++
-		} else if (node.type_name === 'Declaration') {
-			declarationsCount++
-		}
-	})
-
-	return {
-		stylesheet: {
-			size: css.length,
-		},
-		rules: {
-			total: rulesCount,
-		},
-		declarations: {
-			total: declarationsCount,
-		},
-	}
 }
 
 function analyzeInternal<T extends boolean>(css: string, options: Options, useLocations: T) {
@@ -258,6 +200,16 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 	let nestingDepth = 0
 
+	// Use Wallace parser to count rules and declarations (migrating from css-tree)
+	let wallaceAst = wallaceParse(css)
+	wallaceWalk(wallaceAst, (node: any) => {
+		if (node.type_name === 'Rule') {
+			totalRules++
+		} else if (node.type_name === 'Declaration') {
+			totalDeclarations++
+		}
+	})
+
 	walk(ast, {
 		enter(node: CssNode) {
 			switch (node.type) {
@@ -387,8 +339,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					uniqueDeclarationsPerRule.p(numDeclarations, block.loc!)
 					ruleNesting.push(nestingDepth)
 					uniqueRuleNesting.p(nestingDepth, node.loc!)
-
-					totalRules++
 
 					if (numDeclarations === 0) {
 						emptyRules++
@@ -761,7 +711,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						return this.skip
 					}
 
-					totalDeclarations++
 					let complexity = 1
 
 					uniqueDeclarations.add(stringifyNode(node))
