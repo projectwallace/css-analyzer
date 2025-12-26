@@ -1,4 +1,4 @@
-import { str_equals } from '@projectwallace/css-parser'
+import { str_equals, str_starts_with } from '@projectwallace/css-parser'
 
 /**
  * Case-insensitive compare two character codes
@@ -69,17 +69,7 @@ export function endsWith(base: string, maybe: string): boolean {
  *
  * @returns true if `base` starts with `maybe`, false otherwise
  */
-export function startsWith(base: string, maybe: string) {
-	if (base === maybe) return true
-
-	let len = base.length
-	if (maybe.length < len) return false
-
-	for (let i = 0; i < len; i++) {
-		if (compareChar(base.charCodeAt(i), maybe.charCodeAt(i)) === false) {
-			return false
-		}
-	}
-
-	return true
+export function startsWith(base: string, maybe: string): boolean {
+	// Note: parameter order is swapped - Wallace's str_starts_with takes (string, prefix)
+	return str_starts_with(maybe, base)
 }
