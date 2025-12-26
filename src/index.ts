@@ -142,7 +142,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let uniqueRuleNesting = new Collection(useLocations)
 
 	// Selectors
-	let totalSelectors = 0
 	let keyframeSelectors = new Collection(useLocations)
 	let uniqueSelectors = new Set()
 	let prefixedSelectors = new Collection(useLocations)
@@ -203,13 +202,24 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 	// Use Wallace parser to count basic structures (migrating from css-tree)
 	let wallaceAst = wallaceParse(css)
-	wallaceWalk(wallaceAst, (node: CSSNode) => {
+
+	function wallaceWalk(node: CSSNode) {
+		// Count nodes
 		if (node.type_name === 'Rule') {
 			totalRules++
 		} else if (node.type_name === 'Declaration') {
 			totalDeclarations++
 		}
-	})
+
+		// Walk children
+		if (node.children && Array.isArray(node.children)) {
+			for (const child of node.children) {
+				wallaceWalk(child)
+			}
+		}
+	}
+
+	wallaceWalk(wallaceAst)
 
 	walk(ast, {
 		enter(node: CssNode) {
