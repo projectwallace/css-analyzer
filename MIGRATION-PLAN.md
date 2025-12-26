@@ -106,23 +106,33 @@ This approach:
 
 ---
 
-## Phase 2: Incremental Wallace Migration ⚠️ PARTIAL
-**Status:** Wallace parser handling rules and declarations counting
+## Phase 2: Incremental Wallace Migration 🚧 IN PROGRESS
+**Status:** Wallace parser handling basic counting metrics
 
-### Step 2.1: Wallace takes over rules and declarations counting ✅
+### Step 2.1: Wallace takes over basic counting metrics ✅
 **File:** `src/index.ts`
-**Commit:** `ae03e79` - "refactor: Wallace parser takes over rules and declarations counting"
 
-Implemented:
+**Commits:**
+- `ae03e79` - Rules and declarations counting
+- `959ae8d` - Empty rules counting
+- `2ff3cf3` - Important declarations counting
+
+**Implemented:**
 - Wallace parse+walk inside `analyzeInternal()`
-- Wallace updates `totalRules` and `totalDeclarations` directly
-- Removed counting from css-tree walk (deleted `totalRules++` and `totalDeclarations++`)
+- Wallace directly updates metrics variables (no Wallace-specific vars)
+- Removed counting logic from css-tree walk
 - Double parse/walk tradeoff accepted for incremental migration
 
-**Results:** All 228 tests pass - Wallace now owns this functionality!
-- ✅ Rules counting: Migrated from css-tree to Wallace
-- ✅ Declarations counting: Migrated from css-tree to Wallace
-- ✅ Identical output - zero behavioral changes
+**Results:** All 228 tests pass - Wallace now handles:
+- ✅ Rules counting
+- ✅ Declarations counting
+- ✅ Empty rules counting (checking `node.block.children` length)
+- ✅ Important declarations counting (using `node.is_important` flag)
+
+**Remaining with css-tree:**
+- Selectors (blocked by parser bug)
+- Collections requiring locations (properties, values, etc.)
+- Context-dependent metrics (importantsInKeyframes, etc.)
 
 ---
 

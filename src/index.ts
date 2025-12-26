@@ -209,11 +209,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			totalRules++
 
 			// Check if rule is empty (no declarations in block)
-			if (node.block && node.block.children) {
-				const hasDeclarations = node.block.children.some((child: CSSNode) => child.type_name === 'Declaration')
-				if (!hasDeclarations) {
-					emptyRules++
-				}
+			if (node.block && node.block.is_empty) {
+				emptyRules++
 			}
 		} else if (node.type_name === 'Declaration') {
 			totalDeclarations++
