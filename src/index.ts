@@ -207,6 +207,14 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 		// Count nodes
 		if (node.type_name === 'Rule') {
 			totalRules++
+
+			// Check if rule is empty (no declarations in block)
+			if (node.block && node.block.children) {
+				const hasDeclarations = node.block.children.some((child: CSSNode) => child.type_name === 'Declaration')
+				if (!hasDeclarations) {
+					emptyRules++
+				}
+			}
 		} else if (node.type_name === 'Declaration') {
 			totalDeclarations++
 		}
@@ -351,9 +359,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					ruleNesting.push(nestingDepth)
 					uniqueRuleNesting.p(nestingDepth, node.loc!)
 
-					if (numDeclarations === 0) {
-						emptyRules++
-					}
+					// emptyRules now counted by Wallace parser
 					break
 				}
 				case Selector: {
