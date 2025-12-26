@@ -3,7 +3,7 @@ import parse from 'css-tree/parser'
 // @ts-expect-error types missing
 import walk from 'css-tree/walker'
 // Wallace parser for dual-parser migration
-import { parse as wallaceParse, walk as wallaceWalk } from '@projectwallace/css-parser'
+import { CSSNode, parse as wallaceParse, walk as wallaceWalk } from '@projectwallace/css-parser'
 // @ts-expect-error types missing
 import { calculateForAST } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
@@ -142,6 +142,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let uniqueRuleNesting = new Collection(useLocations)
 
 	// Selectors
+	let totalSelectors = 0
 	let keyframeSelectors = new Collection(useLocations)
 	let uniqueSelectors = new Set()
 	let prefixedSelectors = new Collection(useLocations)
@@ -200,9 +201,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 	let nestingDepth = 0
 
-	// Use Wallace parser to count rules and declarations (migrating from css-tree)
+	// Use Wallace parser to count basic structures (migrating from css-tree)
 	let wallaceAst = wallaceParse(css)
-	wallaceWalk(wallaceAst, (node: any) => {
+	wallaceWalk(wallaceAst, (node: CSSNode) => {
 		if (node.type_name === 'Rule') {
 			totalRules++
 		} else if (node.type_name === 'Declaration') {

@@ -106,24 +106,23 @@ This approach:
 
 ---
 
-## Phase 2: Dual Parser Implementation (4 steps)
-**Status:** ✅ COMPLETE
+## Phase 2: Incremental Wallace Migration ✅ COMPLETE
+**Status:** Wallace parser now actively handling functionality
 
-### Step 2.1: Add Wallace parser alongside css-tree ✅
+### Step 2.1: Wallace takes over counting ✅
 **File:** `src/index.ts`
-**Commit:** `582186b` - "feat: add Wallace parser running alongside css-tree for migration validation"
+**Commit:** `ae03e79` - "refactor: Wallace parser takes over rules and declarations counting"
 
 Implemented:
-- Wallace parser import alongside css-tree
-- `analyzeWithWallace()` function using wallaceWalk()
-- Counts: rules, declarations, stylesheet size
-- `WALLACE_COMPARE=true` env flag for validation
-- Side-by-side comparison logging
+- Wallace parse+walk inside `analyzeInternal()`
+- Wallace updates `totalRules` and `totalDeclarations` directly
+- Removed counting from css-tree walk (deleted `totalRules++` and `totalDeclarations++`)
+- Double parse/walk tradeoff accepted for incremental migration
 
-**Results:** All 3 metrics match perfectly between parsers!
-- ✅ Stylesheet size: 204 bytes (css-tree) vs 204 bytes (Wallace)
-- ✅ Rules count: 1 (css-tree) vs 1 (Wallace)
-- ✅ Declarations count: 8 (css-tree) vs 8 (Wallace)
+**Results:** All 228 tests pass - Wallace now owns this functionality!
+- ✅ Rules counting: Migrated from css-tree to Wallace
+- ✅ Declarations counting: Migrated from css-tree to Wallace
+- ✅ Identical output - zero behavioral changes
 
 ---
 

@@ -35,4 +35,21 @@ _(To be filled during migration)_
 _(To be filled during migration)_
 
 ## Developer Experience
+
+### Simple Walk vs Context-Aware Walk
+
+**Observation:** Wallace's `walk()` function is simple and performant, but lacks the contextual awareness that css-tree's walk provides.
+
+**Example - Selector Counting:**
+- css-tree's walk has `this.atrule` context to know if we're inside a @keyframes rule
+- Selectors inside @keyframes are tracked separately (not counted as regular selectors)
+- Wallace's walk visits all Selector nodes equally, without parent context
+- Result: Cannot directly replace context-dependent logic with Wallace walk
+
+**Migration Implication:**
+- ✅ Good for: Simple counting (Rules, Declarations)
+- ❌ Complex for: Context-dependent logic (Selectors in different atrule contexts)
+- Strategy: Migrate simple metrics first, keep css-tree walk for complex analysis
+
+## Developer Experience
 _(To be filled during migration)_
