@@ -3,7 +3,7 @@ import parse from 'css-tree/parser'
 // @ts-expect-error types missing
 import walk from 'css-tree/walker'
 // Wallace parser for dual-parser migration
-import { CSSNode, is_custom, str_equals, parse as wallaceParse } from '@projectwallace/css-parser'
+import { CSSNode, is_custom, is_vendor_prefixed, str_equals, parse as wallaceParse } from '@projectwallace/css-parser'
 // @ts-expect-error types missing
 import { calculateForAST } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
@@ -224,6 +224,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			uniqueAtruleNesting.p(depth, atruleLoc)
 			atrules.p(node.name, atruleLoc)
 
+			//#region @FONT-FACE
 			if (str_equals('font-face', node.name)) {
 				let descriptors = Object.create(null)
 				if (useLocations) {
@@ -237,6 +238,45 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				}
 				fontfaces.push(descriptors)
 			}
+			//#endregion
+
+			let complexity = 1
+
+			if (node.prelude === null) {
+				if (str_equals('layer', node.name)) {
+					// @layer without a prelude is anonymous
+					layers.p('<anonymous>', wallaceLoc(node))
+					// complexity++
+				}
+			} else {
+				let { name } = node
+				// All the AtRules in here MUST have a prelude, so we can count their names
+				if (str_equals('media', name)) {
+					medias.p(node.prelude, wallaceLoc(node))
+				} else if (str_equals('supports', name)) {
+					supports.p(node.prelude, wallaceLoc(node))
+				} else if (endsWith('keyframes', name)) {
+					let prelude = `@${name} ${node.prelude}`
+					keyframes.p(prelude, wallaceLoc(node))
+
+					if (is_vendor_prefixed(name)) {
+						prefixedKeyframes.p(prelude, wallaceLoc(node))
+					}
+				} else if (str_equals('import', name)) {
+					imports.p(node.prelude, wallaceLoc(node))
+
+					if (node.has_children) {
+						for (let child of node) {
+							if (child.type_name === 'SupportsQuery') {
+								// Fix while waiting for parser to allow child.value
+								supports.p(child.text.slice('supports('.length, -1), wallaceLoc(child))
+							}
+						}
+					}
+				}
+			}
+
+			// atRuleComplexities.push(complexity)
 		} else if (node.type_name === 'Rule') {
 			totalRules++
 			ruleNesting.push(depth)
@@ -353,13 +393,11 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						let loc = prelude.loc!
 
 						if (atRuleName === 'media') {
-							medias.p(preludeStr, loc)
 							if (isMediaBrowserhack(prelude)) {
 								mediaBrowserhacks.p(preludeStr, loc)
 								complexity++
 							}
 						} else if (atRuleName === 'supports') {
-							supports.p(preludeStr, loc)
 							// TODO: analyze vendor prefixes in @supports
 							// TODO: analyze complexity of @supports 'declaration'
 							if (isSupportsBrowserhack(prelude)) {
@@ -367,23 +405,18 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 								complexity++
 							}
 						} else if (endsWith('keyframes', atRuleName)) {
-							let name = '@' + atRuleName + ' ' + preludeStr
 							if (hasVendorPrefix(atRuleName)) {
-								prefixedKeyframes.p(name, loc)
 								complexity++
 							}
-							keyframes.p(name, loc!)
 						} else if (atRuleName === 'import') {
-							// @ts-expect-error Outdated css-tree types
-							walk(node, (prelude_node) => {
-								if (prelude_node.type === 'Condition' && prelude_node.kind === 'supports') {
-									let prelude = stringifyNode(prelude_node)
-
-									supports.p(prelude, prelude_node.loc!)
-									return walk.break
-								}
-							})
-							imports.p(preludeStr, loc)
+							// // @ts-expect-error Outdated css-tree types
+							// walk(node, (prelude_node) => {
+							// 	if (prelude_node.type === 'Condition' && prelude_node.kind === 'supports') {
+							// 		let prelude = stringifyNode(prelude_node)
+							// 		supports.p(prelude, prelude_node.loc!)
+							// 		return walk.break
+							// 	}
+							// })
 							// TODO: analyze complexity of media queries, layers and supports in @import
 							// see https://github.com/projectwallace/css-analyzer/issues/326
 						} else if (atRuleName === 'charset') {
@@ -404,7 +437,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						}
 					} else {
 						if (atRuleName === 'layer') {
-							layers.p('<anonymous>', node.loc!)
+							// layers.p('<anonymous>', node.loc!)
 							complexity++
 						}
 					}
