@@ -341,6 +341,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			uniqueRuleNesting.p(depth, loc)
 		} else if (node.type_name === 'Selector') {
 			selectorNesting.push(depth > 0 ? depth - 1 : 0)
+			uniqueSelectorNesting.p(depth > 0 ? depth - 1 : 0, wallaceLoc(node))
+			uniqueSelectors.add(node.text)
 		} else if (node.type_name === 'Declaration') {
 			totalDeclarations++
 			uniqueDeclarations.add(node.text)
@@ -468,11 +470,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						prefixedSelectors.p(selector, loc)
 					}
 
-					uniqueSelectors.add(selector)
 					selectorComplexities.push(complexity)
 					uniqueSelectorComplexities.p(complexity, loc)
-					// selectorNesting now tracked by Wallace parser
-					uniqueSelectorNesting.p(nestingDepth - 1, loc)
 
 					// #region specificity
 					let specificity: Specificity = calculateForAST(node).toArray()
