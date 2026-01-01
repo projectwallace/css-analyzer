@@ -203,10 +203,26 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	// Use Wallace parser to count basic structures (migrating from css-tree)
 	let wallaceAst = wallaceParse(css)
 
+	function wallaceLoc(node: CSSNode) {
+		return {
+			start: {
+				offset: node.start,
+				line: node.line,
+				column: node.column,
+			},
+			end: {
+				offset: node.end,
+			},
+		}
+	}
+
 	function wallaceWalk(node: CSSNode, depth: number = 0) {
 		// Count nodes and track nesting
 		if (node.type_name === 'Atrule') {
+			let atruleLoc = wallaceLoc(node)
 			atruleNesting.push(depth)
+			uniqueAtruleNesting.p(depth, atruleLoc)
+			atrules.p(node.name, atruleLoc)
 		} else if (node.type_name === 'Rule') {
 			totalRules++
 			ruleNesting.push(depth)
@@ -257,18 +273,12 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 			let declarationDepth = depth > 0 ? depth - 1 : 0
 			declarationNesting.push(declarationDepth)
-			uniqueDeclarationNesting.p(declarationDepth, {
-				start: { line: node.line, offset: node.start, column: node.column },
-				end: { offset: node.end },
-			})
+			uniqueDeclarationNesting.p(declarationDepth, wallaceLoc(node))
 
 			//#region PROPERTIES
 			let { is_important, property, is_browserhack, is_vendor_prefixed } = node
 
-			let propertyLoc = {
-				start: { line: node.line, offset: node.start, column: node.column },
-				end: { offset: node.end },
-			}
+			let propertyLoc = wallaceLoc(node)
 
 			properties.p(property, propertyLoc)
 
@@ -312,10 +322,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 		enter(node: CssNode) {
 			switch (node.type) {
 				case Atrule: {
-					atrules.p(node.name, node.loc!)
-					// atruleNesting now tracked by Wallace parser
-					uniqueAtruleNesting.p(nestingDepth, node.loc!)
-
 					let atRuleName = node.name
 
 					if (atRuleName === 'font-face') {
