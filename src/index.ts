@@ -3,7 +3,7 @@ import parse from 'css-tree/parser'
 // @ts-expect-error types missing
 import walk from 'css-tree/walker'
 // Wallace parser for dual-parser migration
-import { CSSNode, is_custom, parse as wallaceParse } from '@projectwallace/css-parser'
+import { CSSNode, is_custom, str_equals, parse as wallaceParse } from '@projectwallace/css-parser'
 // @ts-expect-error types missing
 import { calculateForAST } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
@@ -223,6 +223,20 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			atruleNesting.push(depth)
 			uniqueAtruleNesting.p(depth, atruleLoc)
 			atrules.p(node.name, atruleLoc)
+
+			if (str_equals('font-face', node.name)) {
+				let descriptors = Object.create(null)
+				if (useLocations) {
+					fontfaces_with_loc.p(node.start, wallaceLoc(node))
+				}
+				let block = node.children.find((child) => child.type_name === 'Block')
+				for (let descriptor of block?.children || []) {
+					if (descriptor.type_name === 'Declaration') {
+						descriptors[descriptor.property] = descriptor.value
+					}
+				}
+				fontfaces.push(descriptors)
+			}
 		} else if (node.type_name === 'Rule') {
 			totalRules++
 			ruleNesting.push(depth)
@@ -325,20 +339,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					let atRuleName = node.name
 
 					if (atRuleName === 'font-face') {
-						let descriptors = Object.create(null)
-
-						if (useLocations) {
-							fontfaces_with_loc.p(node.loc!.start.offset, node.loc!)
-						}
-
-						node.block?.children.forEach((descriptor) => {
-							// Ignore 'Raw' nodes in case of CSS syntax errors
-							if (descriptor.type === 'Declaration') {
-								descriptors[descriptor.property] = stringifyNode(descriptor.value)
-							}
-						})
-
-						fontfaces.push(descriptors)
 						atRuleComplexities.push(1)
 						break
 					}

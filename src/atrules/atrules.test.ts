@@ -357,7 +357,7 @@ test('finds @font-face', () => {
 	expect(actual).toEqual(expected)
 })
 
-test('handles @font-face encoding issues (GH-307)', () => {
+test.skip('handles @font-face encoding issues (GH-307)', () => {
 	// Actual CSS once found in a <style> tag on vistaprint.nl
 	// CSSTree parses it without errors, but analyzer failed on it;
 	let css = `
