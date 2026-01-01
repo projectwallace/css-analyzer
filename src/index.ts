@@ -240,8 +240,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			}
 			//#endregion
 
-			let complexity = 1
-
 			if (node.prelude === null) {
 				if (str_equals('layer', node.name)) {
 					// @layer without a prelude is anonymous
@@ -291,11 +289,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					registeredProperties.p(node.prelude, wallaceLoc(node))
 				}
 			}
-
-			// atRuleComplexities.push(complexity)
 		} else if (node.type_name === 'Rule') {
 			totalRules++
-			ruleNesting.push(depth)
 
 			// Check if rule is empty (no declarations in block)
 			if (node.block && node.block.is_empty) {
@@ -305,13 +300,14 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			// Count selectors and declarations in this rule
 			let numSelectors = 0
 			let numDeclarations = 0
+			let loc = wallaceLoc(node)
 
 			// Find the SelectorList child and count Selector nodes inside it
 			if (node.children && Array.isArray(node.children)) {
 				for (const child of node.children) {
 					if (child.type_name === 'SelectorList') {
 						// Count Selector nodes inside the SelectorList
-						if (child.children && Array.isArray(child.children)) {
+						if (Array.isArray(child.children)) {
 							for (const selector of child.children) {
 								if (selector.type_name === 'Selector') {
 									numSelectors++
@@ -323,7 +319,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			}
 
 			// Count declarations in the block
-			if (node.block && node.block.children && Array.isArray(node.block.children)) {
+			if (node.block && Array.isArray(node.block.children)) {
 				for (const child of node.block.children) {
 					if (child.type_name === 'Declaration') {
 						numDeclarations++
@@ -333,8 +329,16 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 			// Track rule metrics
 			ruleSizes.push(numSelectors + numDeclarations)
+			uniqueRuleSize.p(numSelectors + numDeclarations, loc)
+
 			selectorsPerRule.push(numSelectors)
+			uniqueSelectorsPerRule.p(numSelectors, loc)
+
 			declarationsPerRule.push(numDeclarations)
+			uniqueDeclarationsPerRule.p(numDeclarations, loc)
+
+			ruleNesting.push(depth)
+			uniqueRuleNesting.p(depth, loc)
 		} else if (node.type_name === 'Selector') {
 			selectorNesting.push(depth > 0 ? depth - 1 : 0)
 		} else if (node.type_name === 'Declaration') {
@@ -406,18 +410,17 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					if (node.prelude !== null) {
 						let prelude = node.prelude
 						let preludeStr = prelude && stringifyNode(node.prelude)
-						let loc = prelude.loc!
 
 						if (atRuleName === 'media') {
 							if (isMediaBrowserhack(prelude)) {
-								mediaBrowserhacks.p(preludeStr, loc)
+								mediaBrowserhacks.p(preludeStr, prelude.loc!)
 								complexity++
 							}
 						} else if (atRuleName === 'supports') {
 							// TODO: analyze vendor prefixes in @supports
 							// TODO: analyze complexity of @supports 'declaration'
 							if (isSupportsBrowserhack(prelude)) {
-								supportsBrowserhacks.p(preludeStr, loc)
+								supportsBrowserhacks.p(preludeStr, prelude.loc!)
 								complexity++
 							}
 						} else if (endsWith('keyframes', atRuleName)) {
@@ -437,25 +440,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				case 'Feature': {
 					// @ts-expect-error Oudated css-tree types
 					mediaFeatures.p(node.name, node.loc)
-					break
-				}
-				case Rule: {
-					let prelude = node.prelude as SelectorList
-					let block = node.block
-
-					let preludeChildren = prelude.children
-					let blockChildren = block.children
-					let numSelectors = preludeChildren ? preludeChildren.size : 0
-					let numDeclarations = blockChildren ? blockChildren.size : 0
-
-					// ruleSizes, selectorsPerRule, declarationsPerRule now tracked by Wallace parser
-					uniqueRuleSize.p(numSelectors + numDeclarations, node.loc!)
-					uniqueSelectorsPerRule.p(numSelectors, prelude.loc!)
-					uniqueDeclarationsPerRule.p(numDeclarations, block.loc!)
-					// ruleNesting now tracked by Wallace parser
-					uniqueRuleNesting.p(nestingDepth, node.loc!)
-
-					// emptyRules now counted by Wallace parser
 					break
 				}
 				case Selector: {
