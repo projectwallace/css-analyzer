@@ -1,12 +1,11 @@
-import { hasVendorPrefix } from '../vendor-prefix.js'
 import { endsWith } from '../string-utils.js'
-import { is_custom } from '@projectwallace/css-parser'
+import { is_custom, is_vendor_prefixed } from '@projectwallace/css-parser'
 
 /**
  * @see https://github.com/csstree/csstree/blob/master/lib/utils/names.js#L69
  */
 export function isHack(property: string): boolean {
-	if (isCustom(property) || hasVendorPrefix(property)) return false
+	if (is_custom(property) || is_vendor_prefixed(property)) return false
 
 	let code = property.charCodeAt(0)
 
@@ -19,10 +18,6 @@ export function isHack(property: string): boolean {
 		code === 36 || // $
 		code === 35
 	) // #
-}
-
-export function isCustom(property: string): boolean {
-	return is_custom(property)
 }
 
 /**
@@ -38,7 +33,7 @@ export function isCustom(property: string): boolean {
  * @returns True if `property` equals `basename` without prefix
  */
 export function isProperty(basename: string, property: string): boolean {
-	if (isCustom(property)) return false
+	if (is_custom(property)) return false
 	return endsWith(basename, property)
 }
 
@@ -47,7 +42,7 @@ export function isProperty(basename: string, property: string): boolean {
  * @returns The property name without vendor prefix
  */
 export function basename(property: string): string {
-	if (hasVendorPrefix(property)) {
+	if (is_vendor_prefixed(property)) {
 		return property.slice(property.indexOf('-', 2) + 1)
 	}
 	return property

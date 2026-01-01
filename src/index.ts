@@ -3,7 +3,7 @@ import parse from 'css-tree/parser'
 // @ts-expect-error types missing
 import walk from 'css-tree/walker'
 // Wallace parser for dual-parser migration
-import { CSSNode, parse as wallaceParse, walk as wallaceWalk } from '@projectwallace/css-parser'
+import { CSSNode, is_custom, parse as wallaceParse } from '@projectwallace/css-parser'
 // @ts-expect-error types missing
 import { calculateForAST } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
@@ -18,7 +18,7 @@ import { Collection, type Location } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
 import { strEquals, startsWith, endsWith } from './string-utils.js'
 import { hasVendorPrefix } from './vendor-prefix.js'
-import { isCustom, isHack, isProperty } from './properties/property-utils.js'
+import { isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
 import { basename } from './properties/property-utils.js'
@@ -253,16 +253,51 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			selectorNesting.push(depth > 0 ? depth - 1 : 0)
 		} else if (node.type_name === 'Declaration') {
 			totalDeclarations++
-			declarationNesting.push(depth > 0 ? depth - 1 : 0)
+			uniqueDeclarations.add(node.text)
 
-			// Count important declarations
-			if (node.is_important) {
+			let declarationDepth = depth > 0 ? depth - 1 : 0
+			declarationNesting.push(declarationDepth)
+			uniqueDeclarationNesting.p(declarationDepth, {
+				start: { line: node.line, offset: node.start, column: node.column },
+				end: { offset: node.end },
+			})
+
+			//#region PROPERTIES
+			let { is_important, property, is_browserhack, is_vendor_prefixed } = node
+
+			let propertyLoc = {
+				start: { line: node.line, offset: node.start, column: node.column },
+				end: { offset: node.end },
+			}
+
+			properties.p(property, propertyLoc)
+
+			if (is_important) {
 				importantDeclarations++
 			}
+
+			// Count important declarations
+			if (is_vendor_prefixed) {
+				propertyComplexities.push(2)
+				propertyVendorPrefixes.p(property, propertyLoc)
+			} else if (is_custom(property)) {
+				customProperties.p(property, propertyLoc)
+				propertyComplexities.push(is_important ? 3 : 2)
+
+				if (is_important) {
+					importantCustomProperties.p(property, propertyLoc)
+				}
+			} else if (is_browserhack) {
+				propertyHacks.p(property, propertyLoc)
+				propertyComplexities.push(2)
+			} else {
+				propertyComplexities.push(1)
+			}
+			//#endregion
 		}
 
 		// Walk children with increased depth for Rules and Atrules
-		const nextDepth = (node.type_name === 'Rule' || node.type_name === 'Atrule') ? depth + 1 : depth
+		const nextDepth = node.type_name === 'Rule' || node.type_name === 'Atrule' ? depth + 1 : depth
 
 		if (node.children && Array.isArray(node.children)) {
 			for (const child of node.children) {
@@ -772,10 +807,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 					let complexity = 1
 
-					uniqueDeclarations.add(stringifyNode(node))
-					// declarationNesting now tracked by Wallace parser
-					uniqueDeclarationNesting.p(nestingDepth - 1, node.loc!)
-
 					if (node.important === true) {
 						// importantDeclarations now counted by Wallace parser
 						complexity++
@@ -787,41 +818,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					}
 
 					declarationComplexities.push(complexity)
-
-					let {
-						property,
-						// @ts-expect-error TODO: fix this
-						loc: { start },
-					} = node
-					let propertyLoc = {
-						start: {
-							line: start.line,
-							column: start.column,
-							offset: start.offset,
-						},
-						end: {
-							offset: start.offset + property.length,
-						},
-					}
-
-					properties.p(property, propertyLoc)
-
-					if (hasVendorPrefix(property)) {
-						propertyVendorPrefixes.p(property, propertyLoc)
-						propertyComplexities.push(2)
-					} else if (isHack(property)) {
-						propertyHacks.p(property, propertyLoc)
-						propertyComplexities.push(2)
-					} else if (isCustom(property)) {
-						customProperties.p(property, propertyLoc)
-						propertyComplexities.push(node.important ? 3 : 2)
-
-						if (node.important === true) {
-							importantCustomProperties.p(property, propertyLoc)
-						}
-					} else {
-						propertyComplexities.push(1)
-					}
 
 					break
 				}
