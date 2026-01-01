@@ -262,17 +262,33 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					if (is_vendor_prefixed(name)) {
 						prefixedKeyframes.p(prelude, wallaceLoc(node))
 					}
+				} else if (str_equals('layer', name)) {
+					for (let layer of node.prelude.split(',').map((s) => s.trim())) {
+						layers.p(layer, wallaceLoc(node))
+					}
 				} else if (str_equals('import', name)) {
 					imports.p(node.prelude, wallaceLoc(node))
 
 					if (node.has_children) {
 						for (let child of node) {
-							if (child.type_name === 'SupportsQuery') {
-								// Fix while waiting for parser to allow child.value
-								supports.p(child.text.slice('supports('.length, -1), wallaceLoc(child))
+							if (child.type_name === 'SupportsQuery' && child.value) {
+								supports.p(child.value, wallaceLoc(child))
+							} else if (child.type_name === 'Layer' && child.value) {
+								layers.p(child.value, wallaceLoc(child))
 							}
 						}
 					}
+				} else if (str_equals('charset', name)) {
+					charsets.p(node.prelude, wallaceLoc(node))
+				} else if (str_equals('container', name)) {
+					containers.p(node.prelude, wallaceLoc(node))
+					if (node.first_child?.type_name === 'ContainerQuery') {
+						if (node.first_child.first_child?.type_name === 'Identifier') {
+							containerNames.p(node.first_child.first_child.text, wallaceLoc(node))
+						}
+					}
+				} else if (str_equals('property', name)) {
+					registeredProperties.p(node.prelude, wallaceLoc(node))
 				}
 			}
 
@@ -408,49 +424,13 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							if (hasVendorPrefix(atRuleName)) {
 								complexity++
 							}
-						} else if (atRuleName === 'import') {
-							// // @ts-expect-error Outdated css-tree types
-							// walk(node, (prelude_node) => {
-							// 	if (prelude_node.type === 'Condition' && prelude_node.kind === 'supports') {
-							// 		let prelude = stringifyNode(prelude_node)
-							// 		supports.p(prelude, prelude_node.loc!)
-							// 		return walk.break
-							// 	}
-							// })
-							// TODO: analyze complexity of media queries, layers and supports in @import
-							// see https://github.com/projectwallace/css-analyzer/issues/326
-						} else if (atRuleName === 'charset') {
-							charsets.p(preludeStr, loc)
-						} else if (atRuleName === 'container') {
-							containers.p(preludeStr, loc)
-
-							if (prelude.type === 'AtrulePrelude') {
-								if (prelude.children.first?.type === 'Identifier') {
-									let containerName = prelude.children.first.name
-									containerNames.p(containerName, loc)
-								}
-							}
-							// TODO: calculate complexity of container 'declaration'
-						} else if (atRuleName === 'property') {
-							registeredProperties.p(preludeStr, loc)
-							// TODO: add complexity for descriptors
 						}
 					} else {
 						if (atRuleName === 'layer') {
-							// layers.p('<anonymous>', node.loc!)
 							complexity++
 						}
 					}
 					atRuleComplexities.push(complexity)
-					break
-				}
-				// @ts-expect-error Oudated css-tree types
-				case 'Layer': {
-					// @ts-expect-error Oudated css-tree types
-					if (node.name !== null) {
-						// @ts-expect-error Oudated css-tree types
-						layers.p(node.name, node.loc)
-					}
 					break
 				}
 				// @ts-expect-error Oudated css-tree types
