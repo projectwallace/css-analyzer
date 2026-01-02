@@ -232,8 +232,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				}
 				let block = node.children.find((child) => child.type_name === 'Block')
 				for (let descriptor of block?.children || []) {
-					if (descriptor.type_name === 'Declaration') {
-						descriptors[descriptor.property] = descriptor.value
+					if (descriptor.type_name === 'Declaration' && descriptor.value) {
+						descriptors[descriptor.property] = (descriptor.value as CSSNode).text
 					}
 				}
 				fontfaces.push(descriptors)
@@ -269,9 +269,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 					if (node.has_children) {
 						for (let child of node) {
-							if (child.type_name === 'SupportsQuery' && child.value) {
+							if (child.type_name === 'SupportsQuery' && typeof child.value === 'string') {
 								supports.p(child.value, wallaceLoc(child))
-							} else if (child.type_name === 'Layer' && child.value) {
+							} else if (child.type_name === 'Layer' && typeof child.value === 'string') {
 								layers.p(child.value, wallaceLoc(child))
 							}
 						}
