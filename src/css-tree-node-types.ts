@@ -1,6 +1,6 @@
 // Atrule
 export const Atrule = 'Atrule'
-export const MediaQuery = 'MediaQuery'
+// export const MediaQuery = 'MediaQuery'
 // export const MediaFeature = 'MediaFeature'
 // Rule
 export const Rule = 'Rule'
