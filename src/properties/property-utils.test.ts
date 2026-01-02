@@ -1,20 +1,5 @@
 import { test, expect } from 'vitest'
-import { isHack, isCustom, isProperty } from './property-utils.js'
-
-test('isHack', () => {
-	expect(isHack('/property')).toEqual(true)
-	expect(isHack('//property')).toEqual(true)
-	expect(isHack('_property')).toEqual(true)
-	expect(isHack('+property')).toEqual(true)
-	expect(isHack('*property')).toEqual(true)
-	expect(isHack('&property')).toEqual(true)
-	expect(isHack('#property')).toEqual(true)
-	expect(isHack('$property')).toEqual(true)
-
-	expect(isHack('property')).toEqual(false)
-	expect(isHack('-property')).toEqual(false)
-	expect(isHack('--property')).toEqual(false)
-})
+import { isCustom, isProperty } from './property-utils.js'
 
 test('isCustom', () => {
 	expect(isCustom('--property')).toEqual(true)

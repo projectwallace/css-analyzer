@@ -8,18 +8,18 @@ test('calculates value complexity', () => {
 			color: green; /* 1 */
 			color: green !ie; /* 2 */
 			width: -webkit-max-content; /* 2 */
-			width: -webkit-max-content !ie; /* 3 */
-			color: green\\9; /* 2 */
+			width: -webkit-max-content !ie; /* 2 */
+			color: green\\9; /* 1 */
     }
   `
 	const actual = analyze(fixture).values.complexity
 	const expected = {
 		min: 1,
-		max: 3,
-		mean: 10 / 5,
-		mode: 2,
-		range: 2,
-		sum: 10,
+		max: 2,
+		mean: 7 / 5,
+		mode: 1,
+		range: 1,
+		sum: 7,
 	}
 
 	expect(actual).toEqual(expected)

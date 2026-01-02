@@ -4,7 +4,6 @@ import parse from 'css-tree/parser'
 import walk from 'css-tree/walker'
 // @ts-expect-error types missing
 import { calculateForAST } from '@bramus/specificity/core'
-import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isAccessibility, isPrefixed, hasPseudoClass } from './selectors/utils.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
 import { destructure, isSystemFont } from './values/destructure-font-shorthand.js'
@@ -16,9 +15,8 @@ import { Collection, type Location } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
 import { strEquals, startsWith, endsWith } from './string-utils.js'
 import { hasVendorPrefix } from './vendor-prefix.js'
-import { isCustom, isHack, isProperty } from './properties/property-utils.js'
+import { isCustom, isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
-import { isIe9Hack } from './values/browserhacks.js'
 import { basename } from './properties/property-utils.js'
 import { Atrule, Selector, Dimension, Url, Value, Hash, Rule, Identifier, Func, Operator } from './css-tree-node-types.js'
 import { KeywordSet } from './keyword-set.js'
@@ -114,11 +112,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let layers = new Collection(useLocations)
 	let imports = new Collection(useLocations)
 	let medias = new Collection(useLocations)
-	let mediaBrowserhacks = new Collection(useLocations)
 	let mediaFeatures = new Collection(useLocations)
 	let charsets = new Collection(useLocations)
 	let supports = new Collection(useLocations)
-	let supportsBrowserhacks = new Collection(useLocations)
 	let keyframes = new Collection(useLocations)
 	let prefixedKeyframes = new Collection(useLocations)
 	let containers = new Collection(useLocations)
@@ -171,7 +167,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 	// Properties
 	let properties = new Collection(useLocations)
-	let propertyHacks = new Collection(useLocations)
 	let propertyVendorPrefixes = new Collection(useLocations)
 	let customProperties = new Collection(useLocations)
 	let propertyComplexities = new AggregateCollection()
@@ -179,7 +174,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	// Values
 	let valueComplexities = new AggregateCollection()
 	let vendorPrefixedValues = new Collection(useLocations)
-	let valueBrowserhacks = new Collection(useLocations)
 	let zindex = new Collection(useLocations)
 	let textShadows = new Collection(useLocations)
 	let boxShadows = new Collection(useLocations)
@@ -238,18 +232,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 						if (atRuleName === 'media') {
 							medias.p(preludeStr, loc)
-							if (isMediaBrowserhack(prelude)) {
-								mediaBrowserhacks.p(preludeStr, loc)
-								complexity++
-							}
 						} else if (atRuleName === 'supports') {
 							supports.p(preludeStr, loc)
 							// TODO: analyze vendor prefixes in @supports
 							// TODO: analyze complexity of @supports 'declaration'
-							if (isSupportsBrowserhack(prelude)) {
-								supportsBrowserhacks.p(preludeStr, loc)
-								complexity++
-							}
 						} else if (endsWith('keyframes', atRuleName)) {
 							let name = '@' + atRuleName + ' ' + preludeStr
 							if (hasVendorPrefix(atRuleName)) {
@@ -476,18 +462,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					// i.e. `background-image: -webkit-linear-gradient()`
 					if (isValuePrefixed(node)) {
 						vendorPrefixedValues.p(stringifyNode(node), loc)
-						complexity++
-					}
-
-					// i.e. `property: value !ie`
-					if (typeof important === 'string') {
-						valueBrowserhacks.p(stringifyNodePlain(node) + '!' + important, loc)
-						complexity++
-					}
-
-					// i.e. `property: value\9`
-					if (isIe9Hack(node)) {
-						valueBrowserhacks.p(stringifyNode(node), loc)
 						complexity++
 					}
 
@@ -741,9 +715,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					if (hasVendorPrefix(property)) {
 						propertyVendorPrefixes.p(property, propertyLoc)
 						propertyComplexities.push(2)
-					} else if (isHack(property)) {
-						propertyHacks.p(property, propertyLoc)
-						propertyComplexities.push(2)
 					} else if (isCustom(property)) {
 						customProperties.p(property, propertyLoc)
 						propertyComplexities.push(node.important ? 3 : 2)
@@ -826,13 +797,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			),
 			import: imports.c(),
 			media: assign(medias.c(), {
-				browserhacks: mediaBrowserhacks.c(),
 				features: mediaFeatures.c(),
 			}),
 			charset: charsets.c(),
-			supports: assign(supports.c(), {
-				browserhacks: supportsBrowserhacks.c(),
-			}),
+			supports: supports.c(),
 			keyframes: assign(keyframes.c(), {
 				prefixed: assign(prefixedKeyframes.c(), {
 					ratio: ratio(prefixedKeyframes.size(), keyframes.size()),
@@ -962,9 +930,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					ratio: ratio(importantCustomProperties.size(), customProperties.size()),
 				}),
 			}),
-			browserhacks: assign(propertyHacks.c(), {
-				ratio: ratio(propertyHacks.size(), properties.size()),
-			}),
 			complexity: propertyComplexity,
 		}),
 		values: {
@@ -984,7 +949,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				timingFunctions: timingFunctions.c(),
 			},
 			prefixes: vendorPrefixedValues.c(),
-			browserhacks: valueBrowserhacks.c(),
 			units: units.count(),
 			complexity: valueComplexity,
 			keywords: valueKeywords.c(),
@@ -1019,10 +983,6 @@ export {
 	isPrefixed as isSelectorPrefixed,
 	isAccessibility as isAccessibilitySelector,
 } from './selectors/utils.js'
-
-export { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
-
-export { isHack as isPropertyHack } from './properties/property-utils.js'
 
 export { isValuePrefixed } from './values/vendor-prefix.js'
 

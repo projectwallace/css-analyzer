@@ -1,25 +1,6 @@
 import { hasVendorPrefix } from '../vendor-prefix.js'
 import { endsWith } from '../string-utils.js'
 
-/**
- * @see https://github.com/csstree/csstree/blob/master/lib/utils/names.js#L69
- */
-export function isHack(property: string): boolean {
-	if (isCustom(property) || hasVendorPrefix(property)) return false
-
-	let code = property.charCodeAt(0)
-
-	return (
-		code === 47 || // /
-		code === 42 || // *
-		code === 95 || // _
-		code === 43 || // +
-		code === 38 || // &
-		code === 36 || // $
-		code === 35
-	) // #
-}
-
 export function isCustom(property: string): boolean {
 	if (property.length < 3) return false
 	// 45 === '-'.charCodeAt(0)

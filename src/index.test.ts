@@ -43,18 +43,6 @@ describe('Public API', () => {
 		expect(typeof isAccessibilitySelector).toBe('function')
 	})
 
-	test('exposes the "isMediaBrowserhack" method', () => {
-		expect(typeof isMediaBrowserhack).toBe('function')
-	})
-
-	test('exposes the "isSupportsBrowserhack" method', () => {
-		expect(typeof isSupportsBrowserhack).toBe('function')
-	})
-
-	test('exposes the "isPropertyHack" method', () => {
-		expect(typeof isPropertyHack).toBe('function')
-	})
-
 	test('exposes the "isValuePrefixed" method', () => {
 		expect(typeof isValuePrefixed).toBe('function')
 	})
@@ -176,12 +164,6 @@ test('handles empty input gracefully', () => {
 				totalUnique: 0,
 				unique: {},
 				uniquenessRatio: 0,
-				browserhacks: {
-					total: 0,
-					totalUnique: 0,
-					unique: {},
-					uniquenessRatio: 0,
-				},
 				features: {
 					total: 0,
 					totalUnique: 0,
@@ -200,12 +182,6 @@ test('handles empty input gracefully', () => {
 				totalUnique: 0,
 				unique: {},
 				uniquenessRatio: 0,
-				browserhacks: {
-					total: 0,
-					totalUnique: 0,
-					unique: {},
-					uniquenessRatio: 0,
-				},
 			},
 			keyframes: {
 				total: 0,
@@ -467,13 +443,6 @@ test('handles empty input gracefully', () => {
 					ratio: 0,
 				},
 			},
-			browserhacks: {
-				total: 0,
-				totalUnique: 0,
-				unique: {},
-				uniquenessRatio: 0,
-				ratio: 0,
-			},
 			complexity: {
 				min: 0,
 				max: 0,
@@ -561,12 +530,6 @@ test('handles empty input gracefully', () => {
 				},
 			},
 			prefixes: {
-				total: 0,
-				totalUnique: 0,
-				unique: {},
-				uniquenessRatio: 0,
-			},
-			browserhacks: {
 				total: 0,
 				totalUnique: 0,
 				unique: {},
