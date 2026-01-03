@@ -3,7 +3,7 @@ import parse from 'css-tree/parser'
 // @ts-expect-error types missing
 import walk from 'css-tree/walker'
 // Wallace parser for dual-parser migration
-import { type CSSNode, is_custom, is_vendor_prefixed, str_equals, parse as wallaceParse } from '@projectwallace/css-parser'
+import { type CSSNode, is_custom, is_vendor_prefixed, SKIP, str_equals, parse as wallaceParse } from '@projectwallace/css-parser'
 // @ts-expect-error types missing
 import { calculateForAST } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
@@ -353,9 +353,36 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			ruleNesting.push(depth)
 			uniqueRuleNesting.p(depth, loc)
 		} else if (node.type_name === 'Selector') {
+			let loc = wallaceLoc(node)
 			selectorNesting.push(depth > 0 ? depth - 1 : 0)
-			uniqueSelectorNesting.p(depth > 0 ? depth - 1 : 0, wallaceLoc(node))
+			uniqueSelectorNesting.p(depth > 0 ? depth - 1 : 0, loc)
 			uniqueSelectors.add(node.text)
+
+			// let complexity = getComplexityWallace(node)
+			// selectorComplexities.push(complexity)
+
+			if (isPrefixed(node)) {
+				prefixedSelectors.p(node.text, loc)
+			}
+
+			let pseudos = hasPseudoClass(node)
+			if (pseudos !== false) {
+				for (let pseudo of pseudos) {
+					// Loc is off for some reason, TODO fix
+					pseudoClasses.p(pseudo, loc)
+				}
+			}
+
+			getCombinators(node, function onCombinator(combinator) {
+				// Loc is off for some reason, TODO fix
+				combinators.p(combinator.name, combinator.loc)
+			})
+
+			// Avoid deeper walking of selectors to not mess with
+			// our specificity calculations in case of a selector
+			// with :where() or :is() that contain SelectorLists
+			// as children
+			return SKIP
 		} else if (node.type_name === 'Declaration') {
 			totalDeclarations++
 			uniqueDeclarations.add(node.text)
@@ -436,18 +463,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						a11y.p(selector, loc)
 					}
 
-					let pseudos = hasPseudoClass(node)
-					if (pseudos !== false) {
-						for (let pseudo of pseudos) {
-							pseudoClasses.p(pseudo, loc)
-						}
-					}
-
 					let complexity = getComplexity(node)
-
-					if (isPrefixed(node)) {
-						prefixedSelectors.p(selector, loc)
-					}
 
 					selectorComplexities.push(complexity)
 					uniqueSelectorComplexities.p(complexity, loc)
@@ -484,10 +500,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					if (sa > 0) {
 						ids.p(selector, loc)
 					}
-
-					getCombinators(node, function onCombinator(combinator) {
-						combinators.p(combinator.name, combinator.loc)
-					})
 
 					// Avoid deeper walking of selectors to not mess with
 					// our specificity calculations in case of a selector
