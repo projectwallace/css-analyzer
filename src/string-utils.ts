@@ -1,5 +1,9 @@
 import { str_equals, str_starts_with } from '@projectwallace/css-parser'
 
+export function unquote(str: string): string {
+	return str.replace(/(?:^['"])|(?:['"]$)/g, '')
+}
+
 /**
  * Case-insensitive compare two character codes
  * @see https://github.com/csstree/csstree/blob/41f276e8862d8223eeaa01a3d113ab70bb13d2d9/lib/tokenizer/utils.js#L22

@@ -3,7 +3,15 @@ import parse from 'css-tree/parser'
 // @ts-expect-error types missing
 import walk from 'css-tree/walker'
 // Wallace parser for dual-parser migration
-import { type CSSNode, is_custom, is_vendor_prefixed, SKIP, str_equals, parse as wallaceParse } from '@projectwallace/css-parser'
+import {
+	type CSSNode,
+	is_custom,
+	is_vendor_prefixed,
+	SKIP,
+	str_equals,
+	str_starts_with,
+	parse as wallaceParse,
+} from '@projectwallace/css-parser'
 // @ts-expect-error types missing
 import { calculateForAST } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
@@ -16,7 +24,7 @@ import { isValuePrefixed } from './values/vendor-prefix.js'
 import { ContextCollection } from './context-collection.js'
 import { Collection, type Location } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
-import { strEquals, startsWith, endsWith } from './string-utils.js'
+import { strEquals, endsWith, unquote } from './string-utils.js'
 import { isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
@@ -427,6 +435,40 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				valueKeywords.p(text, wallaceLoc(node))
 				return
 			}
+		} else if (node.type_name === 'Url') {
+			let { value } = node
+			let embed = unquote((value as string) || '')
+			if (str_starts_with(embed, 'data:')) {
+				let size = embed.length
+				let type = getEmbedType(embed)
+
+				embedTypes.total++
+				embedSize += size
+
+				let loc = {
+					line: node.line,
+					column: node.column,
+					offset: node.start,
+					length: node.length,
+				}
+
+				if (embedTypes.unique.has(type)) {
+					let item = embedTypes.unique.get(type)!
+					item.count++
+					item.size += size
+					embedTypes.unique.set(type, item)
+					if (useLocations && item.uniqueWithLocations) {
+						item.uniqueWithLocations.push(loc)
+					}
+				} else {
+					let item = {
+						count: 1,
+						size,
+						uniqueWithLocations: useLocations ? [loc] : undefined,
+					}
+					embedTypes.unique.set(type, item)
+				}
+			}
 		}
 
 		// Walk children with increased depth for Rules and Atrules
@@ -521,41 +563,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					}
 
 					return this.skip
-				}
-				case Url: {
-					if (startsWith('data:', node.value)) {
-						let embed = node.value
-						let size = embed.length
-						let type = getEmbedType(embed)
-
-						embedTypes.total++
-						embedSize += size
-
-						let loc = {
-							line: node.loc!.start.line,
-							column: node.loc!.start.column,
-							offset: node.loc!.start.offset,
-							length: node.loc!.end.offset - node.loc!.start.offset,
-						}
-
-						if (embedTypes.unique.has(type)) {
-							let item = embedTypes.unique.get(type)!
-							item.count++
-							item.size += size
-							embedTypes.unique.set(type, item)
-							if (useLocations && item.uniqueWithLocations) {
-								item.uniqueWithLocations.push(loc)
-							}
-						} else {
-							let item = {
-								count: 1,
-								size,
-								uniqueWithLocations: useLocations ? [loc] : undefined,
-							}
-							embedTypes.unique.set(type, item)
-						}
-					}
-					break
 				}
 				case Value: {
 					let loc = node.loc!
