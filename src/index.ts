@@ -380,6 +380,13 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				propertyComplexities.push(1)
 			}
 			//#endregion
+		} else if (node.type_name === 'Value') {
+			let { text } = node
+
+			if (keywords.has(text)) {
+				valueKeywords.p(text, wallaceLoc(node))
+				return
+			}
 		}
 
 		// Walk children with increased depth for Rules and Atrules
@@ -571,7 +578,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 					if (isValueKeyword(node)) {
 						valueComplexities.push(1)
-						valueKeywords.p(stringifyNode(node), loc)
 						break
 					}
 
