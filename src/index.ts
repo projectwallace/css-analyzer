@@ -3,7 +3,7 @@ import parse from 'css-tree/parser'
 // @ts-expect-error types missing
 import walk from 'css-tree/walker'
 // Wallace parser for dual-parser migration
-import { CSSNode, is_custom, is_vendor_prefixed, str_equals, parse as wallaceParse } from '@projectwallace/css-parser'
+import { type CSSNode, is_custom, is_vendor_prefixed, str_equals, parse as wallaceParse } from '@projectwallace/css-parser'
 // @ts-expect-error types missing
 import { calculateForAST } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
@@ -17,14 +17,13 @@ import { ContextCollection } from './context-collection.js'
 import { Collection, type Location } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
 import { strEquals, startsWith, endsWith } from './string-utils.js'
-import { hasVendorPrefix } from './vendor-prefix.js'
 import { isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
 import { basename } from './properties/property-utils.js'
 import { Atrule, Selector, Dimension, Url, Value, Hash, Rule, Identifier, Func, Operator } from './css-tree-node-types.js'
 import { KeywordSet } from './keyword-set.js'
-import type { CssNode, Declaration, SelectorList } from 'css-tree'
+import type { CssNode, Declaration } from 'css-tree'
 
 export type Specificity = [number, number, number]
 
@@ -236,6 +235,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						descriptors[descriptor.property] = (descriptor.value as CSSNode).text
 					}
 				}
+				atRuleComplexities.push(1)
 				fontfaces.push(descriptors)
 			}
 			//#endregion
@@ -244,21 +244,32 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				if (str_equals('layer', node.name)) {
 					// @layer without a prelude is anonymous
 					layers.p('<anonymous>', wallaceLoc(node))
-					// complexity++
+					atRuleComplexities.push(2)
 				}
 			} else {
 				let { name } = node
+				let complexity = 1
+
 				// All the AtRules in here MUST have a prelude, so we can count their names
 				if (str_equals('media', name)) {
 					medias.p(node.prelude, wallaceLoc(node))
+					if (isMediaBrowserhack(node)) {
+						mediaBrowserhacks.p(node.prelude, wallaceLoc(node))
+						complexity++
+					}
 				} else if (str_equals('supports', name)) {
 					supports.p(node.prelude, wallaceLoc(node))
+					if (isSupportsBrowserhack(node)) {
+						supportsBrowserhacks.p(node.prelude, wallaceLoc(node))
+						complexity++
+					}
 				} else if (endsWith('keyframes', name)) {
 					let prelude = `@${name} ${node.prelude}`
 					keyframes.p(prelude, wallaceLoc(node))
 
 					if (is_vendor_prefixed(name)) {
 						prefixedKeyframes.p(prelude, wallaceLoc(node))
+						complexity++
 					}
 				} else if (str_equals('layer', name)) {
 					for (let layer of node.prelude.split(',').map((s) => s.trim())) {
@@ -288,6 +299,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				} else if (str_equals('property', name)) {
 					registeredProperties.p(node.prelude, wallaceLoc(node))
 				}
+
+				atRuleComplexities.push(complexity)
 			}
 		} else if (node.type_name === 'Rule') {
 			totalRules++
@@ -404,47 +417,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	walk(ast, {
 		enter(node: CssNode) {
 			switch (node.type) {
-				case Atrule: {
-					let atRuleName = node.name
-
-					if (atRuleName === 'font-face') {
-						atRuleComplexities.push(1)
-						break
-					}
-
-					let complexity = 1
-
-					// All the AtRules in here MUST have a prelude, so we can count their names
-					// oxlint-disable-next-line no-negated-condition
-					if (node.prelude !== null) {
-						let prelude = node.prelude
-						let preludeStr = prelude && stringifyNode(node.prelude)
-
-						if (atRuleName === 'media') {
-							if (isMediaBrowserhack(prelude)) {
-								mediaBrowserhacks.p(preludeStr, prelude.loc!)
-								complexity++
-							}
-						} else if (atRuleName === 'supports') {
-							// TODO: analyze vendor prefixes in @supports
-							// TODO: analyze complexity of @supports 'declaration'
-							if (isSupportsBrowserhack(prelude)) {
-								supportsBrowserhacks.p(preludeStr, prelude.loc!)
-								complexity++
-							}
-						} else if (endsWith('keyframes', atRuleName)) {
-							if (hasVendorPrefix(atRuleName)) {
-								complexity++
-							}
-						}
-					} else {
-						if (atRuleName === 'layer') {
-							complexity++
-						}
-					}
-					atRuleComplexities.push(complexity)
-					break
-				}
 				// @ts-expect-error Oudated css-tree types
 				case 'Feature': {
 					// @ts-expect-error Oudated css-tree types
