@@ -262,10 +262,10 @@ test('counts Accessibility selectors', () => {
     img[role="presentation"],
     .selector:not([role="tablist"]),
     body.intent-mouse·[role=tabpanel][tabindex="0"]:focus,
-
-    /* false positives */
     img[loading="lazy"],
     [hidden] {}
+
+    /* Note: img[loading="lazy"] and [hidden] are false positives for accessibility */
   `
 	const actual = analyze(fixture).selectors.accessibility
 	const expected = {

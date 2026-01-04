@@ -16,7 +16,7 @@ import {
 // @ts-expect-error types missing
 import { calculateForAST } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
-import { getCombinators, getComplexity, isAccessibility, isPrefixed, hasPseudoClass } from './selectors/utils.js'
+import { getCombinators, getComplexity, isPrefixed, hasPseudoClass, isAccessibility } from './selectors/utils.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
 import { destructure, isSystemFont } from './values/destructure-font-shorthand.js'
 import { isValueKeyword, keywords, isValueReset } from './values/values.js'
@@ -224,7 +224,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 		}
 	}
 
-	function wallaceWalk(node: CSSNode, depth: number = 0) {
+	function wallaceWalk(node: CSSNode, depth: number = 0, inKeyframes: boolean = false) {
 		// Count nodes and track nesting
 		if (node.type_name === 'Atrule') {
 			let atruleLoc = wallaceLoc(node)
@@ -280,6 +280,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						prefixedKeyframes.p(prelude, wallaceLoc(node))
 						complexity++
 					}
+
+					// Mark that we're inside a keyframes atrule
+					inKeyframes = true
 				} else if (str_equals('layer', name)) {
 					for (let layer of node.prelude.text.split(',').map((s) => s.trim())) {
 						layers.p(layer, wallaceLoc(node))
@@ -312,59 +315,84 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				atRuleComplexities.push(complexity)
 			}
 		} else if (node.type_name === 'Rule') {
-			totalRules++
+			// Handle keyframe rules specially
+			if (inKeyframes && node.prelude) {
+				// In keyframes, the prelude is a SelectorList that may not have Selector children
+				// (e.g., "50%" is just a SelectorList with text, no Selector child)
+				if (node.prelude.type_name === 'SelectorList' && node.prelude.text) {
+					keyframeSelectors.p(node.prelude.text, wallaceLoc(node.prelude))
+				}
+				// Don't count keyframe rules as regular rules, but continue walking
+				// children to count declarations inside keyframes
+				// (Declarations are counted in the Declaration handler below)
+			} else {
+				// Only count non-keyframe rules
+				totalRules++
 
-			// Check if rule is empty (no declarations in block)
-			if (node.block?.is_empty) {
-				emptyRules++
-			}
+				// Check if rule is empty (no declarations in block)
+				if (node.block?.is_empty) {
+					emptyRules++
+				}
 
-			// Count selectors and declarations in this rule
-			let numSelectors = 0
-			let numDeclarations = 0
-			let loc = wallaceLoc(node)
+				// Count selectors and declarations in this rule
+				let numSelectors = 0
+				let numDeclarations = 0
+				let loc = wallaceLoc(node)
 
-			// Find the SelectorList child and count Selector nodes inside it
-			if (node.prelude) {
-				for (const selector of node.prelude.children) {
-					if (selector.type_name === 'Selector') {
-						numSelectors++
+				// Find the SelectorList child and count Selector nodes inside it
+				if (node.prelude) {
+					for (const selector of node.prelude.children) {
+						if (selector.type_name === 'Selector') {
+							numSelectors++
+						}
 					}
 				}
-			}
 
-			// Count declarations in the block
-			if (node.block) {
-				for (const declaration of node.block.children) {
-					if (declaration.type_name === 'Declaration') {
-						numDeclarations++
+				// Count declarations in the block
+				if (node.block) {
+					for (const declaration of node.block.children) {
+						if (declaration.type_name === 'Declaration') {
+							numDeclarations++
+						}
 					}
 				}
+
+				// Track rule metrics
+				ruleSizes.push(numSelectors + numDeclarations)
+				uniqueRuleSize.p(numSelectors + numDeclarations, loc)
+
+				selectorsPerRule.push(numSelectors)
+				uniqueSelectorsPerRule.p(numSelectors, loc)
+
+				declarationsPerRule.push(numDeclarations)
+				uniqueDeclarationsPerRule.p(numDeclarations, loc)
+
+				ruleNesting.push(depth)
+				uniqueRuleNesting.p(depth, loc)
 			}
-
-			// Track rule metrics
-			ruleSizes.push(numSelectors + numDeclarations)
-			uniqueRuleSize.p(numSelectors + numDeclarations, loc)
-
-			selectorsPerRule.push(numSelectors)
-			uniqueSelectorsPerRule.p(numSelectors, loc)
-
-			declarationsPerRule.push(numDeclarations)
-			uniqueDeclarationsPerRule.p(numDeclarations, loc)
-
-			ruleNesting.push(depth)
-			uniqueRuleNesting.p(depth, loc)
 		} else if (node.type_name === 'Selector') {
+			// Keyframe selectors are now handled at the Rule level, so skip them here
+			if (inKeyframes) {
+				return SKIP
+			}
+
 			let loc = wallaceLoc(node)
+
 			selectorNesting.push(depth > 0 ? depth - 1 : 0)
 			uniqueSelectorNesting.p(depth > 0 ? depth - 1 : 0, loc)
 			uniqueSelectors.add(node.text)
 
-			// let complexity = getComplexityWallace(node)
-			// selectorComplexities.push(complexity)
+			let complexity = getComplexity(node)
+			selectorComplexities.push(complexity)
+			uniqueSelectorComplexities.p(complexity, loc)
 
 			if (isPrefixed(node)) {
 				prefixedSelectors.p(node.text, loc)
+			}
+
+			// Check for accessibility selectors
+			if (isAccessibility(node)) {
+				a11y.p(node.text, loc)
 			}
 
 			let pseudos = hasPseudoClass(node)
@@ -470,7 +498,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 		if (node.children && Array.isArray(node.children)) {
 			for (const child of node.children) {
-				wallaceWalk(child, nextDepth)
+				wallaceWalk(child, nextDepth, inKeyframes)
 			}
 		}
 	}
@@ -489,20 +517,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				case Selector: {
 					let selector = stringifyNode(node)
 					let loc = node.loc!
-
-					if (this.atrule && endsWith('keyframes', this.atrule.name)) {
-						keyframeSelectors.p(selector, loc)
-						return this.skip
-					}
-
-					if (isAccessibility(node)) {
-						a11y.p(selector, loc)
-					}
-
-					let complexity = getComplexity(node)
-
-					selectorComplexities.push(complexity)
-					uniqueSelectorComplexities.p(complexity, loc)
 
 					// #region specificity
 					let specificity: Specificity = calculateForAST(node).toArray()
