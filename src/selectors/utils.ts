@@ -235,6 +235,9 @@ export function getComplexityWallace(selector: CSSNode): number {
  * Walk a selector node and trigger a callback every time a Combinator was found
  */
 export function getCombinators(selector: CSSNode, onMatch: ({ name, loc }: { name: string; loc: CssLocation }) => void) {
+	// Get CSS source from the selector's arena
+	// const css = selector.source || ''
+
 	wallaceWalk(selector, function (node) {
 		if (node.type_name === 'Combinator') {
 			onMatch({
@@ -247,7 +250,7 @@ export function getCombinators(selector: CSSNode, onMatch: ({ name, loc }: { nam
 						column: node.column,
 					},
 					end: {
-						offset: node.start + node.length,
+						offset: node.start + 1,
 						line: node.line,
 						column: node.column,
 					},

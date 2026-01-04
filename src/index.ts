@@ -10,6 +10,7 @@ import {
 	SKIP,
 	str_equals,
 	str_starts_with,
+	walk as wallaceWalk2,
 	parse as wallaceParse,
 } from '@projectwallace/css-parser'
 // @ts-expect-error types missing
@@ -248,7 +249,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			}
 			//#endregion
 
-			if (node.prelude === null) {
+			if (node.prelude === null || node.prelude === undefined) {
 				if (str_equals('layer', node.name)) {
 					// @layer without a prelude is anonymous
 					layers.p('<anonymous>', wallaceLoc(node))
@@ -260,19 +261,19 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 				// All the AtRules in here MUST have a prelude, so we can count their names
 				if (str_equals('media', name)) {
-					medias.p(node.prelude, wallaceLoc(node))
-					if (isMediaBrowserhack(node)) {
-						mediaBrowserhacks.p(node.prelude, wallaceLoc(node))
+					medias.p(node.prelude.text, wallaceLoc(node))
+					if (isMediaBrowserhack(node.prelude)) {
+						mediaBrowserhacks.p(node.prelude.text, wallaceLoc(node))
 						complexity++
 					}
 				} else if (str_equals('supports', name)) {
-					supports.p(node.prelude, wallaceLoc(node))
-					if (isSupportsBrowserhack(node)) {
-						supportsBrowserhacks.p(node.prelude, wallaceLoc(node))
+					supports.p(node.prelude.text, wallaceLoc(node))
+					if (isSupportsBrowserhack(node.prelude)) {
+						supportsBrowserhacks.p(node.prelude.text, wallaceLoc(node))
 						complexity++
 					}
 				} else if (endsWith('keyframes', name)) {
-					let prelude = `@${name} ${node.prelude}`
+					let prelude = `@${name} ${node.prelude.text}`
 					keyframes.p(prelude, wallaceLoc(node))
 
 					if (is_vendor_prefixed(name)) {
@@ -280,14 +281,14 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						complexity++
 					}
 				} else if (str_equals('layer', name)) {
-					for (let layer of node.prelude.split(',').map((s) => s.trim())) {
+					for (let layer of node.prelude.text.split(',').map((s) => s.trim())) {
 						layers.p(layer, wallaceLoc(node))
 					}
 				} else if (str_equals('import', name)) {
-					imports.p(node.prelude, wallaceLoc(node))
+					imports.p(node.prelude.text, wallaceLoc(node))
 
-					if (node.has_children) {
-						for (let child of node) {
+					if (node.prelude.has_children) {
+						for (let child of node.prelude) {
 							if (child.type_name === 'SupportsQuery' && typeof child.value === 'string') {
 								supports.p(child.value, wallaceLoc(child))
 							} else if (child.type_name === 'Layer' && typeof child.value === 'string') {
@@ -295,17 +296,17 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							}
 						}
 					}
-				} else if (str_equals('charset', name)) {
-					charsets.p(node.prelude, wallaceLoc(node))
 				} else if (str_equals('container', name)) {
-					containers.p(node.prelude, wallaceLoc(node))
-					if (node.first_child?.type_name === 'ContainerQuery') {
-						if (node.first_child.first_child?.type_name === 'Identifier') {
-							containerNames.p(node.first_child.first_child.text, wallaceLoc(node))
+					containers.p(node.prelude.text, wallaceLoc(node))
+					if (node.prelude.first_child?.type_name === 'ContainerQuery') {
+						if (node.prelude.first_child.first_child?.type_name === 'Identifier') {
+							containerNames.p(node.prelude.first_child.first_child.text, wallaceLoc(node))
 						}
 					}
 				} else if (str_equals('property', name)) {
-					registeredProperties.p(node.prelude, wallaceLoc(node))
+					registeredProperties.p(node.prelude.text, wallaceLoc(node))
+				} else if (str_equals('charset', name)) {
+					charsets.p(node.prelude.text, wallaceLoc(node))
 				}
 
 				atRuleComplexities.push(complexity)
@@ -314,7 +315,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			totalRules++
 
 			// Check if rule is empty (no declarations in block)
-			if (node.block && node.block.is_empty) {
+			if (node.block?.is_empty) {
 				emptyRules++
 			}
 
@@ -324,25 +325,18 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			let loc = wallaceLoc(node)
 
 			// Find the SelectorList child and count Selector nodes inside it
-			if (node.children && Array.isArray(node.children)) {
-				for (const child of node.children) {
-					if (child.type_name === 'SelectorList') {
-						// Count Selector nodes inside the SelectorList
-						if (Array.isArray(child.children)) {
-							for (const selector of child.children) {
-								if (selector.type_name === 'Selector') {
-									numSelectors++
-								}
-							}
-						}
+			if (node.prelude) {
+				for (const selector of node.prelude.children) {
+					if (selector.type_name === 'Selector') {
+						numSelectors++
 					}
 				}
 			}
 
 			// Count declarations in the block
-			if (node.block && Array.isArray(node.block.children)) {
-				for (const child of node.block.children) {
-					if (child.type_name === 'Declaration') {
+			if (node.block) {
+				for (const declaration of node.block.children) {
+					if (declaration.type_name === 'Declaration') {
 						numDeclarations++
 					}
 				}
