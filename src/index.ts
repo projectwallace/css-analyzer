@@ -224,7 +224,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 		}
 	}
 
-	function wallaceWalk(node: CSSNode, depth: number = 0, inKeyframes: boolean = false) {
+	function wallaceWalk(node: CSSNode, depth: number = 0, inKeyframes: boolean = false, inAtrulePrelude: boolean = false) {
 		// Count nodes and track nesting
 		if (node.type_name === 'Atrule') {
 			let atruleLoc = wallaceLoc(node)
@@ -421,6 +421,16 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			declarationNesting.push(declarationDepth)
 			uniqueDeclarationNesting.p(declarationDepth, wallaceLoc(node))
 
+			let complexity = 1
+			if (node.is_important) {
+				complexity++
+				if (inKeyframes) {
+					importantsInKeyframes++
+					complexity++
+				}
+			}
+			declarationComplexities.push(complexity)
+
 			//#region PROPERTIES
 			let { is_important, property, is_browserhack, is_vendor_prefixed } = node
 
@@ -493,12 +503,19 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			}
 		}
 
+		// Walk at-rule prelude children with inAtrulePrelude flag
+		if (node.type_name === 'Atrule' && node.prelude && node.prelude.has_children) {
+			for (const child of node.prelude) {
+				wallaceWalk(child, depth, inKeyframes, true)
+			}
+		}
+
 		// Walk children with increased depth for Rules and Atrules
 		const nextDepth = node.type_name === 'Rule' || node.type_name === 'Atrule' ? depth + 1 : depth
 
 		if (node.children && Array.isArray(node.children)) {
 			for (const child of node.children) {
-				wallaceWalk(child, nextDepth, inKeyframes)
+				wallaceWalk(child, nextDepth, inKeyframes, inAtrulePrelude)
 			}
 		}
 	}
@@ -585,7 +602,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					let complexity = 1
 
 					// i.e. `background-image: -webkit-linear-gradient()`
-					if (isValuePrefixed(node)) {
+					// Skip counting vendor prefixes in at-rule preludes (e.g., @supports (position: -webkit-sticky))
+					if (isValuePrefixed(node) && !this.atrulePrelude) {
 						vendorPrefixedValues.p(stringifyNode(node), loc)
 						complexity++
 					}
@@ -803,29 +821,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							}
 						}
 					})
-					break
-				}
-				case 'Declaration': {
-					// Do not process Declarations in atRule preludes
-					// because we will handle them manually
-					if (this.atrulePrelude !== null) {
-						return this.skip
-					}
-
-					let complexity = 1
-
-					if (node.important === true) {
-						// importantDeclarations now counted by Wallace parser
-						complexity++
-
-						if (this.atrule && endsWith('keyframes', this.atrule.name)) {
-							importantsInKeyframes++
-							complexity++
-						}
-					}
-
-					declarationComplexities.push(complexity)
-
 					break
 				}
 			}
