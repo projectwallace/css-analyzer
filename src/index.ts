@@ -13,8 +13,6 @@ import {
 	walk as wallaceWalk2,
 	parse as wallaceParse,
 } from '@projectwallace/css-parser'
-// @ts-expect-error types missing
-import { calculateForAST } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isPrefixed, hasPseudoClass, isAccessibility } from './selectors/utils.js'
 import { calculateForAST as calculateSpecificity } from './selectors/specificity.js'
@@ -31,7 +29,7 @@ import { isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
 import { basename } from './properties/property-utils.js'
-import { Atrule, Selector, Dimension, Value, Hash, Rule, Identifier, Func, Operator } from './css-tree-node-types.js'
+import { Value, Hash, Identifier, Func, Operator } from './css-tree-node-types.js'
 import { KeywordSet } from './keyword-set.js'
 import type { CssNode, Declaration } from 'css-tree'
 
@@ -206,8 +204,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let valueKeywords = new Collection(useLocations)
 	let borderRadiuses = new ContextCollection(useLocations)
 	let resets = new Collection(useLocations)
-
-	let nestingDepth = 0
 
 	// Use Wallace parser to count basic structures (migrating from css-tree)
 	let wallaceAst = wallaceParse(css)
@@ -503,6 +499,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 					return SKIP
 				}
+
+				// Rest of Value analysis here
 			})
 		} else if (node.type_name === 'Value') {
 			let { text } = node
@@ -809,15 +807,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					})
 					break
 				}
-			}
-
-			if (node.type === Rule || node.type === Atrule) {
-				nestingDepth++
-			}
-		},
-		leave(node: CssNode) {
-			if (node.type === Rule || node.type === Atrule) {
-				nestingDepth--
 			}
 		},
 	})
