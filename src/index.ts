@@ -17,7 +17,7 @@ import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isPrefixed, hasPseudoClass, isAccessibility } from './selectors/utils.js'
 import { calculateForAST as calculateSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
-import { destructure, isSystemFont, SYSTEM_FONTS } from './values/destructure-font-shorthand.js'
+import { destructure, SYSTEM_FONTS } from './values/destructure-font-shorthand.js'
 import { isValueKeyword, keywords, isValueReset } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
@@ -29,7 +29,7 @@ import { isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
 import { basename } from './properties/property-utils.js'
-import { Value, Hash, Identifier, Func, Operator } from './css-tree-node-types.js'
+import { Value, Hash, Identifier, Func } from './css-tree-node-types.js'
 import { KeywordSet } from './keyword-set.js'
 import type { CssNode, Declaration } from 'css-tree'
 
@@ -555,7 +555,32 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					zindex.p(text, valueLoc)
 					return SKIP
 				} else if (isProperty('font', property)) {
-					// TODO: implement
+					if (!SYSTEM_FONTS.has(text)) {
+						let result = destructure(value, function (item) {
+							if (item.type === 'keyword') {
+								valueKeywords.p(item.value, valueLoc)
+							}
+						})
+
+						if (!result) {
+							return SKIP
+						}
+
+						let { font_size, line_height, font_family } = result
+						if (font_family) {
+							fontFamilies.p(font_family, valueLoc)
+						}
+
+						if (font_size) {
+							fontSizes.p(font_size, valueLoc)
+						}
+
+						if (line_height) {
+							lineHeights.p(line_height, valueLoc)
+						}
+					}
+					// Don't return SKIP here - let css-tree walker continue to find
+					// units, colors, and font families in var() fallbacks
 				} else if (isProperty('font-size', property)) {
 					if (!SYSTEM_FONTS.has(text)) {
 						fontSizes.p(text, valueLoc)
@@ -593,7 +618,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				} else if (isProperty('container-name', property)) {
 					containerNames.p(text, valueLoc)
 				} else if (isProperty('container', property)) {
-					// The first identifier is the container name
+					// The first identifier in the `container` shorthand is the container name
 					// Example: container: my-layout / inline-size;
 					if (value.first_child?.type_name === 'Identifier') {
 						containerNames.p(value.first_child.text, valueLoc)
@@ -696,35 +721,33 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					let declaration: Declaration = this.declaration
 					let { property } = declaration
 
-					let children = node.children
-
 					// Process properties first that don't have colors,
 					// so we can avoid further walking them;
 					if (isProperty('font', property)) {
-						if (isSystemFont(node)) return
+						// if (isSystemFont(node)) return
 
-						let result = destructure(node, stringifyNode, function (item) {
-							if (item.type === 'keyword') {
-								valueKeywords.p(item.value, loc)
-							}
-						})
+						// let result = destructure(node, stringifyNode, function (item) {
+						// 	if (item.type === 'keyword') {
+						// 		valueKeywords.p(item.value, loc)
+						// 	}
+						// })
 
-						if (!result) {
-							return this.skip
-						}
+						// if (!result) {
+						// 	return this.skip
+						// }
 
-						let { font_size, line_height, font_family } = result
-						if (font_family) {
-							fontFamilies.p(font_family, loc)
-						}
+						// let { font_size, line_height, font_family } = result
+						// if (font_family) {
+						// 	fontFamilies.p(font_family, loc)
+						// }
 
-						if (font_size) {
-							fontSizes.p(font_size, loc)
-						}
+						// if (font_size) {
+						// 	fontSizes.p(font_size, loc)
+						// }
 
-						if (line_height) {
-							lineHeights.p(line_height, loc)
-						}
+						// if (line_height) {
+						// 	lineHeights.p(line_height, loc)
+						// }
 
 						break
 					} else if (isProperty('font-family', property)) {
