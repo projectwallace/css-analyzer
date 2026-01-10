@@ -552,20 +552,49 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						resets.p(property, valueLoc)
 					}
 				} else if (isProperty('z-index', property)) {
-					zindex.p(value.text, valueLoc)
+					zindex.p(text, valueLoc)
 					return SKIP
 				} else if (isProperty('font', property)) {
 					// TODO: implement
 				} else if (isProperty('font-size', property)) {
-					if (!SYSTEM_FONTS.has(value.text)) {
-						fontSizes.p(value.text, valueLoc)
+					if (!SYSTEM_FONTS.has(text)) {
+						fontSizes.p(text, valueLoc)
 					}
 				} else if (isProperty('font-family', property)) {
-					if (!SYSTEM_FONTS.has(value.text)) {
-						fontFamilies.p(value.text, valueLoc)
+					if (!SYSTEM_FONTS.has(text)) {
+						fontFamilies.p(text, valueLoc)
 					}
+					return SKIP // to prevent finding color false positives (Black as font family name is not a color)
 				} else if (isProperty('line-height', property)) {
-					lineHeights.p(value.text, valueLoc)
+					lineHeights.p(text, valueLoc)
+				} else if (isProperty('transition', property) || isProperty('animation', property)) {
+					// TODO: iplement
+				} else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
+					for (let child of value.children) {
+						if (child.type_name !== 'Operator') {
+							durations.p(child.text, valueLoc)
+						}
+					}
+				} else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
+					for (let child of value.children) {
+						if (child.type_name !== 'Operator') {
+							timingFunctions.p(child.text, valueLoc)
+						}
+					}
+				} else if (isProperty('container-name', property)) {
+					containerNames.p(text, valueLoc)
+				} else if (isProperty('container', property)) {
+					// The first identifier is the container name
+					// Example: container: my-layout / inline-size;
+					if (value.first_child?.type_name === 'Identifier') {
+						containerNames.p(value.first_child.text, valueLoc)
+					}
+				} else if (border_radius_properties.has(basename(property))) {
+					borderRadiuses.push(text, property, valueLoc)
+				} else if (isProperty('text-shadow', property)) {
+					textShadows.p(text, valueLoc)
+				} else if (isProperty('box-shadow', property)) {
+					boxShadows.p(text, valueLoc)
 				}
 
 				wallaceWalk2(value, (valueNode) => {
@@ -662,29 +691,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 					// Process properties first that don't have colors,
 					// so we can avoid further walking them;
-					if (
-						isProperty('margin', property) ||
-						isProperty('margin-block', property) ||
-						isProperty('margin-inline', property) ||
-						isProperty('margin-top', property) ||
-						isProperty('margin-right', property) ||
-						isProperty('margin-bottom', property) ||
-						isProperty('margin-left', property) ||
-						isProperty('padding', property) ||
-						isProperty('padding-block', property) ||
-						isProperty('padding-inline', property) ||
-						isProperty('padding-top', property) ||
-						isProperty('padding-right', property) ||
-						isProperty('padding-bottom', property) ||
-						isProperty('padding-left', property)
-					) {
-						// if (isValueReset(node)) {
-						// 	resets.p(property, declaration.loc!)
-						// }
-					} else if (isProperty('z-index', property)) {
-						// zindex.p(stringifyNode(node), loc)
-						// return this.skip
-					} else if (isProperty('font', property)) {
+					if (isProperty('font', property)) {
 						if (isSystemFont(node)) return
 
 						let result = destructure(node, stringifyNode, function (item) {
@@ -711,18 +718,11 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						}
 
 						break
-					} else if (isProperty('font-size', property)) {
-						// if (!isSystemFont(node)) {
-						// 	fontSizes.p(stringifyNode(node), loc)
-						// }
-						break
 					} else if (isProperty('font-family', property)) {
 						// if (!isSystemFont(node)) {
 						// 	fontFamilies.p(stringifyNode(node), loc)
 						// }
 						break
-					} else if (isProperty('line-height', property)) {
-						// lineHeights.p(stringifyNode(node), loc)
 					} else if (isProperty('transition', property) || isProperty('animation', property)) {
 						analyzeAnimation(children, function (item: { type: string; value: CssNode }) {
 							if (item.type === 'fn') {
@@ -734,51 +734,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							}
 						})
 						break
-					} else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
-						if (children && children.size > 1) {
-							children.forEach((child) => {
-								if (child.type !== Operator) {
-									durations.p(stringifyNode(child), loc)
-								}
-							})
-						} else {
-							durations.p(stringifyNode(node), loc)
-						}
-						break
-					} else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
-						if (children && children.size > 1) {
-							children.forEach((child) => {
-								if (child.type !== Operator) {
-									timingFunctions.p(stringifyNode(child), loc)
-								}
-							})
-						} else {
-							timingFunctions.p(stringifyNode(node), loc)
-						}
-						break
-					} else if (isProperty('container-name', property)) {
-						containerNames.p(stringifyNode(node), loc)
-					} else if (isProperty('container', property)) {
-						// The first identifier is the container name
-						// Example: container: my-layout / inline-size;
-						if (children.first?.type === 'Identifier') {
-							containerNames.p(children.first.name, loc)
-						}
-					} else if (border_radius_properties.has(basename(property))) {
-						if (!isValueKeyword(node)) {
-							borderRadiuses.push(stringifyNode(node), property, loc)
-						}
-						break
-					} else if (isProperty('text-shadow', property)) {
-						if (!isValueKeyword(node)) {
-							textShadows.p(stringifyNode(node), loc)
-						}
-						// no break here: potentially contains colors
-					} else if (isProperty('box-shadow', property)) {
-						if (!isValueKeyword(node)) {
-							boxShadows.p(stringifyNode(node), loc)
-						}
-						// no break here: potentially contains colors
 					}
 
 					walk(node, function (valueNode: CssNode) {
