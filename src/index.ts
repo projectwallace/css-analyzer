@@ -568,7 +568,16 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				} else if (isProperty('line-height', property)) {
 					lineHeights.p(text, valueLoc)
 				} else if (isProperty('transition', property) || isProperty('animation', property)) {
-					// TODO: iplement
+					analyzeAnimation(value.children, function (item: { type: string; value: CSSNode }) {
+						if (item.type === 'fn') {
+							timingFunctions.p(item.value.text, valueLoc)
+						} else if (item.type === 'duration') {
+							durations.p(item.value.text, valueLoc)
+						} else if (item.type === 'keyword') {
+							valueKeywords.p(item.value.text, valueLoc)
+						}
+					})
+					return SKIP
 				} else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
 					for (let child of value.children) {
 						if (child.type_name !== 'Operator') {
@@ -724,15 +733,15 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						// }
 						break
 					} else if (isProperty('transition', property) || isProperty('animation', property)) {
-						analyzeAnimation(children, function (item: { type: string; value: CssNode }) {
-							if (item.type === 'fn') {
-								timingFunctions.p(stringifyNode(item.value), loc)
-							} else if (item.type === 'duration') {
-								durations.p(stringifyNode(item.value), loc)
-							} else if (item.type === 'keyword') {
-								valueKeywords.p(stringifyNode(item.value), loc)
-							}
-						})
+						// analyzeAnimation(children, function (item: { type: string; value: CssNode }) {
+						// 	if (item.type === 'fn') {
+						// 		timingFunctions.p(stringifyNode(item.value), loc)
+						// 	} else if (item.type === 'duration') {
+						// 		durations.p(stringifyNode(item.value), loc)
+						// 	} else if (item.type === 'keyword') {
+						// 		valueKeywords.p(stringifyNode(item.value), loc)
+						// 	}
+						// })
 						break
 					}
 

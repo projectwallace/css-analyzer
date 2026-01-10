@@ -1,18 +1,17 @@
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
 import { Operator, Dimension, Identifier, Func } from '../css-tree-node-types.js'
-import type { CssNode, List } from 'css-tree'
+import type { CSSNode } from '@projectwallace/css-parser'
 
 const TIMING_KEYWORDS = new KeywordSet(['linear', 'ease', 'ease-in', 'ease-out', 'ease-in-out', 'step-start', 'step-end'])
 
 const TIMING_FUNCTION_VALUES = new KeywordSet(['cubic-bezier', 'steps'])
 
-export function analyzeAnimation(children: List<CssNode>, cb: ({ type, value }: { type: string; value: CssNode }) => void) {
+export function analyzeAnimation(children: CSSNode[], cb: ({ type, value }: { type: string; value: CSSNode }) => void) {
 	let durationFound = false
 
 	for (let child of children) {
-		let type = child.type
-		// @ts-expect-error TODO: fix this
+		let type = child.type_name
 		let name = child.name
 
 		// Right after a ',' we start over again
