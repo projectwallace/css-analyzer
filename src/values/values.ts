@@ -24,13 +24,6 @@ export function isValueKeyword(node: Value) {
 	return firstChild!.type === Identifier && keywords.has(firstChild.name)
 }
 
-export function isValueKeywordWallace(node: CSSNode) {
-	if (!node.has_children) return false
-	let size = node.children.length
-	if (size > 1 || size === 0) return false
-	return node.first_child?.type_name === 'Identifier' && keywords.has(node.first_child.name)
-}
-
 function isZero(string: string): boolean {
 	return parseFloat(string) === 0
 }
@@ -38,10 +31,10 @@ function isZero(string: string): boolean {
 /**
  * Test whether a value is a reset (0, 0px, -0.0e0 etc.)
  */
-export function isValueReset(node: Value): boolean {
-	for (let child of node.children.toArray()) {
-		if (child.type === Nr && isZero(child.value)) continue
-		if (child.type === Dimension && isZero(child.value)) continue
+export function isValueReset(node: CSSNode): boolean {
+	for (let child of node.children) {
+		if (child.type_name === 'Number' && isZero(child.text)) continue
+		if (child.type_name === 'Dimension' && child.value === 0) continue
 		return false
 	}
 

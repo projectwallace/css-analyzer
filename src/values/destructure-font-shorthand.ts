@@ -3,7 +3,7 @@ import { keywords } from './values.js'
 import { Identifier, Nr, Operator } from '../css-tree-node-types.js'
 import type { CssNode, Value } from 'css-tree'
 
-const SYSTEM_FONTS = new KeywordSet(['caption', 'icon', 'menu', 'message-box', 'small-caption', 'status-bar'])
+export const SYSTEM_FONTS = new KeywordSet(['caption', 'icon', 'menu', 'message-box', 'small-caption', 'status-bar'])
 
 const SIZE_KEYWORDS = new KeywordSet([
 	/* <absolute-size> values */

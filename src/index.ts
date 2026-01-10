@@ -17,7 +17,7 @@ import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isPrefixed, hasPseudoClass, isAccessibility } from './selectors/utils.js'
 import { calculateForAST as calculateSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
-import { destructure, isSystemFont } from './values/destructure-font-shorthand.js'
+import { destructure, isSystemFont, SYSTEM_FONTS } from './values/destructure-font-shorthand.js'
 import { isValueKeyword, keywords, isValueReset } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
@@ -503,30 +503,70 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				let value = node.value as CSSNode
 
 				let { text } = value
-				let loc = wallaceLoc(value)
+				let valueLoc = wallaceLoc(value)
 				let complexity = 1
 
 				// auto, inherit, initial, etc.
 				if (keywords.has(text)) {
-					valueKeywords.p(text, loc)
+					valueKeywords.p(text, valueLoc)
 					valueComplexities.push(complexity)
 					return
 				}
 
+				//#region VALUE COMPLEXITY
 				// i.e. `background-image: -webkit-linear-gradient()`
 				if (isValuePrefixed(value)) {
-					vendorPrefixedValues.p(value.text, loc)
+					vendorPrefixedValues.p(value.text, valueLoc)
 					complexity++
 				}
 
 				// i.e. `property: value\9`
 				if (isIe9Hack(value)) {
-					valueBrowserhacks.p(text, loc)
+					valueBrowserhacks.p(text, valueLoc)
 					complexity++
 				}
+				//#endregion VALUE COMPLEXITY
 
 				// TODO: should shorthands be counted towards complexity?
 				valueComplexities.push(complexity)
+
+				// Process properties first that don't have colors,
+				// so we can avoid further walking them;
+				if (
+					isProperty('margin', property) ||
+					isProperty('margin-block', property) ||
+					isProperty('margin-inline', property) ||
+					isProperty('margin-top', property) ||
+					isProperty('margin-right', property) ||
+					isProperty('margin-bottom', property) ||
+					isProperty('margin-left', property) ||
+					isProperty('padding', property) ||
+					isProperty('padding-block', property) ||
+					isProperty('padding-inline', property) ||
+					isProperty('padding-top', property) ||
+					isProperty('padding-right', property) ||
+					isProperty('padding-bottom', property) ||
+					isProperty('padding-left', property)
+				) {
+					if (isValueReset(value)) {
+						resets.p(property, valueLoc)
+					}
+				} else if (isProperty('z-index', property)) {
+					zindex.p(value.text, valueLoc)
+					return SKIP
+				} else if (isProperty('font', property)) {
+					// TODO: implement
+				} else if (isProperty('font-size', property)) {
+					if (!SYSTEM_FONTS.has(value.text)) {
+						fontSizes.p(value.text, valueLoc)
+					}
+				} else if (isProperty('font-family', property)) {
+					if (!SYSTEM_FONTS.has(value.text)) {
+						fontFamilies.p(value.text, valueLoc)
+					}
+				} else if (isProperty('line-height', property)) {
+					lineHeights.p(value.text, valueLoc)
+				}
 
 				wallaceWalk2(value, (valueNode) => {
 					if (valueNode.type_name === 'Dimension') {
@@ -611,7 +651,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					let loc = node.loc!
 
 					if (isValueKeyword(node)) {
-						valueComplexities.push(1)
+						// valueComplexities.push(1)
 						break
 					}
 
@@ -638,12 +678,12 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						isProperty('padding-bottom', property) ||
 						isProperty('padding-left', property)
 					) {
-						if (isValueReset(node)) {
-							resets.p(property, declaration.loc!)
-						}
+						// if (isValueReset(node)) {
+						// 	resets.p(property, declaration.loc!)
+						// }
 					} else if (isProperty('z-index', property)) {
-						zindex.p(stringifyNode(node), loc)
-						return this.skip
+						// zindex.p(stringifyNode(node), loc)
+						// return this.skip
 					} else if (isProperty('font', property)) {
 						if (isSystemFont(node)) return
 
@@ -672,17 +712,17 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 						break
 					} else if (isProperty('font-size', property)) {
-						if (!isSystemFont(node)) {
-							fontSizes.p(stringifyNode(node), loc)
-						}
+						// if (!isSystemFont(node)) {
+						// 	fontSizes.p(stringifyNode(node), loc)
+						// }
 						break
 					} else if (isProperty('font-family', property)) {
-						if (!isSystemFont(node)) {
-							fontFamilies.p(stringifyNode(node), loc)
-						}
+						// if (!isSystemFont(node)) {
+						// 	fontFamilies.p(stringifyNode(node), loc)
+						// }
 						break
 					} else if (isProperty('line-height', property)) {
-						lineHeights.p(stringifyNode(node), loc)
+						// lineHeights.p(stringifyNode(node), loc)
 					} else if (isProperty('transition', property) || isProperty('animation', property)) {
 						analyzeAnimation(children, function (item: { type: string; value: CssNode }) {
 							if (item.type === 'fn') {
