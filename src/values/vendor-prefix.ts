@@ -1,24 +1,15 @@
-import { hasVendorPrefix } from '../vendor-prefix.js'
-import { Func, Identifier } from '../css-tree-node-types.js'
-import type { CssNode, Value } from 'css-tree'
+import type { CSSNode } from '@projectwallace/css-parser'
 
-export function isValuePrefixed(node: Value | CssNode): boolean {
-	// @ts-expect-error TODO: fix this
-	let children = node.children
+export function isValuePrefixed(node: CSSNode): boolean {
+	if (!node.has_children) return false
 
-	if (!children) {
-		return false
-	}
-
-	for (let node of children) {
-		let { type, name } = node
-
-		if (type === Identifier && hasVendorPrefix(name)) {
+	for (let child of node.children) {
+		let type = child.type_name
+		if (child.is_vendor_prefixed) {
 			return true
 		}
-
-		if (type === Func) {
-			if (hasVendorPrefix(name) || isValuePrefixed(node)) {
+		if (type === 'Function') {
+			if (isValuePrefixed(child)) {
 				return true
 			}
 		}

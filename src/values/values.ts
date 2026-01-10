@@ -1,6 +1,7 @@
 import { KeywordSet } from '../keyword-set.js'
 import { Identifier, Nr, Dimension } from '../css-tree-node-types.js'
 import type { Value } from 'css-tree'
+import type { CSSNode } from '@projectwallace/css-parser'
 
 export const keywords = new KeywordSet([
 	'auto',
@@ -21,6 +22,13 @@ export function isValueKeyword(node: Value) {
 
 	let firstChild = children.first
 	return firstChild!.type === Identifier && keywords.has(firstChild.name)
+}
+
+export function isValueKeywordWallace(node: CSSNode) {
+	if (!node.has_children) return false
+	let size = node.children.length
+	if (size > 1 || size === 0) return false
+	return node.first_child?.type_name === 'Identifier' && keywords.has(node.first_child.name)
 }
 
 function isZero(string: string): boolean {

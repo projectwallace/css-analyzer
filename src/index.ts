@@ -450,6 +450,15 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			let complexity = 1
 			if (node.is_important) {
 				complexity++
+
+				let declaration = node.text
+				if (!declaration.toLowerCase().includes('!important')) {
+					let valueText = (node.value as CSSNode).text
+					let valueOffset = declaration.indexOf(valueText)
+					let stripSemi = declaration.slice(-1) === ';'
+					valueBrowserhacks.p(`${declaration.slice(valueOffset, stripSemi ? -1 : undefined)}`, wallaceLoc(node.value as CSSNode))
+				}
+
 				if (inKeyframes) {
 					importantsInKeyframes++
 					complexity++
@@ -499,16 +508,36 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 					return SKIP
 				}
-
-				// Rest of Value analysis here
 			})
 		} else if (node.type_name === 'Value') {
 			let { text } = node
+			let loc = wallaceLoc(node)
+			let complexity = 1
 
+			// auto, inherit, initial, etc.
 			if (keywords.has(text)) {
-				valueKeywords.p(text, wallaceLoc(node))
+				valueKeywords.p(text, loc)
+				valueComplexities.push(complexity)
 				return
 			}
+
+			// i.e. `background-image: -webkit-linear-gradient()`
+			if (isValuePrefixed(node)) {
+				vendorPrefixedValues.p(node.text, loc)
+				complexity++
+			}
+
+			// i.e. `property: value\9`
+			if (isIe9Hack(node)) {
+				valueBrowserhacks.p(text, loc)
+				complexity++
+			}
+
+			// TODO: should shorthands be counted towards complexity?
+			valueComplexities.push(complexity)
+
+			// Process properties first that don't have colors,
+			// so we can avoid further walking them;
 		} else if (node.type_name === 'Url') {
 			let { value } = node
 			let embed = unquote((value as string) || '')
@@ -582,32 +611,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					}
 
 					let declaration: Declaration = this.declaration
-					let { property, important } = declaration
-					let complexity = 1
-
-					// i.e. `background-image: -webkit-linear-gradient()`
-					// Skip counting vendor prefixes in at-rule preludes (e.g., @supports (position: -webkit-sticky))
-					if (isValuePrefixed(node) && !this.atrulePrelude) {
-						vendorPrefixedValues.p(stringifyNode(node), loc)
-						complexity++
-					}
-
-					// i.e. `property: value !ie`
-					if (typeof important === 'string') {
-						valueBrowserhacks.p(stringifyNodePlain(node) + '!' + important, loc)
-						complexity++
-					}
-
-					// i.e. `property: value\9`
-					if (isIe9Hack(node)) {
-						valueBrowserhacks.p(stringifyNode(node), loc)
-						complexity++
-					}
+					let { property } = declaration
 
 					let children = node.children
-
-					// TODO: should shorthands be counted towards complexity?
-					valueComplexities.push(complexity)
 
 					// Process properties first that don't have colors,
 					// so we can avoid further walking them;
