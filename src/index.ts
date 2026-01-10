@@ -490,6 +490,20 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				propertyComplexities.push(1)
 			}
 			//#endregion
+
+			wallaceWalk2(node, (valueNode) => {
+				if (valueNode.type_name === 'Dimension') {
+					let unit = valueNode.unit!
+					let loc = wallaceLoc(valueNode)
+					if (endsWith('\\9', unit)) {
+						units.push(unit.substring(0, unit.length - 2), property, loc)
+					} else {
+						units.push(unit, property, loc)
+					}
+
+					return SKIP
+				}
+			})
 		} else if (node.type_name === 'Value') {
 			let { text } = node
 
@@ -560,21 +574,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					// @ts-expect-error Oudated css-tree types
 					mediaFeatures.p(node.name, node.loc)
 					break
-				}
-				case Dimension: {
-					if (!this.declaration) {
-						break
-					}
-
-					let unit = node.unit
-
-					if (endsWith('\\9', unit)) {
-						units.push(unit.substring(0, unit.length - 2), this.declaration.property, node.loc!)
-					} else {
-						units.push(unit, this.declaration.property, node.loc!)
-					}
-
-					return this.skip
 				}
 				case Value: {
 					let loc = node.loc!

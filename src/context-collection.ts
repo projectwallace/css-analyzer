@@ -1,4 +1,3 @@
-import type { CssLocation } from 'css-tree'
 import { Collection, type CollectionCount } from './collection.js'
 
 export class ContextCollection<UseLocations extends boolean = false> {
@@ -18,7 +17,7 @@ export class ContextCollection<UseLocations extends boolean = false> {
 	 * @param context Context to push Item to
 	 * @param node_location
 	 */
-	push(item: string, context: string, node_location: CssLocation) {
+	push(item: string, context: string, node_location: { start: { line: number; column: number; offset: number }; end: { offset: number } }) {
 		this.#list.p(item, node_location)
 
 		if (!this.#contexts.has(context)) {
