@@ -443,9 +443,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			totalDeclarations++
 			uniqueDeclarations.add(node.text)
 
+			let loc = wallaceLoc(node)
 			let declarationDepth = depth > 0 ? depth - 1 : 0
 			declarationNesting.push(declarationDepth)
-			uniqueDeclarationNesting.p(declarationDepth, wallaceLoc(node))
+			uniqueDeclarationNesting.p(declarationDepth, loc)
 
 			let complexity = 1
 			if (node.is_important) {
@@ -494,50 +495,54 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			} else {
 				propertyComplexities.push(1)
 			}
-			//#endregion
+			//#endregion PROPERTIES
 
-			wallaceWalk2(node, (valueNode) => {
-				if (valueNode.type_name === 'Dimension') {
-					let unit = valueNode.unit!
-					let loc = wallaceLoc(valueNode)
-					if (endsWith('\\9', unit)) {
-						units.push(unit.substring(0, unit.length - 2), property, loc)
-					} else {
-						units.push(unit, property, loc)
-					}
+			//#region VALUES
+			// Values are analyzed inside declaration because we need context, like which property is used
+			{
+				let value = node.value as CSSNode
 
-					return SKIP
+				let { text } = value
+				let loc = wallaceLoc(value)
+				let complexity = 1
+
+				// auto, inherit, initial, etc.
+				if (keywords.has(text)) {
+					valueKeywords.p(text, loc)
+					valueComplexities.push(complexity)
+					return
 				}
-			})
-		} else if (node.type_name === 'Value') {
-			let { text } = node
-			let loc = wallaceLoc(node)
-			let complexity = 1
 
-			// auto, inherit, initial, etc.
-			if (keywords.has(text)) {
-				valueKeywords.p(text, loc)
+				// i.e. `background-image: -webkit-linear-gradient()`
+				if (isValuePrefixed(value)) {
+					vendorPrefixedValues.p(value.text, loc)
+					complexity++
+				}
+
+				// i.e. `property: value\9`
+				if (isIe9Hack(value)) {
+					valueBrowserhacks.p(text, loc)
+					complexity++
+				}
+
+				// TODO: should shorthands be counted towards complexity?
 				valueComplexities.push(complexity)
-				return
+
+				wallaceWalk2(value, (valueNode) => {
+					if (valueNode.type_name === 'Dimension') {
+						let unit = valueNode.unit!
+						let loc = wallaceLoc(valueNode)
+						if (endsWith('\\9', unit)) {
+							units.push(unit.substring(0, unit.length - 2), property, loc)
+						} else {
+							units.push(unit, property, loc)
+						}
+
+						return SKIP
+					}
+				})
 			}
-
-			// i.e. `background-image: -webkit-linear-gradient()`
-			if (isValuePrefixed(node)) {
-				vendorPrefixedValues.p(node.text, loc)
-				complexity++
-			}
-
-			// i.e. `property: value\9`
-			if (isIe9Hack(node)) {
-				valueBrowserhacks.p(text, loc)
-				complexity++
-			}
-
-			// TODO: should shorthands be counted towards complexity?
-			valueComplexities.push(complexity)
-
-			// Process properties first that don't have colors,
-			// so we can avoid further walking them;
+			//#endregion VALUES
 		} else if (node.type_name === 'Url') {
 			let { value } = node
 			let embed = unquote((value as string) || '')
