@@ -523,6 +523,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				// i.e. `property: value\9`
 				if (isIe9Hack(value)) {
 					valueBrowserhacks.p(text, valueLoc)
+					text = text.slice(0, -2)
 					complexity++
 				}
 				//#endregion VALUE COMPLEXITY
@@ -579,7 +580,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							lineHeights.p(line_height, valueLoc)
 						}
 					}
-					// Don't return SKIP here - let css-tree walker continue to find
+					// Don't return SKIP here - let walker continue to find
 					// units, colors, and font families in var() fallbacks
 				} else if (isProperty('font-size', property)) {
 					if (!SYSTEM_FONTS.has(text)) {
@@ -631,17 +632,105 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					boxShadows.p(text, valueLoc)
 				}
 
-				wallaceWalk2(value, (valueNode) => {
-					if (valueNode.type_name === 'Dimension') {
-						let unit = valueNode.unit!
-						let loc = wallaceLoc(valueNode)
-						if (endsWith('\\9', unit)) {
-							units.push(unit.substring(0, unit.length - 2), property, loc)
-						} else {
-							units.push(unit, property, loc)
-						}
+				// Check if the value has an IE9 browserhack before walking
+				let valueHasIe9Hack = isIe9Hack(value)
 
-						return SKIP
+				wallaceWalk2(value, (valueNode) => {
+					switch (valueNode.type_name) {
+						case 'Dimension': {
+							let unit = valueNode.unit!
+							let loc = wallaceLoc(valueNode)
+							units.push(unit, property, loc)
+							return SKIP
+						}
+						case Hash: {
+							// Use text property for the hash value
+							let hashText = valueNode.text
+							if (!hashText || !hashText.startsWith('#')) {
+								return SKIP
+							}
+							let hashValue = hashText
+
+							// If the full value has an IE9 hack, append it to the hash
+							if (valueHasIe9Hack && !hashValue.endsWith('\\9')) {
+								hashValue = hashValue + '\\9'
+							}
+
+							// Calculate hex length (excluding the # and any IE9 browserhack \9)
+							let hexLength = hashValue.length - 1 // Remove the # from length
+							if (endsWith('\\9', hashValue)) {
+								hexLength = hexLength - 2 // Remove the \9 from length
+							}
+
+							let hashLoc = wallaceLoc(valueNode)
+							colors.push(hashValue, property, hashLoc)
+							colorFormats.p(`hex` + hexLength, hashLoc)
+
+							return SKIP
+						}
+						case Identifier: {
+							let identifierText = valueNode.text
+							let identifierLoc = wallaceLoc(valueNode)
+
+							// Skip all identifier processing for font properties to avoid:
+							// 1. False positives for colors (e.g., "Black" as a font family vs. "black" the color)
+							// 2. Duplicate keywords (already extracted by destructure function)
+							if (isProperty('font', property) || isProperty('font-family', property)) {
+								return SKIP
+							}
+
+							if (keywords.has(identifierText)) {
+								valueKeywords.p(identifierText, identifierLoc)
+							}
+
+							// Bail out if it can't be a color name
+							// 20 === 'lightgoldenrodyellow'.length
+							// 3 === 'red'.length
+							let nodeLen = identifierText.length
+							if (nodeLen > 20 || nodeLen < 3) {
+								return SKIP
+							}
+
+							// A keyword is most likely to be 'transparent' or 'currentColor'
+							if (colorKeywords.has(identifierText)) {
+								colors.push(identifierText, property, identifierLoc)
+								colorFormats.p(identifierText.toLowerCase(), identifierLoc)
+								return
+							}
+
+							// Or it can be a named color
+							if (namedColors.has(identifierText)) {
+								colors.push(identifierText, property, identifierLoc)
+								colorFormats.p('named', identifierLoc)
+								return
+							}
+
+							// Or it can be a system color
+							if (systemColors.has(identifierText)) {
+								colors.push(identifierText, property, identifierLoc)
+								colorFormats.p('system', identifierLoc)
+								return
+							}
+							return SKIP
+						}
+						case Func: {
+							let funcName = valueNode.name as string
+							let funcLoc = wallaceLoc(valueNode)
+
+							// rgb(a), hsl(a), color(), hwb(), lch(), lab(), oklab(), oklch()
+							if (colorFunctions.has(funcName)) {
+								colors.push(valueNode.text, property, funcLoc)
+								colorFormats.p(funcName.toLowerCase(), funcLoc)
+								return
+							}
+
+							if (endsWith('gradient', funcName)) {
+								gradients.p(valueNode.text, funcLoc)
+								return
+							}
+							// No SKIP here intentionally,
+							// otherwise we'll miss colors in linear-gradient(), var() fallbacks, etc.
+						}
 					}
 				})
 			}
@@ -708,141 +797,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				case 'Feature': {
 					// @ts-expect-error Oudated css-tree types
 					mediaFeatures.p(node.name, node.loc)
-					break
-				}
-				case Value: {
-					let loc = node.loc!
-
-					if (isValueKeyword(node)) {
-						// valueComplexities.push(1)
-						break
-					}
-
-					let declaration: Declaration = this.declaration
-					let { property } = declaration
-
-					// Process properties first that don't have colors,
-					// so we can avoid further walking them;
-					if (isProperty('font', property)) {
-						// if (isSystemFont(node)) return
-
-						// let result = destructure(node, stringifyNode, function (item) {
-						// 	if (item.type === 'keyword') {
-						// 		valueKeywords.p(item.value, loc)
-						// 	}
-						// })
-
-						// if (!result) {
-						// 	return this.skip
-						// }
-
-						// let { font_size, line_height, font_family } = result
-						// if (font_family) {
-						// 	fontFamilies.p(font_family, loc)
-						// }
-
-						// if (font_size) {
-						// 	fontSizes.p(font_size, loc)
-						// }
-
-						// if (line_height) {
-						// 	lineHeights.p(line_height, loc)
-						// }
-
-						break
-					} else if (isProperty('font-family', property)) {
-						// if (!isSystemFont(node)) {
-						// 	fontFamilies.p(stringifyNode(node), loc)
-						// }
-						break
-					} else if (isProperty('transition', property) || isProperty('animation', property)) {
-						// analyzeAnimation(children, function (item: { type: string; value: CssNode }) {
-						// 	if (item.type === 'fn') {
-						// 		timingFunctions.p(stringifyNode(item.value), loc)
-						// 	} else if (item.type === 'duration') {
-						// 		durations.p(stringifyNode(item.value), loc)
-						// 	} else if (item.type === 'keyword') {
-						// 		valueKeywords.p(stringifyNode(item.value), loc)
-						// 	}
-						// })
-						break
-					}
-
-					walk(node, function (valueNode: CssNode) {
-						// @ts-expect-error TODO: fix this
-						let nodeName = valueNode.name
-
-						switch (valueNode.type) {
-							case Hash: {
-								let hexLength = valueNode.value.length
-								if (endsWith('\\9', valueNode.value)) {
-									hexLength = hexLength - 2
-								}
-								colors.push('#' + valueNode.value, property, loc)
-								colorFormats.p(`hex` + hexLength, loc)
-
-								return walk.skip
-							}
-							case Identifier: {
-								if (keywords.has(nodeName)) {
-									valueKeywords.p(nodeName, loc)
-								}
-
-								// Bail out if it can't be a color name
-								// 20 === 'lightgoldenrodyellow'.length
-								// 3 === 'red'.length
-								let nodeLen = nodeName.length
-								if (nodeLen > 20 || nodeLen < 3) {
-									return walk.skip
-								}
-
-								// A keyword is most likely to be 'transparent' or 'currentColor'
-								if (colorKeywords.has(nodeName)) {
-									let stringified = stringifyNode(valueNode)
-									colors.push(stringified, property, loc)
-									colorFormats.p(nodeName.toLowerCase(), loc)
-									return
-								}
-
-								// Or it can be a named color
-								if (namedColors.has(nodeName)) {
-									let stringified = stringifyNode(valueNode)
-									colors.push(stringified, property, loc)
-									colorFormats.p('named', loc)
-									return
-								}
-
-								// Or it can be a system color
-								if (systemColors.has(nodeName)) {
-									let stringified = stringifyNode(valueNode)
-									colors.push(stringified, property, loc)
-									colorFormats.p('system', loc)
-									return
-								}
-								return walk.skip
-							}
-							case Func: {
-								// Don't walk var() multiple times
-								if (strEquals('var', nodeName)) {
-									return walk.skip
-								}
-
-								// rgb(a), hsl(a), color(), hwb(), lch(), lab(), oklab(), oklch()
-								if (colorFunctions.has(nodeName)) {
-									colors.push(stringifyNode(valueNode), property, valueNode.loc!)
-									colorFormats.p(nodeName.toLowerCase(), valueNode.loc!)
-									return
-								}
-
-								if (endsWith('gradient', nodeName)) {
-									gradients.p(stringifyNode(valueNode), valueNode.loc!)
-									return
-								}
-								// No walk.skip here intentionally,
-								// otherwise we'll miss colors in linear-gradient() etc.
-							}
-						}
-					})
 					break
 				}
 			}
