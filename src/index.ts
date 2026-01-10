@@ -17,6 +17,7 @@ import {
 import { calculateForAST } from '@bramus/specificity/core'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isPrefixed, hasPseudoClass, isAccessibility } from './selectors/utils.js'
+import { calculateForAST as calculateSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
 import { destructure, isSystemFont } from './values/destructure-font-shorthand.js'
 import { isValueKeyword, keywords, isValueReset } from './values/values.js'
@@ -30,7 +31,7 @@ import { isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
 import { basename } from './properties/property-utils.js'
-import { Atrule, Selector, Dimension, Url, Value, Hash, Rule, Identifier, Func, Operator } from './css-tree-node-types.js'
+import { Atrule, Selector, Dimension, Value, Hash, Rule, Identifier, Func, Operator } from './css-tree-node-types.js'
 import { KeywordSet } from './keyword-set.js'
 import type { CssNode, Declaration } from 'css-tree'
 
@@ -398,15 +399,44 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			let pseudos = hasPseudoClass(node)
 			if (pseudos !== false) {
 				for (let pseudo of pseudos) {
-					// Loc is off for some reason, TODO fix
 					pseudoClasses.p(pseudo, loc)
 				}
 			}
 
 			getCombinators(node, function onCombinator(combinator) {
-				// Loc is off for some reason, TODO fix
 				combinators.p(combinator.name, combinator.loc)
 			})
+
+			let specificity = calculateSpecificity(node)
+			let [sa, sb, sc] = specificity
+
+			uniqueSpecificities.p(specificity.toString(), loc)
+
+			specificityA.push(sa)
+			specificityB.push(sb)
+			specificityC.push(sc)
+
+			if (maxSpecificity === undefined) {
+				maxSpecificity = specificity
+			}
+
+			if (minSpecificity === undefined) {
+				minSpecificity = specificity
+			}
+
+			if (minSpecificity !== undefined && compareSpecificity(minSpecificity, specificity) < 0) {
+				minSpecificity = specificity
+			}
+
+			if (maxSpecificity !== undefined && compareSpecificity(maxSpecificity, specificity) > 0) {
+				maxSpecificity = specificity
+			}
+
+			specificities.push(specificity)
+
+			if (sa > 0) {
+				ids.p(node.text, loc)
+			}
 
 			// Avoid deeper walking of selectors to not mess with
 			// our specificity calculations in case of a selector
@@ -530,49 +560,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					// @ts-expect-error Oudated css-tree types
 					mediaFeatures.p(node.name, node.loc)
 					break
-				}
-				case Selector: {
-					let selector = stringifyNode(node)
-					let loc = node.loc!
-
-					// #region specificity
-					let specificity: Specificity = calculateForAST(node).toArray()
-					let [sa, sb, sc] = specificity
-
-					uniqueSpecificities.p(specificity.toString(), loc)
-
-					specificityA.push(sa)
-					specificityB.push(sb)
-					specificityC.push(sc)
-
-					if (maxSpecificity === undefined) {
-						maxSpecificity = specificity
-					}
-
-					if (minSpecificity === undefined) {
-						minSpecificity = specificity
-					}
-
-					if (minSpecificity !== undefined && compareSpecificity(minSpecificity, specificity) < 0) {
-						minSpecificity = specificity
-					}
-
-					if (maxSpecificity !== undefined && compareSpecificity(maxSpecificity, specificity) > 0) {
-						maxSpecificity = specificity
-					}
-
-					specificities.push(specificity)
-					// #endregion
-
-					if (sa > 0) {
-						ids.p(selector, loc)
-					}
-
-					// Avoid deeper walking of selectors to not mess with
-					// our specificity calculations in case of a selector
-					// with :where() or :is() that contain SelectorLists
-					// as children
-					return this.skip
 				}
 				case Dimension: {
 					if (!this.declaration) {
