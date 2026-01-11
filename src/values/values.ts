@@ -1,5 +1,4 @@
 import { KeywordSet } from '../keyword-set.js'
-import { Identifier, Nr, Dimension } from '../css-tree-node-types.js'
 import type { Value } from 'css-tree'
 import type { CSSNode } from '@projectwallace/css-parser'
 
@@ -21,7 +20,7 @@ export function isValueKeyword(node: Value) {
 	if (size > 1 || size === 0) return false
 
 	let firstChild = children.first
-	return firstChild!.type === Identifier && keywords.has(firstChild.name)
+	return firstChild!.type === 'Identifier' && keywords.has(firstChild.name)
 }
 
 function isZero(string: string): boolean {

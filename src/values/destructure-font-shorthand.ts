@@ -1,6 +1,5 @@
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
-import { Identifier, Nr, Operator } from '../css-tree-node-types.js'
 import type { CssNode, Value } from 'css-tree'
 import type { CSSNode } from '@projectwallace/css-parser'
 
@@ -27,7 +26,7 @@ const SLASH = 47 // '/'.charCodeAt(0) === 47
 export function isSystemFont(node: Value) {
 	let firstChild = node.children.first
 	if (firstChild === null) return false
-	return firstChild.type === Identifier && SYSTEM_FONTS.has(firstChild.name)
+	return firstChild.type === 'Identifier' && SYSTEM_FONTS.has(firstChild.name)
 }
 
 export function destructure(value: CSSNode, cb: ({ type, value }: { type: string; value: string }) => void) {
@@ -44,7 +43,7 @@ export function destructure(value: CSSNode, cb: ({ type, value }: { type: string
 	for (let node of value.children) {
 		let next = node.next_sibling
 
-		if (node.type_name === Identifier && keywords.has(node.name)) {
+		if (node.type_name === 'Identifier' && keywords.has(node.name)) {
 			cb({
 				type: 'keyword',
 				value: node.name,
@@ -52,21 +51,21 @@ export function destructure(value: CSSNode, cb: ({ type, value }: { type: string
 		}
 
 		// any node that comes before the '/' is the font-size
-		if (next && next.type_name === Operator && next.text.charCodeAt(0) === SLASH) {
+		if (next && next.type_name === 'Operator' && next.text.charCodeAt(0) === SLASH) {
 			font_size = node.text
 			prev = node
 			continue
 		}
 
 		// any node that comes after '/' is the line-height
-		if (prev?.type_name === Operator && prev.text.charCodeAt(0) === SLASH) {
+		if (prev?.type_name === 'Operator' && prev.text.charCodeAt(0) === SLASH) {
 			line_height = node.text
 			prev = node
 			continue
 		}
 
 		// any node that's followed by ',' is a font-family
-		if (next?.type_name === Operator && next.text.charCodeAt(0) === COMMA && !font_family[0]) {
+		if (next?.type_name === 'Operator' && next.text.charCodeAt(0) === COMMA && !font_family[0]) {
 			font_family[0] = node
 
 			if (!font_size && prev) {
@@ -93,13 +92,13 @@ export function destructure(value: CSSNode, cb: ({ type, value }: { type: string
 
 		// any node that's a number and not previously caught by line-height or font-size is the font-weight
 		// (oblique <angle> will not be caught here, because that's a Dimension, not a Number)
-		if (node.type_name === Nr) {
+		if (node.type_name === 'Number') {
 			prev = node
 			continue
 		}
 
 		// Any remaining identifiers can be font-size, font-style, font-stretch, font-variant or font-weight
-		if (node.type_name === Identifier) {
+		if (node.type_name === 'Identifier') {
 			let name = node.name
 			if (SIZE_KEYWORDS.has(name)) {
 				font_size = name

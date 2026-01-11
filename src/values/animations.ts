@@ -1,6 +1,5 @@
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
-import { Operator, Dimension, Identifier, Func } from '../css-tree-node-types.js'
 import type { CSSNode } from '@projectwallace/css-parser'
 
 const TIMING_KEYWORDS = new KeywordSet(['linear', 'ease', 'ease-in', 'ease-out', 'ease-in-out', 'step-start', 'step-end'])
@@ -15,16 +14,16 @@ export function analyzeAnimation(children: CSSNode[], cb: ({ type, value }: { ty
 		let name = child.name
 
 		// Right after a ',' we start over again
-		if (type === Operator) {
+		if (type === 'Operator') {
 			durationFound = false
-		} else if (type === Dimension && durationFound === false) {
+		} else if (type === 'Dimension' && durationFound === false) {
 			// The first Dimension is the duration, the second is the delay
 			durationFound = true
 			cb({
 				type: 'duration',
 				value: child,
 			})
-		} else if (type === Identifier) {
+		} else if (type === 'Identifier') {
 			if (TIMING_KEYWORDS.has(name)) {
 				cb({
 					type: 'fn',
@@ -36,7 +35,7 @@ export function analyzeAnimation(children: CSSNode[], cb: ({ type, value }: { ty
 					value: child,
 				})
 			}
-		} else if (type === Func && TIMING_FUNCTION_VALUES.has(name)) {
+		} else if (type === 'Function' && TIMING_FUNCTION_VALUES.has(name)) {
 			cb({
 				type: 'fn',
 				value: child,

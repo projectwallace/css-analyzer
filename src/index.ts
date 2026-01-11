@@ -1,7 +1,5 @@
 // @ts-expect-error types missing
 import parse from 'css-tree/parser'
-// @ts-expect-error types missing
-import walk from 'css-tree/walker'
 // Wallace parser for dual-parser migration
 import {
 	type CSSNode,
@@ -10,7 +8,7 @@ import {
 	SKIP,
 	str_equals,
 	str_starts_with,
-	walk as wallaceWalk2,
+	walk,
 	parse as wallaceParse,
 } from '@projectwallace/css-parser'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
@@ -18,20 +16,18 @@ import { getCombinators, getComplexity, isPrefixed, hasPseudoClass, isAccessibil
 import { calculateForAST as calculateSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
 import { destructure, SYSTEM_FONTS } from './values/destructure-font-shorthand.js'
-import { isValueKeyword, keywords, isValueReset } from './values/values.js'
+import { keywords, isValueReset } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
 import { ContextCollection } from './context-collection.js'
 import { Collection, type Location } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
-import { strEquals, endsWith, unquote } from './string-utils.js'
+import { endsWith, unquote } from './string-utils.js'
 import { isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
 import { basename } from './properties/property-utils.js'
-import { Value, Hash, Identifier, Func } from './css-tree-node-types.js'
 import { KeywordSet } from './keyword-set.js'
-import type { CssNode, Declaration } from 'css-tree'
 
 export type Specificity = [number, number, number]
 
@@ -70,20 +66,6 @@ export function analyze(css: string, options: Options = {}): any {
 function analyzeInternal<T extends boolean>(css: string, options: Options, useLocations: T) {
 	let start = Date.now()
 
-	/**
-	 * Recreate the authored CSS from a CSSTree node
-	 * @param node - Node from CSSTree AST to stringify
-	 * @returns The stringified node
-	 */
-	function stringifyNode(node: CssNode): string {
-		return stringifyNodePlain(node).trim()
-	}
-
-	function stringifyNodePlain(node: CssNode): string {
-		let loc = node.loc!
-		return css.substring(loc.start.offset, loc.end.offset)
-	}
-
 	// Stylesheet
 	let totalComments = 0
 	let commentsSize = 0
@@ -103,7 +85,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let startParse = Date.now()
 
 	let ast = parse(css, {
-		parseCustomProperty: true, // To find font-families, colors, etc.
 		positions: true, // So we can use stringifyNode()
 		onComment: function (comment: string) {
 			totalComments++
@@ -635,7 +616,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				// Check if the value has an IE9 browserhack before walking
 				let valueHasIe9Hack = isIe9Hack(value)
 
-				wallaceWalk2(value, (valueNode) => {
+				walk(value, (valueNode) => {
 					switch (valueNode.type_name) {
 						case 'Dimension': {
 							let unit = valueNode.unit!
@@ -643,7 +624,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							units.push(unit, property, loc)
 							return SKIP
 						}
-						case Hash: {
+						case 'Hash': {
 							// Use text property for the hash value
 							let hashText = valueNode.text
 							if (!hashText || !hashText.startsWith('#')) {
@@ -668,7 +649,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 							return SKIP
 						}
-						case Identifier: {
+						case 'Identifier': {
 							let identifierText = valueNode.text
 							let identifierLoc = wallaceLoc(valueNode)
 
@@ -713,7 +694,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							}
 							return SKIP
 						}
-						case Func: {
+						case 'Function': {
 							let funcName = valueNode.name as string
 							let funcLoc = wallaceLoc(valueNode)
 
@@ -769,13 +750,19 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					embedTypes.unique.set(type, item)
 				}
 			}
+		} else if (node.type_name === 'Feature') {
+			// console.log({ Feature: node.text, name: node.name, value: node.value })
+			mediaFeatures.p(node.name, wallaceLoc(node))
+			return SKIP
 		}
 
 		// Walk at-rule prelude children with inAtrulePrelude flag
+		let preludeWalked = false
 		if (node.type_name === 'Atrule' && node.prelude && node.prelude.has_children) {
 			for (const child of node.prelude) {
 				wallaceWalk(child, depth, inKeyframes, true)
 			}
+			preludeWalked = true
 		}
 
 		// Walk children with increased depth for Rules and Atrules
@@ -783,25 +770,16 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 		if (node.children && Array.isArray(node.children)) {
 			for (const child of node.children) {
+				// Skip the AtrulePrelude node if we already walked it above
+				if (preludeWalked && child.type_name === 'AtrulePrelude') {
+					continue
+				}
 				wallaceWalk(child, nextDepth, inKeyframes, inAtrulePrelude)
 			}
 		}
 	}
 
 	wallaceWalk(wallaceAst)
-
-	walk(ast, {
-		enter(node: CssNode) {
-			switch (node.type) {
-				// @ts-expect-error Oudated css-tree types
-				case 'Feature': {
-					// @ts-expect-error Oudated css-tree types
-					mediaFeatures.p(node.name, node.loc)
-					break
-				}
-			}
-		},
-	})
 
 	let totalUniqueDeclarations = uniqueDeclarations.size
 
