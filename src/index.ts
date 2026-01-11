@@ -82,6 +82,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let start = Date.now()
 
 	// Stylesheet
+	let linesOfCode = (css.match(/\n/g) || []).length + 1
 	let totalComments = 0
 	let commentsSize = 0
 	let embedSize = 0
@@ -202,17 +203,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let resets = new Collection(useLocations)
 
 	let ast = parse(css)
-
-	// Find the maximum line number in the Wallace AST
-	function getMaxLine(node: CSSNode): number {
-		let maxLine = node.line
-		for (const child of node.children) {
-			maxLine = Math.max(maxLine, getMaxLine(child))
-		}
-		return maxLine
-	}
-
-	let linesOfCode = getMaxLine(ast)
 
 	function toLoc(node: CSSNode) {
 		return {

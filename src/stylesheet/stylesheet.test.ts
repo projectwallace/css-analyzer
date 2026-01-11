@@ -15,7 +15,7 @@ test('counts Lines of Code', () => {
     }
   `
 	const actual = analyze(fixture).stylesheet.linesOfCode
-	expect(actual).toBe(10)
+	expect(actual).toBe(11)
 })
 
 test('counts Source Lines of Code', () => {
