@@ -25,6 +25,7 @@ import {
 	DIMENSION,
 	FUNCTION,
 	HASH,
+	TOKEN_COMMENT,
 } from '@projectwallace/css-parser'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isPrefixed, hasPseudoClass, isAccessibility } from './selectors/utils.js'
@@ -101,8 +102,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let startParse = Date.now()
 
 	for (let token of tokenize(css, false)) {
-		// 25 = comment
-		if (token.type === 25) {
+		if (token.type === TOKEN_COMMENT) {
 			totalComments++
 			// include /* and */ in the size calculation
 			commentsSize += token.end - token.start
