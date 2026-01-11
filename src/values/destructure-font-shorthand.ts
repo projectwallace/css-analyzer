@@ -1,6 +1,5 @@
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
-import type { CssNode, Value } from 'css-tree'
 import type { CSSNode } from '@projectwallace/css-parser'
 
 export const SYSTEM_FONTS = new KeywordSet(['caption', 'icon', 'menu', 'message-box', 'small-caption', 'status-bar'])
@@ -22,12 +21,6 @@ const SIZE_KEYWORDS = new KeywordSet([
 
 const COMMA = 44 // ','.charCodeAt(0) === 44
 const SLASH = 47 // '/'.charCodeAt(0) === 47
-
-export function isSystemFont(node: Value) {
-	let firstChild = node.children.first
-	if (firstChild === null) return false
-	return firstChild.type === 'Identifier' && SYSTEM_FONTS.has(firstChild.name)
-}
 
 export function destructure(value: CSSNode, cb: ({ type, value }: { type: string; value: string }) => void) {
 	let font_family: (CSSNode | undefined)[] = [undefined, undefined]

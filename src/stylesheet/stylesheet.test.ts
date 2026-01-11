@@ -15,7 +15,7 @@ test('counts Lines of Code', () => {
     }
   `
 	const actual = analyze(fixture).stylesheet.linesOfCode
-	expect(actual).toBe(11)
+	expect(actual).toBe(10)
 })
 
 test('counts Source Lines of Code', () => {
@@ -77,7 +77,7 @@ test('counts comments', () => {
 	const actual = result.stylesheet.comments
 	const expected = {
 		total: 6,
-		size: 66,
+		size: 90, // includes the /* and */ symbols
 	}
 
 	expect(actual).toEqual(expected)

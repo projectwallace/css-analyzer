@@ -1,5 +1,4 @@
 import { KeywordSet } from '../keyword-set.js'
-import type { CssLocation } from 'css-tree'
 import { type CSSNode, is_vendor_prefixed, SKIP, BREAK, walk as wallaceWalk } from '@projectwallace/css-parser'
 
 const PSEUDO_FUNCTIONS = new KeywordSet(['nth-child', 'where', 'not', 'is', 'has', 'nth-last-child', 'matches', '-webkit-any', '-moz-any'])
@@ -90,10 +89,9 @@ export function getComplexity(selector: CSSNode): number {
 			return
 		}
 
-		// Handle Nth nodes specially: In css-tree, Nth contains an AnPlusB child that gets counted.
-		// In Wallace, Nth is a leaf node. Count it if it has content (matches css-tree behavior).
+		// In Wallace, Nth is a leaf node. Count it if it has content
 		if (type === 'Nth') {
-			// Count non-empty Nth nodes (like "1", "2n+1", etc.) to match css-tree's AnPlusB counting
+			// Count non-empty Nth nodes (like "1", "2n+1", etc.)
 			if (node.text && node.text.trim()) {
 				complexity++
 			}
@@ -180,16 +178,21 @@ export function getComplexity(selector: CSSNode): number {
 /**
  * Walk a selector node and trigger a callback every time a Combinator was found
  */
-export function getCombinators(selector: CSSNode, onMatch: ({ name, loc }: { name: string; loc: CssLocation }) => void) {
-	// Get CSS source from the selector's arena
-	// const css = selector.source || ''
-
+export function getCombinators(
+	selector: CSSNode,
+	onMatch: ({
+		name,
+		loc,
+	}: {
+		name: string
+		loc: { start: { line: number; column: number; offset: number }; end: { offset: number } }
+	}) => void,
+) {
 	wallaceWalk(selector, function (node) {
 		if (node.type_name === 'Combinator') {
 			onMatch({
 				name: node.name.trim() === '' ? ' ' : node.name,
 				loc: {
-					source: '',
 					start: {
 						offset: node.start,
 						line: node.line,
@@ -197,8 +200,6 @@ export function getCombinators(selector: CSSNode, onMatch: ({ name, loc }: { nam
 					},
 					end: {
 						offset: node.start + 1,
-						line: node.line,
-						column: node.column,
 					},
 				},
 			})

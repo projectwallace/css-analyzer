@@ -1,5 +1,3 @@
-// @ts-expect-error types missing
-import parse from 'css-tree/parser'
 // Wallace parser for dual-parser migration
 import {
 	type CSSNode,
@@ -8,8 +6,9 @@ import {
 	SKIP,
 	str_equals,
 	str_starts_with,
+	tokenize,
 	walk,
-	parse as wallaceParse,
+	parse,
 } from '@projectwallace/css-parser'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isPrefixed, hasPseudoClass, isAccessibility } from './selectors/utils.js'
@@ -84,16 +83,16 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 	let startParse = Date.now()
 
-	let ast = parse(css, {
-		positions: true, // So we can use stringifyNode()
-		onComment: function (comment: string) {
+	for (let token of tokenize(css, false)) {
+		// 25 = comment
+		if (token.type === 25) {
 			totalComments++
-			commentsSize += comment.length
-		},
-	})
+			// include /* and */ in the size calculation
+			commentsSize += token.end - token.start
+		}
+	}
 
 	let startAnalysis = Date.now()
-	let linesOfCode = ast.loc.end.line - ast.loc.start.line + 1
 
 	// Atrules
 	let atrules = new Collection(useLocations)
@@ -186,10 +185,20 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let borderRadiuses = new ContextCollection(useLocations)
 	let resets = new Collection(useLocations)
 
-	// Use Wallace parser to count basic structures (migrating from css-tree)
-	let wallaceAst = wallaceParse(css)
+	let ast = parse(css)
 
-	function wallaceLoc(node: CSSNode) {
+	// Find the maximum line number in the Wallace AST
+	function getMaxLine(node: CSSNode): number {
+		let maxLine = node.line
+		for (const child of node.children) {
+			maxLine = Math.max(maxLine, getMaxLine(child))
+		}
+		return maxLine
+	}
+
+	let linesOfCode = getMaxLine(ast)
+
+	function toLoc(node: CSSNode) {
 		return {
 			start: {
 				offset: node.start,
@@ -205,7 +214,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	function wallaceWalk(node: CSSNode, depth: number = 0, inKeyframes: boolean = false, inAtrulePrelude: boolean = false) {
 		// Count nodes and track nesting
 		if (node.type_name === 'Atrule') {
-			let atruleLoc = wallaceLoc(node)
+			let atruleLoc = toLoc(node)
 			atruleNesting.push(depth)
 			uniqueAtruleNesting.p(depth, atruleLoc)
 			atrules.p(node.name, atruleLoc)
@@ -214,7 +223,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			if (str_equals('font-face', node.name)) {
 				let descriptors = Object.create(null)
 				if (useLocations) {
-					fontfaces_with_loc.p(node.start, wallaceLoc(node))
+					fontfaces_with_loc.p(node.start, toLoc(node))
 				}
 				let block = node.children.find((child) => child.type_name === 'Block')
 				for (let descriptor of block?.children || []) {
@@ -230,7 +239,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			if (node.prelude === null || node.prelude === undefined) {
 				if (str_equals('layer', node.name)) {
 					// @layer without a prelude is anonymous
-					layers.p('<anonymous>', wallaceLoc(node))
+					layers.p('<anonymous>', toLoc(node))
 					atRuleComplexities.push(2)
 				}
 			} else {
@@ -239,23 +248,23 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 				// All the AtRules in here MUST have a prelude, so we can count their names
 				if (str_equals('media', name)) {
-					medias.p(node.prelude.text, wallaceLoc(node))
+					medias.p(node.prelude.text, toLoc(node))
 					if (isMediaBrowserhack(node.prelude)) {
-						mediaBrowserhacks.p(node.prelude.text, wallaceLoc(node))
+						mediaBrowserhacks.p(node.prelude.text, toLoc(node))
 						complexity++
 					}
 				} else if (str_equals('supports', name)) {
-					supports.p(node.prelude.text, wallaceLoc(node))
+					supports.p(node.prelude.text, toLoc(node))
 					if (isSupportsBrowserhack(node.prelude)) {
-						supportsBrowserhacks.p(node.prelude.text, wallaceLoc(node))
+						supportsBrowserhacks.p(node.prelude.text, toLoc(node))
 						complexity++
 					}
 				} else if (endsWith('keyframes', name)) {
 					let prelude = `@${name} ${node.prelude.text}`
-					keyframes.p(prelude, wallaceLoc(node))
+					keyframes.p(prelude, toLoc(node))
 
 					if (is_vendor_prefixed(name)) {
-						prefixedKeyframes.p(prelude, wallaceLoc(node))
+						prefixedKeyframes.p(prelude, toLoc(node))
 						complexity++
 					}
 
@@ -263,31 +272,31 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					inKeyframes = true
 				} else if (str_equals('layer', name)) {
 					for (let layer of node.prelude.text.split(',').map((s) => s.trim())) {
-						layers.p(layer, wallaceLoc(node))
+						layers.p(layer, toLoc(node))
 					}
 				} else if (str_equals('import', name)) {
-					imports.p(node.prelude.text, wallaceLoc(node))
+					imports.p(node.prelude.text, toLoc(node))
 
 					if (node.prelude.has_children) {
 						for (let child of node.prelude) {
 							if (child.type_name === 'SupportsQuery' && typeof child.value === 'string') {
-								supports.p(child.value, wallaceLoc(child))
+								supports.p(child.value, toLoc(child))
 							} else if (child.type_name === 'Layer' && typeof child.value === 'string') {
-								layers.p(child.value, wallaceLoc(child))
+								layers.p(child.value, toLoc(child))
 							}
 						}
 					}
 				} else if (str_equals('container', name)) {
-					containers.p(node.prelude.text, wallaceLoc(node))
+					containers.p(node.prelude.text, toLoc(node))
 					if (node.prelude.first_child?.type_name === 'ContainerQuery') {
 						if (node.prelude.first_child.first_child?.type_name === 'Identifier') {
-							containerNames.p(node.prelude.first_child.first_child.text, wallaceLoc(node))
+							containerNames.p(node.prelude.first_child.first_child.text, toLoc(node))
 						}
 					}
 				} else if (str_equals('property', name)) {
-					registeredProperties.p(node.prelude.text, wallaceLoc(node))
+					registeredProperties.p(node.prelude.text, toLoc(node))
 				} else if (str_equals('charset', name)) {
-					charsets.p(node.prelude.text, wallaceLoc(node))
+					charsets.p(node.prelude.text, toLoc(node))
 				}
 
 				atRuleComplexities.push(complexity)
@@ -298,7 +307,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				// In keyframes, the prelude is a SelectorList that may not have Selector children
 				// (e.g., "50%" is just a SelectorList with text, no Selector child)
 				if (node.prelude.type_name === 'SelectorList' && node.prelude.text) {
-					keyframeSelectors.p(node.prelude.text, wallaceLoc(node.prelude))
+					keyframeSelectors.p(node.prelude.text, toLoc(node.prelude))
 				}
 				// Don't count keyframe rules as regular rules, but continue walking
 				// children to count declarations inside keyframes
@@ -315,7 +324,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				// Count selectors and declarations in this rule
 				let numSelectors = 0
 				let numDeclarations = 0
-				let loc = wallaceLoc(node)
+				let loc = toLoc(node)
 
 				// Find the SelectorList child and count Selector nodes inside it
 				if (node.prelude) {
@@ -354,7 +363,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				return SKIP
 			}
 
-			let loc = wallaceLoc(node)
+			let loc = toLoc(node)
 
 			selectorNesting.push(depth > 0 ? depth - 1 : 0)
 			uniqueSelectorNesting.p(depth > 0 ? depth - 1 : 0, loc)
@@ -381,7 +390,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			}
 
 			getCombinators(node, function onCombinator(combinator) {
-				combinators.p(combinator.name, combinator.loc)
+				let name = combinator.name.trim() === '' ? ' ' : combinator.name
+				combinators.p(name, combinator.loc)
 			})
 
 			let specificity = calculateSpecificity(node)
@@ -424,7 +434,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			totalDeclarations++
 			uniqueDeclarations.add(node.text)
 
-			let loc = wallaceLoc(node)
+			let loc = toLoc(node)
 			let declarationDepth = depth > 0 ? depth - 1 : 0
 			declarationNesting.push(declarationDepth)
 			uniqueDeclarationNesting.p(declarationDepth, loc)
@@ -438,7 +448,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					let valueText = (node.value as CSSNode).text
 					let valueOffset = declaration.indexOf(valueText)
 					let stripSemi = declaration.slice(-1) === ';'
-					valueBrowserhacks.p(`${declaration.slice(valueOffset, stripSemi ? -1 : undefined)}`, wallaceLoc(node.value as CSSNode))
+					valueBrowserhacks.p(`${declaration.slice(valueOffset, stripSemi ? -1 : undefined)}`, toLoc(node.value as CSSNode))
 				}
 
 				if (inKeyframes) {
@@ -451,7 +461,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			//#region PROPERTIES
 			let { is_important, property, is_browserhack, is_vendor_prefixed } = node
 
-			let propertyLoc = wallaceLoc(node)
+			let propertyLoc = toLoc(node)
 
 			properties.p(property, propertyLoc)
 
@@ -484,7 +494,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				let value = node.value as CSSNode
 
 				let { text } = value
-				let valueLoc = wallaceLoc(value)
+				let valueLoc = toLoc(value)
 				let complexity = 1
 
 				// auto, inherit, initial, etc.
@@ -620,7 +630,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					switch (valueNode.type_name) {
 						case 'Dimension': {
 							let unit = valueNode.unit!
-							let loc = wallaceLoc(valueNode)
+							let loc = toLoc(valueNode)
 							units.push(unit, property, loc)
 							return SKIP
 						}
@@ -643,7 +653,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 								hexLength = hexLength - 2 // Remove the \9 from length
 							}
 
-							let hashLoc = wallaceLoc(valueNode)
+							let hashLoc = toLoc(valueNode)
 							colors.push(hashValue, property, hashLoc)
 							colorFormats.p(`hex` + hexLength, hashLoc)
 
@@ -651,7 +661,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						}
 						case 'Identifier': {
 							let identifierText = valueNode.text
-							let identifierLoc = wallaceLoc(valueNode)
+							let identifierLoc = toLoc(valueNode)
 
 							// Skip all identifier processing for font properties to avoid:
 							// 1. False positives for colors (e.g., "Black" as a font family vs. "black" the color)
@@ -696,7 +706,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						}
 						case 'Function': {
 							let funcName = valueNode.name as string
-							let funcLoc = wallaceLoc(valueNode)
+							let funcLoc = toLoc(valueNode)
 
 							// rgb(a), hsl(a), color(), hwb(), lch(), lab(), oklab(), oklch()
 							if (colorFunctions.has(funcName)) {
@@ -752,7 +762,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			}
 		} else if (node.type_name === 'Feature') {
 			// console.log({ Feature: node.text, name: node.name, value: node.value })
-			mediaFeatures.p(node.name, wallaceLoc(node))
+			mediaFeatures.p(node.name, toLoc(node))
 			return SKIP
 		}
 
@@ -768,18 +778,16 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 		// Walk children with increased depth for Rules and Atrules
 		const nextDepth = node.type_name === 'Rule' || node.type_name === 'Atrule' ? depth + 1 : depth
 
-		if (node.children && Array.isArray(node.children)) {
-			for (const child of node.children) {
-				// Skip the AtrulePrelude node if we already walked it above
-				if (preludeWalked && child.type_name === 'AtrulePrelude') {
-					continue
-				}
-				wallaceWalk(child, nextDepth, inKeyframes, inAtrulePrelude)
+		for (const child of node.children) {
+			// Skip the AtrulePrelude node if we already walked it above
+			if (preludeWalked && child.type_name === 'AtrulePrelude') {
+				continue
 			}
+			wallaceWalk(child, nextDepth, inKeyframes, inAtrulePrelude)
 		}
 	}
 
-	wallaceWalk(wallaceAst)
+	wallaceWalk(ast)
 
 	let totalUniqueDeclarations = uniqueDeclarations.size
 
