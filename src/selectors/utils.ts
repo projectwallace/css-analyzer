@@ -76,16 +76,20 @@ export function hasPseudoClass(selector: CSSNode): string[] | false {
 export function getComplexity(selector: CSSNode): number {
 	let complexity = 0
 
-	function walkNode(node: CSSNode): void | typeof SKIP {
+	// Helper function to find all Selector nodes recursively
+	function findSelectors(node: CSSNode, complexities: number[]): void {
+		walk(node, function (n) {
+			if (n.type_name === 'Selector') {
+				complexities.push(getComplexity(n))
+			}
+		})
+	}
+
+	walk(selector, function (node) {
 		const type = node.type_name
 
 		// Skip Selector nodes (don't count the selector container itself)
 		if (type === 'Selector') {
-			if (node.has_children) {
-				for (const child of node) {
-					walkNode(child)
-				}
-			}
 			return
 		}
 
@@ -150,28 +154,8 @@ export function getComplexity(selector: CSSNode): number {
 				// This allows Nth nodes and their content to be counted
 			}
 		}
+	})
 
-		// Continue walking children
-		if (node.has_children) {
-			for (const child of node) {
-				walkNode(child)
-			}
-		}
-	}
-
-	// Helper function to find all Selector nodes recursively
-	function findSelectors(node: CSSNode, complexities: number[]): void {
-		if (node.type_name === 'Selector') {
-			complexities.push(getComplexity(node))
-		}
-		if (node.has_children) {
-			for (const child of node) {
-				findSelectors(child, complexities)
-			}
-		}
-	}
-
-	walkNode(selector)
 	return complexity
 }
 
