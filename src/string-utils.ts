@@ -18,22 +18,6 @@ function compareChar(referenceCode: number, testCode: number): boolean {
 }
 
 /**
- * Case-insensitive string-comparison
- * @example
- * strEquals('test', 'test') // true
- * strEquals('test', 'TEST') // true
- * strEquals('test', 'TesT') // true
- * strEquals('test', 'derp') // false
- *
- * @param base The string to check against
- * @param maybe The test string, possibly containing uppercased characters
- * @returns true if the two strings are the same, false otherwise
- */
-export function strEquals(base: string, maybe: string): boolean {
-	return str_equals(base, maybe)
-}
-
-/**
  * Case-insensitive testing whether a string ends with a given substring
  *
  * @example
@@ -61,19 +45,4 @@ export function endsWith(base: string, maybe: string): boolean {
 	}
 
 	return true
-}
-
-/**
- * Case-insensitive testing whether a string starts with a given substring
- *
- * @example
- * startsWith('test', 'my-test') // false
- * startsWith('test', 'tes') // true
- * startsWith('test', 'test-me') // true
- *
- * @returns true if `base` starts with `maybe`, false otherwise
- */
-export function startsWith(base: string, maybe: string): boolean {
-	// Note: parameter order is swapped - Wallace's str_starts_with takes (string, prefix)
-	return str_starts_with(maybe, base)
 }

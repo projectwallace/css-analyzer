@@ -1,12 +1,12 @@
 import { KeywordSet } from '../keyword-set.js'
-import { type CSSNode, is_vendor_prefixed, SKIP, BREAK, walk as wallaceWalk } from '@projectwallace/css-parser'
+import { type CSSNode, is_vendor_prefixed, SKIP, BREAK, walk } from '@projectwallace/css-parser'
 
 const PSEUDO_FUNCTIONS = new KeywordSet(['nth-child', 'where', 'not', 'is', 'has', 'nth-last-child', 'matches', '-webkit-any', '-moz-any'])
 
 export function isPrefixed(selector: CSSNode): boolean {
 	let isPrefixed = false
 
-	wallaceWalk(selector, function (node) {
+	walk(selector, function (node) {
 		if (node.type_name === 'PseudoElementSelector' || node.type_name === 'PseudoClassSelector' || node.type_name === 'TypeSelector') {
 			if (node.is_vendor_prefixed) {
 				isPrefixed = true
@@ -24,7 +24,7 @@ export function isPrefixed(selector: CSSNode): boolean {
 export function isAccessibility(selector: CSSNode): boolean {
 	let isA11y = false
 
-	wallaceWalk(selector, function (node) {
+	walk(selector, function (node) {
 		if (node.type_name === 'AttributeSelector') {
 			const name = node.name || ''
 			if (name === 'role' || name.startsWith('aria-')) {
@@ -55,7 +55,7 @@ export function isAccessibility(selector: CSSNode): boolean {
 export function hasPseudoClass(selector: CSSNode): string[] | false {
 	let pseudos: string[] = []
 
-	wallaceWalk(selector, function (node) {
+	walk(selector, function (node) {
 		if (node.type_name === 'PseudoClassSelector') {
 			pseudos.push(node.name)
 		}
@@ -188,7 +188,7 @@ export function getCombinators(
 		loc: { start: { line: number; column: number; offset: number }; end: { offset: number } }
 	}) => void,
 ) {
-	wallaceWalk(selector, function (node) {
+	walk(selector, function (node) {
 		if (node.type_name === 'Combinator') {
 			onMatch({
 				name: node.name.trim() === '' ? ' ' : node.name,
