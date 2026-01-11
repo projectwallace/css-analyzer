@@ -118,7 +118,7 @@ export function getComplexity(selector: CSSNode): number {
 			if (node.value) {
 				complexity++
 			}
-			// Skip children (equivalent to walk.skip)
+			// Skip children
 			return SKIP
 		}
 
