@@ -31,18 +31,16 @@ export class Collection<UseLocations extends boolean = false> {
 		this.#useLocations = useLocations
 	}
 
-	p(item: string | number, node_location: { start: { line: number; column: number; offset: number }; end: { offset: number } }) {
+	p(item: string | number, node_location: Location) {
 		let index = this.#total
 
 		if (this.#useLocations) {
-			let start = node_location.start
-			let start_offset = start.offset
 			let position = index * 4
 
-			this.#nodes[position] = start.line
-			this.#nodes[position + 1] = start.column
-			this.#nodes[position + 2] = start_offset
-			this.#nodes[position + 3] = node_location.end.offset - start_offset
+			this.#nodes[position] = node_location.line
+			this.#nodes[position + 1] = node_location.column
+			this.#nodes[position + 2] = node_location.offset
+			this.#nodes[position + 3] = node_location.length
 		}
 
 		if (this.#items.has(item)) {

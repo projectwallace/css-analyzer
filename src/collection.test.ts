@@ -1,7 +1,7 @@
 import { test, expect, expectTypeOf } from 'vitest'
 import { Collection, type UniqueWithLocations } from './collection'
 
-let loc = { start: { line: 1, column: 1, offset: 1 }, end: { offset: 2 } }
+let loc = { line: 1, column: 1, offset: 1, length: 1 }
 
 test('basic collection - size()', () => {
 	let collection = new Collection()

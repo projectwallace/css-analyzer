@@ -1,7 +1,7 @@
+import type { Location } from '../collection.js'
 import { KeywordSet } from '../keyword-set.js'
 import {
 	type CSSNode,
-	is_vendor_prefixed,
 	SKIP,
 	BREAK,
 	walk,
@@ -174,29 +174,16 @@ export function getComplexity(selector: CSSNode): number {
 /**
  * Walk a selector node and trigger a callback every time a Combinator was found
  */
-export function getCombinators(
-	selector: CSSNode,
-	onMatch: ({
-		name,
-		loc,
-	}: {
-		name: string
-		loc: { start: { line: number; column: number; offset: number }; end: { offset: number } }
-	}) => void,
-) {
+export function getCombinators(selector: CSSNode, onMatch: ({ name, loc }: { name: string; loc: Location }) => void) {
 	walk(selector, function (node) {
 		if (node.type === COMBINATOR) {
 			onMatch({
 				name: node.name.trim() === '' ? ' ' : node.name,
 				loc: {
-					start: {
-						offset: node.start,
-						line: node.line,
-						column: node.column,
-					},
-					end: {
-						offset: node.start + 1,
-					},
+					offset: node.start,
+					line: node.line,
+					column: node.column,
+					length: 1,
 				},
 			})
 		}

@@ -203,16 +203,12 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 	let ast = parse(css)
 
-	function toLoc(node: CSSNode) {
+	function toLoc(node: CSSNode): Location {
 		return {
-			start: {
-				offset: node.start,
-				line: node.line,
-				column: node.column,
-			},
-			end: {
-				offset: node.end,
-			},
+			line: node.line,
+			column: node.column,
+			offset: node.start,
+			length: node.length,
 		}
 	}
 
