@@ -1,5 +1,6 @@
 import { KeywordSet } from '../keyword-set.js'
 import type { CSSNode } from '@projectwallace/css-parser'
+import { NUMBER, DIMENSION } from '@projectwallace/css-parser'
 
 export const keywords = new KeywordSet([
 	'auto',
@@ -16,8 +17,8 @@ export const keywords = new KeywordSet([
  */
 export function isValueReset(node: CSSNode): boolean {
 	for (let child of node.children) {
-		if (child.type_name === 'Number' && child.value === 0) continue
-		if (child.type_name === 'Dimension' && child.value === 0) continue
+		if (child.type === NUMBER && child.value === 0) continue
+		if (child.type === DIMENSION && child.value === 0) continue
 		return false
 	}
 

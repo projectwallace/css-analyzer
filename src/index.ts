@@ -9,6 +9,25 @@ import {
 	tokenize,
 	walk,
 	parse,
+	AT_RULE,
+	BLOCK,
+	DECLARATION,
+	STYLE_RULE,
+	SELECTOR_LIST,
+	SELECTOR,
+	URL,
+	MEDIA_FEATURE,
+	AT_RULE_PRELUDE,
+	SUPPORTS_QUERY,
+	LAYER_NAME,
+	CONTAINER_QUERY,
+	IDENTIFIER,
+	OPERATOR,
+	DIMENSION,
+	NUMBER,
+	FUNCTION,
+	HASH,
+	STRING,
 } from '@projectwallace/css-parser'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isPrefixed, hasPseudoClass, isAccessibility } from './selectors/utils.js'
@@ -213,7 +232,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 	function wallaceWalk(node: CSSNode, depth: number = 0, inKeyframes: boolean = false, inAtrulePrelude: boolean = false) {
 		// Count nodes and track nesting
-		if (node.type_name === 'Atrule') {
+		if (node.type === AT_RULE) {
 			let atruleLoc = toLoc(node)
 			atruleNesting.push(depth)
 			uniqueAtruleNesting.p(depth, atruleLoc)
@@ -225,9 +244,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				if (useLocations) {
 					fontfaces_with_loc.p(node.start, toLoc(node))
 				}
-				let block = node.children.find((child) => child.type_name === 'Block')
+				let block = node.children.find((child) => child.type === BLOCK)
 				for (let descriptor of block?.children || []) {
-					if (descriptor.type_name === 'Declaration' && descriptor.value) {
+					if (descriptor.type === DECLARATION && descriptor.value) {
 						descriptors[descriptor.property] = (descriptor.value as CSSNode).text
 					}
 				}
@@ -279,17 +298,17 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 					if (node.prelude.has_children) {
 						for (let child of node.prelude) {
-							if (child.type_name === 'SupportsQuery' && typeof child.value === 'string') {
+							if (child.type === SUPPORTS_QUERY && typeof child.value === 'string') {
 								supports.p(child.value, toLoc(child))
-							} else if (child.type_name === 'Layer' && typeof child.value === 'string') {
+							} else if (child.type === LAYER_NAME && typeof child.value === 'string') {
 								layers.p(child.value, toLoc(child))
 							}
 						}
 					}
 				} else if (str_equals('container', name)) {
 					containers.p(node.prelude.text, toLoc(node))
-					if (node.prelude.first_child?.type_name === 'ContainerQuery') {
-						if (node.prelude.first_child.first_child?.type_name === 'Identifier') {
+					if (node.prelude.first_child?.type === CONTAINER_QUERY) {
+						if (node.prelude.first_child.first_child?.type === IDENTIFIER) {
 							containerNames.p(node.prelude.first_child.first_child.text, toLoc(node))
 						}
 					}
@@ -301,12 +320,12 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 				atRuleComplexities.push(complexity)
 			}
-		} else if (node.type_name === 'Rule') {
+		} else if (node.type === STYLE_RULE) {
 			// Handle keyframe rules specially
 			if (inKeyframes && node.prelude) {
 				// In keyframes, the prelude is a SelectorList that may not have Selector children
 				// (e.g., "50%" is just a SelectorList with text, no Selector child)
-				if (node.prelude.type_name === 'SelectorList' && node.prelude.text) {
+				if (node.prelude.type === SELECTOR_LIST && node.prelude.text) {
 					keyframeSelectors.p(node.prelude.text, toLoc(node.prelude))
 				}
 				// Don't count keyframe rules as regular rules, but continue walking
@@ -329,7 +348,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				// Find the SelectorList child and count Selector nodes inside it
 				if (node.prelude) {
 					for (const selector of node.prelude.children) {
-						if (selector.type_name === 'Selector') {
+						if (selector.type === SELECTOR) {
 							numSelectors++
 						}
 					}
@@ -338,7 +357,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				// Count declarations in the block
 				if (node.block) {
 					for (const declaration of node.block.children) {
-						if (declaration.type_name === 'Declaration') {
+						if (declaration.type === DECLARATION) {
 							numDeclarations++
 						}
 					}
@@ -357,7 +376,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				ruleNesting.push(depth)
 				uniqueRuleNesting.p(depth, loc)
 			}
-		} else if (node.type_name === 'Selector') {
+		} else if (node.type === SELECTOR) {
 			// Keyframe selectors are now handled at the Rule level, so skip them here
 			if (inKeyframes) {
 				return SKIP
@@ -430,7 +449,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			// with :where() or :is() that contain SelectorLists
 			// as children
 			return SKIP
-		} else if (node.type_name === 'Declaration') {
+		} else if (node.type === DECLARATION) {
 			totalDeclarations++
 			uniqueDeclarations.add(node.text)
 
@@ -597,13 +616,13 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					return SKIP
 				} else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
 					for (let child of value.children) {
-						if (child.type_name !== 'Operator') {
+						if (child.type !== OPERATOR) {
 							durations.p(child.text, valueLoc)
 						}
 					}
 				} else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
 					for (let child of value.children) {
-						if (child.type_name !== 'Operator') {
+						if (child.type !== OPERATOR) {
 							timingFunctions.p(child.text, valueLoc)
 						}
 					}
@@ -612,7 +631,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				} else if (isProperty('container', property)) {
 					// The first identifier in the `container` shorthand is the container name
 					// Example: container: my-layout / inline-size;
-					if (value.first_child?.type_name === 'Identifier') {
+					if (value.first_child?.type === IDENTIFIER) {
 						containerNames.p(value.first_child.text, valueLoc)
 					}
 				} else if (border_radius_properties.has(basename(property))) {
@@ -627,14 +646,14 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				let valueHasIe9Hack = isIe9Hack(value)
 
 				walk(value, (valueNode) => {
-					switch (valueNode.type_name) {
-						case 'Dimension': {
+					switch (valueNode.type) {
+						case DIMENSION: {
 							let unit = valueNode.unit!
 							let loc = toLoc(valueNode)
 							units.push(unit, property, loc)
 							return SKIP
 						}
-						case 'Hash': {
+						case HASH: {
 							// Use text property for the hash value
 							let hashText = valueNode.text
 							if (!hashText || !hashText.startsWith('#')) {
@@ -659,7 +678,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 							return SKIP
 						}
-						case 'Identifier': {
+						case IDENTIFIER: {
 							let identifierText = valueNode.text
 							let identifierLoc = toLoc(valueNode)
 
@@ -704,7 +723,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							}
 							return SKIP
 						}
-						case 'Function': {
+						case FUNCTION: {
 							let funcName = valueNode.name as string
 							let funcLoc = toLoc(valueNode)
 
@@ -726,7 +745,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				})
 			}
 			//#endregion VALUES
-		} else if (node.type_name === 'Url') {
+		} else if (node.type === URL) {
 			let { value } = node
 			let embed = unquote((value as string) || '')
 			if (str_starts_with(embed, 'data:')) {
@@ -760,7 +779,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					embedTypes.unique.set(type, item)
 				}
 			}
-		} else if (node.type_name === 'Feature') {
+		} else if (node.type === MEDIA_FEATURE) {
 			// console.log({ Feature: node.text, name: node.name, value: node.value })
 			mediaFeatures.p(node.name, toLoc(node))
 			return SKIP
@@ -768,7 +787,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 		// Walk at-rule prelude children with inAtrulePrelude flag
 		let preludeWalked = false
-		if (node.type_name === 'Atrule' && node.prelude && node.prelude.has_children) {
+		if (node.type === AT_RULE && node.prelude && node.prelude.has_children) {
 			for (const child of node.prelude) {
 				wallaceWalk(child, depth, inKeyframes, true)
 			}
@@ -776,11 +795,11 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 		}
 
 		// Walk children with increased depth for Rules and Atrules
-		const nextDepth = node.type_name === 'Rule' || node.type_name === 'Atrule' ? depth + 1 : depth
+		const nextDepth = node.type === STYLE_RULE || node.type === AT_RULE ? depth + 1 : depth
 
 		for (const child of node.children) {
 			// Skip the AtrulePrelude node if we already walked it above
-			if (preludeWalked && child.type_name === 'AtrulePrelude') {
+			if (preludeWalked && child.type === AT_RULE_PRELUDE) {
 				continue
 			}
 			wallaceWalk(child, nextDepth, inKeyframes, inAtrulePrelude)

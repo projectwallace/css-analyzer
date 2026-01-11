@@ -2,7 +2,7 @@
 // BELOW IS A COPY OF BRAMUS/SPECIFICTY TAILORED FOR PORJECT WALLACE'S CSS PARSER
 // https://github.com/bramus/specificity/blob/80938c4cf77518a4d4abe559eb5a5ff919626c39/src/core/calculate.js
 
-import { type CSSNode } from '@projectwallace/css-parser'
+import { type CSSNode, ID_SELECTOR, ATTRIBUTE_SELECTOR, CLASS_SELECTOR, PSEUDO_CLASS_SELECTOR, SELECTOR_LIST, NTH_OF, SELECTOR, COMBINATOR, PSEUDO_ELEMENT_SELECTOR, TYPE_SELECTOR } from '@projectwallace/css-parser'
 import { parse_selector } from '@projectwallace/css-parser/parse-selector'
 
 type Specificity = [number, number, number]
@@ -30,17 +30,17 @@ export const calculateForAST = (selectorAST: CSSNode): Specificity => {
 	// Iterate through all parts of the selector (children of NODE_SELECTOR)
 	let current = selectorAST.first_child
 	while (current) {
-		switch (current.type_name) {
-			case 'IdSelector':
+		switch (current.type) {
+			case ID_SELECTOR:
 				a += 1
 				break
 
-			case 'AttributeSelector':
-			case 'ClassSelector':
+			case ATTRIBUTE_SELECTOR:
+			case CLASS_SELECTOR:
 				b += 1
 				break
 
-			case 'PseudoClassSelector':
+			case PSEUDO_CLASS_SELECTOR:
 				switch (current.name.toLowerCase()) {
 					// "The specificity of a :where() pseudo-class is replaced by zero."
 					case 'where':
@@ -63,7 +63,7 @@ export const calculateForAST = (selectorAST: CSSNode): Specificity => {
 						if (current.has_children) {
 							// The first child should be a NODE_SELECTOR_LIST
 							const childSelectorList = current.first_child
-							if (childSelectorList?.type_name === 'SelectorList') {
+							if (childSelectorList?.type === SELECTOR_LIST) {
 								// Calculate Specificity for all selectors in the list and get max
 								const max1 = max(calculate(childSelectorList))
 
@@ -83,7 +83,7 @@ export const calculateForAST = (selectorAST: CSSNode): Specificity => {
 
 						// Get NODE_SELECTOR_NTH_OF which contains the "of" selector list
 						const nthOf = current.first_child
-						if (nthOf?.type_name === 'NthOf' && nthOf.selector) {
+						if (nthOf?.type === NTH_OF && nthOf.selector) {
 							// Use the convenience property to access the selector list directly
 							const max2 = max(calculate(nthOf.selector))
 
@@ -101,11 +101,11 @@ export const calculateForAST = (selectorAST: CSSNode): Specificity => {
 						b += 1
 
 						const childSelector = current.first_child?.first_child
-						if (childSelector?.type_name === 'Selector') {
+						if (childSelector?.type === SELECTOR) {
 							// Calculate specificity for parts before the first combinator
 							let childPart = childSelector.first_child
 							while (childPart) {
-								if (childPart.type_name === 'Combinator') break
+								if (childPart.type === COMBINATOR) break
 
 								// Calculate contribution from this part
 								const partSpecificity = calculateForAST({
@@ -137,18 +137,18 @@ export const calculateForAST = (selectorAST: CSSNode): Specificity => {
 				}
 				break
 
-			case 'PseudoElementSelector':
+			case PSEUDO_ELEMENT_SELECTOR:
 				switch (current.name.toLowerCase()) {
 					// "The specificity of ::slotted() is that of a pseudo-element, plus the specificity of its argument."
 					case 'slotted':
 						c += 1
 
 						const childSelector = current.first_child?.first_child
-						if (childSelector?.type_name === 'Selector') {
+						if (childSelector?.type === SELECTOR) {
 							// Calculate specificity for parts before the first combinator
 							let childPart = childSelector.first_child
 							while (childPart) {
-								if (childPart.type_name === 'Combinator') break
+								if (childPart.type === COMBINATOR) break
 
 								// Calculate contribution from this part
 								const partSpecificity = calculateForAST({
@@ -184,7 +184,7 @@ export const calculateForAST = (selectorAST: CSSNode): Specificity => {
 				}
 				break
 
-			case 'TypeSelector':
+			case TYPE_SELECTOR:
 				// Omit namespace
 				let typeSelector = current.name ?? ''
 				if (typeSelector.includes('|')) {
@@ -223,7 +223,7 @@ const convertToAST = (source: string | CSSNode) => {
 	// The passed in argument was an Object.
 	// ~> Let's verify if it's a AST of the type NODE_SELECTOR_LIST
 	if (source instanceof Object) {
-		if (source.type_name === 'SelectorList') {
+		if (source.type === SELECTOR_LIST) {
 			return source
 		}
 

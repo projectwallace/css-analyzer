@@ -1,4 +1,4 @@
-import { type CSSNode, str_equals, walk, BREAK } from '@projectwallace/css-parser'
+import { type CSSNode, str_equals, walk, BREAK, SUPPORTS_QUERY, MEDIA_TYPE, MEDIA_FEATURE, DIMENSION, NUMBER, IDENTIFIER } from '@projectwallace/css-parser'
 
 /**
  * Check if an @supports atRule is a browserhack (Wallace parser version)
@@ -10,7 +10,7 @@ export function isSupportsBrowserhack(node: CSSNode): boolean {
 
 	walk(node, function (n) {
 		// Check SupportsQuery nodes for browserhack patterns
-		if (n.type_name === 'SupportsQuery') {
+		if (n.type === SUPPORTS_QUERY) {
 			const prelude = n.prelude || n.value || ''
 			const normalizedPrelude = prelude.toString().toLowerCase().replaceAll(/\s+/g, '')
 
@@ -35,7 +35,7 @@ export function isMediaBrowserhack(node: CSSNode): boolean {
 
 	walk(node, function (n) {
 		// Check MediaType nodes for \0 prefix or \9 suffix
-		if (n.type_name === 'MediaType') {
+		if (n.type === MEDIA_TYPE) {
 			const text = n.text || ''
 			if (text.startsWith('\\0') || text.includes('\\9')) {
 				isBrowserhack = true
@@ -44,7 +44,7 @@ export function isMediaBrowserhack(node: CSSNode): boolean {
 		}
 
 		// Check Feature nodes
-		if (n.type_name === 'Feature') {
+		if (n.type === MEDIA_FEATURE) {
 			const name = n.name || ''
 
 			// Check for vendor-specific feature hacks
@@ -60,7 +60,7 @@ export function isMediaBrowserhack(node: CSSNode): boolean {
 			// Check for min-resolution with .001dpcm
 			if (str_equals('min-resolution', name) && n.has_children) {
 				for (const child of n) {
-					if (child.type_name === 'Dimension' && child.value === 0.001 && str_equals('dpcm', child.unit || '')) {
+					if (child.type === DIMENSION && child.value === 0.001 && str_equals('dpcm', child.unit || '')) {
 						isBrowserhack = true
 						return BREAK
 					}
@@ -70,7 +70,7 @@ export function isMediaBrowserhack(node: CSSNode): boolean {
 			// Check for -webkit-min-device-pixel-ratio with 0 or 10000
 			if (str_equals('-webkit-min-device-pixel-ratio', name) && n.has_children) {
 				for (const child of n) {
-					if (child.type_name === 'Number' && (child.value === 0 || child.value === 10000)) {
+					if (child.type === NUMBER && (child.value === 0 || child.value === 10000)) {
 						isBrowserhack = true
 						return BREAK
 					}
@@ -80,7 +80,7 @@ export function isMediaBrowserhack(node: CSSNode): boolean {
 			// Check for \0 unit hack (appears as Identifier node)
 			if (n.has_children) {
 				for (const child of n) {
-					if (child.type_name === 'Identifier' && child.text === '\\0') {
+					if (child.type === IDENTIFIER && child.text === '\\0') {
 						isBrowserhack = true
 						return BREAK
 					}
