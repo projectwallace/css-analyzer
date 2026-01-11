@@ -16,7 +16,6 @@ import {
 	SELECTOR,
 	URL,
 	MEDIA_FEATURE,
-	AT_RULE_PRELUDE,
 	SUPPORTS_QUERY,
 	LAYER_NAME,
 	CONTAINER_QUERY,
@@ -217,7 +216,18 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 		}
 	}
 
-	function wallaceWalk(node: CSSNode, depth: number = 0, inKeyframes: boolean = false, inAtrulePrelude: boolean = false) {
+	// Track keyframes context by depth
+	let keyframesDepth = -1
+
+	walk(ast, (node, depth) => {
+		// Reset keyframesDepth when we exit the keyframes block (at same or shallower depth)
+		if (keyframesDepth >= 0 && depth <= keyframesDepth) {
+			keyframesDepth = -1
+		}
+
+		// Check if we're inside a keyframes block
+		let inKeyframes = keyframesDepth >= 0 && depth > keyframesDepth
+
 		// Count nodes and track nesting
 		if (node.type === AT_RULE) {
 			let atruleLoc = toLoc(node)
@@ -231,7 +241,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				if (useLocations) {
 					fontfaces_with_loc.p(node.start, toLoc(node))
 				}
-				let block = node.children.find((child) => child.type === BLOCK)
+				let block = node.children.find((child: CSSNode) => child.type === BLOCK)
 				for (let descriptor of block?.children || []) {
 					if (descriptor.type === DECLARATION && descriptor.value) {
 						descriptors[descriptor.property] = (descriptor.value as CSSNode).text
@@ -274,10 +284,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						complexity++
 					}
 
-					// Mark that we're inside a keyframes atrule
-					inKeyframes = true
+					// Mark the depth at which we enter a keyframes atrule
+					keyframesDepth = depth
 				} else if (str_equals('layer', name)) {
-					for (let layer of node.prelude.text.split(',').map((s) => s.trim())) {
+					for (let layer of node.prelude.text.split(',').map((s: string) => s.trim())) {
 						layers.p(layer, toLoc(node))
 					}
 				} else if (str_equals('import', name)) {
@@ -771,29 +781,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			mediaFeatures.p(node.name, toLoc(node))
 			return SKIP
 		}
-
-		// Walk at-rule prelude children with inAtrulePrelude flag
-		let preludeWalked = false
-		if (node.type === AT_RULE && node.prelude && node.prelude.has_children) {
-			for (const child of node.prelude) {
-				wallaceWalk(child, depth, inKeyframes, true)
-			}
-			preludeWalked = true
-		}
-
-		// Walk children with increased depth for Rules and Atrules
-		const nextDepth = node.type === STYLE_RULE || node.type === AT_RULE ? depth + 1 : depth
-
-		for (const child of node.children) {
-			// Skip the AtrulePrelude node if we already walked it above
-			if (preludeWalked && child.type === AT_RULE_PRELUDE) {
-				continue
-			}
-			wallaceWalk(child, nextDepth, inKeyframes, inAtrulePrelude)
-		}
-	}
-
-	wallaceWalk(ast)
+	})
 
 	let totalUniqueDeclarations = uniqueDeclarations.size
 
