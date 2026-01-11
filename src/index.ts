@@ -1033,6 +1033,8 @@ export function compareSpecificity(a: Specificity, b: Specificity): number {
 	return b[0] - a[0]
 }
 
+export { calculate as calculateSpecificity } from './selectors/specificity.js'
+
 export {
 	getComplexity as selectorComplexity,
 	isPrefixed as isSelectorPrefixed,

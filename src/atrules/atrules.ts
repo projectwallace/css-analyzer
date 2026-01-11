@@ -10,7 +10,7 @@ export function isSupportsBrowserhack(node: CSSNode): boolean {
 		// Check SupportsQuery nodes for browserhack patterns
 		if (n.type_name === 'SupportsQuery') {
 			const prelude = n.prelude || n.value || ''
-			const normalizedPrelude = prelude.toString().toLowerCase().replace(/\s+/g, '')
+			const normalizedPrelude = prelude.toString().toLowerCase().replaceAll(/\s+/g, '')
 
 			// Check for known browserhack patterns
 			if (normalizedPrelude.includes('-webkit-appearance:none') || normalizedPrelude.includes('-moz-appearance:meterbar')) {
