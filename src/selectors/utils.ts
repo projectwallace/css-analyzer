@@ -1,5 +1,18 @@
 import { KeywordSet } from '../keyword-set.js'
-import { type CSSNode, is_vendor_prefixed, SKIP, BREAK, walk, PSEUDO_ELEMENT_SELECTOR, PSEUDO_CLASS_SELECTOR, TYPE_SELECTOR, ATTRIBUTE_SELECTOR, SELECTOR, COMBINATOR, NTH } from '@projectwallace/css-parser'
+import {
+	type CSSNode,
+	is_vendor_prefixed,
+	SKIP,
+	BREAK,
+	walk,
+	PSEUDO_ELEMENT_SELECTOR,
+	PSEUDO_CLASS_SELECTOR,
+	TYPE_SELECTOR,
+	ATTRIBUTE_SELECTOR,
+	SELECTOR,
+	COMBINATOR,
+	NTH,
+} from '@projectwallace/css-parser'
 
 const PSEUDO_FUNCTIONS = new KeywordSet(['nth-child', 'where', 'not', 'is', 'has', 'nth-last-child', 'matches', '-webkit-any', '-moz-any'])
 
@@ -107,8 +120,7 @@ export function getComplexity(selector: CSSNode): number {
 
 		// Check for vendor-prefixed pseudo-elements, type selectors, and pseudo-classes
 		if (type === PSEUDO_ELEMENT_SELECTOR || type === TYPE_SELECTOR || type === PSEUDO_CLASS_SELECTOR) {
-			const name = node.name || node.text || ''
-			if (is_vendor_prefixed(name)) {
+			if (node.is_vendor_prefixed) {
 				complexity++
 			}
 		}

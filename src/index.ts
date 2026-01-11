@@ -282,7 +282,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					let prelude = `@${name} ${node.prelude.text}`
 					keyframes.p(prelude, toLoc(node))
 
-					if (is_vendor_prefixed(name)) {
+					if (node.is_vendor_prefixed) {
 						prefixedKeyframes.p(prelude, toLoc(node))
 						complexity++
 					}
