@@ -2,7 +2,6 @@
 import {
 	type CSSNode,
 	is_custom,
-	is_vendor_prefixed,
 	SKIP,
 	str_equals,
 	str_starts_with,
@@ -24,10 +23,8 @@ import {
 	IDENTIFIER,
 	OPERATOR,
 	DIMENSION,
-	NUMBER,
 	FUNCTION,
 	HASH,
-	STRING,
 } from '@projectwallace/css-parser'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isPrefixed, hasPseudoClass, isAccessibility } from './selectors/utils.js'

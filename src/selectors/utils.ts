@@ -11,7 +11,7 @@ import {
 	ATTRIBUTE_SELECTOR,
 	SELECTOR,
 	COMBINATOR,
-	NTH,
+	NTH_SELECTOR,
 } from '@projectwallace/css-parser'
 
 const PSEUDO_FUNCTIONS = new KeywordSet(['nth-child', 'where', 'not', 'is', 'has', 'nth-last-child', 'matches', '-webkit-any', '-moz-any'])
@@ -107,7 +107,7 @@ export function getComplexity(selector: CSSNode): number {
 		}
 
 		// In Wallace, Nth is a leaf node. Count it if it has content
-		if (type === NTH) {
+		if (type === NTH_SELECTOR) {
 			// Count non-empty Nth nodes (like "1", "2n+1", etc.)
 			if (node.text && node.text.trim()) {
 				complexity++

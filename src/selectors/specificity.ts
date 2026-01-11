@@ -2,7 +2,19 @@
 // BELOW IS A COPY OF BRAMUS/SPECIFICTY TAILORED FOR PORJECT WALLACE'S CSS PARSER
 // https://github.com/bramus/specificity/blob/80938c4cf77518a4d4abe559eb5a5ff919626c39/src/core/calculate.js
 
-import { type CSSNode, ID_SELECTOR, ATTRIBUTE_SELECTOR, CLASS_SELECTOR, PSEUDO_CLASS_SELECTOR, SELECTOR_LIST, NTH_OF, SELECTOR, COMBINATOR, PSEUDO_ELEMENT_SELECTOR, TYPE_SELECTOR } from '@projectwallace/css-parser'
+import {
+	type CSSNode,
+	ID_SELECTOR,
+	ATTRIBUTE_SELECTOR,
+	CLASS_SELECTOR,
+	PSEUDO_CLASS_SELECTOR,
+	SELECTOR_LIST,
+	NTH_OF_SELECTOR,
+	SELECTOR,
+	COMBINATOR,
+	PSEUDO_ELEMENT_SELECTOR,
+	TYPE_SELECTOR,
+} from '@projectwallace/css-parser'
 import { parse_selector } from '@projectwallace/css-parser/parse-selector'
 
 type Specificity = [number, number, number]
@@ -83,7 +95,7 @@ export const calculateForAST = (selectorAST: CSSNode): Specificity => {
 
 						// Get NODE_SELECTOR_NTH_OF which contains the "of" selector list
 						const nthOf = current.first_child
-						if (nthOf?.type === NTH_OF && nthOf.selector) {
+						if (nthOf?.type === NTH_OF_SELECTOR && nthOf.selector) {
 							// Use the convenience property to access the selector list directly
 							const max2 = max(calculate(nthOf.selector))
 
