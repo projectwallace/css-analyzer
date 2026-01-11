@@ -1,16 +1,14 @@
-import type { CSSNode } from '@projectwallace/css-parser'
+import { type CSSNode, walk, BREAK } from '@projectwallace/css-parser'
 
 export function isValuePrefixed(node: CSSNode): boolean {
-	if (!node.has_children) return false
+	let isPrefixed = false
 
-	for (let child of node.children) {
+	walk(node, function (child) {
 		if (child.is_vendor_prefixed) {
-			return true
+			isPrefixed = true
+			return BREAK
 		}
-		if (child.type_name === 'Function' && isValuePrefixed(child)) {
-			return true
-		}
-	}
+	})
 
-	return false
+	return isPrefixed
 }
