@@ -471,6 +471,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			let { is_important, property, is_browserhack, is_vendor_prefixed } = node
 
 			let propertyLoc = toLoc(node)
+			propertyLoc.length = property.length
 
 			properties.p(property, propertyLoc)
 
