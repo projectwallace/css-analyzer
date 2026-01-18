@@ -37,7 +37,7 @@
 		"max-depth": [
 			"warn",
 			{
-				"max": 5
+				"max": 6
 			}
 		],
 		"explicit-function-return-type": "off",
@@ -54,6 +54,7 @@
 		"no-rest-spread-properties": "off",
 		"require-await": "warn",
 		"no-null": "off",
-		"no-warning-comments": "off"
+		"no-warning-comments": "off",
+		"no-case-declarations": "off"
 	}
 }

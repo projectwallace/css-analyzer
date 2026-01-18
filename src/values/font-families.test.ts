@@ -61,8 +61,8 @@ test('extracts the `font` shorthand', () => {
   `
 	const actual = analyze(fixture).values.fontFamilies
 	const expected = {
-		total: 12,
-		totalUnique: 8,
+		total: 11,
+		totalUnique: 7,
 		unique: {
 			[`'Noto Sans'`]: 1,
 			'"Source Sans Pro", serif': 1,
@@ -71,10 +71,8 @@ test('extracts the `font` shorthand', () => {
 			'Consolas, "Liberation Mono", Menlo, Courier, monospace': 1,
 			a: 1,
 			'var(--fontStack-monospace, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace)': 1,
-			// This entry exists due to a ??bug?? in CSSTree, but it's better than not counting the value above this as well
-			'ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace': 1,
 		},
-		uniquenessRatio: 8 / 12,
+		uniquenessRatio: 7 / 11,
 	}
 	expect(actual).toEqual(expected)
 })

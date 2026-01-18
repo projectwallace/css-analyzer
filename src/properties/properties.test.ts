@@ -1,4 +1,4 @@
-import { test, expect } from 'vitest'
+import { test, expect, describe } from 'vitest'
 import { analyze } from '../index.js'
 
 test('counts totals', () => {
@@ -78,6 +78,7 @@ test('counts browser hacks', () => {
     hacks {
       margin: 0;
       *zoom: 1;
+      --custom: 1;
     }
 
     @media (min-width: 0) {
@@ -96,7 +97,7 @@ test('counts browser hacks', () => {
 	expect(actual.total).toEqual(2)
 	expect(actual.totalUnique).toEqual(1)
 	expect(actual.unique).toEqual(expected)
-	expect(actual.ratio).toEqual(2 / 3)
+	expect(actual.ratio).toEqual(2 / 4)
 })
 
 test('counts custom properties', () => {
@@ -132,8 +133,29 @@ test('counts custom properties', () => {
 	expect(actual.ratio).toEqual(3 / 6)
 })
 
-test('calculates property complexity', () => {
-	const fixture = `
+describe('property complexity', () => {
+	test('regular property', () => {
+		const actual = analyze('a { property: 1 }').properties.complexity
+		expect(actual.sum).toBe(1)
+	})
+
+	test('custom property', () => {
+		const actual = analyze('a { --property: 1 }').properties.complexity
+		expect(actual.sum).toBe(2)
+	})
+
+	test('browserhack property', () => {
+		const actual = analyze('a { *property: 1 }').properties.complexity
+		expect(actual.sum).toBe(2)
+	})
+
+	test('vendor prefixed property', () => {
+		const actual = analyze('a { -o-property: 1 }').properties.complexity
+		expect(actual.sum).toBe(2)
+	})
+
+	test('counts totals', () => {
+		const fixture = `
     .property-complexity-fixture {
       regular-property: 1;
       --my-custom-property: 2;
@@ -141,14 +163,15 @@ test('calculates property complexity', () => {
       -webkit-property: 2;
     }
   `
-	const actual = analyze(fixture).properties.complexity
+		const actual = analyze(fixture).properties.complexity
 
-	expect(actual.max).toEqual(2)
-	expect(actual.mean).toEqual(1.75)
-	expect(actual.min).toEqual(1)
-	expect(actual.mode).toEqual(2)
-	expect(actual.range).toEqual(1)
-	expect(actual.sum).toEqual(7)
+		expect.soft(actual.max).toEqual(2)
+		expect.soft(actual.mean).toEqual(1.75)
+		expect.soft(actual.min).toEqual(1)
+		expect.soft(actual.mode).toEqual(2)
+		expect.soft(actual.range).toEqual(1)
+		expect.soft(actual.sum).toEqual(7)
+	})
 })
 
 test('counts the amount of !important used on custom properties', () => {

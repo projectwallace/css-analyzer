@@ -1,28 +1,48 @@
-// @ts-expect-error types missing
-import parse from 'css-tree/parser'
-// @ts-expect-error types missing
-import walk from 'css-tree/walker'
-// @ts-expect-error types missing
-import { calculateForAST } from '@bramus/specificity/core'
+// Wallace parser for dual-parser migration
+import {
+	type CSSNode,
+	is_custom,
+	SKIP,
+	str_equals,
+	str_starts_with,
+	tokenize,
+	walk,
+	parse,
+	AT_RULE,
+	BLOCK,
+	DECLARATION,
+	STYLE_RULE,
+	SELECTOR_LIST,
+	SELECTOR,
+	URL,
+	MEDIA_FEATURE,
+	SUPPORTS_QUERY,
+	LAYER_NAME,
+	CONTAINER_QUERY,
+	IDENTIFIER,
+	OPERATOR,
+	DIMENSION,
+	FUNCTION,
+	HASH,
+	TOKEN_COMMENT,
+} from '@projectwallace/css-parser'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
-import { getCombinators, getComplexity, isAccessibility, isPrefixed, hasPseudoClass } from './selectors/utils.js'
+import { getCombinators, getComplexity, isPrefixed, hasPseudoClass, isAccessibility } from './selectors/utils.js'
+import { calculateForAST as calculateSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
-import { destructure, isSystemFont } from './values/destructure-font-shorthand.js'
-import { isValueKeyword, keywords, isValueReset } from './values/values.js'
+import { destructure, SYSTEM_FONTS } from './values/destructure-font-shorthand.js'
+import { keywords, isValueReset } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
 import { ContextCollection } from './context-collection.js'
 import { Collection, type Location } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
-import { strEquals, startsWith, endsWith } from './string-utils.js'
-import { hasVendorPrefix } from './vendor-prefix.js'
-import { isCustom, isHack, isProperty } from './properties/property-utils.js'
+import { endsWith, unquote } from './string-utils.js'
+import { isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
 import { basename } from './properties/property-utils.js'
-import { Atrule, Selector, Dimension, Url, Value, Hash, Rule, Identifier, Func, Operator } from './css-tree-node-types.js'
 import { KeywordSet } from './keyword-set.js'
-import type { CssNode, Declaration, SelectorList } from 'css-tree'
 
 export type Specificity = [number, number, number]
 
@@ -61,21 +81,8 @@ export function analyze(css: string, options: Options = {}): any {
 function analyzeInternal<T extends boolean>(css: string, options: Options, useLocations: T) {
 	let start = Date.now()
 
-	/**
-	 * Recreate the authored CSS from a CSSTree node
-	 * @param node - Node from CSSTree AST to stringify
-	 * @returns The stringified node
-	 */
-	function stringifyNode(node: CssNode): string {
-		return stringifyNodePlain(node).trim()
-	}
-
-	function stringifyNodePlain(node: CssNode): string {
-		let loc = node.loc!
-		return css.substring(loc.start.offset, loc.end.offset)
-	}
-
 	// Stylesheet
+	let linesOfCode = (css.match(/\n/g) || []).length + 1
 	let totalComments = 0
 	let commentsSize = 0
 	let embedSize = 0
@@ -92,18 +99,15 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	}
 
 	let startParse = Date.now()
-
 	let ast = parse(css, {
-		parseCustomProperty: true, // To find font-families, colors, etc.
-		positions: true, // So we can use stringifyNode()
-		onComment: function (comment: string) {
+		on_comment({ length }) {
 			totalComments++
-			commentsSize += comment.length
+			// includes /* and */ in the size calculation
+			commentsSize += length
 		},
 	})
 
 	let startAnalysis = Date.now()
-	let linesOfCode = ast.loc.end.line - ast.loc.start.line + 1
 
 	// Atrules
 	let atrules = new Collection(useLocations)
@@ -196,578 +200,580 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let borderRadiuses = new ContextCollection(useLocations)
 	let resets = new Collection(useLocations)
 
-	let nestingDepth = 0
+	function toLoc(node: CSSNode): Location {
+		return {
+			line: node.line,
+			column: node.column,
+			offset: node.start,
+			length: node.length,
+		}
+	}
 
-	walk(ast, {
-		enter(node: CssNode) {
-			switch (node.type) {
-				case Atrule: {
-					atrules.p(node.name, node.loc!)
-					atruleNesting.push(nestingDepth)
-					uniqueAtruleNesting.p(nestingDepth, node.loc!)
+	// Track keyframes context by depth
+	let keyframesDepth = -1
 
-					let atRuleName = node.name
+	walk(ast, (node, depth) => {
+		// Reset keyframesDepth when we exit the keyframes block (at same or shallower depth)
+		if (keyframesDepth >= 0 && depth <= keyframesDepth) {
+			keyframesDepth = -1
+		}
 
-					if (atRuleName === 'font-face') {
-						let descriptors = Object.create(null)
+		// Check if we're inside a keyframes block
+		let inKeyframes = keyframesDepth >= 0 && depth > keyframesDepth
 
-						if (useLocations) {
-							fontfaces_with_loc.p(node.loc!.start.offset, node.loc!)
-						}
+		// Count nodes and track nesting
+		if (node.type === AT_RULE) {
+			let atruleLoc = toLoc(node)
+			atruleNesting.push(depth)
+			uniqueAtruleNesting.p(depth, atruleLoc)
+			atrules.p(node.name, atruleLoc)
 
-						node.block?.children.forEach((descriptor) => {
-							// Ignore 'Raw' nodes in case of CSS syntax errors
-							if (descriptor.type === 'Declaration') {
-								descriptors[descriptor.property] = stringifyNode(descriptor.value)
-							}
-						})
-
-						fontfaces.push(descriptors)
-						atRuleComplexities.push(1)
-						break
-					}
-
-					let complexity = 1
-
-					// All the AtRules in here MUST have a prelude, so we can count their names
-					// oxlint-disable-next-line no-negated-condition
-					if (node.prelude !== null) {
-						let prelude = node.prelude
-						let preludeStr = prelude && stringifyNode(node.prelude)
-						let loc = prelude.loc!
-
-						if (atRuleName === 'media') {
-							medias.p(preludeStr, loc)
-							if (isMediaBrowserhack(prelude)) {
-								mediaBrowserhacks.p(preludeStr, loc)
-								complexity++
-							}
-						} else if (atRuleName === 'supports') {
-							supports.p(preludeStr, loc)
-							// TODO: analyze vendor prefixes in @supports
-							// TODO: analyze complexity of @supports 'declaration'
-							if (isSupportsBrowserhack(prelude)) {
-								supportsBrowserhacks.p(preludeStr, loc)
-								complexity++
-							}
-						} else if (endsWith('keyframes', atRuleName)) {
-							let name = '@' + atRuleName + ' ' + preludeStr
-							if (hasVendorPrefix(atRuleName)) {
-								prefixedKeyframes.p(name, loc)
-								complexity++
-							}
-							keyframes.p(name, loc!)
-						} else if (atRuleName === 'import') {
-							// @ts-expect-error Outdated css-tree types
-							walk(node, (prelude_node) => {
-								if (prelude_node.type === 'Condition' && prelude_node.kind === 'supports') {
-									let prelude = stringifyNode(prelude_node)
-
-									supports.p(prelude, prelude_node.loc!)
-									return walk.break
-								}
-							})
-							imports.p(preludeStr, loc)
-							// TODO: analyze complexity of media queries, layers and supports in @import
-							// see https://github.com/projectwallace/css-analyzer/issues/326
-						} else if (atRuleName === 'charset') {
-							charsets.p(preludeStr, loc)
-						} else if (atRuleName === 'container') {
-							containers.p(preludeStr, loc)
-
-							if (prelude.type === 'AtrulePrelude') {
-								if (prelude.children.first?.type === 'Identifier') {
-									let containerName = prelude.children.first.name
-									containerNames.p(containerName, loc)
-								}
-							}
-							// TODO: calculate complexity of container 'declaration'
-						} else if (atRuleName === 'property') {
-							registeredProperties.p(preludeStr, loc)
-							// TODO: add complexity for descriptors
-						}
-					} else {
-						if (atRuleName === 'layer') {
-							layers.p('<anonymous>', node.loc!)
-							complexity++
-						}
-					}
-					atRuleComplexities.push(complexity)
-					break
+			//#region @FONT-FACE
+			if (str_equals('font-face', node.name)) {
+				let descriptors = Object.create(null)
+				if (useLocations) {
+					fontfaces_with_loc.p(node.start, toLoc(node))
 				}
-				// @ts-expect-error Oudated css-tree types
-				case 'Layer': {
-					// @ts-expect-error Oudated css-tree types
-					if (node.name !== null) {
-						// @ts-expect-error Oudated css-tree types
-						layers.p(node.name, node.loc)
+				let block = node.children.find((child: CSSNode) => child.type === BLOCK)
+				for (let descriptor of block?.children || []) {
+					if (descriptor.type === DECLARATION && descriptor.value) {
+						descriptors[descriptor.property] = (descriptor.value as CSSNode).text
 					}
-					break
 				}
-				// @ts-expect-error Oudated css-tree types
-				case 'Feature': {
-					// @ts-expect-error Oudated css-tree types
-					mediaFeatures.p(node.name, node.loc)
-					break
+				atRuleComplexities.push(1)
+				fontfaces.push(descriptors)
+			}
+			//#endregion
+
+			if (node.prelude === null || node.prelude === undefined) {
+				if (str_equals('layer', node.name)) {
+					// @layer without a prelude is anonymous
+					layers.p('<anonymous>', toLoc(node))
+					atRuleComplexities.push(2)
 				}
-				case Rule: {
-					let prelude = node.prelude as SelectorList
-					let block = node.block
+			} else {
+				let { name } = node
+				let complexity = 1
 
-					let preludeChildren = prelude.children
-					let blockChildren = block.children
-					let numSelectors = preludeChildren ? preludeChildren.size : 0
-					let numDeclarations = blockChildren ? blockChildren.size : 0
-
-					ruleSizes.push(numSelectors + numDeclarations)
-					uniqueRuleSize.p(numSelectors + numDeclarations, node.loc!)
-					selectorsPerRule.push(numSelectors)
-					uniqueSelectorsPerRule.p(numSelectors, prelude.loc!)
-					declarationsPerRule.push(numDeclarations)
-					uniqueDeclarationsPerRule.p(numDeclarations, block.loc!)
-					ruleNesting.push(nestingDepth)
-					uniqueRuleNesting.p(nestingDepth, node.loc!)
-
-					totalRules++
-
-					if (numDeclarations === 0) {
-						emptyRules++
+				// All the AtRules in here MUST have a prelude, so we can count their names
+				if (str_equals('media', name)) {
+					medias.p(node.prelude.text, toLoc(node))
+					if (isMediaBrowserhack(node.prelude)) {
+						mediaBrowserhacks.p(node.prelude.text, toLoc(node))
+						complexity++
 					}
-					break
-				}
-				case Selector: {
-					let selector = stringifyNode(node)
-					let loc = node.loc!
-
-					if (this.atrule && endsWith('keyframes', this.atrule.name)) {
-						keyframeSelectors.p(selector, loc)
-						return this.skip
+				} else if (str_equals('supports', name)) {
+					supports.p(node.prelude.text, toLoc(node))
+					if (isSupportsBrowserhack(node.prelude)) {
+						supportsBrowserhacks.p(node.prelude.text, toLoc(node))
+						complexity++
 					}
+				} else if (endsWith('keyframes', name)) {
+					let prelude = `@${name} ${node.prelude.text}`
+					keyframes.p(prelude, toLoc(node))
 
-					if (isAccessibility(node)) {
-						a11y.p(selector, loc)
-					}
-
-					let pseudos = hasPseudoClass(node)
-					if (pseudos !== false) {
-						for (let pseudo of pseudos) {
-							pseudoClasses.p(pseudo, loc)
-						}
-					}
-
-					let complexity = getComplexity(node)
-
-					if (isPrefixed(node)) {
-						prefixedSelectors.p(selector, loc)
-					}
-
-					uniqueSelectors.add(selector)
-					selectorComplexities.push(complexity)
-					uniqueSelectorComplexities.p(complexity, loc)
-					selectorNesting.push(nestingDepth - 1)
-					uniqueSelectorNesting.p(nestingDepth - 1, loc)
-
-					// #region specificity
-					let specificity: Specificity = calculateForAST(node).toArray()
-					let [sa, sb, sc] = specificity
-
-					uniqueSpecificities.p(specificity.toString(), loc)
-
-					specificityA.push(sa)
-					specificityB.push(sb)
-					specificityC.push(sc)
-
-					if (maxSpecificity === undefined) {
-						maxSpecificity = specificity
-					}
-
-					if (minSpecificity === undefined) {
-						minSpecificity = specificity
-					}
-
-					if (minSpecificity !== undefined && compareSpecificity(minSpecificity, specificity) < 0) {
-						minSpecificity = specificity
-					}
-
-					if (maxSpecificity !== undefined && compareSpecificity(maxSpecificity, specificity) > 0) {
-						maxSpecificity = specificity
-					}
-
-					specificities.push(specificity)
-					// #endregion
-
-					if (sa > 0) {
-						ids.p(selector, loc)
-					}
-
-					getCombinators(node, function onCombinator(combinator) {
-						combinators.p(combinator.name, combinator.loc)
-					})
-
-					// Avoid deeper walking of selectors to not mess with
-					// our specificity calculations in case of a selector
-					// with :where() or :is() that contain SelectorLists
-					// as children
-					return this.skip
-				}
-				case Dimension: {
-					if (!this.declaration) {
-						break
-					}
-
-					let unit = node.unit
-
-					if (endsWith('\\9', unit)) {
-						units.push(unit.substring(0, unit.length - 2), this.declaration.property, node.loc!)
-					} else {
-						units.push(unit, this.declaration.property, node.loc!)
-					}
-
-					return this.skip
-				}
-				case Url: {
-					if (startsWith('data:', node.value)) {
-						let embed = node.value
-						let size = embed.length
-						let type = getEmbedType(embed)
-
-						embedTypes.total++
-						embedSize += size
-
-						let loc = {
-							line: node.loc!.start.line,
-							column: node.loc!.start.column,
-							offset: node.loc!.start.offset,
-							length: node.loc!.end.offset - node.loc!.start.offset,
-						}
-
-						if (embedTypes.unique.has(type)) {
-							let item = embedTypes.unique.get(type)!
-							item.count++
-							item.size += size
-							embedTypes.unique.set(type, item)
-							if (useLocations && item.uniqueWithLocations) {
-								item.uniqueWithLocations.push(loc)
-							}
-						} else {
-							let item = {
-								count: 1,
-								size,
-								uniqueWithLocations: useLocations ? [loc] : undefined,
-							}
-							embedTypes.unique.set(type, item)
-						}
-					}
-					break
-				}
-				case Value: {
-					let loc = node.loc!
-
-					if (isValueKeyword(node)) {
-						valueComplexities.push(1)
-						valueKeywords.p(stringifyNode(node), loc)
-						break
-					}
-
-					let declaration: Declaration = this.declaration
-					let { property, important } = declaration
-					let complexity = 1
-
-					// i.e. `background-image: -webkit-linear-gradient()`
-					if (isValuePrefixed(node)) {
-						vendorPrefixedValues.p(stringifyNode(node), loc)
+					if (node.is_vendor_prefixed) {
+						prefixedKeyframes.p(prelude, toLoc(node))
 						complexity++
 					}
 
-					// i.e. `property: value !ie`
-					if (typeof important === 'string') {
-						valueBrowserhacks.p(stringifyNodePlain(node) + '!' + important, loc)
-						complexity++
+					// Mark the depth at which we enter a keyframes atrule
+					keyframesDepth = depth
+				} else if (str_equals('layer', name)) {
+					for (let layer of node.prelude.text.split(',').map((s: string) => s.trim())) {
+						layers.p(layer, toLoc(node))
 					}
+				} else if (str_equals('import', name)) {
+					imports.p(node.prelude.text, toLoc(node))
 
-					// i.e. `property: value\9`
-					if (isIe9Hack(node)) {
-						valueBrowserhacks.p(stringifyNode(node), loc)
-						complexity++
+					if (node.prelude.has_children) {
+						for (let child of node.prelude) {
+							if (child.type === SUPPORTS_QUERY && typeof child.value === 'string') {
+								supports.p(child.value, toLoc(child))
+							} else if (child.type === LAYER_NAME && typeof child.value === 'string') {
+								layers.p(child.value, toLoc(child))
+							}
+						}
 					}
+				} else if (str_equals('container', name)) {
+					containers.p(node.prelude.text, toLoc(node))
+					if (node.prelude.first_child?.type === CONTAINER_QUERY) {
+						if (node.prelude.first_child.first_child?.type === IDENTIFIER) {
+							containerNames.p(node.prelude.first_child.first_child.text, toLoc(node))
+						}
+					}
+				} else if (str_equals('property', name)) {
+					registeredProperties.p(node.prelude.text, toLoc(node))
+				} else if (str_equals('charset', name)) {
+					charsets.p(node.prelude.text, toLoc(node))
+				}
 
-					let children = node.children
+				atRuleComplexities.push(complexity)
+			}
+		} else if (node.type === STYLE_RULE) {
+			// Handle keyframe rules specially
+			if (inKeyframes && node.prelude) {
+				// In keyframes, the prelude is a SelectorList that may not have Selector children
+				// (e.g., "50%" is just a SelectorList with text, no Selector child)
+				if (node.prelude.type === SELECTOR_LIST && node.prelude.text) {
+					keyframeSelectors.p(node.prelude.text, toLoc(node.prelude))
+				}
+				// Don't count keyframe rules as regular rules, but continue walking
+				// children to count declarations inside keyframes
+				// (Declarations are counted in the Declaration handler below)
+			} else {
+				// Only count non-keyframe rules
+				totalRules++
 
-					// TODO: should shorthands be counted towards complexity?
+				// Check if rule is empty (no declarations in block)
+				if (node.block?.is_empty) {
+					emptyRules++
+				}
+
+				// Count selectors and declarations in this rule
+				let numSelectors = 0
+				let numDeclarations = 0
+				let loc = toLoc(node)
+
+				// Find the SelectorList child and count Selector nodes inside it
+				if (node.prelude) {
+					for (const selector of node.prelude.children) {
+						if (selector.type === SELECTOR) {
+							numSelectors++
+						}
+					}
+				}
+
+				// Count declarations in the block
+				if (node.block) {
+					for (const declaration of node.block.children) {
+						if (declaration.type === DECLARATION) {
+							numDeclarations++
+						}
+					}
+				}
+
+				// Track rule metrics
+				ruleSizes.push(numSelectors + numDeclarations)
+				uniqueRuleSize.p(numSelectors + numDeclarations, loc)
+
+				selectorsPerRule.push(numSelectors)
+				uniqueSelectorsPerRule.p(numSelectors, loc)
+
+				declarationsPerRule.push(numDeclarations)
+				uniqueDeclarationsPerRule.p(numDeclarations, loc)
+
+				ruleNesting.push(depth)
+				uniqueRuleNesting.p(depth, loc)
+			}
+		} else if (node.type === SELECTOR) {
+			// Keyframe selectors are now handled at the Rule level, so skip them here
+			if (inKeyframes) {
+				return SKIP
+			}
+
+			let loc = toLoc(node)
+
+			selectorNesting.push(depth > 0 ? depth - 1 : 0)
+			uniqueSelectorNesting.p(depth > 0 ? depth - 1 : 0, loc)
+			uniqueSelectors.add(node.text)
+
+			let complexity = getComplexity(node)
+			selectorComplexities.push(complexity)
+			uniqueSelectorComplexities.p(complexity, loc)
+
+			if (isPrefixed(node)) {
+				prefixedSelectors.p(node.text, loc)
+			}
+
+			// Check for accessibility selectors
+			if (isAccessibility(node)) {
+				a11y.p(node.text, loc)
+			}
+
+			let pseudos = hasPseudoClass(node)
+			if (pseudos !== false) {
+				for (let pseudo of pseudos) {
+					pseudoClasses.p(pseudo, loc)
+				}
+			}
+
+			getCombinators(node, function onCombinator(combinator) {
+				let name = combinator.name.trim() === '' ? ' ' : combinator.name
+				combinators.p(name, combinator.loc)
+			})
+
+			let specificity = calculateSpecificity(node)
+			let [sa, sb, sc] = specificity
+
+			uniqueSpecificities.p(specificity.toString(), loc)
+
+			specificityA.push(sa)
+			specificityB.push(sb)
+			specificityC.push(sc)
+
+			if (maxSpecificity === undefined) {
+				maxSpecificity = specificity
+			}
+
+			if (minSpecificity === undefined) {
+				minSpecificity = specificity
+			}
+
+			if (minSpecificity !== undefined && compareSpecificity(minSpecificity, specificity) < 0) {
+				minSpecificity = specificity
+			}
+
+			if (maxSpecificity !== undefined && compareSpecificity(maxSpecificity, specificity) > 0) {
+				maxSpecificity = specificity
+			}
+
+			specificities.push(specificity)
+
+			if (sa > 0) {
+				ids.p(node.text, loc)
+			}
+
+			// Avoid deeper walking of selectors to not mess with
+			// our specificity calculations in case of a selector
+			// with :where() or :is() that contain SelectorLists
+			// as children
+			return SKIP
+		} else if (node.type === DECLARATION) {
+			totalDeclarations++
+			uniqueDeclarations.add(node.text)
+
+			let loc = toLoc(node)
+			let declarationDepth = depth > 0 ? depth - 1 : 0
+			declarationNesting.push(declarationDepth)
+			uniqueDeclarationNesting.p(declarationDepth, loc)
+
+			let complexity = 1
+			if (node.is_important) {
+				complexity++
+
+				let declaration = node.text
+				if (!declaration.toLowerCase().includes('!important')) {
+					let valueText = (node.value as CSSNode).text
+					let valueOffset = declaration.indexOf(valueText)
+					let stripSemi = declaration.slice(-1) === ';'
+					valueBrowserhacks.p(`${declaration.slice(valueOffset, stripSemi ? -1 : undefined)}`, toLoc(node.value as CSSNode))
+				}
+
+				if (inKeyframes) {
+					importantsInKeyframes++
+					complexity++
+				}
+			}
+			declarationComplexities.push(complexity)
+
+			//#region PROPERTIES
+			let { is_important, property, is_browserhack, is_vendor_prefixed } = node
+
+			let propertyLoc = toLoc(node)
+
+			properties.p(property, propertyLoc)
+
+			if (is_important) {
+				importantDeclarations++
+			}
+
+			// Count important declarations
+			if (is_vendor_prefixed) {
+				propertyComplexities.push(2)
+				propertyVendorPrefixes.p(property, propertyLoc)
+			} else if (is_custom(property)) {
+				customProperties.p(property, propertyLoc)
+				propertyComplexities.push(is_important ? 3 : 2)
+
+				if (is_important) {
+					importantCustomProperties.p(property, propertyLoc)
+				}
+			} else if (is_browserhack) {
+				propertyHacks.p(property, propertyLoc)
+				propertyComplexities.push(2)
+			} else {
+				propertyComplexities.push(1)
+			}
+			//#endregion PROPERTIES
+
+			//#region VALUES
+			// Values are analyzed inside declaration because we need context, like which property is used
+			{
+				let value = node.value as CSSNode
+
+				let { text } = value
+				let valueLoc = toLoc(value)
+				let complexity = 1
+
+				// auto, inherit, initial, etc.
+				if (keywords.has(text)) {
+					valueKeywords.p(text, valueLoc)
 					valueComplexities.push(complexity)
+					return
+				}
 
-					// Process properties first that don't have colors,
-					// so we can avoid further walking them;
-					if (
-						isProperty('margin', property) ||
-						isProperty('margin-block', property) ||
-						isProperty('margin-inline', property) ||
-						isProperty('margin-top', property) ||
-						isProperty('margin-right', property) ||
-						isProperty('margin-bottom', property) ||
-						isProperty('margin-left', property) ||
-						isProperty('padding', property) ||
-						isProperty('padding-block', property) ||
-						isProperty('padding-inline', property) ||
-						isProperty('padding-top', property) ||
-						isProperty('padding-right', property) ||
-						isProperty('padding-bottom', property) ||
-						isProperty('padding-left', property)
-					) {
-						if (isValueReset(node)) {
-							resets.p(property, declaration.loc!)
-						}
-					} else if (isProperty('z-index', property)) {
-						zindex.p(stringifyNode(node), loc)
-						return this.skip
-					} else if (isProperty('font', property)) {
-						if (isSystemFont(node)) return
+				//#region VALUE COMPLEXITY
+				// i.e. `background-image: -webkit-linear-gradient()`
+				if (isValuePrefixed(value)) {
+					vendorPrefixedValues.p(value.text, valueLoc)
+					complexity++
+				}
 
-						let result = destructure(node, stringifyNode, function (item) {
+				// i.e. `property: value\9`
+				if (isIe9Hack(value)) {
+					valueBrowserhacks.p(text, valueLoc)
+					text = text.slice(0, -2)
+					complexity++
+				}
+				//#endregion VALUE COMPLEXITY
+
+				// TODO: should shorthands be counted towards complexity?
+				valueComplexities.push(complexity)
+
+				// Process properties first that don't have colors,
+				// so we can avoid further walking them;
+				if (
+					isProperty('margin', property) ||
+					isProperty('margin-block', property) ||
+					isProperty('margin-inline', property) ||
+					isProperty('margin-top', property) ||
+					isProperty('margin-right', property) ||
+					isProperty('margin-bottom', property) ||
+					isProperty('margin-left', property) ||
+					isProperty('padding', property) ||
+					isProperty('padding-block', property) ||
+					isProperty('padding-inline', property) ||
+					isProperty('padding-top', property) ||
+					isProperty('padding-right', property) ||
+					isProperty('padding-bottom', property) ||
+					isProperty('padding-left', property)
+				) {
+					if (isValueReset(value)) {
+						resets.p(property, valueLoc)
+					}
+				} else if (isProperty('z-index', property)) {
+					zindex.p(text, valueLoc)
+					return SKIP
+				} else if (isProperty('font', property)) {
+					if (!SYSTEM_FONTS.has(text)) {
+						let result = destructure(value, function (item) {
 							if (item.type === 'keyword') {
-								valueKeywords.p(item.value, loc)
+								valueKeywords.p(item.value, valueLoc)
 							}
 						})
 
 						if (!result) {
-							return this.skip
+							return SKIP
 						}
 
 						let { font_size, line_height, font_family } = result
 						if (font_family) {
-							fontFamilies.p(font_family, loc)
+							fontFamilies.p(font_family, valueLoc)
 						}
 
 						if (font_size) {
-							fontSizes.p(font_size, loc)
+							fontSizes.p(font_size, valueLoc)
 						}
 
 						if (line_height) {
-							lineHeights.p(line_height, loc)
+							lineHeights.p(line_height, valueLoc)
 						}
-
-						break
-					} else if (isProperty('font-size', property)) {
-						if (!isSystemFont(node)) {
-							fontSizes.p(stringifyNode(node), loc)
-						}
-						break
-					} else if (isProperty('font-family', property)) {
-						if (!isSystemFont(node)) {
-							fontFamilies.p(stringifyNode(node), loc)
-						}
-						break
-					} else if (isProperty('line-height', property)) {
-						lineHeights.p(stringifyNode(node), loc)
-					} else if (isProperty('transition', property) || isProperty('animation', property)) {
-						analyzeAnimation(children, function (item: { type: string; value: CssNode }) {
-							if (item.type === 'fn') {
-								timingFunctions.p(stringifyNode(item.value), loc)
-							} else if (item.type === 'duration') {
-								durations.p(stringifyNode(item.value), loc)
-							} else if (item.type === 'keyword') {
-								valueKeywords.p(stringifyNode(item.value), loc)
-							}
-						})
-						break
-					} else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
-						if (children && children.size > 1) {
-							children.forEach((child) => {
-								if (child.type !== Operator) {
-									durations.p(stringifyNode(child), loc)
-								}
-							})
-						} else {
-							durations.p(stringifyNode(node), loc)
-						}
-						break
-					} else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
-						if (children && children.size > 1) {
-							children.forEach((child) => {
-								if (child.type !== Operator) {
-									timingFunctions.p(stringifyNode(child), loc)
-								}
-							})
-						} else {
-							timingFunctions.p(stringifyNode(node), loc)
-						}
-						break
-					} else if (isProperty('container-name', property)) {
-						containerNames.p(stringifyNode(node), loc)
-					} else if (isProperty('container', property)) {
-						// The first identifier is the container name
-						// Example: container: my-layout / inline-size;
-						if (children.first?.type === 'Identifier') {
-							containerNames.p(children.first.name, loc)
-						}
-					} else if (border_radius_properties.has(basename(property))) {
-						if (!isValueKeyword(node)) {
-							borderRadiuses.push(stringifyNode(node), property, loc)
-						}
-						break
-					} else if (isProperty('text-shadow', property)) {
-						if (!isValueKeyword(node)) {
-							textShadows.p(stringifyNode(node), loc)
-						}
-						// no break here: potentially contains colors
-					} else if (isProperty('box-shadow', property)) {
-						if (!isValueKeyword(node)) {
-							boxShadows.p(stringifyNode(node), loc)
-						}
-						// no break here: potentially contains colors
 					}
-
-					walk(node, function (valueNode: CssNode) {
-						// @ts-expect-error TODO: fix this
-						let nodeName = valueNode.name
-
-						switch (valueNode.type) {
-							case Hash: {
-								let hexLength = valueNode.value.length
-								if (endsWith('\\9', valueNode.value)) {
-									hexLength = hexLength - 2
-								}
-								colors.push('#' + valueNode.value, property, loc)
-								colorFormats.p(`hex` + hexLength, loc)
-
-								return walk.skip
-							}
-							case Identifier: {
-								if (keywords.has(nodeName)) {
-									valueKeywords.p(nodeName, loc)
-								}
-
-								// Bail out if it can't be a color name
-								// 20 === 'lightgoldenrodyellow'.length
-								// 3 === 'red'.length
-								let nodeLen = nodeName.length
-								if (nodeLen > 20 || nodeLen < 3) {
-									return walk.skip
-								}
-
-								// A keyword is most likely to be 'transparent' or 'currentColor'
-								if (colorKeywords.has(nodeName)) {
-									let stringified = stringifyNode(valueNode)
-									colors.push(stringified, property, loc)
-									colorFormats.p(nodeName.toLowerCase(), loc)
-									return
-								}
-
-								// Or it can be a named color
-								if (namedColors.has(nodeName)) {
-									let stringified = stringifyNode(valueNode)
-									colors.push(stringified, property, loc)
-									colorFormats.p('named', loc)
-									return
-								}
-
-								// Or it can be a system color
-								if (systemColors.has(nodeName)) {
-									let stringified = stringifyNode(valueNode)
-									colors.push(stringified, property, loc)
-									colorFormats.p('system', loc)
-									return
-								}
-								return walk.skip
-							}
-							case Func: {
-								// Don't walk var() multiple times
-								if (strEquals('var', nodeName)) {
-									return walk.skip
-								}
-
-								// rgb(a), hsl(a), color(), hwb(), lch(), lab(), oklab(), oklch()
-								if (colorFunctions.has(nodeName)) {
-									colors.push(stringifyNode(valueNode), property, valueNode.loc!)
-									colorFormats.p(nodeName.toLowerCase(), valueNode.loc!)
-									return
-								}
-
-								if (endsWith('gradient', nodeName)) {
-									gradients.p(stringifyNode(valueNode), valueNode.loc!)
-									return
-								}
-								// No walk.skip here intentionally,
-								// otherwise we'll miss colors in linear-gradient() etc.
-							}
+					// Don't return SKIP here - let walker continue to find
+					// units, colors, and font families in var() fallbacks
+				} else if (isProperty('font-size', property)) {
+					if (!SYSTEM_FONTS.has(text)) {
+						fontSizes.p(text, valueLoc)
+					}
+				} else if (isProperty('font-family', property)) {
+					if (!SYSTEM_FONTS.has(text)) {
+						fontFamilies.p(text, valueLoc)
+					}
+					return SKIP // to prevent finding color false positives (Black as font family name is not a color)
+				} else if (isProperty('line-height', property)) {
+					lineHeights.p(text, valueLoc)
+				} else if (isProperty('transition', property) || isProperty('animation', property)) {
+					analyzeAnimation(value.children, function (item: { type: string; value: CSSNode }) {
+						if (item.type === 'fn') {
+							timingFunctions.p(item.value.text, valueLoc)
+						} else if (item.type === 'duration') {
+							durations.p(item.value.text, valueLoc)
+						} else if (item.type === 'keyword') {
+							valueKeywords.p(item.value.text, valueLoc)
 						}
 					})
-					break
-				}
-				case 'Declaration': {
-					// Do not process Declarations in atRule preludes
-					// because we will handle them manually
-					if (this.atrulePrelude !== null) {
-						return this.skip
-					}
-
-					totalDeclarations++
-					let complexity = 1
-
-					uniqueDeclarations.add(stringifyNode(node))
-					declarationNesting.push(nestingDepth - 1)
-					uniqueDeclarationNesting.p(nestingDepth - 1, node.loc!)
-
-					if (node.important === true) {
-						importantDeclarations++
-						complexity++
-
-						if (this.atrule && endsWith('keyframes', this.atrule.name)) {
-							importantsInKeyframes++
-							complexity++
+					return SKIP
+				} else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
+					for (let child of value.children) {
+						if (child.type !== OPERATOR) {
+							durations.p(child.text, valueLoc)
 						}
 					}
-
-					declarationComplexities.push(complexity)
-
-					let {
-						property,
-						// @ts-expect-error TODO: fix this
-						loc: { start },
-					} = node
-					let propertyLoc = {
-						start: {
-							line: start.line,
-							column: start.column,
-							offset: start.offset,
-						},
-						end: {
-							offset: start.offset + property.length,
-						},
-					}
-
-					properties.p(property, propertyLoc)
-
-					if (hasVendorPrefix(property)) {
-						propertyVendorPrefixes.p(property, propertyLoc)
-						propertyComplexities.push(2)
-					} else if (isHack(property)) {
-						propertyHacks.p(property, propertyLoc)
-						propertyComplexities.push(2)
-					} else if (isCustom(property)) {
-						customProperties.p(property, propertyLoc)
-						propertyComplexities.push(node.important ? 3 : 2)
-
-						if (node.important === true) {
-							importantCustomProperties.p(property, propertyLoc)
+				} else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
+					for (let child of value.children) {
+						if (child.type !== OPERATOR) {
+							timingFunctions.p(child.text, valueLoc)
 						}
-					} else {
-						propertyComplexities.push(1)
 					}
+				} else if (isProperty('container-name', property)) {
+					containerNames.p(text, valueLoc)
+				} else if (isProperty('container', property)) {
+					// The first identifier in the `container` shorthand is the container name
+					// Example: container: my-layout / inline-size;
+					if (value.first_child?.type === IDENTIFIER) {
+						containerNames.p(value.first_child.text, valueLoc)
+					}
+				} else if (border_radius_properties.has(basename(property))) {
+					borderRadiuses.push(text, property, valueLoc)
+				} else if (isProperty('text-shadow', property)) {
+					textShadows.p(text, valueLoc)
+				} else if (isProperty('box-shadow', property)) {
+					boxShadows.p(text, valueLoc)
+				}
 
-					break
+				// Check if the value has an IE9 browserhack before walking
+				let valueHasIe9Hack = isIe9Hack(value)
+
+				walk(value, (valueNode) => {
+					switch (valueNode.type) {
+						case DIMENSION: {
+							let unit = valueNode.unit!
+							let loc = toLoc(valueNode)
+							units.push(unit, property, loc)
+							return SKIP
+						}
+						case HASH: {
+							// Use text property for the hash value
+							let hashText = valueNode.text
+							if (!hashText || !hashText.startsWith('#')) {
+								return SKIP
+							}
+							let hashValue = hashText
+
+							// If the full value has an IE9 hack, append it to the hash
+							if (valueHasIe9Hack && !hashValue.endsWith('\\9')) {
+								hashValue = hashValue + '\\9'
+							}
+
+							// Calculate hex length (excluding the # and any IE9 browserhack \9)
+							let hexLength = hashValue.length - 1 // Remove the # from length
+							if (endsWith('\\9', hashValue)) {
+								hexLength = hexLength - 2 // Remove the \9 from length
+							}
+
+							let hashLoc = toLoc(valueNode)
+							colors.push(hashValue, property, hashLoc)
+							colorFormats.p(`hex` + hexLength, hashLoc)
+
+							return SKIP
+						}
+						case IDENTIFIER: {
+							let identifierText = valueNode.text
+							let identifierLoc = toLoc(valueNode)
+
+							// Skip all identifier processing for font properties to avoid:
+							// 1. False positives for colors (e.g., "Black" as a font family vs. "black" the color)
+							// 2. Duplicate keywords (already extracted by destructure function)
+							if (isProperty('font', property) || isProperty('font-family', property)) {
+								return SKIP
+							}
+
+							if (keywords.has(identifierText)) {
+								valueKeywords.p(identifierText, identifierLoc)
+							}
+
+							// Bail out if it can't be a color name
+							// 20 === 'lightgoldenrodyellow'.length
+							// 3 === 'red'.length
+							let nodeLen = identifierText.length
+							if (nodeLen > 20 || nodeLen < 3) {
+								return SKIP
+							}
+
+							// A keyword is most likely to be 'transparent' or 'currentColor'
+							if (colorKeywords.has(identifierText)) {
+								colors.push(identifierText, property, identifierLoc)
+								colorFormats.p(identifierText.toLowerCase(), identifierLoc)
+								return
+							}
+
+							// Or it can be a named color
+							if (namedColors.has(identifierText)) {
+								colors.push(identifierText, property, identifierLoc)
+								colorFormats.p('named', identifierLoc)
+								return
+							}
+
+							// Or it can be a system color
+							if (systemColors.has(identifierText)) {
+								colors.push(identifierText, property, identifierLoc)
+								colorFormats.p('system', identifierLoc)
+								return
+							}
+							return SKIP
+						}
+						case FUNCTION: {
+							let funcName = valueNode.name as string
+							let funcLoc = toLoc(valueNode)
+
+							// rgb(a), hsl(a), color(), hwb(), lch(), lab(), oklab(), oklch()
+							if (colorFunctions.has(funcName)) {
+								colors.push(valueNode.text, property, funcLoc)
+								colorFormats.p(funcName.toLowerCase(), funcLoc)
+								return
+							}
+
+							if (endsWith('gradient', funcName)) {
+								gradients.p(valueNode.text, funcLoc)
+								return
+							}
+							// No SKIP here intentionally,
+							// otherwise we'll miss colors in linear-gradient(), var() fallbacks, etc.
+						}
+					}
+				})
+			}
+			//#endregion VALUES
+		} else if (node.type === URL) {
+			let { value } = node
+			let embed = unquote((value as string) || '')
+			if (str_starts_with(embed, 'data:')) {
+				let size = embed.length
+				let type = getEmbedType(embed)
+
+				embedTypes.total++
+				embedSize += size
+
+				let loc = {
+					line: node.line,
+					column: node.column,
+					offset: node.start,
+					length: node.length,
+				}
+
+				if (embedTypes.unique.has(type)) {
+					let item = embedTypes.unique.get(type)!
+					item.count++
+					item.size += size
+					embedTypes.unique.set(type, item)
+					if (useLocations && item.uniqueWithLocations) {
+						item.uniqueWithLocations.push(loc)
+					}
+				} else {
+					let item = {
+						count: 1,
+						size,
+						uniqueWithLocations: useLocations ? [loc] : undefined,
+					}
+					embedTypes.unique.set(type, item)
 				}
 			}
-
-			if (node.type === Rule || node.type === Atrule) {
-				nestingDepth++
-			}
-		},
-		leave(node: CssNode) {
-			if (node.type === Rule || node.type === Atrule) {
-				nestingDepth--
-			}
-		},
+		} else if (node.type === MEDIA_FEATURE) {
+			// console.log({ Feature: node.text, name: node.name, value: node.value })
+			mediaFeatures.p(node.name, toLoc(node))
+			return SKIP
+		}
 	})
 
 	let totalUniqueDeclarations = uniqueDeclarations.size
@@ -1013,6 +1019,8 @@ export function compareSpecificity(a: Specificity, b: Specificity): number {
 
 	return b[0] - a[0]
 }
+
+export { calculate as calculateSpecificity } from './selectors/specificity.js'
 
 export {
 	getComplexity as selectorComplexity,

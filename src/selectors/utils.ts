@@ -1,81 +1,29 @@
-// @ts-expect-error CSS Tree types are incomplete
-import walk from 'css-tree/walker'
-import { startsWith, strEquals } from '../string-utils.js'
-import { hasVendorPrefix } from '../vendor-prefix.js'
+import type { Location } from '../collection.js'
 import { KeywordSet } from '../keyword-set.js'
-import { Combinator, Nth } from '../css-tree-node-types.js'
-import type {
-	AttributeSelector,
-	CssLocation,
-	CssNode,
-	ListItem,
-	PseudoClassSelector,
-	PseudoElementSelector,
-	Selector,
-	TypeSelector,
-} from 'css-tree'
-
-/**
- * @returns Analyzed selectors in the selectorList
- */
-function analyzeList(selectorListAst: Selector | PseudoClassSelector, cb: (node: Selector) => unknown): Selector[] {
-	let childSelectors: Selector[] = []
-	walk(selectorListAst, {
-		visit: 'Selector',
-		enter: function (node: Selector) {
-			// @ts-expect-error TODO: fix this
-			childSelectors.push(cb(node))
-		},
-	})
-
-	return childSelectors
-}
+import {
+	type CSSNode,
+	SKIP,
+	BREAK,
+	walk,
+	PSEUDO_ELEMENT_SELECTOR,
+	PSEUDO_CLASS_SELECTOR,
+	TYPE_SELECTOR,
+	ATTRIBUTE_SELECTOR,
+	SELECTOR,
+	COMBINATOR,
+	NTH_SELECTOR,
+} from '@projectwallace/css-parser'
 
 const PSEUDO_FUNCTIONS = new KeywordSet(['nth-child', 'where', 'not', 'is', 'has', 'nth-last-child', 'matches', '-webkit-any', '-moz-any'])
 
-export function isAccessibility(selector: Selector | PseudoClassSelector): boolean {
-	let isA11y = false
-
-	walk(selector, function (node: CssNode) {
-		if (node.type === 'AttributeSelector') {
-			let name = node.name.name
-			if (strEquals('role', name) || startsWith('aria-', name)) {
-				isA11y = true
-				return walk.break
-			}
-		}
-		// Test for [aria-] or [role] inside :is()/:where() and friends
-		else if (node.type === 'PseudoClassSelector' && PSEUDO_FUNCTIONS.has(node.name)) {
-			let list = analyzeList(node, isAccessibility)
-
-			for (let c of list) {
-				// @ts-expect-error TODO: fix this
-				if (c === true) {
-					isA11y = true
-					break
-				}
-			}
-
-			return walk.skip
-		}
-	})
-
-	return isA11y
-}
-
-/**
- * @returns true if the selector contains a vendor prefix
- */
-export function isPrefixed(selector: Selector): boolean {
+export function isPrefixed(selector: CSSNode): boolean {
 	let isPrefixed = false
 
-	walk(selector, function (node: PseudoElementSelector | PseudoClassSelector | TypeSelector) {
-		let type = node.type
-
-		if (type === 'PseudoElementSelector' || type === 'TypeSelector' || type === 'PseudoClassSelector') {
-			if (hasVendorPrefix(node.name)) {
+	walk(selector, function (node) {
+		if (node.type === PSEUDO_ELEMENT_SELECTOR || node.type === PSEUDO_CLASS_SELECTOR || node.type === TYPE_SELECTOR) {
+			if (node.is_vendor_prefixed) {
 				isPrefixed = true
-				return walk.break
+				return BREAK
 			}
 		}
 	})
@@ -84,13 +32,44 @@ export function isPrefixed(selector: Selector): boolean {
 }
 
 /**
+ * Check if a Wallace selector is an accessibility selector (has aria-* or role attribute)
+ */
+export function isAccessibility(selector: CSSNode): boolean {
+	let isA11y = false
+
+	walk(selector, function (node) {
+		if (node.type === ATTRIBUTE_SELECTOR) {
+			const name = node.name || ''
+			if (name === 'role' || name.startsWith('aria-')) {
+				isA11y = true
+				return BREAK
+			}
+		}
+		// Test for [aria-] or [role] inside :is()/:where() and friends
+		else if (node.type === PSEUDO_CLASS_SELECTOR && PSEUDO_FUNCTIONS.has(node.name || '')) {
+			// Check if any child selectors are accessibility selectors
+			if (node.has_children) {
+				for (const child of node) {
+					if (child.type === SELECTOR && isAccessibility(child)) {
+						isA11y = true
+						return BREAK
+					}
+				}
+			}
+		}
+	})
+
+	return isA11y
+}
+
+/**
  * @returns {string[] | false} The pseudo-class name if it exists, otherwise false
  */
-export function hasPseudoClass(selector: Selector): string[] | false {
+export function hasPseudoClass(selector: CSSNode): string[] | false {
 	let pseudos: string[] = []
 
-	walk(selector, function (node: CssNode) {
-		if (node.type === 'PseudoClassSelector') {
+	walk(selector, function (node) {
+		if (node.type === PSEUDO_CLASS_SELECTOR) {
 			pseudos.push(node.name)
 		}
 	})
@@ -103,44 +82,88 @@ export function hasPseudoClass(selector: Selector): string[] | false {
 }
 
 /**
- * Get the Complexity for the AST of a Selector Node
- * @param selector - AST Node for a Selector
- * @return The numeric complexity of the Selector and whether it's prefixed or not
+ * Get the Complexity for a Wallace Selector Node
+ * @param selector - Wallace CSSNode for a Selector
+ * @return The numeric complexity of the Selector
  */
-export function getComplexity(selector: Selector): number {
+export function getComplexity(selector: CSSNode): number {
 	let complexity = 0
 
-	walk(selector, function (node: CssNode) {
-		let type = node.type
-		if (type === 'Selector' || type === Nth) return
+	// Helper function to find all Selector nodes recursively
+	function findSelectors(node: CSSNode, complexities: number[]): void {
+		walk(node, function (n) {
+			if (n.type === SELECTOR) {
+				complexities.push(getComplexity(n))
+			}
+		})
+	}
+
+	walk(selector, function (node) {
+		const type = node.type
+
+		// Skip Selector nodes (don't count the selector container itself)
+		if (type === SELECTOR) {
+			return
+		}
+
+		// In Wallace, Nth is a leaf node. Count it if it has content
+		if (type === NTH_SELECTOR) {
+			// Count non-empty Nth nodes (like "1", "2n+1", etc.)
+			if (node.text && node.text.trim()) {
+				complexity++
+			}
+			// No children to recurse into in Wallace's Nth
+			return
+		}
 
 		complexity++
 
-		if (type === 'PseudoElementSelector' || type === 'TypeSelector' || type === 'PseudoClassSelector') {
-			if (hasVendorPrefix((node as PseudoElementSelector | TypeSelector | PseudoClassSelector).name)) {
+		// Check for vendor-prefixed pseudo-elements, type selectors, and pseudo-classes
+		if (type === PSEUDO_ELEMENT_SELECTOR || type === TYPE_SELECTOR || type === PSEUDO_CLASS_SELECTOR) {
+			if (node.is_vendor_prefixed) {
 				complexity++
 			}
 		}
 
-		if (type === 'AttributeSelector') {
-			if ((node as AttributeSelector).value) {
+		// Handle AttributeSelector - add complexity if it has a value
+		if (type === ATTRIBUTE_SELECTOR) {
+			if (node.value) {
 				complexity++
 			}
-			return walk.skip
+			// Skip children
+			return SKIP
 		}
 
-		if (type === 'PseudoClassSelector') {
-			if (PSEUDO_FUNCTIONS.has((node as PseudoClassSelector).name)) {
-				let list = analyzeList(node as PseudoClassSelector, getComplexity)
+		// Handle PseudoClass functions like :nth-child(), :where(), :not(), etc.
+		if (type === PSEUDO_CLASS_SELECTOR) {
+			const name = node.name || ''
 
-				// Bail out for empty/non-existent :nth-child() params
-				if (list.length === 0) return
+			if (PSEUDO_FUNCTIONS.has(name.toLowerCase())) {
+				// Find child selectors and recursively calculate their complexity
+				const childComplexities: number[] = []
 
-				for (let c of list) {
-					// @ts-expect-error TODO: fix this
-					complexity += c
+				if (node.has_children) {
+					for (const child of node) {
+						if (child.type === SELECTOR) {
+							childComplexities.push(getComplexity(child))
+						} else {
+							// Recurse to find nested selectors
+							findSelectors(child, childComplexities)
+						}
+					}
 				}
-				return walk.skip
+
+				// If there are child selectors (like in :where(), :is(), etc.), add their complexity
+				if (childComplexities.length > 0) {
+					for (const c of childComplexities) {
+						complexity += c
+					}
+					// Skip further processing of children since we already processed them
+					return SKIP
+				}
+
+				// If no child selectors (like :nth-child(1)), continue to process children normally
+				// This allows Nth nodes and their content to be counted
 			}
 		}
 	})
@@ -150,45 +173,19 @@ export function getComplexity(selector: Selector): number {
 
 /**
  * Walk a selector node and trigger a callback every time a Combinator was found
- * We need create the `loc` for descendant combinators manually, because CSSTree
- * does not keep track of whitespace for us. We'll assume that the combinator is
- * alwas a single ` ` (space) character, even though there could be newlines or
- * multiple spaces
  */
-export function getCombinators(node: CssNode, onMatch: ({ name, loc }: { name: string; loc: CssLocation }) => void) {
-	walk(node, function (selectorNode: CssNode, item: ListItem<CssNode>) {
-		if (selectorNode.type === Combinator) {
-			let loc = selectorNode.loc
-			let name = selectorNode.name
-
-			// .loc is null when selectorNode.name === ' '
-			if (loc === null) {
-				let previousLoc = item.prev!.data.loc!.end
-				let start = {
-					offset: previousLoc.offset,
-					line: previousLoc.line,
-					column: previousLoc.column,
-				}
-
-				onMatch({
-					name,
-					// @ts-expect-error TODO: fix this
-					loc: {
-						start,
-						end: {
-							offset: start.offset + 1,
-							line: start.line,
-							column: start.column + 1,
-						},
-					},
-				})
-			} else {
-				onMatch({
-					name,
-					// @ts-expect-error TODO: fix this
-					loc,
-				})
-			}
+export function getCombinators(selector: CSSNode, onMatch: ({ name, loc }: { name: string; loc: Location }) => void) {
+	walk(selector, function (node) {
+		if (node.type === COMBINATOR) {
+			onMatch({
+				name: node.name.trim() === '' ? ' ' : node.name,
+				loc: {
+					offset: node.start,
+					line: node.line,
+					column: node.column,
+					length: 1,
+				},
+			})
 		}
 	})
 }

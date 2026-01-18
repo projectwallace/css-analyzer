@@ -77,7 +77,7 @@ test('counts comments', () => {
 	const actual = result.stylesheet.comments
 	const expected = {
 		total: 6,
-		size: 66,
+		size: 90, // includes the /* and */ symbols
 	}
 
 	expect(actual).toEqual(expected)
