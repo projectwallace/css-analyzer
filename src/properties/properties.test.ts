@@ -209,3 +209,16 @@ test('counts the amount of !important used on custom properties', () => {
 		'--color3': 1,
 	})
 })
+
+test('reports locations correctly', () => {
+	const fixture = `
+    properties {
+      margin: 0;
+    }
+  `
+	const actual = analyze(fixture, { useLocations: true }).properties.uniqueWithLocations
+
+	expect(actual).toEqual({
+		margin: [{ offset: 24, length: 6, column: 7, line: 3 }],
+	})
+})

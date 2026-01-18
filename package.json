@@ -49,7 +49,7 @@
 		"code"
 	],
 	"dependencies": {
-		"@projectwallace/css-parser": "^0.12.2"
+		"@projectwallace/css-parser": "^0.12.3"
 	},
 	"devDependencies": {
 		"@codecov/vite-plugin": "^1.9.1",
