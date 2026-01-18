@@ -99,14 +99,13 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	}
 
 	let startParse = Date.now()
-
-	for (let token of tokenize(css, false)) {
-		if (token.type === TOKEN_COMMENT) {
+	let ast = parse(css, {
+		on_comment({ length }) {
 			totalComments++
-			// include /* and */ in the size calculation
-			commentsSize += token.end - token.start
-		}
-	}
+			// includes /* and */ in the size calculation
+			commentsSize += length
+		},
+	})
 
 	let startAnalysis = Date.now()
 
@@ -200,8 +199,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let valueKeywords = new Collection(useLocations)
 	let borderRadiuses = new ContextCollection(useLocations)
 	let resets = new Collection(useLocations)
-
-	let ast = parse(css)
 
 	function toLoc(node: CSSNode): Location {
 		return {
