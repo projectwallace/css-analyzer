@@ -313,10 +313,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 		} else if (node.type === STYLE_RULE) {
 			// Handle keyframe rules specially
 			if (inKeyframes && node.prelude) {
-				// In keyframes, the prelude is a SelectorList that may not have Selector children
-				// (e.g., "50%" is just a SelectorList with text, no Selector child)
-				if (node.prelude.type === SELECTOR_LIST && node.prelude.text) {
-					keyframeSelectors.p(node.prelude.text, toLoc(node.prelude))
+				if (node.prelude.type === SELECTOR_LIST && node.prelude.children.length > 0) {
+					for (let keyframe_selector of node.prelude.children) {
+						keyframeSelectors.p(keyframe_selector.text, toLoc(keyframe_selector))
+					}
 				}
 				// Don't count keyframe rules as regular rules, but continue walking
 				// children to count declarations inside keyframes
