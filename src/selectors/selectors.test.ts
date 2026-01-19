@@ -199,6 +199,7 @@ test('counts <keyframes-selector>s', () => {
       50% {
         opacity: 0;
       }
+      90%,
       to {
         opacity: 1;
       }
@@ -219,14 +220,15 @@ test('counts <keyframes-selector>s', () => {
 	const actual = analyze(fixture).selectors
 	expect(actual.total).toBe(2)
 	expect(actual.keyframes).toEqual({
-		total: 4,
-		totalUnique: 3,
+		total: 5,
+		totalUnique: 4,
 		unique: {
 			from: 2,
+			'90%': 1,
 			to: 1,
 			'50%': 1,
 		},
-		uniquenessRatio: 3 / 4,
+		uniquenessRatio: 4 / 5,
 	})
 })
 
