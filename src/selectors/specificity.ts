@@ -1,5 +1,6 @@
 // NOTICE
-// BELOW IS A COPY OF BRAMUS/SPECIFICTY TAILORED FOR PORJECT WALLACE'S CSS PARSER
+// BELOW IS A COPY OF BRAMUS/SPECIFICTY (MIT) AND CSSO's SPECIFICITY (MIT), TAILORED FOR PORJECT WALLACE'S CSS PARSER
+// https://github.com/css/csso/blob/221c9a7145721362ae98ef0313cef4f60dbfa65a/lib/restructure/prepare/specificity.js#L30
 // https://github.com/bramus/specificity/blob/80938c4cf77518a4d4abe559eb5a5ff919626c39/src/core/calculate.js
 
 import {
