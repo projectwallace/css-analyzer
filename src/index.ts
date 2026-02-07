@@ -469,16 +469,17 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			let { is_important, property, is_browserhack, is_vendor_prefixed } = node
 
 			if (!property) return
+			let normalizedProperty = property
 
 			let propertyLoc = toLoc(node)
 			propertyLoc.length = property.length
 
 			if (!is_custom(property)) {
-				let base = basename(property).toLowerCase()
+				normalizedProperty = basename(property).toLowerCase()
 				if (is_browserhack) {
-					base = base.slice(1)
+					normalizedProperty = normalizedProperty.slice(1)
 				}
-				properties.p(base, propertyLoc)
+				properties.p(normalizedProperty, propertyLoc)
 			} else {
 				properties.p(property, propertyLoc)
 			}
@@ -546,23 +547,33 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				// Process properties first that don't have colors,
 				// so we can avoid further walking them;
 				if (
-					isProperty('margin', property) ||
-					isProperty('margin-block', property) ||
-					isProperty('margin-inline', property) ||
-					isProperty('margin-top', property) ||
-					isProperty('margin-right', property) ||
-					isProperty('margin-bottom', property) ||
-					isProperty('margin-left', property) ||
-					isProperty('padding', property) ||
-					isProperty('padding-block', property) ||
-					isProperty('padding-inline', property) ||
-					isProperty('padding-top', property) ||
-					isProperty('padding-right', property) ||
-					isProperty('padding-bottom', property) ||
-					isProperty('padding-left', property)
+					new Set([
+						'margin',
+						'margin-block',
+						'margin-inline',
+						'margin-top',
+						'margin-block-start',
+						'margin-block-end',
+						'margin-inline-end',
+						'margin-inline-end',
+						'margin-right',
+						'margin-bottom',
+						'margin-left',
+						'padding',
+						'padding-block',
+						'padding-inline',
+						'padding-top',
+						'padding-right',
+						'padding-bottom',
+						'padding-left',
+						'padding-block-start',
+						'padding-block-end',
+						'padding-inline-start',
+						'padding-inline-end',
+					]).has(normalizedProperty)
 				) {
 					if (isValueReset(value)) {
-						resets.p(property, valueLoc)
+						resets.p(normalizedProperty, valueLoc)
 					}
 				} else if (isProperty('z-index', property)) {
 					zindex.p(text, valueLoc)
@@ -629,7 +640,12 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				} else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
 					for (let child of value.children) {
 						if (child.type !== OPERATOR) {
-							durations.p(child.text, valueLoc)
+							let text = child.text
+							if (/var\(/i.test(text)) {
+								durations.p(text, valueLoc)
+							} else {
+								durations.p(text.toLowerCase(), valueLoc)
+							}
 						}
 					}
 				} else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {

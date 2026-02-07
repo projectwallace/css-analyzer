@@ -47,7 +47,7 @@ test('accepts weird casing', () => {
 		MARGIN: 0;
 	}`)
 	let resets = actual.values.resets
-	expect(resets.unique).toEqual({ MARGIN: 1 })
+	expect(resets.unique).toEqual({ margin: 1 })
 })
 
 test('accepts vendor prefixes', () => {
@@ -55,7 +55,15 @@ test('accepts vendor prefixes', () => {
 		-webkit-margin: 0;
 	}`)
 	let resets = actual.values.resets
-	expect(resets.unique).toEqual({ '-webkit-margin': 1 })
+	expect(resets.unique).toEqual({ margin: 1 })
+})
+
+test('accepts browserhacks', () => {
+	let actual = analyze(`t {
+		*margin: 0;
+	}`)
+	let resets = actual.values.resets
+	expect(resets.unique).toEqual({ margin: 1 })
 })
 
 // Test all properties
