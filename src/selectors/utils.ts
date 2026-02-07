@@ -69,7 +69,7 @@ export function hasPseudoClass(selector: CSSNode): string[] | false {
 	let pseudos: string[] = []
 
 	walk(selector, function (node) {
-		if (node.type === PSEUDO_CLASS_SELECTOR) {
+		if (node.type === PSEUDO_CLASS_SELECTOR && node.name) {
 			pseudos.push(node.name)
 		}
 	})
@@ -178,7 +178,7 @@ export function getCombinators(selector: CSSNode, onMatch: ({ name, loc }: { nam
 	walk(selector, function (node) {
 		if (node.type === COMBINATOR) {
 			onMatch({
-				name: node.name.trim() === '' ? ' ' : node.name,
+				name: node.name?.trim() === '' ? ' ' : node.name!,
 				loc: {
 					offset: node.start,
 					line: node.line,

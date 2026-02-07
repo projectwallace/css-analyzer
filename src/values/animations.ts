@@ -24,7 +24,7 @@ export function analyzeAnimation(children: CSSNode[], cb: ({ type, value }: { ty
 				type: 'duration',
 				value: child,
 			})
-		} else if (type === IDENTIFIER) {
+		} else if (type === IDENTIFIER && name) {
 			if (TIMING_KEYWORDS.has(name)) {
 				cb({
 					type: 'fn',
@@ -36,7 +36,7 @@ export function analyzeAnimation(children: CSSNode[], cb: ({ type, value }: { ty
 					value: child,
 				})
 			}
-		} else if (type === FUNCTION && TIMING_FUNCTION_VALUES.has(name)) {
+		} else if (type === FUNCTION && name && TIMING_FUNCTION_VALUES.has(name)) {
 			cb({
 				type: 'fn',
 				value: child,
