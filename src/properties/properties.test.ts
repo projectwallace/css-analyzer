@@ -78,6 +78,8 @@ test('counts browser hacks', () => {
     hacks {
       margin: 0;
       *zoom: 1;
+      *margin: 0;
+      _property: 0;
       --custom: 1;
     }
 
@@ -91,13 +93,14 @@ test('counts browser hacks', () => {
   `
 	const actual = analyze(fixture).properties.browserhacks
 	const expected = {
-		'*zoom': 2,
+		'*': 3,
+		_: 1,
 	}
 
-	expect(actual.total).toEqual(2)
-	expect(actual.totalUnique).toEqual(1)
+	expect(actual.total).toEqual(4)
+	expect(actual.totalUnique).toEqual(2)
 	expect(actual.unique).toEqual(expected)
-	expect(actual.ratio).toEqual(2 / 4)
+	expect(actual.ratio).toEqual(4 / 6)
 })
 
 test('counts custom properties', () => {

@@ -6,6 +6,7 @@ test('finds hacks', () => {
 	const fixture = `
     value-browserhacks {
       property: value !ie;
+      property: value !IE;
       property: value !test;
       property: value!nospace;
       property: value\\9;
@@ -13,15 +14,13 @@ test('finds hacks', () => {
   `
 	const actual = analyze(fixture).values.browserhacks
 	const expected = {
-		total: 4,
-		totalUnique: 4,
+		total: 5,
+		totalUnique: 2,
 		unique: {
-			'value !ie': 1,
-			'value !test': 1,
-			'value!nospace': 1,
-			'value\\9': 1,
+			'!ie': 4,
+			'\\9': 1,
 		},
-		uniquenessRatio: 4 / 4,
+		uniquenessRatio: 2 / 5,
 	}
 	expect(actual).toEqual(expected)
 })

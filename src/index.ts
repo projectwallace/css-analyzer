@@ -452,10 +452,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 				let declaration = node.text
 				if (!declaration.toLowerCase().includes('!important')) {
-					let valueText = (node.value as CSSNode).text
-					let valueOffset = declaration.indexOf(valueText)
-					let stripSemi = declaration.slice(-1) === ';'
-					valueBrowserhacks.p(`${declaration.slice(valueOffset, stripSemi ? -1 : undefined)}`, toLoc(node.value as CSSNode))
+					valueBrowserhacks.p('!ie', toLoc(node.value as CSSNode))
 				}
 
 				if (inKeyframes) {
@@ -491,7 +488,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					importantCustomProperties.p(property, propertyLoc)
 				}
 			} else if (is_browserhack) {
-				propertyHacks.p(property, propertyLoc)
+				propertyHacks.p(property.charAt(0), propertyLoc)
 				propertyComplexities.push(2)
 			} else {
 				propertyComplexities.push(1)
@@ -523,7 +520,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 				// i.e. `property: value\9`
 				if (isIe9Hack(value)) {
-					valueBrowserhacks.p(text, valueLoc)
+					valueBrowserhacks.p('\\9', valueLoc)
 					text = text.slice(0, -2)
 					complexity++
 				}
