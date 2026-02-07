@@ -509,7 +509,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 				// auto, inherit, initial, etc.
 				if (keywords.has(text)) {
-					valueKeywords.p(text, valueLoc)
+					valueKeywords.p(text.toLowerCase(), valueLoc)
 					valueComplexities.push(complexity)
 					return
 				}
