@@ -589,7 +589,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						}
 
 						if (line_height) {
-							lineHeights.p(line_height, valueLoc)
+							lineHeights.p(line_height.toLowerCase(), valueLoc)
 						}
 					}
 					// Don't return SKIP here - let walker continue to find
@@ -609,7 +609,12 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					}
 					return SKIP // to prevent finding color false positives (Black as font family name is not a color)
 				} else if (isProperty('line-height', property)) {
-					lineHeights.p(text, valueLoc)
+					let normalized = text.toLowerCase()
+					if (normalized.includes('var(')) {
+						lineHeights.p(text, valueLoc)
+					} else {
+						lineHeights.p(normalized, valueLoc)
+					}
 				} else if (isProperty('transition', property) || isProperty('animation', property)) {
 					analyzeAnimation(value.children, function (item: { type: string; value: CSSNode }) {
 						if (item.type === 'fn') {
