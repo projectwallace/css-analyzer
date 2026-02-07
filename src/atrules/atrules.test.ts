@@ -767,6 +767,8 @@ test('analyzes container queries', () => {
       h2 { font-size: 1.5em; }
     }
 
+		@CONTAINER (width > 40em) {}
+
     /* Example 4 */
     @container (--cards) {
       article {
@@ -802,18 +804,18 @@ test('analyzes container queries', () => {
 	const result = analyze(fixture)
 	const actual = result.atrules.container
 	const expected = {
-		total: 7,
+		total: 8,
 		totalUnique: 7,
 		unique: {
 			'(inline-size > 45em)': 1,
-			'(width > 40em)': 1,
+			'(width > 40em)': 2,
 			'(--cards)': 1,
 			'page-layout (block-size > 12em)': 1,
 			'component-library (inline-size > 30em)': 1,
 			'card (inline-size > 30em) and (--responsive = true)': 1,
 			'type(inline-size)': 1,
 		},
-		uniquenessRatio: 7 / 7,
+		uniquenessRatio: 7 / 8,
 		names: {
 			total: 3,
 			totalUnique: 3,
