@@ -224,7 +224,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			let atruleLoc = toLoc(node)
 			atruleNesting.push(depth)
 			uniqueAtruleNesting.p(depth, atruleLoc)
-			atrules.p(node.name!, atruleLoc)
+			atrules.p(node.name?.toLowerCase()!, atruleLoc)
 
 			//#region @FONT-FACE
 			if (str_equals('font-face', node.name!)) {
@@ -262,8 +262,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					}
 				} else if (str_equals('supports', name)) {
 					supports.p(node.prelude.text, toLoc(node))
-					if (isSupportsBrowserhack(node.prelude)) {
-						supportsBrowserhacks.p(node.prelude.text, toLoc(node))
+
+					let hack = isSupportsBrowserhack(node.prelude)
+					if (hack) {
+						supportsBrowserhacks.p(hack, toLoc(node))
 						complexity++
 					}
 				} else if (endsWith('keyframes', name)) {

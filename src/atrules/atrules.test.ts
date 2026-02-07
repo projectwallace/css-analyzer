@@ -14,17 +14,19 @@ test('counts total atrules', () => {
     @supports (display: grid) {
       a {}
     }
+
+		@LAYER A;
   `
 	let actual = analyze(css).atrules
-	expect(actual.total).toEqual(4)
+	expect(actual.total).toEqual(5)
 	expect(actual.totalUnique).toEqual(4)
 	expect(actual.unique).toEqual({
 		import: 1,
-		layer: 1,
+		layer: 2,
 		media: 1,
 		supports: 1,
 	})
-	expect(actual.uniquenessRatio).toEqual(4 / 4)
+	expect(actual.uniquenessRatio).toEqual(4 / 5)
 })
 
 test('calculates complexity', () => {
@@ -538,19 +540,11 @@ test('finds @supports browserhacks', () => {
 	const actual = result.atrules.supports.browserhacks
 	const expected = {
 		total: 10,
-		totalUnique: 10,
-		uniquenessRatio: 10 / 10,
+		totalUnique: 2,
+		uniquenessRatio: 2 / 10,
 		unique: {
-			'(-webkit-appearance:none)': 1,
-			'(-webkit-appearance: none)': 1,
-			'(-moz-appearance:meterbar)': 1,
-			'(-moz-appearance:meterbar) and (display:flex)': 1,
-			'(-moz-appearance:meterbar) and (cursor:zoom-in)': 1,
-			'(-moz-appearance:meterbar) and (background-attachment:local)': 1,
-			'(-moz-appearance:meterbar) and (image-orientation:90deg)': 1,
-			'(-moz-appearance:meterbar) and (all:initial)': 1,
-			'(-moz-appearance:meterbar) and (list-style-type:japanese-formal)': 1,
-			'(-moz-appearance:meterbar) and (background-blend-mode:difference,normal)': 1,
+			'-webkit-appearance: none': 2,
+			'-moz-appearance: meterbar': 8,
 		},
 	}
 

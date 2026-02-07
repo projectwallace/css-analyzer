@@ -1,12 +1,23 @@
-import { type CSSNode, str_equals, walk, BREAK, SUPPORTS_QUERY, MEDIA_TYPE, MEDIA_FEATURE, DIMENSION, NUMBER, IDENTIFIER } from '@projectwallace/css-parser'
+import {
+	type CSSNode,
+	str_equals,
+	walk,
+	BREAK,
+	SUPPORTS_QUERY,
+	MEDIA_TYPE,
+	MEDIA_FEATURE,
+	DIMENSION,
+	NUMBER,
+	IDENTIFIER,
+} from '@projectwallace/css-parser'
 
 /**
  * Check if an @supports atRule is a browserhack (Wallace parser version)
  * @param node - The Atrule CSSNode from Wallace parser
  * @returns true if the atrule is a browserhack
  */
-export function isSupportsBrowserhack(node: CSSNode): boolean {
-	let isBrowserhack = false
+export function isSupportsBrowserhack(node: CSSNode): false | string {
+	let browserhack: false | string = false
 
 	walk(node, function (n) {
 		// Check SupportsQuery nodes for browserhack patterns
@@ -15,14 +26,18 @@ export function isSupportsBrowserhack(node: CSSNode): boolean {
 			const normalizedPrelude = prelude.toString().toLowerCase().replaceAll(/\s+/g, '')
 
 			// Check for known browserhack patterns
-			if (normalizedPrelude.includes('-webkit-appearance:none') || normalizedPrelude.includes('-moz-appearance:meterbar')) {
-				isBrowserhack = true
+			if (normalizedPrelude.includes('-webkit-appearance:none')) {
+				browserhack = '-webkit-appearance: none'
+				return BREAK
+			}
+			if (normalizedPrelude.includes('-moz-appearance:meterbar')) {
+				browserhack = '-moz-appearance: meterbar'
 				return BREAK
 			}
 		}
 	})
 
-	return isBrowserhack
+	return browserhack
 }
 
 /**
