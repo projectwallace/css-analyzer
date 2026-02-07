@@ -473,7 +473,15 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			let propertyLoc = toLoc(node)
 			propertyLoc.length = property.length
 
-			properties.p(property, propertyLoc)
+			if (!is_custom(property)) {
+				let base = basename(property).toLowerCase()
+				if (is_browserhack) {
+					base = base.slice(1)
+				}
+				properties.p(base, propertyLoc)
+			} else {
+				properties.p(property, propertyLoc)
+			}
 
 			if (is_important) {
 				importantDeclarations++
