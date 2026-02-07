@@ -694,6 +694,7 @@ test('analyzes @keyframes', () => {
     @keyframes one {}
     @keyframes one {}
     @keyframes TWO {}
+		@KEYFRAMES three {}
 
     /* No prelude */
     @keyframes {}
@@ -702,29 +703,29 @@ test('analyzes @keyframes', () => {
     @-webkit-keyframes animation {}
     @-moz-keyframes animation {}
     @-o-keyframes animation {}
+    @-O-KEYFRAMES animation {}
   `
 	const actual = analyze(fixture).atrules.keyframes
 	const expected = {
-		total: 6,
-		totalUnique: 5,
+		total: 8,
+		totalUnique: 4,
 		unique: {
-			'@keyframes one': 2,
-			'@keyframes TWO': 1,
-			'@-webkit-keyframes animation': 1,
-			'@-moz-keyframes animation': 1,
-			'@-o-keyframes animation': 1,
+			one: 2,
+			TWO: 1,
+			three: 1,
+			animation: 4,
 		},
-		uniquenessRatio: 5 / 6,
+		uniquenessRatio: 4 / 8,
 		prefixed: {
-			total: 3,
+			total: 4,
 			totalUnique: 3,
 			unique: {
 				'@-webkit-keyframes animation': 1,
 				'@-moz-keyframes animation': 1,
-				'@-o-keyframes animation': 1,
+				'@-o-keyframes animation': 2,
 			},
-			uniquenessRatio: 3 / 3,
-			ratio: 3 / 6,
+			uniquenessRatio: 3 / 4,
+			ratio: 4 / 8,
 		},
 	}
 

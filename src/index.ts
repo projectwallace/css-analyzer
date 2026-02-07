@@ -224,7 +224,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			let atruleLoc = toLoc(node)
 			atruleNesting.push(depth)
 			uniqueAtruleNesting.p(depth, atruleLoc)
-			let normalized_name = node.name?.toLowerCase() ?? ''
+			let normalized_name = basename(node.name?.toLowerCase() ?? '')
 			atrules.p(normalized_name, atruleLoc)
 
 			//#region @FONT-FACE
@@ -270,11 +270,11 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						complexity++
 					}
 				} else if (normalized_name.endsWith('keyframes')) {
-					let prelude = `@${normalized_name} ${node.prelude.text}`
+					let prelude = node.prelude.text
 					keyframes.p(prelude, toLoc(node))
 
 					if (node.is_vendor_prefixed) {
-						prefixedKeyframes.p(prelude, toLoc(node))
+						prefixedKeyframes.p(`@${node.name?.toLowerCase()} ${node.prelude.text}`, toLoc(node))
 						complexity++
 					}
 
