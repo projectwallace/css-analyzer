@@ -771,7 +771,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				}
 			}
 		} else if (node.type === MEDIA_FEATURE) {
-			mediaFeatures.p(node.name!, toLoc(node))
+			if (node.name) {
+				mediaFeatures.p(node.name.toLowerCase(), toLoc(node))
+			}
 			return SKIP
 		}
 	})

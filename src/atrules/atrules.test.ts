@@ -652,15 +652,16 @@ test('finds Media Features', () => {
     @media (prefers-color-scheme: dark) {}
     @media (prefers-reduced-motion: reduce) {}
     @media (prefers-contrast: more) {}
+		@MEDIA (MIN-WIDTH: 0) {}
 
     @media screen and (50px <= width <= 100px), (min-height: 100px) {}
     `
 	const actual = analyze(fixture).atrules.media.features
 	const expected = {
-		total: 8,
+		total: 9,
 		totalUnique: 8,
 		unique: {
-			'min-width': 1,
+			'min-width': 2,
 			'max-width': 1,
 			hover: 1,
 			'forced-colors': 1,
@@ -669,7 +670,7 @@ test('finds Media Features', () => {
 			'prefers-contrast': 1,
 			'min-height': 1,
 		},
-		uniquenessRatio: 8 / 8,
+		uniquenessRatio: 8 / 9,
 	}
 
 	expect(actual).toEqual(expected)
