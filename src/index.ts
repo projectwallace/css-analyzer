@@ -585,7 +585,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						}
 
 						if (font_size) {
-							fontSizes.p(font_size, valueLoc)
+							fontSizes.p(font_size.toLowerCase(), valueLoc)
 						}
 
 						if (line_height) {
@@ -596,7 +596,12 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					// units, colors, and font families in var() fallbacks
 				} else if (isProperty('font-size', property)) {
 					if (!SYSTEM_FONTS.has(text)) {
-						fontSizes.p(text, valueLoc)
+						let normalized = text.toLowerCase()
+						if (normalized.includes('var(')) {
+							fontSizes.p(text, valueLoc)
+						} else {
+							fontSizes.p(normalized, valueLoc)
+						}
 					}
 				} else if (isProperty('font-family', property)) {
 					if (!SYSTEM_FONTS.has(text)) {
