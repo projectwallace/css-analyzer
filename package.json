@@ -54,7 +54,7 @@
 	"devDependencies": {
 		"@codecov/vite-plugin": "^1.9.1",
 		"c8": "^10.1.3",
-		"knip": "^5.68.0",
+		"knip": "^5.83.1",
 		"oxlint": "^1.26.0",
 		"prettier": "^3.6.2",
 		"publint": "^0.3.15",
