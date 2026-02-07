@@ -29,7 +29,7 @@ export function destructure(value: CSSNode, cb: ({ type, value }: { type: string
 	let line_height: string | undefined
 
 	// Bail out if the value is a single var()
-	if (value.first_child!.type === FUNCTION && value.first_child!.name.toLowerCase() === 'var') {
+	if (value.first_child!.type === FUNCTION && value.first_child!.name?.toLowerCase() === 'var') {
 		return null
 	}
 
@@ -37,10 +37,10 @@ export function destructure(value: CSSNode, cb: ({ type, value }: { type: string
 	for (let node of value.children) {
 		let next = node.next_sibling
 
-		if (node.type === IDENTIFIER && keywords.has(node.name)) {
+		if (node.type === IDENTIFIER && keywords.has(node.name!)) {
 			cb({
 				type: 'keyword',
-				value: node.name,
+				value: node.name!,
 			})
 		}
 
@@ -94,7 +94,7 @@ export function destructure(value: CSSNode, cb: ({ type, value }: { type: string
 		// Any remaining identifiers can be font-size, font-style, font-stretch, font-variant or font-weight
 		if (node.type === IDENTIFIER) {
 			let name = node.name
-			if (SIZE_KEYWORDS.has(name)) {
+			if (name && SIZE_KEYWORDS.has(name)) {
 				font_size = name
 				prev = node
 				continue

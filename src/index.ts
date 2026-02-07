@@ -5,7 +5,6 @@ import {
 	SKIP,
 	str_equals,
 	str_starts_with,
-	tokenize,
 	walk,
 	parse,
 	AT_RULE,
@@ -24,7 +23,6 @@ import {
 	DIMENSION,
 	FUNCTION,
 	HASH,
-	TOKEN_COMMENT,
 } from '@projectwallace/css-parser'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isPrefixed, hasPseudoClass, isAccessibility } from './selectors/utils.js'
@@ -226,10 +224,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			let atruleLoc = toLoc(node)
 			atruleNesting.push(depth)
 			uniqueAtruleNesting.p(depth, atruleLoc)
-			atrules.p(node.name, atruleLoc)
+			atrules.p(node.name!, atruleLoc)
 
 			//#region @FONT-FACE
-			if (str_equals('font-face', node.name)) {
+			if (str_equals('font-face', node.name!)) {
 				let descriptors = Object.create(null)
 				if (useLocations) {
 					fontfaces_with_loc.p(node.start, toLoc(node))
@@ -237,7 +235,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				let block = node.children.find((child: CSSNode) => child.type === BLOCK)
 				for (let descriptor of block?.children || []) {
 					if (descriptor.type === DECLARATION && descriptor.value) {
-						descriptors[descriptor.property] = (descriptor.value as CSSNode).text
+						descriptors[descriptor.property!] = (descriptor.value as CSSNode).text
 					}
 				}
 				atRuleComplexities.push(1)
@@ -246,13 +244,13 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			//#endregion
 
 			if (node.prelude === null || node.prelude === undefined) {
-				if (str_equals('layer', node.name)) {
+				if (str_equals('layer', node.name!)) {
 					// @layer without a prelude is anonymous
 					layers.p('<anonymous>', toLoc(node))
 					atRuleComplexities.push(2)
 				}
 			} else {
-				let { name } = node
+				let name = node.name!
 				let complexity = 1
 
 				// All the AtRules in here MUST have a prelude, so we can count their names
@@ -469,6 +467,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 			//#region PROPERTIES
 			let { is_important, property, is_browserhack, is_vendor_prefixed } = node
+
+			if (!property) return
 
 			let propertyLoc = toLoc(node)
 			propertyLoc.length = property.length
@@ -771,8 +771,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				}
 			}
 		} else if (node.type === MEDIA_FEATURE) {
-			// console.log({ Feature: node.text, name: node.name, value: node.value })
-			mediaFeatures.p(node.name, toLoc(node))
+			mediaFeatures.p(node.name!, toLoc(node))
 			return SKIP
 		}
 	})

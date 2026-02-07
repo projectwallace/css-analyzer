@@ -55,6 +55,8 @@
 		"require-await": "warn",
 		"no-null": "off",
 		"no-warning-comments": "off",
-		"no-case-declarations": "off"
+		"no-case-declarations": "off",
+		"no-inline-comments": "off",
+		"no-useless-return": "warn"
 	}
 }

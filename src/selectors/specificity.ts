@@ -54,7 +54,7 @@ export const calculateForAST = (selectorAST: CSSNode): Specificity => {
 				break
 
 			case PSEUDO_CLASS_SELECTOR:
-				switch (current.name.toLowerCase()) {
+				switch (current.name?.toLowerCase()) {
 					// "The specificity of a :where() pseudo-class is replaced by zero."
 					case 'where':
 						// Noop :)
@@ -151,7 +151,7 @@ export const calculateForAST = (selectorAST: CSSNode): Specificity => {
 				break
 
 			case PSEUDO_ELEMENT_SELECTOR:
-				switch (current.name.toLowerCase()) {
+				switch (current.name?.toLowerCase()) {
 					// "The specificity of ::slotted() is that of a pseudo-element, plus the specificity of its argument."
 					case 'slotted':
 						c += 1
