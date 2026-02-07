@@ -45,15 +45,21 @@ export function isSupportsBrowserhack(node: CSSNode): false | string {
  * @param node - The Atrule CSSNode from Wallace parser
  * @returns true if the atrule is a browserhack
  */
-export function isMediaBrowserhack(node: CSSNode): boolean {
-	let isBrowserhack = false
+export function isMediaBrowserhack(node: CSSNode): false | string {
+	let browserhack: string | false = false
 
 	walk(node, function (n) {
 		// Check MediaType nodes for \0 prefix or \9 suffix
 		if (n.type === MEDIA_TYPE) {
 			const text = n.text || ''
-			if (text.startsWith('\\0') || text.includes('\\9')) {
-				isBrowserhack = true
+
+			if (text.startsWith('\\0')) {
+				browserhack = '\\0'
+				return BREAK
+			}
+
+			if (text.includes('\\9')) {
+				browserhack = '\\9'
 				return BREAK
 			}
 		}
@@ -62,13 +68,19 @@ export function isMediaBrowserhack(node: CSSNode): boolean {
 		if (n.type === MEDIA_FEATURE) {
 			const name = n.name || ''
 
+			if (str_equals('-moz-images-in-menus', name)) {
+				browserhack = '-moz-images-in-menus'
+				return BREAK
+			}
+
+			if (str_equals('min--moz-device-pixel-ratio', name)) {
+				browserhack = 'min--moz-device-pixel-ratio'
+				return BREAK
+			}
+
 			// Check for vendor-specific feature hacks
-			if (
-				str_equals('-moz-images-in-menus', name) ||
-				str_equals('min--moz-device-pixel-ratio', name) ||
-				str_equals('-ms-high-contrast', name)
-			) {
-				isBrowserhack = true
+			if (str_equals('-ms-high-contrast', name)) {
+				browserhack = '-ms-high-contrast'
 				return BREAK
 			}
 
@@ -76,7 +88,7 @@ export function isMediaBrowserhack(node: CSSNode): boolean {
 			if (str_equals('min-resolution', name) && n.has_children) {
 				for (const child of n) {
 					if (child.type === DIMENSION && child.value === 0.001 && str_equals('dpcm', child.unit || '')) {
-						isBrowserhack = true
+						browserhack = 'min-resolution: .001dpcm'
 						return BREAK
 					}
 				}
@@ -86,7 +98,7 @@ export function isMediaBrowserhack(node: CSSNode): boolean {
 			if (str_equals('-webkit-min-device-pixel-ratio', name) && n.has_children) {
 				for (const child of n) {
 					if (child.type === NUMBER && (child.value === 0 || child.value === 10000)) {
-						isBrowserhack = true
+						browserhack = '-webkit-min-device-pixel-ratio'
 						return BREAK
 					}
 				}
@@ -96,7 +108,7 @@ export function isMediaBrowserhack(node: CSSNode): boolean {
 			if (n.has_children) {
 				for (const child of n) {
 					if (child.type === IDENTIFIER && child.text === '\\0') {
-						isBrowserhack = true
+						browserhack = '\\0'
 						return BREAK
 					}
 				}
@@ -104,5 +116,5 @@ export function isMediaBrowserhack(node: CSSNode): boolean {
 		}
 	})
 
-	return isBrowserhack
+	return browserhack
 }

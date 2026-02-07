@@ -256,8 +256,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				// All the AtRules in here MUST have a prelude, so we can count their names
 				if (normalized_name === 'media') {
 					medias.p(node.prelude.text, toLoc(node))
-					if (isMediaBrowserhack(node.prelude)) {
-						mediaBrowserhacks.p(node.prelude.text, toLoc(node))
+					let hack = isMediaBrowserhack(node.prelude)
+					if (hack) {
+						mediaBrowserhacks.p(hack, toLoc(node))
 						complexity++
 					}
 				} else if (normalized_name === 'supports') {
