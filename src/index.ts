@@ -571,7 +571,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					if (!SYSTEM_FONTS.has(text)) {
 						let result = destructure(value, function (item) {
 							if (item.type === 'keyword') {
-								valueKeywords.p(item.value, valueLoc)
+								valueKeywords.p(item.value.toLowerCase(), valueLoc)
 							}
 						})
 

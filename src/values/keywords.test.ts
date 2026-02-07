@@ -42,16 +42,17 @@ test('normalizes keyword casing', () => {
 			/* Global values */
 			line-height: inherit;
 			line-height: INHERIT;
+			font: 10px/12px INHERIT;
 		}
 	`
 	const actual = analyze(fixture).values.keywords
 	const expected = {
-		total: 2,
+		total: 3,
 		totalUnique: 1,
 		unique: {
-			inherit: 2,
+			inherit: 3,
 		},
-		uniquenessRatio: 1 / 2,
+		uniquenessRatio: 1 / 3,
 	}
 
 	expect(actual).toEqual(expected)
