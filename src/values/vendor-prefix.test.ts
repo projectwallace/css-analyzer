@@ -34,13 +34,33 @@ test('finds simple prefixes', () => {
 		unique: {
 			'-moz-max-content': 1,
 			'-webkit-max-content': 1,
-			'0 0 0 3px -moz-mac-focusring': 1,
+			'-moz-mac-focusring': 1,
 			'-webkit-sticky': 2,
-			'-webkit-transform 0.3s ease-out': 1,
-			'-moz-transform 0.3s ease-out': 1,
-			'-o-transform 0.3s ease-out': 2,
+			'-webkit-transform': 1,
+			'-moz-transform': 1,
+			'-o-transform': 2,
 		},
 		uniquenessRatio: 7 / 9,
+	}
+
+	expect(actual).toEqual(expected)
+})
+
+test('normalizes prefixes', () => {
+	const fixture = `
+    value-vendor-prefix-simple {
+      width: -moz-max-content;
+      WIDTH: -MOZ-MAX-CONTENT;
+    }
+  `
+	const actual = analyze(fixture).values.prefixes
+	const expected = {
+		total: 2,
+		totalUnique: 1,
+		unique: {
+			'-moz-max-content': 2,
+		},
+		uniquenessRatio: 1 / 2,
 	}
 
 	expect(actual).toEqual(expected)
@@ -61,12 +81,15 @@ test('finds nested prefixes', () => {
   `
 	const actual = analyze(fixture).values.prefixes
 	const expected = {
-		total: 3,
-		totalUnique: 3,
+		total: 6,
+		totalUnique: 6,
 		unique: {
-			'-khtml-linear-gradient(90deg, red, green)': 1,
-			'red,\n        -webkit-linear-gradient(transparent, transparent),\n        -moz-linear-gradient(transparent, transparent),\n        -ms-linear-gradient(transparent, transparent),\n        -o-linear-gradient(transparent, transparent)': 1,
-			'repeat(3, max(-webkit-max-content, 100vw))': 1,
+			'-khtml-linear-gradient': 1,
+			'-webkit-linear-gradient': 1,
+			'-moz-linear-gradient': 1,
+			'-ms-linear-gradient': 1,
+			'-o-linear-gradient': 1,
+			'-webkit-max-content': 1,
 		},
 		uniquenessRatio: 1,
 	}
@@ -74,7 +97,7 @@ test('finds nested prefixes', () => {
 	expect(actual).toEqual(expected)
 })
 
-test.skip('finds DEEPLY nested prefixes', () => {
+test('finds DEEPLY nested prefixes', () => {
 	const fixture = `
     value-vendor-prefix-deeply-nested {
       width: var(--test, -webkit-max-content);
@@ -85,7 +108,7 @@ test.skip('finds DEEPLY nested prefixes', () => {
 		total: 1,
 		totalUnique: 1,
 		unique: {
-			'var(--test, -webkit-max-content)': 1,
+			'-webkit-max-content': 1,
 		},
 		uniquenessRatio: 1,
 	}
