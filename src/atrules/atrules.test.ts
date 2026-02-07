@@ -224,6 +224,11 @@ test('finds @font-face', () => {
       font-weight: bold;
     }
 
+		@FONT-FACE {
+			font-family: Upper;
+			src: url('upper.woff2');
+		}
+
     /* Duplicate @font-face in Media Query */
     @media (min-width: 1000px) {
       @font-face {
@@ -233,8 +238,8 @@ test('finds @font-face', () => {
     }`
 	const actual = analyze(fixture).atrules.fontface
 	const expected = {
-		total: 5,
-		totalUnique: 5,
+		total: 6,
+		totalUnique: 6,
 		unique: [
 			{
 				'font-family': 'Arial',
@@ -262,6 +267,10 @@ test('finds @font-face', () => {
 				'font-weight': 'bold',
 			},
 			{
+				'font-family': 'Upper',
+				src: `url('upper.woff2')`,
+			},
+			{
 				'font-family': "'Input Mono'",
 				src: 'local(\'Input Mono\') url("https://url-to-input-mono.woff")',
 			},
@@ -272,7 +281,7 @@ test('finds @font-face', () => {
 	expect(actual).toEqual(expected)
 })
 
-test('finds @font-face', () => {
+test('finds @font-face (with locations)', () => {
 	const fixture = `
     @font-face {
       font-family: Arial;
@@ -421,11 +430,13 @@ test('finds @imports', () => {
 
     /* @import without prelude */
     @import;
+
+		@IMPORT url(test.css);
   `
 	const actual = analyze(fixture).atrules
 	const expected = {
-		total: 10,
-		totalUnique: 10,
+		total: 11,
+		totalUnique: 11,
 		unique: {
 			'"https://example.com/without-url"': 1,
 			'url("https://example.com/with-url")': 1,
@@ -437,6 +448,7 @@ test('finds @imports', () => {
 			"'test.css' supports((display: grid))": 1,
 			"'test.css' supports(not (display: grid))": 1,
 			"'test.css' supports(selector(a:has(b)))": 1,
+			'url(test.css)': 1,
 		},
 		uniquenessRatio: 1,
 	}
@@ -476,6 +488,7 @@ test('finds @imports', () => {
 test('finds @charsets', () => {
 	const fixture = `
     @charset "UTF-8";
+    @charset "utf-8";
     @charset "UTF-16";
 
     /* No prelude */
@@ -483,13 +496,13 @@ test('finds @charsets', () => {
   `
 	const actual = analyze(fixture).atrules.charset
 	const expected = {
-		total: 2,
+		total: 3,
 		totalUnique: 2,
 		unique: {
-			'"UTF-8"': 1,
-			'"UTF-16"': 1,
+			'"utf-8"': 2,
+			'"utf-16"': 1,
 		},
-		uniquenessRatio: 2 / 2,
+		uniquenessRatio: 2 / 3,
 	}
 
 	expect(actual).toEqual(expected)

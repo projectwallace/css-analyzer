@@ -224,10 +224,11 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			let atruleLoc = toLoc(node)
 			atruleNesting.push(depth)
 			uniqueAtruleNesting.p(depth, atruleLoc)
-			atrules.p(node.name?.toLowerCase()!, atruleLoc)
+			let normalized_name = node.name?.toLowerCase() ?? ''
+			atrules.p(normalized_name, atruleLoc)
 
 			//#region @FONT-FACE
-			if (str_equals('font-face', node.name!)) {
+			if (normalized_name === 'font-face') {
 				let descriptors = Object.create(null)
 				if (useLocations) {
 					fontfaces_with_loc.p(node.start, toLoc(node))
@@ -244,23 +245,22 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			//#endregion
 
 			if (node.prelude === null || node.prelude === undefined) {
-				if (str_equals('layer', node.name!)) {
+				if (normalized_name === 'layer') {
 					// @layer without a prelude is anonymous
 					layers.p('<anonymous>', toLoc(node))
 					atRuleComplexities.push(2)
 				}
 			} else {
-				let name = node.name!
 				let complexity = 1
 
 				// All the AtRules in here MUST have a prelude, so we can count their names
-				if (str_equals('media', name)) {
+				if (normalized_name === 'media') {
 					medias.p(node.prelude.text, toLoc(node))
 					if (isMediaBrowserhack(node.prelude)) {
 						mediaBrowserhacks.p(node.prelude.text, toLoc(node))
 						complexity++
 					}
-				} else if (str_equals('supports', name)) {
+				} else if (normalized_name === 'supports') {
 					supports.p(node.prelude.text, toLoc(node))
 
 					let hack = isSupportsBrowserhack(node.prelude)
@@ -268,8 +268,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						supportsBrowserhacks.p(hack, toLoc(node))
 						complexity++
 					}
-				} else if (endsWith('keyframes', name)) {
-					let prelude = `@${name} ${node.prelude.text}`
+				} else if (normalized_name.endsWith('keyframes')) {
+					let prelude = `@${normalized_name} ${node.prelude.text}`
 					keyframes.p(prelude, toLoc(node))
 
 					if (node.is_vendor_prefixed) {
@@ -279,11 +279,11 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 					// Mark the depth at which we enter a keyframes atrule
 					keyframesDepth = depth
-				} else if (str_equals('layer', name)) {
+				} else if (normalized_name === 'layer') {
 					for (let layer of node.prelude.text.split(',').map((s: string) => s.trim())) {
 						layers.p(layer, toLoc(node))
 					}
-				} else if (str_equals('import', name)) {
+				} else if (normalized_name === 'import') {
 					imports.p(node.prelude.text, toLoc(node))
 
 					if (node.prelude.has_children) {
@@ -295,17 +295,17 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							}
 						}
 					}
-				} else if (str_equals('container', name)) {
+				} else if (normalized_name === 'container') {
 					containers.p(node.prelude.text, toLoc(node))
 					if (node.prelude.first_child?.type === CONTAINER_QUERY) {
 						if (node.prelude.first_child.first_child?.type === IDENTIFIER) {
 							containerNames.p(node.prelude.first_child.first_child.text, toLoc(node))
 						}
 					}
-				} else if (str_equals('property', name)) {
+				} else if (normalized_name === 'property') {
 					registeredProperties.p(node.prelude.text, toLoc(node))
-				} else if (str_equals('charset', name)) {
-					charsets.p(node.prelude.text, toLoc(node))
+				} else if (normalized_name === 'charset') {
+					charsets.p(node.prelude.text.toLowerCase(), toLoc(node))
 				}
 
 				atRuleComplexities.push(complexity)
