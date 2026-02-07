@@ -518,18 +518,21 @@ test('finds @supports', () => {
       @supports (-webkit-appearance: none) {}
     }
 
+		@SUPPORTS (display: grid) {}
+
     /* No prelude */
     @supports {}
   `
 	const actual = analyze(fixture).atrules.supports
 
-	expect(actual.total).toEqual(4)
-	expect(actual.totalUnique).toEqual(3)
-	expect(actual.uniquenessRatio).toEqual(3 / 4)
+	expect(actual.total).toEqual(5)
+	expect(actual.totalUnique).toEqual(4)
+	expect(actual.uniquenessRatio).toEqual(4 / 5)
 	expect(actual.unique).toEqual({
 		'(filter: blur(5px))': 1,
 		'(display: table-cell) and (display: list-item)': 1,
 		'(-webkit-appearance: none)': 2,
+		'(display: grid)': 1,
 	})
 })
 
@@ -537,7 +540,7 @@ test('finds @supports browserhacks', () => {
 	const fixture = `
     @supports (-webkit-appearance:none) {}
     @supports (-webkit-appearance: none) {}
-    @supports (-moz-appearance:meterbar) {}
+    @SUPPORTS (-moz-appearance:meterbar) {}
     @supports (-moz-appearance:meterbar) and (display:flex) {}
     @supports (-moz-appearance:meterbar) and (cursor:zoom-in) {}
     @supports (-moz-appearance:meterbar) and (background-attachment:local) {}
@@ -577,13 +580,15 @@ test('finds @media', () => {
       @media (min-width: 0) {}
     }
 
+		@MEDIA all {}
+
     /* No prelude */
     @media {}
   `
 	const actual = analyze(fixture).atrules.media
 
-	expect(actual.total).toEqual(7)
-	expect(actual.totalUnique).toEqual(7)
+	expect(actual.total).toEqual(8)
+	expect(actual.totalUnique).toEqual(8)
 	expect(actual.unique).toEqual({
 		screen: 1,
 		'screen and (min-width: 33em)': 1,
@@ -592,6 +597,7 @@ test('finds @media', () => {
 		'screen or print': 1,
 		'all and (transform-3d), (-webkit-transform-3d)': 1,
 		'(min-width: 0)': 1,
+		all: 1,
 	})
 	expect(actual.uniquenessRatio).toEqual(1)
 })
