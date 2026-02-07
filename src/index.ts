@@ -639,7 +639,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				walk(value, (valueNode) => {
 					switch (valueNode.type) {
 						case DIMENSION: {
-							let unit = valueNode.unit!
+							let unit = valueNode.unit?.toLowerCase() ?? ''
 							let loc = toLoc(valueNode)
 							units.push(unit, property, loc)
 							return SKIP
