@@ -14,11 +14,8 @@ import {
 /**
  * Check if an @supports atRule is a browserhack (Wallace parser version)
  * @param node - The Atrule CSSNode from Wallace parser
- * @returns true if the atrule is a browserhack
  */
-export function isSupportsBrowserhack(node: CSSNode): false | string {
-	let browserhack: false | string = false
-
+export function isSupportsBrowserhack(node: CSSNode, on_hack: (hack: string) => void): void {
 	walk(node, function (n) {
 		// Check SupportsQuery nodes for browserhack patterns
 		if (n.type === SUPPORTS_QUERY) {
@@ -27,17 +24,15 @@ export function isSupportsBrowserhack(node: CSSNode): false | string {
 
 			// Check for known browserhack patterns
 			if (normalizedPrelude.includes('-webkit-appearance:none')) {
-				browserhack = '-webkit-appearance: none'
+				on_hack('-webkit-appearance: none')
 				return BREAK
 			}
 			if (normalizedPrelude.includes('-moz-appearance:meterbar')) {
-				browserhack = '-moz-appearance: meterbar'
+				on_hack('-moz-appearance: meterbar')
 				return BREAK
 			}
 		}
 	})
-
-	return browserhack
 }
 
 /**
@@ -45,21 +40,19 @@ export function isSupportsBrowserhack(node: CSSNode): false | string {
  * @param node - The Atrule CSSNode from Wallace parser
  * @returns true if the atrule is a browserhack
  */
-export function isMediaBrowserhack(node: CSSNode): false | string {
-	let browserhack: string | false = false
-
+export function isMediaBrowserhack(node: CSSNode, on_hack: (hack: string) => void): void {
 	walk(node, function (n) {
 		// Check MediaType nodes for \0 prefix or \9 suffix
 		if (n.type === MEDIA_TYPE) {
 			const text = n.text || ''
 
 			if (text.startsWith('\\0')) {
-				browserhack = '\\0'
+				on_hack('\\0')
 				return BREAK
 			}
 
 			if (text.includes('\\9')) {
-				browserhack = '\\9'
+				on_hack('\\9')
 				return BREAK
 			}
 		}
@@ -69,18 +62,18 @@ export function isMediaBrowserhack(node: CSSNode): false | string {
 			const name = n.name || ''
 
 			if (str_equals('-moz-images-in-menus', name)) {
-				browserhack = '-moz-images-in-menus'
+				on_hack('-moz-images-in-menus')
 				return BREAK
 			}
 
 			if (str_equals('min--moz-device-pixel-ratio', name)) {
-				browserhack = 'min--moz-device-pixel-ratio'
+				on_hack('min--moz-device-pixel-ratio')
 				return BREAK
 			}
 
 			// Check for vendor-specific feature hacks
 			if (str_equals('-ms-high-contrast', name)) {
-				browserhack = '-ms-high-contrast'
+				on_hack('-ms-high-contrast')
 				return BREAK
 			}
 
@@ -88,7 +81,7 @@ export function isMediaBrowserhack(node: CSSNode): false | string {
 			if (str_equals('min-resolution', name) && n.has_children) {
 				for (const child of n) {
 					if (child.type === DIMENSION && child.value === 0.001 && str_equals('dpcm', child.unit || '')) {
-						browserhack = 'min-resolution: .001dpcm'
+						on_hack('min-resolution: .001dpcm')
 						return BREAK
 					}
 				}
@@ -98,7 +91,7 @@ export function isMediaBrowserhack(node: CSSNode): false | string {
 			if (str_equals('-webkit-min-device-pixel-ratio', name) && n.has_children) {
 				for (const child of n) {
 					if (child.type === NUMBER && (child.value === 0 || child.value === 10000)) {
-						browserhack = '-webkit-min-device-pixel-ratio'
+						on_hack('-webkit-min-device-pixel-ratio')
 						return BREAK
 					}
 				}
@@ -108,13 +101,11 @@ export function isMediaBrowserhack(node: CSSNode): false | string {
 			if (n.has_children) {
 				for (const child of n) {
 					if (child.type === IDENTIFIER && child.text === '\\0') {
-						browserhack = '\\0'
+						on_hack('\\0')
 						return BREAK
 					}
 				}
 			}
 		}
 	})
-
-	return browserhack
 }
