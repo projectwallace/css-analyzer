@@ -86,6 +86,12 @@ test('handles CSS without selectors', () => {
 			uniquenessRatio: 0,
 			ratio: 0,
 		},
+		attributes: {
+			total: 0,
+			totalUnique: 0,
+			unique: {},
+			uniquenessRatio: 0,
+		},
 		keyframes: {
 			total: 0,
 			totalUnique: 0,
@@ -264,6 +270,26 @@ test('counts ID selectors', () => {
 	expect(actual).toEqual(expected)
 })
 
+test('counts attribute selectors', () => {
+	const fixture = `
+    [ROLE],
+		[role="status"],
+		[href^="test"],
+		[name$="test"],
+    [HREF="#hash"] { }
+  `
+	const actual = analyze(fixture).selectors.attributes
+
+	expect(actual.total).toEqual(5)
+	expect(actual.totalUnique).toEqual(3)
+	expect(actual.unique).toEqual({
+		role: 2,
+		href: 2,
+		name: 1,
+	})
+	expect(actual.uniquenessRatio).toBe(3 / 5)
+})
+
 test('handles emoji selectors', () => {
 	const fixture = `
     .💩 {}
@@ -327,6 +353,12 @@ test('handles emoji selectors', () => {
 			unique: {},
 			uniquenessRatio: 0,
 			ratio: 0,
+		},
+		attributes: {
+			total: 0,
+			totalUnique: 0,
+			unique: {},
+			uniquenessRatio: 0,
 		},
 		keyframes: {
 			total: 0,
