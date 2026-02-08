@@ -276,7 +276,7 @@ test('counts attribute selectors', () => {
 		[role="status"],
 		[href^="test"],
 		[name$="test"],
-    [href="#hash"] { }
+    [HREF="#hash"] { }
   `
 	const actual = analyze(fixture).selectors.attributes
 
