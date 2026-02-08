@@ -378,12 +378,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				a11y.p(a11y_selector, loc)
 			})
 
-			let pseudos = hasPseudoClass(node)
-			if (pseudos) {
-				for (let pseudo of pseudos) {
-					pseudoClasses.p(pseudo, loc)
-				}
-			}
+			hasPseudoClass(node, (pseudo) => {
+				pseudoClasses.p(pseudo.toLowerCase(), loc)
+			})
 
 			getCombinators(node, function onCombinator(combinator) {
 				let name = combinator.name.trim() === '' ? ' ' : combinator.name

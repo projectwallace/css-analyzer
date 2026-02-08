@@ -60,23 +60,12 @@ export function isAccessibility(selector: CSSNode, on_selector: (a11y_selector: 
 	})
 }
 
-/**
- * @returns {string[] | false} The pseudo-class name if it exists, otherwise false
- */
-export function hasPseudoClass(selector: CSSNode): string[] | false {
-	let pseudos: string[] = []
-
+export function hasPseudoClass(selector: CSSNode, on_selector: (selector: string) => void): void {
 	walk(selector, function (node) {
 		if (node.type === PSEUDO_CLASS_SELECTOR && node.name) {
-			pseudos.push(node.name)
+			on_selector(node.name)
 		}
 	})
-
-	if (pseudos.length === 0) {
-		return false
-	}
-
-	return pseudos
 }
 
 /**
