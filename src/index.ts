@@ -22,6 +22,7 @@ import {
 	DIMENSION,
 	FUNCTION,
 	HASH,
+	ATTRIBUTE_SELECTOR,
 } from '@projectwallace/css-parser'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isPrefixed, hasPseudoClass, isAccessibility, hasPseudoElement } from './selectors/utils.js'
@@ -143,6 +144,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let a11y = new Collection(useLocations)
 	let pseudoClasses = new Collection(useLocations)
 	let pseudoElements = new Collection(useLocations)
+	let attributeSelectors = new Collection(useLocations)
 	let combinators = new Collection(useLocations)
 	let selectorNesting = new AggregateCollection()
 	let uniqueSelectorNesting = new Collection(useLocations)
@@ -384,7 +386,13 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				pseudoElements.p(pseudo.toLowerCase(), loc)
 			})
 
-			getCombinators(node, function onCombinator(combinator) {
+			walk(node, (child) => {
+				if (child.type === ATTRIBUTE_SELECTOR) {
+					attributeSelectors.p(child.name?.toLowerCase() ?? '', loc)
+				}
+			})
+
+			getCombinators(node, (combinator) => {
 				let name = combinator.name.trim() === '' ? ' ' : combinator.name
 				combinators.p(name, combinator.loc)
 			})
@@ -921,6 +929,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			accessibility: assign(a11y.c(), {
 				ratio: ratio(a11y.size(), totalSelectors),
 			}),
+			attributes: attributeSelectors.c(),
 			keyframes: keyframeSelectors.c(),
 			prefixed: assign(prefixedSelectors.c(), {
 				ratio: ratio(prefixedSelectors.size(), totalSelectors),

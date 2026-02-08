@@ -393,6 +393,12 @@ test('handles empty input gracefully', () => {
 				uniquenessRatio: 0,
 				ratio: 0,
 			},
+			attributes: {
+				total: 0,
+				totalUnique: 0,
+				unique: {},
+				uniquenessRatio: 0,
+			},
 			keyframes: {
 				total: 0,
 				totalUnique: 0,
