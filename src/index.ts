@@ -374,9 +374,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			}
 
 			// Check for accessibility selectors
-			if (isAccessibility(node)) {
-				a11y.p(node.text, loc)
-			}
+			isAccessibility(node, (a11y_selector) => {
+				a11y.p(a11y_selector, loc)
+			})
 
 			let pseudos = hasPseudoClass(node)
 			if (pseudos) {

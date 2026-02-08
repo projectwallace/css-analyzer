@@ -12,7 +12,10 @@ import {
 	SELECTOR,
 	COMBINATOR,
 	NTH_SELECTOR,
+	str_equals,
+	str_starts_with,
 } from '@projectwallace/css-parser'
+import { unquote } from '../string-utils.js'
 
 const PSEUDO_FUNCTIONS = new KeywordSet(['nth-child', 'where', 'not', 'is', 'has', 'nth-last-child', 'matches', '-webkit-any', '-moz-any'])
 
@@ -34,33 +37,26 @@ export function isPrefixed(selector: CSSNode): boolean {
 /**
  * Check if a Wallace selector is an accessibility selector (has aria-* or role attribute)
  */
-export function isAccessibility(selector: CSSNode): false | string[] {
-	let isA11y = false
-	let a11y: string[] = []
+export function isAccessibility(selector: CSSNode, on_selector: (a11y_selector: string) => void): void {
+	function normalize(node: CSSNode) {
+		let clone = node.clone()
+		// We're intentionally not adding attr_flags here because they don't matter for normalization
+		// Also not lowercasing node.value because that DOES matter for CSS
+		if (clone.value) {
+			return '[' + clone.name?.toLowerCase() + clone.attr_operator + '"' + unquote(clone.value.toString()) + '"' + ']'
+		} else {
+			return '[' + clone.name?.toLowerCase() + ']'
+		}
+	}
 
 	walk(selector, function (node) {
 		if (node.type === ATTRIBUTE_SELECTOR) {
 			const name = node.name || ''
-			if (name === 'role' || name.startsWith('aria-')) {
-				isA11y = true
-				return BREAK
-			}
-		}
-		// Test for [aria-] or [role] inside :is()/:where() and friends
-		else if (node.type === PSEUDO_CLASS_SELECTOR && PSEUDO_FUNCTIONS.has(node.name || '')) {
-			// Check if any child selectors are accessibility selectors
-			if (node.has_children) {
-				for (const child of node) {
-					if (child.type === SELECTOR && isAccessibility(child)) {
-						isA11y = true
-						return BREAK
-					}
-				}
+			if (str_equals('role', name) || str_starts_with(name, 'aria-')) {
+				on_selector(normalize(node))
 			}
 		}
 	})
-
-	return isA11y ? a11y : false
 }
 
 /**
