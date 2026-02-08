@@ -119,10 +119,10 @@ describe('pseudo elements', () => {
 
 	test('can find multiple pseudo elements in one selector', () => {
 		const fixture = `
-			main:has(a) a:hover {}
+			custom-element::slotted(::grammer-error) {}
 		`
-		let actual = analyze(fixture).selectors.pseudoClasses
-		expect(actual.unique).toEqual({ has: 1, hover: 1 })
+		let actual = analyze(fixture).selectors.pseudoElements
+		expect(actual.unique).toEqual({ slotted: 1, 'grammer-error': 1 })
 		expect(actual.totalUnique).toBe(2)
 	})
 })
