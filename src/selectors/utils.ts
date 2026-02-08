@@ -45,9 +45,8 @@ export function isAccessibility(selector: CSSNode, on_selector: (a11y_selector: 
 		// Also not lowercasing node.value because that DOES matter for CSS
 		if (clone.value) {
 			return '[' + clone.name?.toLowerCase() + clone.attr_operator + '"' + unquote(clone.value.toString()) + '"' + ']'
-		} else {
-			return '[' + clone.name?.toLowerCase() + ']'
 		}
+		return '[' + clone.name?.toLowerCase() + ']'
 	}
 
 	walk(selector, function (node) {
