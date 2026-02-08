@@ -368,6 +368,7 @@ test('analyzes vendor prefixed selectors', () => {
     input[type=text]:-moz-placeholder {
       color: green;
     }
+		input:-MOZ-PLACEHOLDER {}
 
     no-prefix,
     fake-webkit,
@@ -376,15 +377,15 @@ test('analyzes vendor prefixed selectors', () => {
     :-moz-any(header, footer) {}
   `).selectors.prefixed
 
-	expect(actual.total).toBe(6)
+	expect(actual.total).toBe(7)
 	expect(actual.totalUnique).toBe(6)
 	expect(actual.unique).toEqual({
-		'input[type=text]::-webkit-input-placeholder': 1,
-		'input[type=text]:-ms-input-placeholder': 1,
+		':-moz-any': 1,
+		':-moz-placeholder': 2,
+		':-ms-input-placeholder': 1,
+		'::-webkit-input-placeholder': 1,
 		'::-webkit-scrollbar': 1,
-		':-moz-any(header, footer)': 1,
-		'input[type=text]::-moz-placeholder': 1,
-		'input[type=text]:-moz-placeholder': 1,
+		'::-moz-placeholder': 1,
 	})
 })
 

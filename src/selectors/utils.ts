@@ -19,19 +19,20 @@ import { unquote } from '../string-utils.js'
 
 const PSEUDO_FUNCTIONS = new KeywordSet(['nth-child', 'where', 'not', 'is', 'has', 'nth-last-child', 'matches', '-webkit-any', '-moz-any'])
 
-export function isPrefixed(selector: CSSNode): boolean {
-	let isPrefixed = false
-
+export function isPrefixed(selector: CSSNode, on_selector: (prefix: string) => void): void {
 	walk(selector, function (node) {
 		if (node.type === PSEUDO_ELEMENT_SELECTOR || node.type === PSEUDO_CLASS_SELECTOR || node.type === TYPE_SELECTOR) {
 			if (node.is_vendor_prefixed) {
-				isPrefixed = true
-				return BREAK
+				let prefix = ''
+				if (node.type === PSEUDO_CLASS_SELECTOR) {
+					prefix = ':'
+				} else if (node.type === PSEUDO_ELEMENT_SELECTOR) {
+					prefix = '::'
+				}
+				on_selector(prefix + (node.name || node.text))
 			}
 		}
 	})
-
-	return isPrefixed
 }
 
 /**

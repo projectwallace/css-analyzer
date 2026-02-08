@@ -369,9 +369,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			selectorComplexities.push(complexity)
 			uniqueSelectorComplexities.p(complexity, loc)
 
-			if (isPrefixed(node)) {
-				prefixedSelectors.p(node.text, loc)
-			}
+			isPrefixed(node, (prefix) => {
+				prefixedSelectors.p(prefix.toLowerCase(), loc)
+			})
 
 			// Check for accessibility selectors
 			isAccessibility(node, (a11y_selector) => {
