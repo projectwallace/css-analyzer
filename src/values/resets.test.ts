@@ -45,25 +45,29 @@ test('crazy notations', () => {
 test('accepts weird casing', () => {
 	let actual = analyze(`t {
 		MARGIN: 0;
-	}`)
-	let resets = actual.values.resets
-	expect(resets.unique).toEqual({ margin: 1 })
+	}`).values.resets
+	expect(actual.unique).toEqual({ margin: 1 })
 })
 
 test('accepts vendor prefixes', () => {
 	let actual = analyze(`t {
 		-webkit-margin: 0;
-	}`)
-	let resets = actual.values.resets
-	expect(resets.unique).toEqual({ margin: 1 })
+	}`).values.resets
+	expect(actual.unique).toEqual({ margin: 1 })
 })
 
 test('accepts browserhacks', () => {
 	let actual = analyze(`t {
 		*margin: 0;
-	}`)
-	let resets = actual.values.resets
-	expect(resets.unique).toEqual({ margin: 1 })
+	}`).values.resets
+	expect(actual.unique).toEqual({ margin: 1 })
+})
+
+test('does not report false positive for custom property', () => {
+	let actual = analyze(`t {
+		--my-margin: 0;
+	}`).values.resets
+	expect(actual.unique).toEqual({})
 })
 
 // Test all properties

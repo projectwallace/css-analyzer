@@ -1,5 +1,4 @@
 import { KeywordSet } from '../keyword-set.js'
-import { endsWith } from '../string-utils.js'
 import { is_custom, is_vendor_prefixed } from '@projectwallace/css-parser'
 
 export const SPACING_RESET_PROPERTIES = new Set([
@@ -59,29 +58,21 @@ export function isHack(property: string): boolean {
 }
 
 /**
- * A check to verify that a propery is `basename` or a prefixed
- * version of that, but never a custom property that accidentally
- * ends with the same substring.
- *
- * @example
- * isProperty('animation', 'animation') // true
- * isProperty('animation', '-webkit-animation') // true
- * isProperty('animation', '--my-animation') // false
- *
- * @returns True if `property` equals `basename` without prefix
- */
-export function isProperty(basename: string, property: string): boolean {
-	if (is_custom(property)) return false
-	return endsWith(basename, property)
-}
-
-/**
- * Get the basename for a property with a vendor prefix
+ * Get the normalized basename for a property with a vendor prefix
  * @returns The property name without vendor prefix
  */
 export function basename(property: string): string {
-	if (is_vendor_prefixed(property)) {
-		return property.slice(property.indexOf('-', 2) + 1)
+	if (is_custom(property)) {
+		return property
 	}
-	return property
+
+	if (is_vendor_prefixed(property)) {
+		return property.slice(property.indexOf('-', 2) + 1).toLowerCase()
+	}
+
+	if (isHack(property)) {
+		return property.slice(1).toLowerCase()
+	}
+
+	return property.toLowerCase()
 }

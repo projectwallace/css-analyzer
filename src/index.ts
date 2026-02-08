@@ -35,7 +35,6 @@ import { ContextCollection } from './context-collection.js'
 import { Collection, type Location } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
 import { endsWith, unquote } from './string-utils.js'
-import { isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
 import { basename, SPACING_RESET_PROPERTIES, border_radius_properties } from './properties/property-utils.js'
@@ -210,7 +209,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			let atruleLoc = toLoc(node)
 			atruleNesting.push(depth)
 			uniqueAtruleNesting.p(depth, atruleLoc)
-			let normalized_name = basename(node.name?.toLowerCase() ?? '')
+			let normalized_name = basename(node.name ?? '')
 			atrules.p(normalized_name, atruleLoc)
 
 			//#region @FONT-FACE
@@ -452,20 +451,12 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			let { is_important, property, is_browserhack, is_vendor_prefixed } = node
 
 			if (!property) return
-			let normalizedProperty = property
 
 			let propertyLoc = toLoc(node)
 			propertyLoc.length = property.length
+			let normalizedProperty = basename(property)
 
-			if (!is_custom(property)) {
-				normalizedProperty = basename(property).toLowerCase()
-				if (is_browserhack) {
-					normalizedProperty = normalizedProperty.slice(1)
-				}
-				properties.p(normalizedProperty, propertyLoc)
-			} else {
-				properties.p(property, propertyLoc)
-			}
+			properties.p(normalizedProperty, propertyLoc)
 
 			if (is_important) {
 				importantDeclarations++
@@ -530,10 +521,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					if (isValueReset(value)) {
 						resets.p(normalizedProperty, valueLoc)
 					}
-				} else if (isProperty('z-index', property)) {
+				} else if (normalizedProperty === 'z-index') {
 					zindex.p(text, valueLoc)
 					return SKIP
-				} else if (isProperty('font', property)) {
+				} else if (normalizedProperty === 'font') {
 					if (!SYSTEM_FONTS.has(text)) {
 						let result = destructure(value, function (item) {
 							if (item.type === 'keyword') {
@@ -560,7 +551,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					}
 					// Don't return SKIP here - let walker continue to find
 					// units, colors, and font families in var() fallbacks
-				} else if (isProperty('font-size', property)) {
+				} else if (normalizedProperty === 'font-size') {
 					if (!SYSTEM_FONTS.has(text)) {
 						let normalized = text.toLowerCase()
 						if (normalized.includes('var(')) {
@@ -569,19 +560,19 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							fontSizes.p(normalized, valueLoc)
 						}
 					}
-				} else if (isProperty('font-family', property)) {
+				} else if (normalizedProperty === 'font-family') {
 					if (!SYSTEM_FONTS.has(text)) {
 						fontFamilies.p(text, valueLoc)
 					}
 					return SKIP // to prevent finding color false positives (Black as font family name is not a color)
-				} else if (isProperty('line-height', property)) {
+				} else if (normalizedProperty === 'line-height') {
 					let normalized = text.toLowerCase()
 					if (normalized.includes('var(')) {
 						lineHeights.p(text, valueLoc)
 					} else {
 						lineHeights.p(normalized, valueLoc)
 					}
-				} else if (isProperty('transition', property) || isProperty('animation', property)) {
+				} else if (normalizedProperty === 'transition' || normalizedProperty === 'animation') {
 					analyzeAnimation(value.children, function (item: { type: string; value: CSSNode }) {
 						if (item.type === 'fn') {
 							timingFunctions.p(item.value.text, valueLoc)
@@ -592,7 +583,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						}
 					})
 					return SKIP
-				} else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
+				} else if (normalizedProperty === 'animation-duration' || normalizedProperty === 'transition-duration') {
 					for (let child of value.children) {
 						if (child.type !== OPERATOR) {
 							let text = child.text
@@ -603,25 +594,25 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							}
 						}
 					}
-				} else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
+				} else if (normalizedProperty === 'transition-timing-function' || normalizedProperty === 'animation-timing-function') {
 					for (let child of value.children) {
 						if (child.type !== OPERATOR) {
 							timingFunctions.p(child.text, valueLoc)
 						}
 					}
-				} else if (isProperty('container-name', property)) {
+				} else if (normalizedProperty === 'container-name') {
 					containerNames.p(text, valueLoc)
-				} else if (isProperty('container', property)) {
+				} else if (normalizedProperty === 'container') {
 					// The first identifier in the `container` shorthand is the container name
 					// Example: container: my-layout / inline-size;
 					if (value.first_child?.type === IDENTIFIER) {
 						containerNames.p(value.first_child.text, valueLoc)
 					}
-				} else if (border_radius_properties.has(basename(property))) {
+				} else if (border_radius_properties.has(normalizedProperty)) {
 					borderRadiuses.push(text, property, valueLoc)
-				} else if (isProperty('text-shadow', property)) {
+				} else if (normalizedProperty === 'text-shadow') {
 					textShadows.p(text, valueLoc)
-				} else if (isProperty('box-shadow', property)) {
+				} else if (normalizedProperty === 'box-shadow') {
 					boxShadows.p(text, valueLoc)
 				}
 
@@ -668,7 +659,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							// Skip all identifier processing for font properties to avoid:
 							// 1. False positives for colors (e.g., "Black" as a font family vs. "black" the color)
 							// 2. Duplicate keywords (already extracted by destructure function)
-							if (isProperty('font', property) || isProperty('font-family', property)) {
+							if (normalizedProperty === 'font' || normalizedProperty === 'font-family') {
 								return SKIP
 							}
 
