@@ -573,13 +573,13 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						lineHeights.p(normalized, valueLoc)
 					}
 				} else if (normalizedProperty === 'transition' || normalizedProperty === 'animation') {
-					analyzeAnimation(value.children, function (item: { type: string; value: CSSNode }) {
+					analyzeAnimation(value.children, function (item) {
 						if (item.type === 'fn') {
-							timingFunctions.p(item.value.text, valueLoc)
+							timingFunctions.p(item.value.text.toLowerCase(), valueLoc)
 						} else if (item.type === 'duration') {
-							durations.p(item.value.text, valueLoc)
+							durations.p(item.value.text.toLowerCase(), valueLoc)
 						} else if (item.type === 'keyword') {
-							valueKeywords.p(item.value.text, valueLoc)
+							valueKeywords.p(item.value.text.toLowerCase(), valueLoc)
 						}
 					})
 					return SKIP

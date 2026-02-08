@@ -120,10 +120,12 @@ test('finds shorthand durations', () => {
     durations {
       animation: 1s ANIMATION_NAME linear;
       animation: 2s ANIMATION_NAME cubic-bezier(0,1,0,1);
+      animation: 2S ANIMATION_NAME cubic-bezier(0,1,0,1);
 
       transition: all 3s;
       transition: all 4s cubic-bezier(0,1,0,1);
       transition: all 5s linear 5000ms;
+      transition: all 5S linear 5000ms;
 
       --my-animation: invalid;
       --my-transition: invalid;
@@ -131,16 +133,16 @@ test('finds shorthand durations', () => {
   `
 	const actual = analyze(fixture).values.animations.durations
 	const expected = {
-		total: 5,
+		total: 7,
 		totalUnique: 5,
 		unique: {
 			'1s': 1,
-			'2s': 1,
+			'2s': 2,
 			'3s': 1,
 			'4s': 1,
-			'5s': 1,
+			'5s': 2,
 		},
-		uniquenessRatio: 5 / 5,
+		uniquenessRatio: 5 / 7,
 	}
 	expect(actual).toEqual(expected)
 })
@@ -149,6 +151,7 @@ test('finds shorthand timing functions', () => {
 	const fixture = `
     durations {
       animation: 1s ANIMATION_NAME linear;
+      animation: 1s ANIMATION_NAME LINEAR;
       animation: 2s ANIMATION_NAME cubic-bezier(0,1,0,1);
 
       transition: all 3s;
@@ -163,14 +166,13 @@ test('finds shorthand timing functions', () => {
   `
 	const actual = analyze(fixture).values.animations.timingFunctions
 	const expected = {
-		total: 5,
-		totalUnique: 3,
+		total: 6,
+		totalUnique: 2,
 		unique: {
-			linear: 2,
-			'cubic-bezier(0,1,0,1)': 2,
-			'Cubic-Bezier(0,1,0,1)': 1,
+			linear: 3,
+			'cubic-bezier(0,1,0,1)': 3,
 		},
-		uniquenessRatio: 3 / 5,
+		uniquenessRatio: 2 / 6,
 	}
 	expect(actual).toEqual(expected)
 })
