@@ -633,7 +633,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							if (!hashText || !hashText.startsWith('#')) {
 								return SKIP
 							}
-							let hashValue = hashText
+							let hashValue = hashText.toLowerCase()
 
 							// If the full value has an IE9 hack, append it to the hash
 							if (valueHasIe9Hack && !hashValue.endsWith('\\9')) {
@@ -664,7 +664,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							}
 
 							if (keywords.has(identifierText)) {
-								valueKeywords.p(identifierText, identifierLoc)
+								valueKeywords.p(identifierText.toLowerCase(), identifierLoc)
 							}
 
 							// Bail out if it can't be a color name
@@ -677,21 +677,22 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 							// A keyword is most likely to be 'transparent' or 'currentColor'
 							if (colorKeywords.has(identifierText)) {
-								colors.push(identifierText, property, identifierLoc)
-								colorFormats.p(identifierText.toLowerCase(), identifierLoc)
+								let colorKeyword = identifierText.toLowerCase()
+								colors.push(colorKeyword, property, identifierLoc)
+								colorFormats.p(colorKeyword, identifierLoc)
 								return
 							}
 
 							// Or it can be a named color
 							if (namedColors.has(identifierText)) {
-								colors.push(identifierText, property, identifierLoc)
+								colors.push(identifierText.toLowerCase(), property, identifierLoc)
 								colorFormats.p('named', identifierLoc)
 								return
 							}
 
 							// Or it can be a system color
 							if (systemColors.has(identifierText)) {
-								colors.push(identifierText, property, identifierLoc)
+								colors.push(identifierText.toLowerCase(), property, identifierLoc)
 								colorFormats.p('system', identifierLoc)
 								return
 							}
