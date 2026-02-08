@@ -539,7 +539,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						resets.p(normalizedProperty, valueLoc)
 					}
 				} else if (normalizedProperty === 'display') {
-					if (/var\(/.test(text)) {
+					if (/var\(/i.test(text)) {
 						displays.p(text, valueLoc)
 					} else {
 						displays.p(text.toLowerCase(), valueLoc)

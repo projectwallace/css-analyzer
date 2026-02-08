@@ -159,11 +159,13 @@ test('handles var()', () => {
 		test {
 			display: var(--myDisplay);
 			display: var(--inline-dir) flow-root;
+			display: Var(--inline-dir) flow-root;
 		}
 	`
 	const actual = analyze(fixture).values.displays
 	expect(actual.unique).toEqual({
 		'var(--myDisplay)': 1,
 		'var(--inline-dir) flow-root': 1,
+		'Var(--inline-dir) flow-root': 1,
 	})
 })
