@@ -379,7 +379,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			}
 
 			let pseudos = hasPseudoClass(node)
-			if (pseudos !== false) {
+			if (pseudos) {
 				for (let pseudo of pseudos) {
 					pseudoClasses.p(pseudo, loc)
 				}

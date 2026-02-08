@@ -34,8 +34,9 @@ export function isPrefixed(selector: CSSNode): boolean {
 /**
  * Check if a Wallace selector is an accessibility selector (has aria-* or role attribute)
  */
-export function isAccessibility(selector: CSSNode): boolean {
+export function isAccessibility(selector: CSSNode): false | string[] {
 	let isA11y = false
+	let a11y: string[] = []
 
 	walk(selector, function (node) {
 		if (node.type === ATTRIBUTE_SELECTOR) {
@@ -59,7 +60,7 @@ export function isAccessibility(selector: CSSNode): boolean {
 		}
 	})
 
-	return isA11y
+	return isA11y ? a11y : false
 }
 
 /**
