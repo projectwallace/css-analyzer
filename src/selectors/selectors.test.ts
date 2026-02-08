@@ -73,6 +73,12 @@ test('handles CSS without selectors', () => {
 			unique: {},
 			uniquenessRatio: 0,
 		},
+		pseudoElements: {
+			total: 0,
+			totalUnique: 0,
+			unique: {},
+			uniquenessRatio: 0,
+		},
 		accessibility: {
 			total: 0,
 			totalUnique: 0,
@@ -304,6 +310,12 @@ test('handles emoji selectors', () => {
 			ratio: 0,
 		},
 		pseudoClasses: {
+			total: 0,
+			totalUnique: 0,
+			unique: {},
+			uniquenessRatio: 0,
+		},
+		pseudoElements: {
 			total: 0,
 			totalUnique: 0,
 			unique: {},

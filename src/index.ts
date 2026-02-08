@@ -24,7 +24,7 @@ import {
 	HASH,
 } from '@projectwallace/css-parser'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
-import { getCombinators, getComplexity, isPrefixed, hasPseudoClass, isAccessibility } from './selectors/utils.js'
+import { getCombinators, getComplexity, isPrefixed, hasPseudoClass, isAccessibility, hasPseudoElement } from './selectors/utils.js'
 import { calculateForAST as calculateSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
 import { destructure, SYSTEM_FONTS } from './values/destructure-font-shorthand.js'
@@ -142,6 +142,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let ids = new Collection(useLocations)
 	let a11y = new Collection(useLocations)
 	let pseudoClasses = new Collection(useLocations)
+	let pseudoElements = new Collection(useLocations)
 	let combinators = new Collection(useLocations)
 	let selectorNesting = new AggregateCollection()
 	let uniqueSelectorNesting = new Collection(useLocations)
@@ -377,6 +378,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 			hasPseudoClass(node, (pseudo) => {
 				pseudoClasses.p(pseudo.toLowerCase(), loc)
+			})
+
+			hasPseudoElement(node, (pseudo) => {
+				pseudoElements.p(pseudo.toLowerCase(), loc)
 			})
 
 			getCombinators(node, function onCombinator(combinator) {
@@ -912,6 +917,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				ratio: ratio(ids.size(), totalSelectors),
 			}),
 			pseudoClasses: pseudoClasses.c(),
+			pseudoElements: pseudoElements.c(),
 			accessibility: assign(a11y.c(), {
 				ratio: ratio(a11y.size(), totalSelectors),
 			}),

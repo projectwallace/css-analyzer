@@ -3,7 +3,6 @@ import { KeywordSet } from '../keyword-set.js'
 import {
 	type CSSNode,
 	SKIP,
-	BREAK,
 	walk,
 	PSEUDO_ELEMENT_SELECTOR,
 	PSEUDO_CLASS_SELECTOR,
@@ -62,6 +61,14 @@ export function isAccessibility(selector: CSSNode, on_selector: (a11y_selector: 
 export function hasPseudoClass(selector: CSSNode, on_selector: (selector: string) => void): void {
 	walk(selector, function (node) {
 		if (node.type === PSEUDO_CLASS_SELECTOR && node.name) {
+			on_selector(node.name)
+		}
+	})
+}
+
+export function hasPseudoElement(selector: CSSNode, on_selector: (selector: string) => void): void {
+	walk(selector, function (node) {
+		if (node.type === PSEUDO_ELEMENT_SELECTOR && node.name) {
 			on_selector(node.name)
 		}
 	})

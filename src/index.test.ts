@@ -380,6 +380,12 @@ test('handles empty input gracefully', () => {
 				unique: {},
 				uniquenessRatio: 0,
 			},
+			pseudoElements: {
+				total: 0,
+				totalUnique: 0,
+				unique: {},
+				uniquenessRatio: 0,
+			},
 			accessibility: {
 				total: 0,
 				totalUnique: 0,
