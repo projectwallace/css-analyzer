@@ -170,6 +170,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let valueComplexities = new AggregateCollection()
 	let vendorPrefixedValues = new Collection(useLocations)
 	let valueBrowserhacks = new Collection(useLocations)
+	let displays = new Collection(useLocations)
 	let zindex = new Collection(useLocations)
 	let textShadows = new Collection(useLocations)
 	let boxShadows = new Collection(useLocations)
@@ -501,10 +502,15 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				let valueLoc = toLoc(value)
 				let complexity = 1
 
-				// auto, inherit, initial, etc.
+				// auto, inherit, initial, none, etc.
 				if (keywords.has(text)) {
 					valueKeywords.p(text.toLowerCase(), valueLoc)
 					valueComplexities.push(complexity)
+
+					if (normalizedProperty === 'display') {
+						displays.p(text.toLowerCase(), valueLoc)
+					}
+
 					return
 				}
 
@@ -531,6 +537,12 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				if (SPACING_RESET_PROPERTIES.has(normalizedProperty)) {
 					if (isValueReset(value)) {
 						resets.p(normalizedProperty, valueLoc)
+					}
+				} else if (normalizedProperty === 'display') {
+					if (/var\(/.test(text)) {
+						displays.p(text, valueLoc)
+					} else {
+						displays.p(text.toLowerCase(), valueLoc)
 					}
 				} else if (normalizedProperty === 'z-index') {
 					zindex.p(text, valueLoc)
@@ -994,6 +1006,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			complexity: valueComplexity,
 			keywords: valueKeywords.c(),
 			resets: resets.c(),
+			displays: displays.c(),
 		},
 		__meta__: {
 			parseTime: startAnalysis - startParse,
