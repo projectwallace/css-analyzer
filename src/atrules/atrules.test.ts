@@ -14,17 +14,19 @@ test('counts total atrules', () => {
     @supports (display: grid) {
       a {}
     }
+
+		@LAYER A;
   `
 	let actual = analyze(css).atrules
-	expect(actual.total).toEqual(4)
+	expect(actual.total).toEqual(5)
 	expect(actual.totalUnique).toEqual(4)
 	expect(actual.unique).toEqual({
 		import: 1,
-		layer: 1,
+		layer: 2,
 		media: 1,
 		supports: 1,
 	})
-	expect(actual.uniquenessRatio).toEqual(4 / 4)
+	expect(actual.uniquenessRatio).toEqual(4 / 5)
 })
 
 test('calculates complexity', () => {
@@ -222,6 +224,11 @@ test('finds @font-face', () => {
       font-weight: bold;
     }
 
+		@FONT-FACE {
+			font-family: Upper;
+			src: url('upper.woff2');
+		}
+
     /* Duplicate @font-face in Media Query */
     @media (min-width: 1000px) {
       @font-face {
@@ -231,8 +238,8 @@ test('finds @font-face', () => {
     }`
 	const actual = analyze(fixture).atrules.fontface
 	const expected = {
-		total: 5,
-		totalUnique: 5,
+		total: 6,
+		totalUnique: 6,
 		unique: [
 			{
 				'font-family': 'Arial',
@@ -260,6 +267,10 @@ test('finds @font-face', () => {
 				'font-weight': 'bold',
 			},
 			{
+				'font-family': 'Upper',
+				src: `url('upper.woff2')`,
+			},
+			{
 				'font-family': "'Input Mono'",
 				src: 'local(\'Input Mono\') url("https://url-to-input-mono.woff")',
 			},
@@ -270,7 +281,7 @@ test('finds @font-face', () => {
 	expect(actual).toEqual(expected)
 })
 
-test('finds @font-face', () => {
+test('finds @font-face (with locations)', () => {
 	const fixture = `
     @font-face {
       font-family: Arial;
@@ -419,11 +430,13 @@ test('finds @imports', () => {
 
     /* @import without prelude */
     @import;
+
+		@IMPORT url(test.css);
   `
 	const actual = analyze(fixture).atrules
 	const expected = {
-		total: 10,
-		totalUnique: 10,
+		total: 11,
+		totalUnique: 11,
 		unique: {
 			'"https://example.com/without-url"': 1,
 			'url("https://example.com/with-url")': 1,
@@ -435,6 +448,7 @@ test('finds @imports', () => {
 			"'test.css' supports((display: grid))": 1,
 			"'test.css' supports(not (display: grid))": 1,
 			"'test.css' supports(selector(a:has(b)))": 1,
+			'url(test.css)': 1,
 		},
 		uniquenessRatio: 1,
 	}
@@ -474,6 +488,7 @@ test('finds @imports', () => {
 test('finds @charsets', () => {
 	const fixture = `
     @charset "UTF-8";
+    @charset "utf-8";
     @charset "UTF-16";
 
     /* No prelude */
@@ -481,13 +496,13 @@ test('finds @charsets', () => {
   `
 	const actual = analyze(fixture).atrules.charset
 	const expected = {
-		total: 2,
+		total: 3,
 		totalUnique: 2,
 		unique: {
-			'"UTF-8"': 1,
-			'"UTF-16"': 1,
+			'"utf-8"': 2,
+			'"utf-16"': 1,
 		},
-		uniquenessRatio: 2 / 2,
+		uniquenessRatio: 2 / 3,
 	}
 
 	expect(actual).toEqual(expected)
@@ -503,18 +518,21 @@ test('finds @supports', () => {
       @supports (-webkit-appearance: none) {}
     }
 
+		@SUPPORTS (display: grid) {}
+
     /* No prelude */
     @supports {}
   `
 	const actual = analyze(fixture).atrules.supports
 
-	expect(actual.total).toEqual(4)
-	expect(actual.totalUnique).toEqual(3)
-	expect(actual.uniquenessRatio).toEqual(3 / 4)
+	expect(actual.total).toEqual(5)
+	expect(actual.totalUnique).toEqual(4)
+	expect(actual.uniquenessRatio).toEqual(4 / 5)
 	expect(actual.unique).toEqual({
 		'(filter: blur(5px))': 1,
 		'(display: table-cell) and (display: list-item)': 1,
 		'(-webkit-appearance: none)': 2,
+		'(display: grid)': 1,
 	})
 })
 
@@ -522,7 +540,7 @@ test('finds @supports browserhacks', () => {
 	const fixture = `
     @supports (-webkit-appearance:none) {}
     @supports (-webkit-appearance: none) {}
-    @supports (-moz-appearance:meterbar) {}
+    @SUPPORTS (-moz-appearance:meterbar) {}
     @supports (-moz-appearance:meterbar) and (display:flex) {}
     @supports (-moz-appearance:meterbar) and (cursor:zoom-in) {}
     @supports (-moz-appearance:meterbar) and (background-attachment:local) {}
@@ -538,19 +556,11 @@ test('finds @supports browserhacks', () => {
 	const actual = result.atrules.supports.browserhacks
 	const expected = {
 		total: 10,
-		totalUnique: 10,
-		uniquenessRatio: 10 / 10,
+		totalUnique: 2,
+		uniquenessRatio: 2 / 10,
 		unique: {
-			'(-webkit-appearance:none)': 1,
-			'(-webkit-appearance: none)': 1,
-			'(-moz-appearance:meterbar)': 1,
-			'(-moz-appearance:meterbar) and (display:flex)': 1,
-			'(-moz-appearance:meterbar) and (cursor:zoom-in)': 1,
-			'(-moz-appearance:meterbar) and (background-attachment:local)': 1,
-			'(-moz-appearance:meterbar) and (image-orientation:90deg)': 1,
-			'(-moz-appearance:meterbar) and (all:initial)': 1,
-			'(-moz-appearance:meterbar) and (list-style-type:japanese-formal)': 1,
-			'(-moz-appearance:meterbar) and (background-blend-mode:difference,normal)': 1,
+			'-webkit-appearance: none': 2,
+			'-moz-appearance: meterbar': 8,
 		},
 	}
 
@@ -570,13 +580,15 @@ test('finds @media', () => {
       @media (min-width: 0) {}
     }
 
+		@MEDIA all {}
+
     /* No prelude */
     @media {}
   `
 	const actual = analyze(fixture).atrules.media
 
-	expect(actual.total).toEqual(7)
-	expect(actual.totalUnique).toEqual(7)
+	expect(actual.total).toEqual(8)
+	expect(actual.totalUnique).toEqual(8)
 	expect(actual.unique).toEqual({
 		screen: 1,
 		'screen and (min-width: 33em)': 1,
@@ -585,6 +597,7 @@ test('finds @media', () => {
 		'screen or print': 1,
 		'all and (transform-3d), (-webkit-transform-3d)': 1,
 		'(min-width: 0)': 1,
+		all: 1,
 	})
 	expect(actual.uniquenessRatio).toEqual(1)
 })
@@ -614,26 +627,16 @@ test('finds @media browserhacks', () => {
 	const actual = result.atrules.media.browserhacks
 	const expected = {
 		total: 17,
-		totalUnique: 17,
-		uniquenessRatio: 1,
+		totalUnique: 7,
+		uniquenessRatio: 7 / 17,
 		unique: {
-			'\\0 all': 1,
-			'\\0 screen': 1,
-			'\\0screen': 1,
-			'screen\\9': 1,
-			'\\0screen\\,screen\\9': 1,
-			'screen and (min-width:0\\0)': 1,
-			'all and (-moz-images-in-menus:0) and (min-resolution: .001dpcm)': 1,
-			'all and (-moz-images-in-menus:0)': 1,
-			'screen and (-moz-images-in-menus:0)': 1,
-			'screen and (min--moz-device-pixel-ratio:0)': 1,
-			'all and (min--moz-device-pixel-ratio:0)': 1,
-			'all and (min--moz-device-pixel-ratio:0) and (min-resolution: .001dpcm)': 1,
-			'all and (min--moz-device-pixel-ratio:0) and (min-resolution: 3e1dpcm)': 1,
-			'screen and (-ms-high-contrast: active), (-ms-high-contrast: none)': 1,
-			'(min-resolution: .001dpcm)': 1,
-			'all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm)': 1,
-			'all and (-webkit-min-device-pixel-ratio:10000), not all and (-webkit-min-device-pixel-ratio:0)': 1,
+			'\\0': 5,
+			'\\9': 1,
+			'-moz-images-in-menus': 3,
+			'min-resolution: .001dpcm': 1,
+			'-webkit-min-device-pixel-ratio': 2,
+			'min--moz-device-pixel-ratio': 4,
+			'-ms-high-contrast': 1,
 		},
 	}
 
@@ -649,15 +652,16 @@ test('finds Media Features', () => {
     @media (prefers-color-scheme: dark) {}
     @media (prefers-reduced-motion: reduce) {}
     @media (prefers-contrast: more) {}
+		@MEDIA (MIN-WIDTH: 0) {}
 
     @media screen and (50px <= width <= 100px), (min-height: 100px) {}
     `
 	const actual = analyze(fixture).atrules.media.features
 	const expected = {
-		total: 8,
+		total: 9,
 		totalUnique: 8,
 		unique: {
-			'min-width': 1,
+			'min-width': 2,
 			'max-width': 1,
 			hover: 1,
 			'forced-colors': 1,
@@ -666,7 +670,7 @@ test('finds Media Features', () => {
 			'prefers-contrast': 1,
 			'min-height': 1,
 		},
-		uniquenessRatio: 8 / 8,
+		uniquenessRatio: 8 / 9,
 	}
 
 	expect(actual).toEqual(expected)
@@ -690,6 +694,7 @@ test('analyzes @keyframes', () => {
     @keyframes one {}
     @keyframes one {}
     @keyframes TWO {}
+		@KEYFRAMES three {}
 
     /* No prelude */
     @keyframes {}
@@ -698,29 +703,29 @@ test('analyzes @keyframes', () => {
     @-webkit-keyframes animation {}
     @-moz-keyframes animation {}
     @-o-keyframes animation {}
+    @-O-KEYFRAMES animation {}
   `
 	const actual = analyze(fixture).atrules.keyframes
 	const expected = {
-		total: 6,
-		totalUnique: 5,
+		total: 8,
+		totalUnique: 4,
 		unique: {
-			'@keyframes one': 2,
-			'@keyframes TWO': 1,
-			'@-webkit-keyframes animation': 1,
-			'@-moz-keyframes animation': 1,
-			'@-o-keyframes animation': 1,
+			one: 2,
+			TWO: 1,
+			three: 1,
+			animation: 4,
 		},
-		uniquenessRatio: 5 / 6,
+		uniquenessRatio: 4 / 8,
 		prefixed: {
-			total: 3,
+			total: 4,
 			totalUnique: 3,
 			unique: {
 				'@-webkit-keyframes animation': 1,
 				'@-moz-keyframes animation': 1,
-				'@-o-keyframes animation': 1,
+				'@-o-keyframes animation': 2,
 			},
-			uniquenessRatio: 3 / 3,
-			ratio: 3 / 6,
+			uniquenessRatio: 3 / 4,
+			ratio: 4 / 8,
 		},
 	}
 
@@ -762,6 +767,8 @@ test('analyzes container queries', () => {
       h2 { font-size: 1.5em; }
     }
 
+		@CONTAINER (width > 40em) {}
+
     /* Example 4 */
     @container (--cards) {
       article {
@@ -797,18 +804,18 @@ test('analyzes container queries', () => {
 	const result = analyze(fixture)
 	const actual = result.atrules.container
 	const expected = {
-		total: 7,
+		total: 8,
 		totalUnique: 7,
 		unique: {
 			'(inline-size > 45em)': 1,
-			'(width > 40em)': 1,
+			'(width > 40em)': 2,
 			'(--cards)': 1,
 			'page-layout (block-size > 12em)': 1,
 			'component-library (inline-size > 30em)': 1,
 			'card (inline-size > 30em) and (--responsive = true)': 1,
 			'type(inline-size)': 1,
 		},
-		uniquenessRatio: 7 / 7,
+		uniquenessRatio: 7 / 8,
 		names: {
 			total: 3,
 			totalUnique: 3,

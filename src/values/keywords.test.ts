@@ -36,6 +36,28 @@ test('finds global keywords', () => {
 	expect(actual).toEqual(expected)
 })
 
+test('normalizes keyword casing', () => {
+	const fixture = `
+		test {
+			/* Global values */
+			line-height: inherit;
+			line-height: INHERIT;
+			font: 10px/12px INHERIT;
+		}
+	`
+	const actual = analyze(fixture).values.keywords
+	const expected = {
+		total: 3,
+		totalUnique: 1,
+		unique: {
+			inherit: 3,
+		},
+		uniquenessRatio: 1 / 3,
+	}
+
+	expect(actual).toEqual(expected)
+})
+
 test('finds global keywords in shorthands', () => {
 	let fixture = `
 		a {

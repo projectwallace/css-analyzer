@@ -23,6 +23,7 @@ test('calculates uniqueness', () => {
 	const fixture = `
     properties {
       margin: 0;
+      MARGIN: 0;
       --custom: 1;
     }
 
@@ -34,17 +35,19 @@ test('calculates uniqueness', () => {
   `
 	const actual = analyze(fixture).properties
 	const expected = {
-		margin: 1,
+		margin: 2,
 		'--custom': 2,
 	}
 
 	expect(actual.totalUnique).toEqual(2)
+	expect(actual.total).toEqual(4)
 	expect(actual.unique).toEqual(expected)
-	expect(actual.uniquenessRatio).toEqual(2 / 3)
+	expect(actual.uniquenessRatio).toEqual(2 / 4)
 })
 
-test('counts vendor prefixes', () => {
-	const fixture = `
+describe('vendor prefixes', () => {
+	test('counts vendor prefixes', () => {
+		const fixture = `
     prefixed {
       border-radius: 2px;
       -webkit-border-radius: 2px;
@@ -60,24 +63,35 @@ test('counts vendor prefixes', () => {
       }
     }
   `
-	const actual = analyze(fixture).properties.prefixed
-	const expected = {
-		'-webkit-border-radius': 1,
-		'-khtml-border-radius': 1,
-		'-o-border-radius': 2,
-	}
+		const actual = analyze(fixture).properties.prefixed
+		const expected = {
+			'-webkit-border-radius': 1,
+			'-khtml-border-radius': 1,
+			'-o-border-radius': 2,
+		}
 
-	expect(actual.total).toEqual(4)
-	expect(actual.totalUnique).toEqual(3)
-	expect(actual.unique).toEqual(expected)
-	expect(actual.ratio).toEqual(4 / 5)
+		expect(actual.total).toEqual(4)
+		expect(actual.totalUnique).toEqual(3)
+		expect(actual.unique).toEqual(expected)
+		expect(actual.ratio).toEqual(4 / 5)
+	})
+
+	test('normalizes to basename', () => {
+		const fixture = `test { -webkit-line-clamp: 3; }`
+		const expected = { 'line-clamp': 1 }
+		const actual = analyze(fixture).properties.unique
+		expect(actual).toEqual(expected)
+	})
 })
 
-test('counts browser hacks', () => {
-	const fixture = `
+describe('browserhacks', () => {
+	test('counts browser hacks', () => {
+		const fixture = `
     hacks {
       margin: 0;
       *zoom: 1;
+      *margin: 0;
+      _property: 0;
       --custom: 1;
     }
 
@@ -89,48 +103,88 @@ test('counts browser hacks', () => {
       }
     }
   `
-	const actual = analyze(fixture).properties.browserhacks
-	const expected = {
-		'*zoom': 2,
-	}
+		const actual = analyze(fixture).properties.browserhacks
+		const expected = {
+			'*': 3,
+			_: 1,
+		}
 
-	expect(actual.total).toEqual(2)
-	expect(actual.totalUnique).toEqual(1)
-	expect(actual.unique).toEqual(expected)
-	expect(actual.ratio).toEqual(2 / 4)
+		expect(actual.total).toEqual(4)
+		expect(actual.totalUnique).toEqual(2)
+		expect(actual.unique).toEqual(expected)
+		expect(actual.ratio).toEqual(4 / 6)
+	})
+
+	test('normalizes browserhacks props to basename', () => {
+		const fixture = `
+      hacks {
+        margin: 0;
+        *zoom: 1;
+        *margin: 0;
+        _property: 0;
+        --custom: 1;
+      }
+    `
+		const actual = analyze(fixture).properties
+		const expected = {
+			margin: 2,
+			zoom: 1,
+			property: 1,
+			'--custom': 1,
+		}
+
+		expect(actual.unique).toEqual(expected)
+		expect(actual.totalUnique).toEqual(4)
+	})
 })
 
-test('counts custom properties', () => {
-	const fixture = `
-    :root {
-      --yellow-400: yellow;
-    }
+describe('custom properties', () => {
+	test('counts custom properties', () => {
+		const fixture = `
+      :root {
+        --yellow-400: yellow;
+      }
 
-    custom {
-      margin: 0;
-      --yellow-400: yellow;
-      color: var(--yellow-400);
-    }
+      custom {
+        margin: 0;
+        --yellow-400: yellow;
+        color: var(--yellow-400);
+      }
 
-    @media (min-width: 0) {
-      @supports (-o-border-radius: 2px) {
-        custom2 {
-          --green-400: green;
-          color: var(--green-400);
+      @media (min-width: 0) {
+        @supports (-o-border-radius: 2px) {
+          custom2 {
+            --green-400: green;
+            color: var(--green-400);
+          }
         }
       }
-    }
-  `
-	const actual = analyze(fixture).properties.custom
-	const expected = {
-		'--yellow-400': 2,
-		'--green-400': 1,
-	}
+    `
+		const actual = analyze(fixture).properties.custom
+		const expected = {
+			'--yellow-400': 2,
+			'--green-400': 1,
+		}
 
-	expect(actual.total).toEqual(3)
-	expect(actual.totalUnique).toEqual(2)
-	expect(actual.unique).toEqual(expected)
-	expect(actual.ratio).toEqual(3 / 6)
+		expect(actual.total).toEqual(3)
+		expect(actual.totalUnique).toEqual(2)
+		expect(actual.unique).toEqual(expected)
+		expect(actual.ratio).toEqual(3 / 6)
+	})
+
+	test('normalizing properties does not lowercase custom properties', () => {
+		const fixture = `
+      :root {
+        --testMe: 1;
+      }
+    `
+		const actual = analyze(fixture).properties.custom
+		const expected = {
+			'--testMe': 1,
+		}
+
+		expect(actual.unique).toEqual(expected)
+	})
 })
 
 describe('property complexity', () => {

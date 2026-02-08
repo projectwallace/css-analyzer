@@ -12,73 +12,59 @@ import {
 	SELECTOR,
 	COMBINATOR,
 	NTH_SELECTOR,
+	str_equals,
+	str_starts_with,
 } from '@projectwallace/css-parser'
+import { unquote } from '../string-utils.js'
 
 const PSEUDO_FUNCTIONS = new KeywordSet(['nth-child', 'where', 'not', 'is', 'has', 'nth-last-child', 'matches', '-webkit-any', '-moz-any'])
 
-export function isPrefixed(selector: CSSNode): boolean {
-	let isPrefixed = false
-
+export function isPrefixed(selector: CSSNode, on_selector: (prefix: string) => void): void {
 	walk(selector, function (node) {
 		if (node.type === PSEUDO_ELEMENT_SELECTOR || node.type === PSEUDO_CLASS_SELECTOR || node.type === TYPE_SELECTOR) {
 			if (node.is_vendor_prefixed) {
-				isPrefixed = true
-				return BREAK
+				let prefix = ''
+				if (node.type === PSEUDO_CLASS_SELECTOR) {
+					prefix = ':'
+				} else if (node.type === PSEUDO_ELEMENT_SELECTOR) {
+					prefix = '::'
+				}
+				on_selector(prefix + (node.name || node.text))
 			}
 		}
 	})
-
-	return isPrefixed
 }
 
 /**
  * Check if a Wallace selector is an accessibility selector (has aria-* or role attribute)
  */
-export function isAccessibility(selector: CSSNode): boolean {
-	let isA11y = false
+export function isAccessibility(selector: CSSNode, on_selector: (a11y_selector: string) => void): void {
+	function normalize(node: CSSNode) {
+		let clone = node.clone()
+		// We're intentionally not adding attr_flags here because they don't matter for normalization
+		// Also not lowercasing node.value because that DOES matter for CSS
+		if (clone.value) {
+			return '[' + clone.name?.toLowerCase() + clone.attr_operator + '"' + unquote(clone.value.toString()) + '"' + ']'
+		}
+		return '[' + clone.name?.toLowerCase() + ']'
+	}
 
 	walk(selector, function (node) {
 		if (node.type === ATTRIBUTE_SELECTOR) {
 			const name = node.name || ''
-			if (name === 'role' || name.startsWith('aria-')) {
-				isA11y = true
-				return BREAK
-			}
-		}
-		// Test for [aria-] or [role] inside :is()/:where() and friends
-		else if (node.type === PSEUDO_CLASS_SELECTOR && PSEUDO_FUNCTIONS.has(node.name || '')) {
-			// Check if any child selectors are accessibility selectors
-			if (node.has_children) {
-				for (const child of node) {
-					if (child.type === SELECTOR && isAccessibility(child)) {
-						isA11y = true
-						return BREAK
-					}
-				}
+			if (str_equals('role', name) || str_starts_with(name, 'aria-')) {
+				on_selector(normalize(node))
 			}
 		}
 	})
-
-	return isA11y
 }
 
-/**
- * @returns {string[] | false} The pseudo-class name if it exists, otherwise false
- */
-export function hasPseudoClass(selector: CSSNode): string[] | false {
-	let pseudos: string[] = []
-
+export function hasPseudoClass(selector: CSSNode, on_selector: (selector: string) => void): void {
 	walk(selector, function (node) {
 		if (node.type === PSEUDO_CLASS_SELECTOR && node.name) {
-			pseudos.push(node.name)
+			on_selector(node.name)
 		}
 	})
-
-	if (pseudos.length === 0) {
-		return false
-	}
-
-	return pseudos
 }
 
 /**

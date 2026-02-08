@@ -3,7 +3,6 @@ import {
 	type CSSNode,
 	is_custom,
 	SKIP,
-	str_equals,
 	str_starts_with,
 	walk,
 	parse,
@@ -36,25 +35,11 @@ import { ContextCollection } from './context-collection.js'
 import { Collection, type Location } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
 import { endsWith, unquote } from './string-utils.js'
-import { isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
-import { basename } from './properties/property-utils.js'
-import { KeywordSet } from './keyword-set.js'
+import { basename, SPACING_RESET_PROPERTIES, border_radius_properties } from './properties/property-utils.js'
 
 export type Specificity = [number, number, number]
-
-let border_radius_properties = new KeywordSet([
-	'border-radius',
-	'border-top-left-radius',
-	'border-top-right-radius',
-	'border-bottom-right-radius',
-	'border-bottom-left-radius',
-	'border-start-start-radius',
-	'border-start-end-radius',
-	'border-end-end-radius',
-	'border-end-start-radius',
-])
 
 function ratio(part: number, total: number): number {
 	if (total === 0) return 0
@@ -224,10 +209,11 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			let atruleLoc = toLoc(node)
 			atruleNesting.push(depth)
 			uniqueAtruleNesting.p(depth, atruleLoc)
-			atrules.p(node.name!, atruleLoc)
+			let normalized_name = basename(node.name ?? '')
+			atrules.p(normalized_name, atruleLoc)
 
 			//#region @FONT-FACE
-			if (str_equals('font-face', node.name!)) {
+			if (normalized_name === 'font-face') {
 				let descriptors = Object.create(null)
 				if (useLocations) {
 					fontfaces_with_loc.p(node.start, toLoc(node))
@@ -244,44 +230,44 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			//#endregion
 
 			if (node.prelude === null || node.prelude === undefined) {
-				if (str_equals('layer', node.name!)) {
+				if (normalized_name === 'layer') {
 					// @layer without a prelude is anonymous
 					layers.p('<anonymous>', toLoc(node))
 					atRuleComplexities.push(2)
 				}
 			} else {
-				let name = node.name!
 				let complexity = 1
 
 				// All the AtRules in here MUST have a prelude, so we can count their names
-				if (str_equals('media', name)) {
+				if (normalized_name === 'media') {
 					medias.p(node.prelude.text, toLoc(node))
-					if (isMediaBrowserhack(node.prelude)) {
-						mediaBrowserhacks.p(node.prelude.text, toLoc(node))
+					isMediaBrowserhack(node.prelude, (hack) => {
+						mediaBrowserhacks.p(hack, toLoc(node))
 						complexity++
-					}
-				} else if (str_equals('supports', name)) {
+					})
+				} else if (normalized_name === 'supports') {
 					supports.p(node.prelude.text, toLoc(node))
-					if (isSupportsBrowserhack(node.prelude)) {
-						supportsBrowserhacks.p(node.prelude.text, toLoc(node))
+
+					isSupportsBrowserhack(node.prelude, (hack) => {
+						supportsBrowserhacks.p(hack, toLoc(node))
 						complexity++
-					}
-				} else if (endsWith('keyframes', name)) {
-					let prelude = `@${name} ${node.prelude.text}`
+					})
+				} else if (normalized_name.endsWith('keyframes')) {
+					let prelude = node.prelude.text
 					keyframes.p(prelude, toLoc(node))
 
 					if (node.is_vendor_prefixed) {
-						prefixedKeyframes.p(prelude, toLoc(node))
+						prefixedKeyframes.p(`@${node.name?.toLowerCase()} ${node.prelude.text}`, toLoc(node))
 						complexity++
 					}
 
 					// Mark the depth at which we enter a keyframes atrule
 					keyframesDepth = depth
-				} else if (str_equals('layer', name)) {
+				} else if (normalized_name === 'layer') {
 					for (let layer of node.prelude.text.split(',').map((s: string) => s.trim())) {
 						layers.p(layer, toLoc(node))
 					}
-				} else if (str_equals('import', name)) {
+				} else if (normalized_name === 'import') {
 					imports.p(node.prelude.text, toLoc(node))
 
 					if (node.prelude.has_children) {
@@ -293,17 +279,17 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							}
 						}
 					}
-				} else if (str_equals('container', name)) {
+				} else if (normalized_name === 'container') {
 					containers.p(node.prelude.text, toLoc(node))
 					if (node.prelude.first_child?.type === CONTAINER_QUERY) {
 						if (node.prelude.first_child.first_child?.type === IDENTIFIER) {
 							containerNames.p(node.prelude.first_child.first_child.text, toLoc(node))
 						}
 					}
-				} else if (str_equals('property', name)) {
+				} else if (normalized_name === 'property') {
 					registeredProperties.p(node.prelude.text, toLoc(node))
-				} else if (str_equals('charset', name)) {
-					charsets.p(node.prelude.text, toLoc(node))
+				} else if (normalized_name === 'charset') {
+					charsets.p(node.prelude.text.toLowerCase(), toLoc(node))
 				}
 
 				atRuleComplexities.push(complexity)
@@ -380,21 +366,18 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			selectorComplexities.push(complexity)
 			uniqueSelectorComplexities.p(complexity, loc)
 
-			if (isPrefixed(node)) {
-				prefixedSelectors.p(node.text, loc)
-			}
+			isPrefixed(node, (prefix) => {
+				prefixedSelectors.p(prefix.toLowerCase(), loc)
+			})
 
 			// Check for accessibility selectors
-			if (isAccessibility(node)) {
-				a11y.p(node.text, loc)
-			}
+			isAccessibility(node, (a11y_selector) => {
+				a11y.p(a11y_selector, loc)
+			})
 
-			let pseudos = hasPseudoClass(node)
-			if (pseudos !== false) {
-				for (let pseudo of pseudos) {
-					pseudoClasses.p(pseudo, loc)
-				}
-			}
+			hasPseudoClass(node, (pseudo) => {
+				pseudoClasses.p(pseudo.toLowerCase(), loc)
+			})
 
 			getCombinators(node, function onCombinator(combinator) {
 				let name = combinator.name.trim() === '' ? ' ' : combinator.name
@@ -452,10 +435,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 				let declaration = node.text
 				if (!declaration.toLowerCase().includes('!important')) {
-					let valueText = (node.value as CSSNode).text
-					let valueOffset = declaration.indexOf(valueText)
-					let stripSemi = declaration.slice(-1) === ';'
-					valueBrowserhacks.p(`${declaration.slice(valueOffset, stripSemi ? -1 : undefined)}`, toLoc(node.value as CSSNode))
+					valueBrowserhacks.p('!ie', toLoc(node.value as CSSNode))
 				}
 
 				if (inKeyframes) {
@@ -472,8 +452,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 			let propertyLoc = toLoc(node)
 			propertyLoc.length = property.length
+			let normalizedProperty = basename(property)
 
-			properties.p(property, propertyLoc)
+			properties.p(normalizedProperty, propertyLoc)
 
 			if (is_important) {
 				importantDeclarations++
@@ -491,7 +472,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					importantCustomProperties.p(property, propertyLoc)
 				}
 			} else if (is_browserhack) {
-				propertyHacks.p(property, propertyLoc)
+				propertyHacks.p(property.charAt(0), propertyLoc)
 				propertyComplexities.push(2)
 			} else {
 				propertyComplexities.push(1)
@@ -509,21 +490,21 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 				// auto, inherit, initial, etc.
 				if (keywords.has(text)) {
-					valueKeywords.p(text, valueLoc)
+					valueKeywords.p(text.toLowerCase(), valueLoc)
 					valueComplexities.push(complexity)
 					return
 				}
 
 				//#region VALUE COMPLEXITY
 				// i.e. `background-image: -webkit-linear-gradient()`
-				if (isValuePrefixed(value)) {
-					vendorPrefixedValues.p(value.text, valueLoc)
+				isValuePrefixed(value, (prefixed) => {
+					vendorPrefixedValues.p(prefixed.toLowerCase(), valueLoc)
 					complexity++
-				}
+				})
 
 				// i.e. `property: value\9`
 				if (isIe9Hack(value)) {
-					valueBrowserhacks.p(text, valueLoc)
+					valueBrowserhacks.p('\\9', valueLoc)
 					text = text.slice(0, -2)
 					complexity++
 				}
@@ -534,33 +515,18 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 				// Process properties first that don't have colors,
 				// so we can avoid further walking them;
-				if (
-					isProperty('margin', property) ||
-					isProperty('margin-block', property) ||
-					isProperty('margin-inline', property) ||
-					isProperty('margin-top', property) ||
-					isProperty('margin-right', property) ||
-					isProperty('margin-bottom', property) ||
-					isProperty('margin-left', property) ||
-					isProperty('padding', property) ||
-					isProperty('padding-block', property) ||
-					isProperty('padding-inline', property) ||
-					isProperty('padding-top', property) ||
-					isProperty('padding-right', property) ||
-					isProperty('padding-bottom', property) ||
-					isProperty('padding-left', property)
-				) {
+				if (SPACING_RESET_PROPERTIES.has(normalizedProperty)) {
 					if (isValueReset(value)) {
-						resets.p(property, valueLoc)
+						resets.p(normalizedProperty, valueLoc)
 					}
-				} else if (isProperty('z-index', property)) {
+				} else if (normalizedProperty === 'z-index') {
 					zindex.p(text, valueLoc)
 					return SKIP
-				} else if (isProperty('font', property)) {
+				} else if (normalizedProperty === 'font') {
 					if (!SYSTEM_FONTS.has(text)) {
 						let result = destructure(value, function (item) {
 							if (item.type === 'keyword') {
-								valueKeywords.p(item.value, valueLoc)
+								valueKeywords.p(item.value.toLowerCase(), valueLoc)
 							}
 						})
 
@@ -574,62 +540,77 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						}
 
 						if (font_size) {
-							fontSizes.p(font_size, valueLoc)
+							fontSizes.p(font_size.toLowerCase(), valueLoc)
 						}
 
 						if (line_height) {
-							lineHeights.p(line_height, valueLoc)
+							lineHeights.p(line_height.toLowerCase(), valueLoc)
 						}
 					}
 					// Don't return SKIP here - let walker continue to find
 					// units, colors, and font families in var() fallbacks
-				} else if (isProperty('font-size', property)) {
+				} else if (normalizedProperty === 'font-size') {
 					if (!SYSTEM_FONTS.has(text)) {
-						fontSizes.p(text, valueLoc)
+						let normalized = text.toLowerCase()
+						if (normalized.includes('var(')) {
+							fontSizes.p(text, valueLoc)
+						} else {
+							fontSizes.p(normalized, valueLoc)
+						}
 					}
-				} else if (isProperty('font-family', property)) {
+				} else if (normalizedProperty === 'font-family') {
 					if (!SYSTEM_FONTS.has(text)) {
 						fontFamilies.p(text, valueLoc)
 					}
 					return SKIP // to prevent finding color false positives (Black as font family name is not a color)
-				} else if (isProperty('line-height', property)) {
-					lineHeights.p(text, valueLoc)
-				} else if (isProperty('transition', property) || isProperty('animation', property)) {
-					analyzeAnimation(value.children, function (item: { type: string; value: CSSNode }) {
+				} else if (normalizedProperty === 'line-height') {
+					let normalized = text.toLowerCase()
+					if (normalized.includes('var(')) {
+						lineHeights.p(text, valueLoc)
+					} else {
+						lineHeights.p(normalized, valueLoc)
+					}
+				} else if (normalizedProperty === 'transition' || normalizedProperty === 'animation') {
+					analyzeAnimation(value.children, function (item) {
 						if (item.type === 'fn') {
-							timingFunctions.p(item.value.text, valueLoc)
+							timingFunctions.p(item.value.text.toLowerCase(), valueLoc)
 						} else if (item.type === 'duration') {
-							durations.p(item.value.text, valueLoc)
+							durations.p(item.value.text.toLowerCase(), valueLoc)
 						} else if (item.type === 'keyword') {
-							valueKeywords.p(item.value.text, valueLoc)
+							valueKeywords.p(item.value.text.toLowerCase(), valueLoc)
 						}
 					})
 					return SKIP
-				} else if (isProperty('animation-duration', property) || isProperty('transition-duration', property)) {
+				} else if (normalizedProperty === 'animation-duration' || normalizedProperty === 'transition-duration') {
 					for (let child of value.children) {
 						if (child.type !== OPERATOR) {
-							durations.p(child.text, valueLoc)
+							let text = child.text
+							if (/var\(/i.test(text)) {
+								durations.p(text, valueLoc)
+							} else {
+								durations.p(text.toLowerCase(), valueLoc)
+							}
 						}
 					}
-				} else if (isProperty('transition-timing-function', property) || isProperty('animation-timing-function', property)) {
+				} else if (normalizedProperty === 'transition-timing-function' || normalizedProperty === 'animation-timing-function') {
 					for (let child of value.children) {
 						if (child.type !== OPERATOR) {
 							timingFunctions.p(child.text, valueLoc)
 						}
 					}
-				} else if (isProperty('container-name', property)) {
+				} else if (normalizedProperty === 'container-name') {
 					containerNames.p(text, valueLoc)
-				} else if (isProperty('container', property)) {
+				} else if (normalizedProperty === 'container') {
 					// The first identifier in the `container` shorthand is the container name
 					// Example: container: my-layout / inline-size;
 					if (value.first_child?.type === IDENTIFIER) {
 						containerNames.p(value.first_child.text, valueLoc)
 					}
-				} else if (border_radius_properties.has(basename(property))) {
+				} else if (border_radius_properties.has(normalizedProperty)) {
 					borderRadiuses.push(text, property, valueLoc)
-				} else if (isProperty('text-shadow', property)) {
+				} else if (normalizedProperty === 'text-shadow') {
 					textShadows.p(text, valueLoc)
-				} else if (isProperty('box-shadow', property)) {
+				} else if (normalizedProperty === 'box-shadow') {
 					boxShadows.p(text, valueLoc)
 				}
 
@@ -639,7 +620,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				walk(value, (valueNode) => {
 					switch (valueNode.type) {
 						case DIMENSION: {
-							let unit = valueNode.unit!
+							let unit = valueNode.unit?.toLowerCase() ?? ''
 							let loc = toLoc(valueNode)
 							units.push(unit, property, loc)
 							return SKIP
@@ -650,7 +631,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							if (!hashText || !hashText.startsWith('#')) {
 								return SKIP
 							}
-							let hashValue = hashText
+							let hashValue = hashText.toLowerCase()
 
 							// If the full value has an IE9 hack, append it to the hash
 							if (valueHasIe9Hack && !hashValue.endsWith('\\9')) {
@@ -676,12 +657,12 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							// Skip all identifier processing for font properties to avoid:
 							// 1. False positives for colors (e.g., "Black" as a font family vs. "black" the color)
 							// 2. Duplicate keywords (already extracted by destructure function)
-							if (isProperty('font', property) || isProperty('font-family', property)) {
+							if (normalizedProperty === 'font' || normalizedProperty === 'font-family') {
 								return SKIP
 							}
 
 							if (keywords.has(identifierText)) {
-								valueKeywords.p(identifierText, identifierLoc)
+								valueKeywords.p(identifierText.toLowerCase(), identifierLoc)
 							}
 
 							// Bail out if it can't be a color name
@@ -694,21 +675,22 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 							// A keyword is most likely to be 'transparent' or 'currentColor'
 							if (colorKeywords.has(identifierText)) {
-								colors.push(identifierText, property, identifierLoc)
-								colorFormats.p(identifierText.toLowerCase(), identifierLoc)
+								let colorKeyword = identifierText.toLowerCase()
+								colors.push(colorKeyword, property, identifierLoc)
+								colorFormats.p(colorKeyword, identifierLoc)
 								return
 							}
 
 							// Or it can be a named color
 							if (namedColors.has(identifierText)) {
-								colors.push(identifierText, property, identifierLoc)
+								colors.push(identifierText.toLowerCase(), property, identifierLoc)
 								colorFormats.p('named', identifierLoc)
 								return
 							}
 
 							// Or it can be a system color
 							if (systemColors.has(identifierText)) {
-								colors.push(identifierText, property, identifierLoc)
+								colors.push(identifierText.toLowerCase(), property, identifierLoc)
 								colorFormats.p('system', identifierLoc)
 								return
 							}
@@ -771,7 +753,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				}
 			}
 		} else if (node.type === MEDIA_FEATURE) {
-			mediaFeatures.p(node.name!, toLoc(node))
+			if (node.name) {
+				mediaFeatures.p(node.name.toLowerCase(), toLoc(node))
+			}
 			return SKIP
 		}
 	})

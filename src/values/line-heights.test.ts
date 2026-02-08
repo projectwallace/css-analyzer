@@ -1,4 +1,4 @@
-import { test } from 'vitest'
+import { describe, test } from 'vitest'
 import { expect } from 'vitest'
 import { analyze } from '../index.js'
 
@@ -62,6 +62,29 @@ test('extracts the `font` shorthand', () => {
 		uniquenessRatio: 3 / 7,
 	}
 	expect(actual).toEqual(expected)
+})
+
+describe('normalizing', () => {
+	test('line-height', () => {
+		const actual = analyze(`test { line-height: 1EM }`).values.lineHeights.unique
+		expect(actual).toEqual({ '1em': 1 })
+	})
+
+	test('font shorthand', () => {
+		const actual = analyze(`test { font: 10PX/1EM serif }`).values.lineHeights.unique
+		expect(actual).toEqual({ '1em': 1 })
+	})
+
+	test('leaves var() intact', () => {
+		const actual = analyze(`test {
+			line-height: var(--lineHeight1);
+			line-height: VAR(--lineHeight2);
+		}`).values.lineHeights.unique
+		expect(actual).toEqual({
+			'var(--lineHeight1)': 1,
+			'VAR(--lineHeight2)': 1,
+		})
+	})
 })
 
 test('handles system fonts', () => {

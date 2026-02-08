@@ -67,6 +67,21 @@ test('analyzes length units', () => {
 	expect(actual).toEqual(expected)
 })
 
+test('normalizes units', () => {
+	let actual = analyze(`
+    a {
+      font-size: 10px;
+      width: 24PX;
+    }
+  `).values.units
+
+	expect(actual.unique).toEqual({
+		px: 2,
+	})
+	expect(actual.total).toBe(2)
+	expect(actual.totalUnique).toBe(1)
+})
+
 test('should not include browserhacks', () => {
 	let actual = analyze(`
     a {
