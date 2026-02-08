@@ -244,6 +244,12 @@ test('handles empty input gracefully', () => {
 				unique: {},
 				uniquenessRatio: 0,
 			},
+			scope: {
+				total: 0,
+				totalUnique: 0,
+				unique: {},
+				uniquenessRatio: 0,
+			},
 			complexity: {
 				min: 0,
 				max: 0,

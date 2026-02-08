@@ -967,6 +967,58 @@ test('analyzes @property', () => {
 	expect(actual).toEqual(expected)
 })
 
+test('analyzes @scope', () => {
+	// Examples from
+	// https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@scope#examples
+	// and
+	// https://drafts.csswg.org/css-cascade-6/#scoped-styles
+	const fixture = `
+		@scope (.article-body) to (figure) {}
+
+		@scope (.article-body) {}
+
+		@scope (.article-body) to (:scope > figure) {}
+
+		@scope (.article-body) to (.feature :scope figure) {}
+
+		@scope (.media-object) to (.content > *) {}
+
+		@scope ([data-scope='main-component']) to ([data-scope]) {}
+
+		@scope ([data-scope='main-component']) to ([data-scope] > *) {}
+
+		@scope (.parent-scope) {
+			@scope (:scope > .child-scope) to (:scope .limit) {}
+		}
+
+		@scope (.parent-scope > .child-scope) to (.parent-scope > .child-scope .limit) {}
+
+    /* No prelude */
+    @scope {}
+  `
+	const result = analyze(fixture)
+	const actual = result.atrules.scope
+	const expected = {
+		total: 10,
+		totalUnique: 10,
+		unique: {
+			'(.article-body) to (figure)': 1,
+			'(.article-body)': 1,
+			'(.article-body) to (:scope > figure)': 1,
+			'(.article-body) to (.feature :scope figure)': 1,
+			'(.media-object) to (.content > *)': 1,
+			"([data-scope='main-component']) to ([data-scope])": 1,
+			"([data-scope='main-component']) to ([data-scope] > *)": 1,
+			'(.parent-scope)': 1,
+			'(:scope > .child-scope) to (:scope .limit)': 1,
+			'(.parent-scope > .child-scope) to (.parent-scope > .child-scope .limit)': 1,
+		},
+		uniquenessRatio: 1,
+	}
+
+	expect(actual).toEqual(expected)
+})
+
 test('tracks nesting depth', () => {
 	const fixture = `
     a {
