@@ -3,7 +3,6 @@ import {
 	type CSSNode,
 	is_custom,
 	SKIP,
-	str_equals,
 	str_starts_with,
 	walk,
 	parse,
@@ -39,22 +38,9 @@ import { endsWith, unquote } from './string-utils.js'
 import { isProperty } from './properties/property-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
-import { basename } from './properties/property-utils.js'
-import { KeywordSet } from './keyword-set.js'
+import { basename, SPACING_RESET_PROPERTIES, border_radius_properties } from './properties/property-utils.js'
 
 export type Specificity = [number, number, number]
-
-let border_radius_properties = new KeywordSet([
-	'border-radius',
-	'border-top-left-radius',
-	'border-top-right-radius',
-	'border-bottom-right-radius',
-	'border-bottom-left-radius',
-	'border-start-start-radius',
-	'border-start-end-radius',
-	'border-end-end-radius',
-	'border-end-start-radius',
-])
 
 function ratio(part: number, total: number): number {
 	if (total === 0) return 0
@@ -546,32 +532,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 				// Process properties first that don't have colors,
 				// so we can avoid further walking them;
-				if (
-					new Set([
-						'margin',
-						'margin-block',
-						'margin-inline',
-						'margin-top',
-						'margin-block-start',
-						'margin-block-end',
-						'margin-inline-end',
-						'margin-inline-end',
-						'margin-right',
-						'margin-bottom',
-						'margin-left',
-						'padding',
-						'padding-block',
-						'padding-inline',
-						'padding-top',
-						'padding-right',
-						'padding-bottom',
-						'padding-left',
-						'padding-block-start',
-						'padding-block-end',
-						'padding-inline-start',
-						'padding-inline-end',
-					]).has(normalizedProperty)
-				) {
+				if (SPACING_RESET_PROPERTIES.has(normalizedProperty)) {
 					if (isValueReset(value)) {
 						resets.p(normalizedProperty, valueLoc)
 					}
