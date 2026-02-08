@@ -508,13 +508,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 				//#region VALUE COMPLEXITY
 				// i.e. `background-image: -webkit-linear-gradient()`
-				let prefixes = isValuePrefixed(value)
-				if (prefixes !== false) {
-					for (let prefix of prefixes) {
-						vendorPrefixedValues.p(prefix.toLowerCase(), valueLoc)
-					}
+				isValuePrefixed(value, (prefixed) => {
+					vendorPrefixedValues.p(prefixed.toLowerCase(), valueLoc)
 					complexity++
-				}
+				})
 
 				// i.e. `property: value\9`
 				if (isIe9Hack(value)) {
