@@ -319,9 +319,10 @@ test('finds @font-face (with locations)', () => {
         src: local('Input Mono') url("https://url-to-input-mono.woff");
       }
     }`
-	const actual = analyze(fixture, {
-		useLocations: true,
-	}).atrules.fontface.uniqueWithLocations
+	const result = analyze(fixture, {
+		locations: true,
+	})
+	const actual = result.locations['atrules.fontface']
 	const expected = {
 		5: [
 			{
@@ -1047,7 +1048,7 @@ test('tracks nesting depth', () => {
       }
     }
   `
-	const actual = analyze(fixture).atrules.nesting
+	const actual = analyze(fixture, { samples: true }).atrules.nesting
 	const expected = {
 		min: 0,
 		max: 1,

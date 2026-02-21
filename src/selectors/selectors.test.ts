@@ -41,7 +41,6 @@ test('handles CSS without selectors', () => {
 			max: [0, 0, 0],
 			mean: [0, 0, 0],
 			mode: [0, 0, 0],
-			items: [],
 			unique: {},
 			total: 0,
 			totalUnique: 0,
@@ -58,7 +57,6 @@ test('handles CSS without selectors', () => {
 			totalUnique: 0,
 			unique: {},
 			uniquenessRatio: 0,
-			items: [],
 		},
 		id: {
 			total: 0,
@@ -118,7 +116,6 @@ test('handles CSS without selectors', () => {
 			mode: 0,
 			range: 0,
 			sum: 0,
-			items: [],
 			total: 0,
 			totalUnique: 0,
 			unique: {},
@@ -144,7 +141,7 @@ test('have their complexity calculated', () => {
       }
     }
   `
-	const actual = analyze(fixture).selectors.complexity.items
+	const actual = analyze(fixture, { samples: true }).selectors.complexity.items
 	const expected = [1, 1]
 
 	expect(actual).toEqual(expected)
@@ -170,7 +167,7 @@ test('have their specificity calculated', () => {
       }
     }
   `
-	const actual = analyze(fixture)
+	const actual = analyze(fixture, { samples: true })
 	const expected = [
 		[0, 0, 1],
 		[0, 0, 0],
@@ -294,7 +291,7 @@ test('handles emoji selectors', () => {
 	const fixture = `
     .💩 {}
   `
-	const result = analyze(fixture)
+	const result = analyze(fixture, { samples: true })
 	const actual = result.selectors
 
 	const expected = {
@@ -398,6 +395,7 @@ test('handles emoji selectors', () => {
 	expect(actual).toEqual(expected)
 })
 
+
 test('analyzes vendor prefixed selectors', () => {
 	let actual = analyze(`
     input[type=text]::-webkit-input-placeholder {
@@ -468,11 +466,10 @@ test('tracks combinator locations', () => {
     a[attr] b {}
   `
 	let result = analyze(css, {
-		useLocations: true,
+		locations: true,
 	})
-	let actual = result.selectors.combinators
 
-	expect(actual.uniqueWithLocations).toEqual({
+	expect(result.locations['selectors.combinators']).toEqual({
 		' ': [
 			{
 				line: 2,
@@ -509,7 +506,7 @@ test('tracks combinator locations', () => {
 		],
 	})
 
-	let as_strings = actual.uniqueWithLocations![' '].map((loc) => css.substring(loc.offset, loc.offset + loc.length))
+	let as_strings = result.locations['selectors.combinators'][' '].map((loc) => css.substring(loc.offset, loc.offset + loc.length))
 	expect(as_strings).toEqual([' ', `\n`, ' ', ' '])
 })
 
@@ -541,7 +538,7 @@ test('tracks nesting depth', () => {
       }
     }
   `
-	const actual = analyze(fixture).selectors.nesting
+	const actual = analyze(fixture, { samples: true }).selectors.nesting
 	const expected = {
 		min: 0,
 		max: 2,
@@ -578,7 +575,8 @@ test('Can keep track of selector locations if we ask it to do so', () => {
       }
     }
   `
-	let actual = analyze(fixture, { useLocations: true }).selectors.complexity.uniqueWithLocations
+	let result = analyze(fixture, { locations: true })
+	let actual = result.locations['selectors.complexity']
 	let expected = {
 		'1': [
 			{

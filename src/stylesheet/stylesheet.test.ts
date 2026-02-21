@@ -165,7 +165,8 @@ test('measures base64 contents - with locations', () => {
     }
   `
 
-	const actual = analyze(fixture, { useLocations: true }).stylesheet.embeddedContent
+	const result = analyze(fixture, { locations: true })
+	const actual = result.stylesheet.embeddedContent
 	const expected = {
 		size: {
 			total: 2337,
@@ -179,50 +180,54 @@ test('measures base64 contents - with locations', () => {
 				'image/gif': {
 					count: 1,
 					size: 310,
-					uniqueWithLocations: [
-						{
-							line: 5,
-							column: 9,
-							offset: 90,
-							length: 315,
-						},
-					],
 				},
 				'image/svg+xml': {
 					count: 4,
 					size: 2027,
-					uniqueWithLocations: [
-						{
-							line: 13,
-							column: 19,
-							offset: 584,
-							length: 464,
-						},
-						{
-							line: 14,
-							column: 19,
-							offset: 1068,
-							length: 439,
-						},
-						{
-							line: 19,
-							column: 25,
-							offset: 1594,
-							length: 862,
-						},
-						{
-							line: 24,
-							column: 26,
-							offset: 2531,
-							length: 286,
-						},
-					],
 				},
 			},
 		},
 	}
 
 	expect(actual).toEqual(expected)
+
+	const locs = result.locations['stylesheet.embeddedContent']
+	expect(locs).toEqual({
+		'image/gif': [
+			{
+				line: 5,
+				column: 9,
+				offset: 90,
+				length: 315,
+			},
+		],
+		'image/svg+xml': [
+			{
+				line: 13,
+				column: 19,
+				offset: 584,
+				length: 464,
+			},
+			{
+				line: 14,
+				column: 19,
+				offset: 1068,
+				length: 439,
+			},
+			{
+				line: 19,
+				column: 25,
+				offset: 1594,
+				length: 862,
+			},
+			{
+				line: 24,
+				column: 26,
+				offset: 2531,
+				length: 286,
+			},
+		],
+	})
 })
 
 test('reports embed size correctly when there are duplicates', () => {

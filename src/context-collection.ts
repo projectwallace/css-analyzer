@@ -1,11 +1,11 @@
-import { Collection, type CollectionCount, type Location } from './collection.js'
+import { Collection, type CollectionCount, type Location, type UniqueWithLocations } from './collection.js'
 
-export class ContextCollection<UseLocations extends boolean = false> {
-	#list: Collection<UseLocations>
-	#contexts: Map<string, Collection<UseLocations>>
-	#useLocations: UseLocations
+export class ContextCollection {
+	#list: Collection
+	#contexts: Map<string, Collection>
+	#useLocations: boolean
 
-	constructor(useLocations: UseLocations) {
+	constructor(useLocations = false) {
 		this.#list = new Collection(useLocations)
 		this.#contexts = new Map()
 		this.#useLocations = useLocations
@@ -28,7 +28,7 @@ export class ContextCollection<UseLocations extends boolean = false> {
 	}
 
 	count() {
-		let itemsPerContext: Map<string, CollectionCount<UseLocations>> = new Map()
+		let itemsPerContext: Map<string, CollectionCount> = new Map()
 
 		for (let [context, value] of this.#contexts.entries()) {
 			itemsPerContext.set(context, value.c())
@@ -37,5 +37,21 @@ export class ContextCollection<UseLocations extends boolean = false> {
 		return Object.assign(this.#list.c(), {
 			itemsPerContext: Object.fromEntries(itemsPerContext),
 		})
+	}
+
+	/** Returns location data for the top-level list, or undefined when not tracking locations */
+	locs(): UniqueWithLocations | undefined {
+		return this.#list.locs()
+	}
+
+	/** Returns location data per context, or undefined when not tracking locations */
+	locsPerContext(): Record<string, UniqueWithLocations> | undefined {
+		if (!this.#useLocations) return undefined
+
+		let result: Record<string, UniqueWithLocations> = {}
+		for (let [context, collection] of this.#contexts.entries()) {
+			result[context] = collection.locs() ?? {}
+		}
+		return result
 	}
 }
