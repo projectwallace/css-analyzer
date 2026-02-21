@@ -33,12 +33,13 @@ import { keywords, isValueReset } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
 import { ContextCollection } from './context-collection.js'
-import { Collection, type Location } from './collection.js'
+import { Collection, type Location, type UniqueWithLocations } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
 import { endsWith, unquote } from './string-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
 import { basename, SPACING_RESET_PROPERTIES, border_radius_properties } from './properties/property-utils.js'
+import { type Options, shouldRun } from './options.js'
 
 export type Specificity = [number, number, number]
 
@@ -47,23 +48,59 @@ function ratio(part: number, total: number): number {
 	return part / total
 }
 
-export type Options = {
-	/** @description Use Locations (`{ 'item': [{ line, column, offset, length }] }`) instead of a regular count per occurrence (`{ 'item': 3 }`) */
-	useLocations?: boolean
-}
+// Re-export Options for external consumers
+export type { Options }
 
-export function analyze(css: string, options?: Options & { useLocations?: false | undefined }): ReturnType<typeof analyzeInternal<false>>
-export function analyze(css: string, options: Options & { useLocations: true }): ReturnType<typeof analyzeInternal<true>>
+export function analyze(css: string, options?: Options): ReturnType<typeof analyzeInternal>
 export function analyze(css: string, options: Options = {}): any {
-	const useLocations = options.useLocations === true
-	if (useLocations) {
-		return analyzeInternal(css, options, true)
-	}
-	return analyzeInternal(css, options, false)
+	return analyzeInternal(css, options)
 }
 
-function analyzeInternal<T extends boolean>(css: string, options: Options, useLocations: T) {
+function analyzeInternal(css: string, options: Options) {
 	let start = Date.now()
+
+	const useLocations = options.locations === true || options.useLocations === true
+	const samples = options.samples === true
+	const only = options.only
+
+	// Precompute which metric groups to run
+	const runStylesheet = shouldRun(only, 'stylesheet')
+	const runAtrules = shouldRun(only, 'atrules')
+	const runRules = shouldRun(only, 'rules')
+	const runSelectors = shouldRun(only, 'selectors')
+	const runDeclarations = shouldRun(only, 'declarations')
+	const runProperties = shouldRun(only, 'properties')
+	const runValues = shouldRun(only, 'values')
+
+	// Sub-metric flags
+	const runSelectors_specificity = shouldRun(only, 'selectors.specificity')
+	const runSelectors_complexity = shouldRun(only, 'selectors.complexity')
+	const runSelectors_id = shouldRun(only, 'selectors.id')
+	const runSelectors_pseudoClasses = shouldRun(only, 'selectors.pseudoClasses')
+	const runSelectors_pseudoElements = shouldRun(only, 'selectors.pseudoElements')
+	const runSelectors_a11y = shouldRun(only, 'selectors.accessibility')
+	const runSelectors_attributes = shouldRun(only, 'selectors.attributes')
+	const runSelectors_combinators = shouldRun(only, 'selectors.combinators')
+	const runSelectors_nesting = shouldRun(only, 'selectors.nesting')
+	const runSelectors_keyframes = shouldRun(only, 'selectors.keyframes')
+	const runSelectors_prefixed = shouldRun(only, 'selectors.prefixed')
+
+	const runValues_colors = shouldRun(only, 'values.colors')
+	const runValues_gradients = shouldRun(only, 'values.gradients')
+	const runValues_fontFamilies = shouldRun(only, 'values.fontFamilies')
+	const runValues_fontSizes = shouldRun(only, 'values.fontSizes')
+	const runValues_lineHeights = shouldRun(only, 'values.lineHeights')
+	const runValues_zindexes = shouldRun(only, 'values.zindexes')
+	const runValues_textShadows = shouldRun(only, 'values.textShadows')
+	const runValues_boxShadows = shouldRun(only, 'values.boxShadows')
+	const runValues_borderRadiuses = shouldRun(only, 'values.borderRadiuses')
+	const runValues_animations = shouldRun(only, 'values.animations')
+	const runValues_prefixes = shouldRun(only, 'values.prefixes')
+	const runValues_browserhacks = shouldRun(only, 'values.browserhacks')
+	const runValues_units = shouldRun(only, 'values.units')
+	const runValues_keywords = shouldRun(only, 'values.keywords')
+	const runValues_resets = shouldRun(only, 'values.resets')
+	const runValues_displays = shouldRun(only, 'values.displays')
 
 	// Stylesheet
 	let linesOfCode = (css.match(/\n/g) || []).length + 1
@@ -77,7 +114,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			{
 				size: number
 				count: number
-				uniqueWithLocations?: Location[]
+				locations?: Location[]
 			}
 		>,
 	}
@@ -95,7 +132,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 	// Atrules
 	let atrules = new Collection(useLocations)
-	let atRuleComplexities = new AggregateCollection()
+	let atRuleComplexities = new AggregateCollection(samples)
 	/** @type {Record<string, string>[]} */
 	let fontfaces: Record<string, string>[] = []
 	let fontfaces_with_loc = new Collection(useLocations)
@@ -113,19 +150,19 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let containerNames = new Collection(useLocations)
 	let registeredProperties = new Collection(useLocations)
 	let scopes = new Collection(useLocations)
-	let atruleNesting = new AggregateCollection()
+	let atruleNesting = new AggregateCollection(samples)
 	let uniqueAtruleNesting = new Collection(useLocations)
 
 	// Rules
 	let totalRules = 0
 	let emptyRules = 0
-	let ruleSizes = new AggregateCollection()
-	let selectorsPerRule = new AggregateCollection()
-	let declarationsPerRule = new AggregateCollection()
+	let ruleSizes = new AggregateCollection(samples)
+	let selectorsPerRule = new AggregateCollection(samples)
+	let declarationsPerRule = new AggregateCollection(samples)
 	let uniqueRuleSize = new Collection(useLocations)
 	let uniqueSelectorsPerRule = new Collection(useLocations)
 	let uniqueDeclarationsPerRule = new Collection(useLocations)
-	let ruleNesting = new AggregateCollection()
+	let ruleNesting = new AggregateCollection(samples)
 	let uniqueRuleNesting = new Collection(useLocations)
 
 	// Selectors
@@ -134,11 +171,11 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let prefixedSelectors = new Collection(useLocations)
 	let maxSpecificity: Specificity | undefined
 	let minSpecificity: Specificity | undefined
-	let specificityA = new AggregateCollection()
-	let specificityB = new AggregateCollection()
-	let specificityC = new AggregateCollection()
+	let specificityA = new AggregateCollection(samples)
+	let specificityB = new AggregateCollection(samples)
+	let specificityC = new AggregateCollection(samples)
 	let uniqueSpecificities = new Collection(useLocations)
-	let selectorComplexities = new AggregateCollection()
+	let selectorComplexities = new AggregateCollection(samples)
 	let uniqueSelectorComplexities = new Collection(useLocations)
 	let specificities: Specificity[] = []
 	let ids = new Collection(useLocations)
@@ -147,17 +184,17 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let pseudoElements = new Collection(useLocations)
 	let attributeSelectors = new Collection(useLocations)
 	let combinators = new Collection(useLocations)
-	let selectorNesting = new AggregateCollection()
+	let selectorNesting = new AggregateCollection(samples)
 	let uniqueSelectorNesting = new Collection(useLocations)
 
 	// Declarations
 	let uniqueDeclarations = new Set()
 	let totalDeclarations = 0
-	let declarationComplexities = new AggregateCollection()
+	let declarationComplexities = new AggregateCollection(samples)
 	let importantDeclarations = 0
 	let importantsInKeyframes = 0
 	let importantCustomProperties = new Collection(useLocations)
-	let declarationNesting = new AggregateCollection()
+	let declarationNesting = new AggregateCollection(samples)
 	let uniqueDeclarationNesting = new Collection(useLocations)
 
 	// Properties
@@ -165,10 +202,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let propertyHacks = new Collection(useLocations)
 	let propertyVendorPrefixes = new Collection(useLocations)
 	let customProperties = new Collection(useLocations)
-	let propertyComplexities = new AggregateCollection()
+	let propertyComplexities = new AggregateCollection(samples)
 
 	// Values
-	let valueComplexities = new AggregateCollection()
+	let valueComplexities = new AggregateCollection(samples)
 	let vendorPrefixedValues = new Collection(useLocations)
 	let valueBrowserhacks = new Collection(useLocations)
 	let displays = new Collection(useLocations)
@@ -211,6 +248,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 		// Count nodes and track nesting
 		if (node.type === AT_RULE) {
+			if (!runAtrules) return SKIP
+
 			let atruleLoc = toLoc(node)
 			atruleNesting.push(depth)
 			uniqueAtruleNesting.p(depth, atruleLoc)
@@ -304,7 +343,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 		} else if (node.type === STYLE_RULE) {
 			// Handle keyframe rules specially
 			if (inKeyframes && node.prelude) {
-				if (node.prelude.type === SELECTOR_LIST && node.prelude.children.length > 0) {
+				if (runSelectors && runSelectors_keyframes && node.prelude.type === SELECTOR_LIST && node.prelude.children.length > 0) {
 					for (let keyframe_selector of node.prelude.children) {
 						keyframeSelectors.p(keyframe_selector.text, toLoc(keyframe_selector))
 					}
@@ -312,7 +351,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				// Don't count keyframe rules as regular rules, but continue walking
 				// children to count declarations inside keyframes
 				// (Declarations are counted in the Declaration handler below)
-			} else {
+			} else if (runRules) {
 				// Only count non-keyframe rules
 				totalRules++
 
@@ -363,73 +402,102 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				return SKIP
 			}
 
+			if (!runSelectors) return SKIP
+
 			let loc = toLoc(node)
 
-			selectorNesting.push(depth > 0 ? depth - 1 : 0)
-			uniqueSelectorNesting.p(depth > 0 ? depth - 1 : 0, loc)
+			if (runSelectors_nesting) {
+				selectorNesting.push(depth > 0 ? depth - 1 : 0)
+				uniqueSelectorNesting.p(depth > 0 ? depth - 1 : 0, loc)
+			}
+
 			uniqueSelectors.add(node.text)
 
-			let complexity = getComplexity(node)
-			selectorComplexities.push(complexity)
-			uniqueSelectorComplexities.p(complexity, loc)
+			if (runSelectors_complexity) {
+				let complexity = getComplexity(node)
+				selectorComplexities.push(complexity)
+				uniqueSelectorComplexities.p(complexity, loc)
+			}
 
-			isPrefixed(node, (prefix) => {
-				prefixedSelectors.p(prefix.toLowerCase(), loc)
-			})
+			if (runSelectors_prefixed) {
+				isPrefixed(node, (prefix) => {
+					prefixedSelectors.p(prefix.toLowerCase(), loc)
+				})
+			}
 
-			// Check for accessibility selectors
-			isAccessibility(node, (a11y_selector) => {
-				a11y.p(a11y_selector, loc)
-			})
+			if (runSelectors_a11y) {
+				// Check for accessibility selectors
+				isAccessibility(node, (a11y_selector) => {
+					a11y.p(a11y_selector, loc)
+				})
+			}
 
-			hasPseudoClass(node, (pseudo) => {
-				pseudoClasses.p(pseudo.toLowerCase(), loc)
-			})
+			if (runSelectors_pseudoClasses) {
+				hasPseudoClass(node, (pseudo) => {
+					pseudoClasses.p(pseudo.toLowerCase(), loc)
+				})
+			}
 
-			hasPseudoElement(node, (pseudo) => {
-				pseudoElements.p(pseudo.toLowerCase(), loc)
-			})
+			if (runSelectors_pseudoElements) {
+				hasPseudoElement(node, (pseudo) => {
+					pseudoElements.p(pseudo.toLowerCase(), loc)
+				})
+			}
 
-			walk(node, (child) => {
-				if (child.type === ATTRIBUTE_SELECTOR) {
-					attributeSelectors.p(child.name?.toLowerCase() ?? '', loc)
+			if (runSelectors_attributes) {
+				walk(node, (child) => {
+					if (child.type === ATTRIBUTE_SELECTOR) {
+						attributeSelectors.p(child.name?.toLowerCase() ?? '', loc)
+					}
+				})
+			}
+
+			if (runSelectors_combinators) {
+				getCombinators(node, (combinator) => {
+					let name = combinator.name.trim() === '' ? ' ' : combinator.name
+					combinators.p(name, combinator.loc)
+				})
+			}
+
+			if (runSelectors_specificity) {
+				let specificity = calculateSpecificity(node)
+				let [sa, sb, sc] = specificity
+
+				uniqueSpecificities.p(specificity.toString(), loc)
+
+				specificityA.push(sa)
+				specificityB.push(sb)
+				specificityC.push(sc)
+
+				if (maxSpecificity === undefined) {
+					maxSpecificity = specificity
 				}
-			})
 
-			getCombinators(node, (combinator) => {
-				let name = combinator.name.trim() === '' ? ' ' : combinator.name
-				combinators.p(name, combinator.loc)
-			})
+				if (minSpecificity === undefined) {
+					minSpecificity = specificity
+				}
 
-			let specificity = calculateSpecificity(node)
-			let [sa, sb, sc] = specificity
+				if (minSpecificity !== undefined && compareSpecificity(minSpecificity, specificity) < 0) {
+					minSpecificity = specificity
+				}
 
-			uniqueSpecificities.p(specificity.toString(), loc)
+				if (maxSpecificity !== undefined && compareSpecificity(maxSpecificity, specificity) > 0) {
+					maxSpecificity = specificity
+				}
 
-			specificityA.push(sa)
-			specificityB.push(sb)
-			specificityC.push(sc)
+				if (samples) {
+					specificities.push(specificity)
+				}
 
-			if (maxSpecificity === undefined) {
-				maxSpecificity = specificity
-			}
-
-			if (minSpecificity === undefined) {
-				minSpecificity = specificity
-			}
-
-			if (minSpecificity !== undefined && compareSpecificity(minSpecificity, specificity) < 0) {
-				minSpecificity = specificity
-			}
-
-			if (maxSpecificity !== undefined && compareSpecificity(maxSpecificity, specificity) > 0) {
-				maxSpecificity = specificity
-			}
-
-			specificities.push(specificity)
-
-			if (sa > 0) {
-				ids.p(node.text, loc)
+				if (runSelectors_id && sa > 0) {
+					ids.p(node.text, loc)
+				}
+			} else if (runSelectors_id) {
+				// Still need specificity for ID detection even if we're not running full specificity
+				let specificity = calculateSpecificity(node)
+				if (specificity[0] > 0) {
+					ids.p(node.text, loc)
+				}
 			}
 
 			// Avoid deeper walking of selectors to not mess with
@@ -438,29 +506,38 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			// as children
 			return SKIP
 		} else if (node.type === DECLARATION) {
+			if (!runDeclarations && !runProperties && !runValues) return
+
 			totalDeclarations++
 			uniqueDeclarations.add(node.text)
 
 			let loc = toLoc(node)
 			let declarationDepth = depth > 0 ? depth - 1 : 0
-			declarationNesting.push(declarationDepth)
-			uniqueDeclarationNesting.p(declarationDepth, loc)
 
-			let complexity = 1
-			if (node.is_important) {
-				complexity++
+			if (runDeclarations) {
+				declarationNesting.push(declarationDepth)
+				uniqueDeclarationNesting.p(declarationDepth, loc)
 
-				let declaration = node.text
-				if (!declaration.toLowerCase().includes('!important')) {
-					valueBrowserhacks.p('!ie', toLoc(node.value as CSSNode))
-				}
-
-				if (inKeyframes) {
-					importantsInKeyframes++
+				let complexity = 1
+				if (node.is_important) {
 					complexity++
+
+					let declaration = node.text
+					if (!declaration.toLowerCase().includes('!important')) {
+						if (runValues_browserhacks) valueBrowserhacks.p('!ie', toLoc(node.value as CSSNode))
+					}
+
+					if (inKeyframes) {
+						importantsInKeyframes++
+						complexity++
+					}
 				}
+				declarationComplexities.push(complexity)
 			}
-			declarationComplexities.push(complexity)
+
+			if (node.is_important && runDeclarations) {
+				importantDeclarations++
+			}
 
 			//#region PROPERTIES
 			let { is_important, property, is_browserhack, is_vendor_prefixed } = node
@@ -471,30 +548,30 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			propertyLoc.length = property.length
 			let normalizedProperty = basename(property)
 
-			properties.p(normalizedProperty, propertyLoc)
+			if (runProperties) {
+				properties.p(normalizedProperty, propertyLoc)
 
-			if (is_important) {
-				importantDeclarations++
-			}
+				// Count important declarations
+				if (is_vendor_prefixed) {
+					propertyComplexities.push(2)
+					propertyVendorPrefixes.p(property, propertyLoc)
+				} else if (is_custom(property)) {
+					customProperties.p(property, propertyLoc)
+					propertyComplexities.push(is_important ? 3 : 2)
 
-			// Count important declarations
-			if (is_vendor_prefixed) {
-				propertyComplexities.push(2)
-				propertyVendorPrefixes.p(property, propertyLoc)
-			} else if (is_custom(property)) {
-				customProperties.p(property, propertyLoc)
-				propertyComplexities.push(is_important ? 3 : 2)
-
-				if (is_important) {
-					importantCustomProperties.p(property, propertyLoc)
+					if (is_important) {
+						importantCustomProperties.p(property, propertyLoc)
+					}
+				} else if (is_browserhack) {
+					propertyHacks.p(property.charAt(0), propertyLoc)
+					propertyComplexities.push(2)
+				} else {
+					propertyComplexities.push(1)
 				}
-			} else if (is_browserhack) {
-				propertyHacks.p(property.charAt(0), propertyLoc)
-				propertyComplexities.push(2)
-			} else {
-				propertyComplexities.push(1)
 			}
 			//#endregion PROPERTIES
+
+			if (!runValues) return
 
 			//#region VALUES
 			// Values are analyzed inside declaration because we need context, like which property is used
@@ -507,10 +584,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 				// auto, inherit, initial, none, etc.
 				if (keywords.has(text)) {
-					valueKeywords.p(text.toLowerCase(), valueLoc)
+					if (runValues_keywords) valueKeywords.p(text.toLowerCase(), valueLoc)
 					valueComplexities.push(complexity)
 
-					if (normalizedProperty === 'display') {
+					if (runValues_displays && normalizedProperty === 'display') {
 						displays.p(text.toLowerCase(), valueLoc)
 					}
 
@@ -519,14 +596,20 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 				//#region VALUE COMPLEXITY
 				// i.e. `background-image: -webkit-linear-gradient()`
-				isValuePrefixed(value, (prefixed) => {
-					vendorPrefixedValues.p(prefixed.toLowerCase(), valueLoc)
-					complexity++
-				})
+				if (runValues_prefixes) {
+					isValuePrefixed(value, (prefixed) => {
+						vendorPrefixedValues.p(prefixed.toLowerCase(), valueLoc)
+						complexity++
+					})
+				} else {
+					isValuePrefixed(value, () => {
+						complexity++
+					})
+				}
 
 				// i.e. `property: value\9`
 				if (isIe9Hack(value)) {
-					valueBrowserhacks.p('\\9', valueLoc)
+					if (runValues_browserhacks) valueBrowserhacks.p('\\9', valueLoc)
 					text = text.slice(0, -2)
 					complexity++
 				}
@@ -537,23 +620,23 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 				// Process properties first that don't have colors,
 				// so we can avoid further walking them;
-				if (SPACING_RESET_PROPERTIES.has(normalizedProperty)) {
+				if (runValues_resets && SPACING_RESET_PROPERTIES.has(normalizedProperty)) {
 					if (isValueReset(value)) {
 						resets.p(normalizedProperty, valueLoc)
 					}
-				} else if (normalizedProperty === 'display') {
+				} else if (runValues_displays && normalizedProperty === 'display') {
 					if (/var\(/i.test(text)) {
 						displays.p(text, valueLoc)
 					} else {
 						displays.p(text.toLowerCase(), valueLoc)
 					}
-				} else if (normalizedProperty === 'z-index') {
+				} else if (runValues_zindexes && normalizedProperty === 'z-index') {
 					zindex.p(text, valueLoc)
 					return SKIP
 				} else if (normalizedProperty === 'font') {
 					if (!SYSTEM_FONTS.has(text)) {
 						let result = destructure(value, function (item) {
-							if (item.type === 'keyword') {
+							if (item.type === 'keyword' && runValues_keywords) {
 								valueKeywords.p(item.value.toLowerCase(), valueLoc)
 							}
 						})
@@ -563,21 +646,21 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						}
 
 						let { font_size, line_height, font_family } = result
-						if (font_family) {
+						if (font_family && runValues_fontFamilies) {
 							fontFamilies.p(font_family, valueLoc)
 						}
 
-						if (font_size) {
+						if (font_size && runValues_fontSizes) {
 							fontSizes.p(font_size.toLowerCase(), valueLoc)
 						}
 
-						if (line_height) {
+						if (line_height && runValues_lineHeights) {
 							lineHeights.p(line_height.toLowerCase(), valueLoc)
 						}
 					}
 					// Don't return SKIP here - let walker continue to find
 					// units, colors, and font families in var() fallbacks
-				} else if (normalizedProperty === 'font-size') {
+				} else if (runValues_fontSizes && normalizedProperty === 'font-size') {
 					if (!SYSTEM_FONTS.has(text)) {
 						let normalized = text.toLowerCase()
 						if (normalized.includes('var(')) {
@@ -587,29 +670,29 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						}
 					}
 				} else if (normalizedProperty === 'font-family') {
-					if (!SYSTEM_FONTS.has(text)) {
+					if (runValues_fontFamilies && !SYSTEM_FONTS.has(text)) {
 						fontFamilies.p(text, valueLoc)
 					}
 					return SKIP // to prevent finding color false positives (Black as font family name is not a color)
-				} else if (normalizedProperty === 'line-height') {
+				} else if (runValues_lineHeights && normalizedProperty === 'line-height') {
 					let normalized = text.toLowerCase()
 					if (normalized.includes('var(')) {
 						lineHeights.p(text, valueLoc)
 					} else {
 						lineHeights.p(normalized, valueLoc)
 					}
-				} else if (normalizedProperty === 'transition' || normalizedProperty === 'animation') {
+				} else if (runValues_animations && (normalizedProperty === 'transition' || normalizedProperty === 'animation')) {
 					analyzeAnimation(value.children, function (item) {
 						if (item.type === 'fn') {
 							timingFunctions.p(item.value.text.toLowerCase(), valueLoc)
 						} else if (item.type === 'duration') {
 							durations.p(item.value.text.toLowerCase(), valueLoc)
-						} else if (item.type === 'keyword') {
+						} else if (item.type === 'keyword' && runValues_keywords) {
 							valueKeywords.p(item.value.text.toLowerCase(), valueLoc)
 						}
 					})
 					return SKIP
-				} else if (normalizedProperty === 'animation-duration' || normalizedProperty === 'transition-duration') {
+				} else if (runValues_animations && (normalizedProperty === 'animation-duration' || normalizedProperty === 'transition-duration')) {
 					for (let child of value.children) {
 						if (child.type !== OPERATOR) {
 							let text = child.text
@@ -620,7 +703,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							}
 						}
 					}
-				} else if (normalizedProperty === 'transition-timing-function' || normalizedProperty === 'animation-timing-function') {
+				} else if (runValues_animations && (normalizedProperty === 'transition-timing-function' || normalizedProperty === 'animation-timing-function')) {
 					for (let child of value.children) {
 						if (child.type !== OPERATOR) {
 							timingFunctions.p(child.text, valueLoc)
@@ -634,11 +717,11 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					if (value.first_child?.type === IDENTIFIER) {
 						containerNames.p(value.first_child.text, valueLoc)
 					}
-				} else if (border_radius_properties.has(normalizedProperty)) {
+				} else if (runValues_borderRadiuses && border_radius_properties.has(normalizedProperty)) {
 					borderRadiuses.push(text, property, valueLoc)
-				} else if (normalizedProperty === 'text-shadow') {
+				} else if (runValues_textShadows && normalizedProperty === 'text-shadow') {
 					textShadows.p(text, valueLoc)
-				} else if (normalizedProperty === 'box-shadow') {
+				} else if (runValues_boxShadows && normalizedProperty === 'box-shadow') {
 					boxShadows.p(text, valueLoc)
 				}
 
@@ -648,12 +731,14 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				walk(value, (valueNode) => {
 					switch (valueNode.type) {
 						case DIMENSION: {
+							if (!runValues_units) return SKIP
 							let unit = valueNode.unit?.toLowerCase() ?? ''
 							let loc = toLoc(valueNode)
 							units.push(unit, property, loc)
 							return SKIP
 						}
 						case HASH: {
+							if (!runValues_colors) return SKIP
 							// Use text property for the hash value
 							let hashText = valueNode.text
 							if (!hashText || !hashText.startsWith('#')) {
@@ -689,9 +774,11 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 								return SKIP
 							}
 
-							if (keywords.has(identifierText)) {
+							if (runValues_keywords && keywords.has(identifierText)) {
 								valueKeywords.p(identifierText.toLowerCase(), identifierLoc)
 							}
+
+							if (!runValues_colors) return SKIP
 
 							// Bail out if it can't be a color name
 							// 20 === 'lightgoldenrodyellow'.length
@@ -729,15 +816,14 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							let funcLoc = toLoc(valueNode)
 
 							// rgb(a), hsl(a), color(), hwb(), lch(), lab(), oklab(), oklch()
-							if (colorFunctions.has(funcName)) {
+							if (runValues_colors && colorFunctions.has(funcName)) {
 								colors.push(valueNode.text, property, funcLoc)
 								colorFormats.p(funcName.toLowerCase(), funcLoc)
 								return
 							}
 
-							if (endsWith('gradient', funcName)) {
+							if (runValues_gradients && endsWith('gradient', funcName)) {
 								gradients.p(valueNode.text, funcLoc)
-								return
 							}
 							// No SKIP here intentionally,
 							// otherwise we'll miss colors in linear-gradient(), var() fallbacks, etc.
@@ -747,6 +833,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			}
 			//#endregion VALUES
 		} else if (node.type === URL) {
+			if (!runStylesheet) return
+
 			let { value } = node
 			let embed = unquote((value as string) || '')
 			if (str_starts_with(embed, 'data:')) {
@@ -768,20 +856,20 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					item.count++
 					item.size += size
 					embedTypes.unique.set(type, item)
-					if (useLocations && item.uniqueWithLocations) {
-						item.uniqueWithLocations.push(loc)
+					if (useLocations && item.locations) {
+						item.locations.push(loc)
 					}
 				} else {
 					let item = {
 						count: 1,
 						size,
-						uniqueWithLocations: useLocations ? [loc] : undefined,
+						locations: useLocations ? [loc] : undefined,
 					}
 					embedTypes.unique.set(type, item)
 				}
 			}
 		} else if (node.type === MEDIA_FEATURE) {
-			if (node.name) {
+			if (runAtrules && node.name) {
 				mediaFeatures.p(node.name.toLowerCase(), toLoc(node))
 			}
 			return SKIP
@@ -805,7 +893,19 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let valueComplexity = valueComplexities.aggregate()
 	let atruleCount = atrules.c()
 
-	return {
+	// Build the embed types unique object without location data in the main result
+	let embedTypesUnique: Record<string, { size: number; count: number }> = {}
+	for (let [type, item] of embedTypes.unique) {
+		embedTypesUnique[type] = { size: item.size, count: item.count }
+	}
+
+	// Helper: conditionally include items[] based on samples option
+	function withSamples<T extends object>(base: T, items: number[]): T & { items?: number[] } {
+		if (samples) return assign({}, base, { items })
+		return base
+	}
+
+	let result = {
 		stylesheet: {
 			sourceLinesOfCode: atruleCount.total + totalSelectors + totalDeclarations + keyframeSelectors.size(),
 			linesOfCode,
@@ -824,24 +924,17 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					total: embedTypes.total,
 					totalUnique: embedTypes.unique.size,
 					uniquenessRatio: ratio(embedTypes.unique.size, embedTypes.total),
-					unique: Object.fromEntries(embedTypes.unique),
+					unique: embedTypesUnique,
 				},
 			},
 		},
 		atrules: assign(atruleCount, {
-			fontface: assign(
-				{
-					total: fontFacesCount,
-					totalUnique: fontFacesCount,
-					unique: fontfaces,
-					uniquenessRatio: fontFacesCount === 0 ? 0 : 1,
-				},
-				useLocations
-					? {
-							uniqueWithLocations: fontfaces_with_loc.c().uniqueWithLocations,
-						}
-					: {},
-			),
+			fontface: {
+				total: fontFacesCount,
+				totalUnique: fontFacesCount,
+				unique: fontfaces,
+				uniquenessRatio: fontFacesCount === 0 ? 0 : 1,
+			},
 			import: imports.c(),
 			media: assign(medias.c(), {
 				browserhacks: mediaBrowserhacks.c(),
@@ -865,9 +958,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			complexity: atRuleComplexity,
 			nesting: assign(
 				atruleNesting.aggregate(),
-				{
-					items: atruleNesting.toArray(),
-				},
+				withSamples({}, atruleNesting.toArray()),
 				uniqueAtruleNesting.c(),
 			),
 		}),
@@ -879,30 +970,22 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			},
 			sizes: assign(
 				ruleSizes.aggregate(),
-				{
-					items: ruleSizes.toArray(),
-				},
+				withSamples({}, ruleSizes.toArray()),
 				uniqueRuleSize.c(),
 			),
 			nesting: assign(
 				ruleNesting.aggregate(),
-				{
-					items: ruleNesting.toArray(),
-				},
+				withSamples({}, ruleNesting.toArray()),
 				uniqueRuleNesting.c(),
 			),
 			selectors: assign(
 				selectorsPerRule.aggregate(),
-				{
-					items: selectorsPerRule.toArray(),
-				},
+				withSamples({}, selectorsPerRule.toArray()),
 				uniqueSelectorsPerRule.c(),
 			),
 			declarations: assign(
 				declarationsPerRule.aggregate(),
-				{
-					items: declarationsPerRule.toArray(),
-				},
+				withSamples({}, declarationsPerRule.toArray()),
 				uniqueDeclarationsPerRule.c(),
 			),
 		},
@@ -922,19 +1005,14 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					mean: [specificitiesA.mean, specificitiesB.mean, specificitiesC.mean],
 					/** @type Specificity */
 					mode: [specificitiesA.mode, specificitiesB.mode, specificitiesC.mode],
-					/** @type Specificity */
-					items: specificities,
+					...(samples ? { items: specificities } : {}),
 				},
 				uniqueSpecificities.c(),
 			),
-			complexity: assign(selectorComplexity, uniqueSelectorComplexities.c(), {
-				items: selectorComplexities.toArray(),
-			}),
+			complexity: assign(selectorComplexity, uniqueSelectorComplexities.c(), withSamples({}, selectorComplexities.toArray())),
 			nesting: assign(
 				selectorNesting.aggregate(),
-				{
-					items: selectorNesting.toArray(),
-				},
+				withSamples({}, selectorNesting.toArray()),
 				uniqueSelectorNesting.c(),
 			),
 			id: assign(ids.c(), {
@@ -967,9 +1045,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			complexity: declarationComplexity,
 			nesting: assign(
 				declarationNesting.aggregate(),
-				{
-					items: declarationNesting.toArray(),
-				},
+				withSamples({}, declarationNesting.toArray()),
 				uniqueDeclarationNesting.c(),
 			),
 		},
@@ -1018,6 +1094,89 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			total: Date.now() - start,
 		},
 	}
+
+	if (!useLocations) {
+		return result
+	}
+
+	// Build the parallel locations map
+	let locations: Record<string, UniqueWithLocations> = {}
+
+	function addLocs(key: string, collection: Collection | ContextCollection) {
+		let locs = collection.locs()
+		if (locs) locations[key] = locs
+	}
+
+	addLocs('atrules', atrules)
+	addLocs('atrules.fontface', fontfaces_with_loc)
+	addLocs('atrules.import', imports)
+	addLocs('atrules.media', medias)
+	addLocs('atrules.media.browserhacks', mediaBrowserhacks)
+	addLocs('atrules.media.features', mediaFeatures)
+	addLocs('atrules.charset', charsets)
+	addLocs('atrules.supports', supports)
+	addLocs('atrules.supports.browserhacks', supportsBrowserhacks)
+	addLocs('atrules.keyframes', keyframes)
+	addLocs('atrules.keyframes.prefixed', prefixedKeyframes)
+	addLocs('atrules.container', containers)
+	addLocs('atrules.container.names', containerNames)
+	addLocs('atrules.layer', layers)
+	addLocs('atrules.property', registeredProperties)
+	addLocs('atrules.scope', scopes)
+	addLocs('atrules.nesting', uniqueAtruleNesting)
+	addLocs('rules.sizes', uniqueRuleSize)
+	addLocs('rules.nesting', uniqueRuleNesting)
+	addLocs('rules.selectors', uniqueSelectorsPerRule)
+	addLocs('rules.declarations', uniqueDeclarationsPerRule)
+	addLocs('selectors.specificity', uniqueSpecificities)
+	addLocs('selectors.complexity', uniqueSelectorComplexities)
+	addLocs('selectors.nesting', uniqueSelectorNesting)
+	addLocs('selectors.id', ids)
+	addLocs('selectors.pseudoClasses', pseudoClasses)
+	addLocs('selectors.pseudoElements', pseudoElements)
+	addLocs('selectors.accessibility', a11y)
+	addLocs('selectors.attributes', attributeSelectors)
+	addLocs('selectors.keyframes', keyframeSelectors)
+	addLocs('selectors.prefixed', prefixedSelectors)
+	addLocs('selectors.combinators', combinators)
+	addLocs('declarations.nesting', uniqueDeclarationNesting)
+	addLocs('declarations.importants.custom', importantCustomProperties)
+	addLocs('properties', properties)
+	addLocs('properties.prefixed', propertyVendorPrefixes)
+	addLocs('properties.custom', customProperties)
+	addLocs('properties.browserhacks', propertyHacks)
+	addLocs('values.colors', colors)
+	addLocs('values.gradients', gradients)
+	addLocs('values.fontFamilies', fontFamilies)
+	addLocs('values.fontSizes', fontSizes)
+	addLocs('values.lineHeights', lineHeights)
+	addLocs('values.zindexes', zindex)
+	addLocs('values.textShadows', textShadows)
+	addLocs('values.boxShadows', boxShadows)
+	addLocs('values.borderRadiuses', borderRadiuses)
+	addLocs('values.animations.durations', durations)
+	addLocs('values.animations.timingFunctions', timingFunctions)
+	addLocs('values.prefixes', vendorPrefixedValues)
+	addLocs('values.browserhacks', valueBrowserhacks)
+	addLocs('values.units', units)
+	addLocs('values.keywords', valueKeywords)
+	addLocs('values.resets', resets)
+	addLocs('values.displays', displays)
+
+	// Add embed location data if tracked
+	if (useLocations) {
+		let embedLocs: UniqueWithLocations = {}
+		for (let [type, item] of embedTypes.unique) {
+			if (item.locations) {
+				embedLocs[type] = item.locations
+			}
+		}
+		if (Object.keys(embedLocs).length > 0) {
+			locations['stylesheet.embeddedContent'] = embedLocs
+		}
+	}
+
+	return assign(result, { locations })
 }
 
 /**
@@ -1059,3 +1218,5 @@ export { hasVendorPrefix } from './vendor-prefix.js'
 export { KeywordSet } from './keyword-set.js'
 
 export type { Location, UniqueWithLocations } from './collection.js'
+
+export { transfer } from './transfer.js'

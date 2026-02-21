@@ -46,12 +46,13 @@ describe('pseudo classes', () => {
 	})
 
 	test('logs the whole parent selector when using locations', () => {
-		let actual = analyze(
+		let result = analyze(
 			`
 			a:hover,
 			a:lang(en) {}`,
-			{ useLocations: true },
-		).selectors.pseudoClasses.uniqueWithLocations
+			{ locations: true },
+		)
+		let actual = result.locations['selectors.pseudoClasses']
 		let expected = {
 			hover: [
 				{

@@ -1059,9 +1059,9 @@ test('Lists locations when unstable flag is set', () => {
       background-color: red;
     }
   `
-	let actual = analyze(css, { useLocations: true })
+	let result = analyze(css, { locations: true })
 
-	expect(actual.values.colors.uniqueWithLocations).toEqual({
+	expect(result.locations['values.colors']).toEqual({
 		red: [
 			{
 				line: 3,

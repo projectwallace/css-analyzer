@@ -270,7 +270,8 @@ test('reports locations correctly', () => {
       margin: 0;
     }
   `
-	const actual = analyze(fixture, { useLocations: true }).properties.uniqueWithLocations
+	const result = analyze(fixture, { locations: true })
+	const actual = result.locations['properties']
 
 	expect(actual).toEqual({
 		margin: [{ offset: 24, length: 6, column: 7, line: 3 }],

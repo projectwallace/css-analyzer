@@ -171,7 +171,7 @@ test('tracks nesting depth', () => {
       }
     }
   `
-	const actual = analyze(fixture).declarations.nesting
+	const actual = analyze(fixture, { samples: true }).declarations.nesting
 	const expected = {
 		min: 0,
 		max: 2,
