@@ -1,46 +1,18 @@
-/**
- * Find the mode (most occurring value) in an array of Numbers
- * Takes the mean/average of multiple values if multiple values occur the same amount of times.
- *
- * @see https://github.com/angus-c/just/blob/684af9ca0c7808bc78543ec89379b1fdfce502b1/packages/array-mode/index.js
- * @param arr - Array to find the mode value for
- * @returns mode - The `mode` value of `arr`
- */
-function Mode(arr: unknown[]): number {
-	let frequencies = new Map()
-	let maxOccurrences = -1
-	let maxOccurenceCount = 0
-	let sum = 0
-	let len = arr.length
-
-	for (let i = 0; i < len; i++) {
-		let element = arr[i]
-		let updatedCount = (frequencies.get(element) || 0) + 1
-		frequencies.set(element, updatedCount)
-
-		if (updatedCount > maxOccurrences) {
-			maxOccurrences = updatedCount
-			maxOccurenceCount = 0
-			sum = 0
-		}
-
-		if (updatedCount >= maxOccurrences) {
-			maxOccurenceCount++
-			// @ts-expect-error TODO: fix this
-			sum += element
-		}
-	}
-
-	return sum / maxOccurenceCount
-}
-
 export class AggregateCollection {
-	#items: number[]
+	#min: number
+	#max: number
 	#sum: number
+	#count: number
+	#frequencies: Map<number, number>
+	#items: number[] | null
 
-	constructor() {
-		this.#items = []
+	constructor(samples = false) {
+		this.#min = Infinity
+		this.#max = -Infinity
 		this.#sum = 0
+		this.#count = 0
+		this.#frequencies = new Map()
+		this.#items = samples ? [] : null
 	}
 
 	/**
@@ -48,16 +20,25 @@ export class AggregateCollection {
 	 * @param item - The item to add
 	 */
 	push(item: number) {
-		this.#items.push(item)
 		this.#sum += item
+		this.#count++
+		if (item < this.#min) this.#min = item
+		if (item > this.#max) this.#max = item
+
+		let freq = (this.#frequencies.get(item) || 0) + 1
+		this.#frequencies.set(item, freq)
+
+		if (this.#items !== null) {
+			this.#items.push(item)
+		}
 	}
 
 	size() {
-		return this.#items.length
+		return this.#count
 	}
 
 	aggregate() {
-		let len = this.#items.length
+		let len = this.#count
 
 		if (len === 0) {
 			return {
@@ -70,25 +51,36 @@ export class AggregateCollection {
 			}
 		}
 
-		// TODO: can we avoid this sort()? It's slow
-		let sorted = this.#items.slice().sort((a, b) => a - b)
-		let min = sorted[0]!
-		let max = sorted[len - 1]!
+		// Find max frequency for mode calculation — O(k) where k = unique values
+		let maxFreq = 0
+		for (let freq of this.#frequencies.values()) {
+			if (freq > maxFreq) maxFreq = freq
+		}
 
-		let mode = Mode(sorted)
-		let sum = this.#sum
+		// Average of all values with max frequency (matches prior behavior)
+		let modeSum = 0
+		let modeCount = 0
+		for (let [val, freq] of this.#frequencies) {
+			if (freq === maxFreq) {
+				modeSum += val
+				modeCount++
+			}
+		}
+
+		let min = this.#min
+		let max = this.#max
 
 		return {
 			min,
 			max,
-			mean: sum / len,
-			mode,
+			mean: this.#sum / len,
+			mode: modeSum / modeCount,
 			range: max - min,
-			sum: sum,
+			sum: this.#sum,
 		}
 	}
 
-	toArray() {
-		return this.#items
+	toArray(): number[] {
+		return this.#items ?? []
 	}
 }

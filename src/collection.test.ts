@@ -49,14 +49,16 @@ test('count with useLocations=true', () => {
 	collection.p('a', loc)
 	collection.p('a', loc)
 
-	let pos = { offset: 1, length: 1, line: 1, column: 1 }
 	let count = collection.c()
 	expect(count).toEqual({
 		total: 2,
 		totalUnique: 1,
-		unique: {},
+		unique: { a: 2 },
 		uniquenessRatio: 0.5,
-		uniqueWithLocations: { a: [pos, pos] },
 	})
-	expectTypeOf(count['uniqueWithLocations']).toMatchObjectType<UniqueWithLocations>()
+	expectTypeOf(count['uniqueWithLocations']).toBeUndefined()
+
+	let locs = collection.locs()
+	let pos = { offset: 1, length: 1, line: 1, column: 1 }
+	expect(locs).toEqual({ a: [pos, pos] })
 })

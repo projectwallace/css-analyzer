@@ -6,7 +6,7 @@ test('handles the universal selector', () => {
     * {}
   test * {}
   `
-  const actual = analyze(fixture).selectors.specificity.items
+  const actual = analyze(fixture, { samples: true }).selectors.specificity.items
   const expected = [
     [0, 0, 0],
     [0, 0, 1],
@@ -25,7 +25,7 @@ test('handles ID selectors', () => {
     #s12:not(FOO)         /* a=1 b=0 c=1 */
     {}
   `
-  const actual = analyze(fixture).selectors.specificity.items
+  const actual = analyze(fixture, { samples: true }).selectors.specificity.items
   const expected = [
     [1, 0, 0],
     [5, 4, 2],
@@ -42,7 +42,7 @@ test('handles class selectors', () => {
     .class.class
     {}
   `
-  const actual = analyze(fixture).selectors.specificity.items
+  const actual = analyze(fixture, { samples: true }).selectors.specificity.items
   const expected = [
     [0, 1, 0],
     [0, 2, 0],
@@ -56,7 +56,7 @@ test('handles element selectors', () => {
     element element
     {}
   `
-  const actual = analyze(fixture).selectors.specificity.items
+  const actual = analyze(fixture, { samples: true }).selectors.specificity.items
   const expected = [
     [0, 0, 1],
     [0, 0, 2],
@@ -75,7 +75,7 @@ test('handles the :not, :is and :has pseudo classes', () => {
     .foo :is(.bar, #baz) /* a=1 b=1 c=0 */
     {}
   `
-  const actual = analyze(fixture).selectors.specificity.items
+  const actual = analyze(fixture, { samples: true }).selectors.specificity.items
   const expected = [
     [1, 0, 0],
     [1, 0, 1],
@@ -108,7 +108,7 @@ test('handles attribute selectors', () => {
     [|att]
     {}
   `
-  const actual = analyze(fixture).selectors.specificity.items
+  const actual = analyze(fixture, { samples: true }).selectors.specificity.items
   const expected = [
     [0, 1, 0],
     [5, 4, 2],
@@ -138,7 +138,7 @@ test('handles the :where pseudo class', () => {
     .qux:where(em, #foo#bar#baz) /* [0,1,0] only the .qux outside the :where() contributes to selector specificity.  */
     {}
   `
-  const actual = analyze(fixture).selectors.specificity.items
+  const actual = analyze(fixture, { samples: true }).selectors.specificity.items
   const expected = [
     [0, 1, 0]
   ]
@@ -158,7 +158,7 @@ test('handles pseudo element selectors', () => {
     :nth-child(2n+1)
     {}
   `
-  const actual = analyze(fixture).selectors.specificity.items
+  const actual = analyze(fixture, { samples: true }).selectors.specificity.items
   const expected = [
     [0, 0, 2],
     [0, 0, 2],

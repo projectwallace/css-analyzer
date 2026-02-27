@@ -2,7 +2,7 @@ import { test, expect } from 'vitest'
 import { AggregateCollection } from './aggregate-collection.js'
 
 test('aggregates correctly', () => {
-	const fixture = new AggregateCollection()
+	const fixture = new AggregateCollection(true)
 	fixture.push(1)
 	fixture.push(2)
 	fixture.push(25)

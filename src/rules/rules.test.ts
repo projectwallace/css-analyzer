@@ -27,7 +27,6 @@ test('should handle CSS without rules', () => {
 			mode: 0,
 			range: 0,
 			sum: 0,
-			items: [],
 			unique: {},
 			total: 0,
 			totalUnique: 0,
@@ -40,7 +39,6 @@ test('should handle CSS without rules', () => {
 			mode: 0,
 			range: 0,
 			sum: 0,
-			items: [],
 			unique: {},
 			total: 0,
 			totalUnique: 0,
@@ -53,7 +51,6 @@ test('should handle CSS without rules', () => {
 			mode: 0,
 			range: 0,
 			sum: 0,
-			items: [],
 			unique: {},
 			total: 0,
 			totalUnique: 0,
@@ -66,7 +63,6 @@ test('should handle CSS without rules', () => {
 			mode: 0,
 			range: 0,
 			sum: 0,
-			items: [],
 			total: 0,
 			totalUnique: 0,
 			unique: {},
@@ -102,7 +98,7 @@ test('counts sizes of rules', () => {
         }
       }
     }
-  `).rules.sizes
+  `, { samples: true }).rules.sizes
 
 	let expected = {
 		min: 2,
@@ -318,7 +314,7 @@ test('return a list of declaration counts per rule', () => {
         d {}
       }
     }
-  `).rules.declarations.items
+  `, { samples: true }).rules.declarations.items
 	const expected = [1, 2, 3, 2, 0]
 	expect(actual).toEqual(expected)
 })
@@ -349,7 +345,7 @@ test('return a list of selectors counts per rule', () => {
         }
       }
     }
-  `).rules.declarations.items
+  `, { samples: true }).rules.declarations.items
 	const expected = [1, 2, 3, 2]
 	expect(actual).toEqual(expected)
 })
@@ -456,7 +452,7 @@ test('tracks nesting depth', () => {
       }
     }
   `
-	const actual = analyze(fixture).rules.nesting
+	const actual = analyze(fixture, { samples: true }).rules.nesting
 	const expected = {
 		min: 0,
 		max: 2,

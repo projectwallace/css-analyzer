@@ -21,7 +21,7 @@ const fixture = `
 `
 
 test('calculates complexity', () => {
-	const actual = analyze(fixture).selectors.complexity.items
+	const actual = analyze(fixture, { samples: true }).selectors.complexity.items
 	const expected = [1, 3, 1, 3, 3, 3, 1, 1, 1, 2, 3, 52, 5, 5, 2, 4]
 
 	expect(actual).toEqual(expected)
