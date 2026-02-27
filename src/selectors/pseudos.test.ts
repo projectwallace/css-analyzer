@@ -50,7 +50,7 @@ describe('pseudo classes', () => {
 			`
 			a:hover,
 			a:lang(en) {}`,
-			{ locations: true },
+			{ useLocations: true },
 		)
 		let actual = result.locations['selectors.pseudoClasses']
 		let expected = {

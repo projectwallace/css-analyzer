@@ -165,7 +165,7 @@ test('measures base64 contents - with locations', () => {
     }
   `
 
-	const result = analyze(fixture, { locations: true })
+	const result = analyze(fixture, { useLocations: true })
 	const actual = result.stylesheet.embeddedContent
 	const expected = {
 		size: {

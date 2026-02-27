@@ -466,7 +466,7 @@ test('tracks combinator locations', () => {
     a[attr] b {}
   `
 	let result = analyze(css, {
-		locations: true,
+		useLocations: true,
 	})
 
 	expect(result.locations['selectors.combinators']).toEqual({
@@ -575,7 +575,7 @@ test('Can keep track of selector locations if we ask it to do so', () => {
       }
     }
   `
-	let result = analyze(fixture, { locations: true })
+	let result = analyze(fixture, { useLocations: true })
 	let actual = result.locations['selectors.complexity']
 	let expected = {
 		'1': [

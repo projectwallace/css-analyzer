@@ -19,11 +19,6 @@ export interface Options {
 	 * When false (default), the main result is smaller and contains counts only.
 	 * @default false
 	 */
-	locations?: boolean
-
-	/**
-	 * @deprecated Use `locations` instead.
-	 */
 	useLocations?: boolean
 }
 

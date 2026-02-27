@@ -59,7 +59,7 @@ export function analyze(css: string, options: Options = {}): any {
 function analyzeInternal(css: string, options: Options) {
 	let start = Date.now()
 
-	const useLocations = options.locations === true || options.useLocations === true
+	const useLocations = options.useLocations === true
 	const samples = options.samples === true
 	const only = options.only
 

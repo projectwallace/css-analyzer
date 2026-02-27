@@ -320,7 +320,7 @@ test('finds @font-face (with locations)', () => {
       }
     }`
 	const result = analyze(fixture, {
-		locations: true,
+		useLocations: true,
 	})
 	const actual = result.locations['atrules.fontface']
 	const expected = {
