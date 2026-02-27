@@ -23,9 +23,12 @@ import {
 	FUNCTION,
 	HASH,
 	ATTRIBUTE_SELECTOR,
+	TYPE_SELECTOR,
+	PSEUDO_CLASS_SELECTOR,
+	PSEUDO_ELEMENT_SELECTOR,
 } from '@projectwallace/css-parser'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
-import { getCombinators, getComplexity, isPrefixed, hasPseudoClass, isAccessibility, hasPseudoElement } from './selectors/utils.js'
+import { getCombinators, getComplexity, isPrefixed, isAccessibility } from './selectors/utils.js'
 import { calculateForAST as calculateSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
 import { destructure, SYSTEM_FONTS } from './values/destructure-font-shorthand.js'
@@ -146,6 +149,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let pseudoClasses = new Collection(useLocations)
 	let pseudoElements = new Collection(useLocations)
 	let attributeSelectors = new Collection(useLocations)
+	let customElementSelectors = new Collection(useLocations)
 	let combinators = new Collection(useLocations)
 	let selectorNesting = new AggregateCollection()
 	let uniqueSelectorNesting = new Collection(useLocations)
@@ -382,17 +386,15 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				a11y.p(a11y_selector, loc)
 			})
 
-			hasPseudoClass(node, (pseudo) => {
-				pseudoClasses.p(pseudo.toLowerCase(), loc)
-			})
-
-			hasPseudoElement(node, (pseudo) => {
-				pseudoElements.p(pseudo.toLowerCase(), loc)
-			})
-
 			walk(node, (child) => {
 				if (child.type === ATTRIBUTE_SELECTOR) {
 					attributeSelectors.p(child.name?.toLowerCase() ?? '', loc)
+				} else if (child.type === TYPE_SELECTOR && child.name?.includes('-')) {
+					customElementSelectors.p(child.name.toLowerCase(), loc)
+				} else if (child.type === PSEUDO_CLASS_SELECTOR) {
+					pseudoClasses.p(child.name?.toLowerCase() ?? '', loc)
+				} else if (child.type === PSEUDO_ELEMENT_SELECTOR) {
+					pseudoElements.p(child.name?.toLowerCase() ?? '', loc)
 				}
 			})
 
@@ -946,6 +948,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				ratio: ratio(a11y.size(), totalSelectors),
 			}),
 			attributes: attributeSelectors.c(),
+			customElements: customElementSelectors.c(),
 			keyframes: keyframeSelectors.c(),
 			prefixed: assign(prefixedSelectors.c(), {
 				ratio: ratio(prefixedSelectors.size(), totalSelectors),
