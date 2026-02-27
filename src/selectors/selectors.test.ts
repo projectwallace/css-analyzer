@@ -92,6 +92,12 @@ test('handles CSS without selectors', () => {
 			unique: {},
 			uniquenessRatio: 0,
 		},
+		customElements: {
+			total: 0,
+			totalUnique: 0,
+			unique: {},
+			uniquenessRatio: 0,
+		},
 		keyframes: {
 			total: 0,
 			totalUnique: 0,
@@ -290,6 +296,26 @@ test('counts attribute selectors', () => {
 	expect(actual.uniquenessRatio).toBe(3 / 5)
 })
 
+test('counts custom element selectors', () => {
+	const fixture = `
+		product-card,
+		event-date,
+		next-route-announcer,
+		Camel-Cased-Element {}
+	`
+	const actual = analyze(fixture).selectors.customElements
+
+	expect(actual.total).toBe(4)
+	expect(actual.totalUnique).toBe(4)
+	expect(actual.unique).toEqual({
+		'product-card': 1,
+		'event-date': 1,
+		'next-route-announcer': 1,
+		'camel-cased-element': 1,
+	})
+	expect(actual.uniquenessRatio).toBe(1)
+})
+
 test('handles emoji selectors', () => {
 	const fixture = `
     .💩 {}
@@ -355,6 +381,12 @@ test('handles emoji selectors', () => {
 			ratio: 0,
 		},
 		attributes: {
+			total: 0,
+			totalUnique: 0,
+			unique: {},
+			uniquenessRatio: 0,
+		},
+		customElements: {
 			total: 0,
 			totalUnique: 0,
 			unique: {},
