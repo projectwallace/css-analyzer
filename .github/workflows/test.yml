@@ -43,7 +43,7 @@ jobs:
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npx c8 --reporter=lcov npm test
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
