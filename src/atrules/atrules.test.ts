@@ -967,6 +967,35 @@ test('analyzes @property', () => {
 	expect(actual).toEqual(expected)
 })
 
+test('analyzes @function', () => {
+	// Examples from https://www.w3.org/TR/css-mixins-1/
+	const fixture = `
+		@function --my-color(--base) {}
+
+		@function --double(--value) {}
+
+		@function --double(--value) {}
+
+		@FUNCTION --uppercased() {}
+
+		/* No prelude */
+		@function {}
+  `
+	const actual = analyze(fixture).atrules.function
+	const expected = {
+		total: 4,
+		totalUnique: 3,
+		unique: {
+			'--my-color': 1,
+			'--double': 2,
+			'--uppercased': 1,
+		},
+		uniquenessRatio: 3 / 4,
+	}
+
+	expect(actual).toEqual(expected)
+})
+
 test('analyzes @scope', () => {
 	// Examples from
 	// https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@scope#examples
