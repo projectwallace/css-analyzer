@@ -115,6 +115,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let containers = new Collection(useLocations)
 	let containerNames = new Collection(useLocations)
 	let registeredProperties = new Collection(useLocations)
+	let functions = new Collection(useLocations)
 	let scopes = new Collection(useLocations)
 	let atruleNesting = new AggregateCollection()
 	let uniqueAtruleNesting = new Collection(useLocations)
@@ -297,6 +298,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					}
 				} else if (normalized_name === 'property') {
 					registeredProperties.p(node.prelude.text, toLoc(node))
+				} else if (normalized_name === 'function') {
+					let prelude = node.prelude.text
+					let name = prelude.includes('(') ? prelude.slice(0, prelude.indexOf('(')).trim() : prelude.trim()
+					functions.p(name, toLoc(node))
 				} else if (normalized_name === 'charset') {
 					charsets.p(node.prelude.text.toLowerCase(), toLoc(node))
 				} else if (normalized_name === 'scope') {
@@ -863,6 +868,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			}),
 			layer: layers.c(),
 			property: registeredProperties.c(),
+			function: functions.c(),
 			scope: scopes.c(),
 			complexity: atRuleComplexity,
 			nesting: assign(
