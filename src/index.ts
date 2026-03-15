@@ -115,7 +115,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let containers = new Collection(useLocations)
 	let containerNames = new Collection(useLocations)
 	let registeredProperties = new Collection(useLocations)
-	let registeredFunctions = new Collection(useLocations)
+	let functions = new Collection(useLocations)
 	let scopes = new Collection(useLocations)
 	let atruleNesting = new AggregateCollection()
 	let uniqueAtruleNesting = new Collection(useLocations)
@@ -299,9 +299,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				} else if (normalized_name === 'property') {
 					registeredProperties.p(node.prelude.text, toLoc(node))
 				} else if (normalized_name === 'function') {
-					let prelText = node.prelude.text
-					let funcName = prelText.includes('(') ? prelText.slice(0, prelText.indexOf('(')).trim() : prelText.trim()
-					registeredFunctions.p(funcName, toLoc(node))
+					let prelude = node.prelude.text
+					let name = prelude.includes('(') ? prelude.slice(0, prelude.indexOf('(')).trim() : prelude.trim()
+					functions.p(name, toLoc(node))
 				} else if (normalized_name === 'charset') {
 					charsets.p(node.prelude.text.toLowerCase(), toLoc(node))
 				} else if (normalized_name === 'scope') {
@@ -868,7 +868,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			}),
 			layer: layers.c(),
 			property: registeredProperties.c(),
-			function: registeredFunctions.c(),
+			function: functions.c(),
 			scope: scopes.c(),
 			complexity: atRuleComplexity,
 			nesting: assign(
