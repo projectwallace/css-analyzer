@@ -59,7 +59,7 @@ export function isMediaBrowserhack(node: CSSNode, on_hack: (hack: string) => voi
 
 		// Check Feature nodes
 		if (n.type === MEDIA_FEATURE) {
-			const name = n.name || ''
+			const name = n.property || ''
 
 			if (str_equals('-moz-images-in-menus', name)) {
 				on_hack('-moz-images-in-menus')
