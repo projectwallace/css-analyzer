@@ -788,8 +788,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				}
 			}
 		} else if (node.type === MEDIA_FEATURE) {
-			if (node.name) {
-				mediaFeatures.p(node.name.toLowerCase(), toLoc(node))
+			if (node.property) {
+				mediaFeatures.p(node.property.toLowerCase(), toLoc(node))
 			}
 			return SKIP
 		}
