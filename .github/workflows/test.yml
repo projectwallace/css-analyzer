@@ -41,7 +41,7 @@ jobs:
         with:
           node-version: 22
       - run: npm ci --ignore-scripts --no-audit --no-fund
-      - run: npx c8 --reporter=lcov npm test
+      - run: npm test
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:

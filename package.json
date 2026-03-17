@@ -26,7 +26,7 @@
 	"scripts": {
 		"lint": "oxlint --config .oxlintrc.json",
 		"lint-package": "publint",
-		"test": "vitest",
+		"test": "vitest --coverage",
 		"check": "tsc --noEmit",
 		"build": "tsdown",
 		"knip": "knip"
@@ -53,6 +53,7 @@
 	},
 	"devDependencies": {
 		"@codecov/rollup-plugin": "^1.9.1",
+		"@vitest/coverage-v8": "^4.0.18",
 		"knip": "^5.83.1",
 		"oxlint": "^1.43.0",
 		"prettier": "^3.6.2",
