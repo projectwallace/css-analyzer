@@ -14,11 +14,11 @@
 	"files": [
 		"dist"
 	],
-	"main": "./dist/css-analyzer.js",
+	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"exports": {
 		"types": "./dist/index.d.ts",
-		"default": "./dist/css-analyzer.js"
+		"default": "./dist/index.js"
 	},
 	"engines": {
 		"node": ">=18.0.0"
@@ -28,7 +28,7 @@
 		"lint-package": "publint",
 		"test": "vitest",
 		"check": "tsc --noEmit",
-		"build": "vite build",
+		"build": "tsdown",
 		"knip": "knip"
 	},
 	"keywords": [
@@ -52,15 +52,13 @@
 		"@projectwallace/css-parser": "^0.13.8"
 	},
 	"devDependencies": {
-		"@codecov/vite-plugin": "^1.9.1",
-		"c8": "^11.0.0",
+		"@codecov/rollup-plugin": "^1.9.1",
 		"knip": "^5.83.1",
 		"oxlint": "^1.43.0",
 		"prettier": "^3.6.2",
 		"publint": "^0.3.17",
+		"tsdown": "^0.21.0",
 		"typescript": "^5.9.3",
-		"vite": "^6.3.4",
-		"vite-plugin-dts": "^4.5.4",
 		"vitest": "^4.0.18"
 	}
 }
