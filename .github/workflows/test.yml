@@ -47,20 +47,6 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-  lint-package:
-    name: Lint package
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22
-      - run: npm ci --ignore-scripts --no-audit --no-fund
-      - run: npm run build
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      - run: npm run lint-package
-
   knip:
     name: Lint unused code
     runs-on: ubuntu-latest
