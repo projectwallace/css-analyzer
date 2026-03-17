@@ -47,6 +47,19 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run build
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
   knip:
     name: Lint unused code
     runs-on: ubuntu-latest
