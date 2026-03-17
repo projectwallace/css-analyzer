@@ -1,9 +1,8 @@
 import type { KnipConfig } from 'knip'
 
 const config: KnipConfig = {
-	entry: ['src/index.ts'],
 	project: ['src/**/*.ts'],
-	ignoreDependencies: ['prettier'],
+	ignoreDependencies: ['prettier', '@vitest/coverage-v8'],
 }
 
 export default config
