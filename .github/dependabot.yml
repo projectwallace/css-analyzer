@@ -7,7 +7,20 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
+    groups:
+      vite:
+        patterns:
+          - 'vitest'
+          - '@vitest/*'
+      oxc:
+        patterns:
+          - 'oxlint'
+          - 'oxfmt'
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
       interval: 'weekly'
+    groups:
+      github-actions:
+        patterns:
+          - '*'
