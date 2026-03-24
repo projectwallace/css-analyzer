@@ -54,7 +54,7 @@
 	"devDependencies": {
 		"@codecov/rollup-plugin": "^1.9.1",
 		"@vitest/coverage-v8": "^4.0.18",
-		"knip": "^5.83.1",
+		"knip": "^6.0.4",
 		"oxlint": "^1.43.0",
 		"prettier": "^3.6.2",
 		"publint": "^0.3.17",
