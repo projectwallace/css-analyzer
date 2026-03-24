@@ -77,7 +77,7 @@
 		"prettier": "^3.6.2",
 		"publint": "^0.3.17",
 		"tsdown": "^0.21.0",
-		"typescript": "^5.9.3",
+		"typescript": "^6.0.2",
 		"vitest": "^4.0.18"
 	}
 }
