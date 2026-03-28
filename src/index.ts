@@ -29,7 +29,7 @@ import {
 } from '@projectwallace/css-parser'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isPrefixed, isAccessibility } from './selectors/utils.js'
-import { calculateForAST as calculateSpecificity, compare as compareSpecificity } from './selectors/specificity.js'
+import { calculateForAST as calculateSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
 import { destructure, SYSTEM_FONTS } from './values/destructure-font-shorthand.js'
 import { keywords, isValueReset } from './values/values.js'
@@ -1029,11 +1029,24 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	}
 }
 
-// TODO: discrepancy with named exports in /selectors/index.ts, but keeping these for backwards compatibility
-export {
-	calculate as calculateSpecificity,
-	compare as compareSpecificity,
-} from './selectors/specificity.js'
+/**
+ * Compare specificity A to Specificity B
+ * @deprecated this one is the inverse of the one exported in /selectors/index.ts; wille be removed in next major version
+ * @returns 0 when a==b, 1 when a<b, -1 when a>b
+ */
+export function compareSpecificity(a: Specificity, b: Specificity): number {
+	if (a[0] === b[0]) {
+		if (a[1] === b[1]) {
+			return b[2] - a[2]
+		}
+
+		return b[1] - a[1]
+	}
+
+	return b[0] - a[0]
+}
+
+export { calculate as calculateSpecificity } from './selectors/specificity.js'
 
 export {
 	getComplexity as selectorComplexity,

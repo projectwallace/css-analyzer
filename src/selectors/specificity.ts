@@ -20,6 +20,9 @@ import { parse_selector } from '@projectwallace/css-parser/parse-selector'
 
 type Specificity = [number, number, number]
 
+/**
+ * @returns 0 if s1 equals s2, a negative number if s1 is lower than s2, or a positive number if s1 higher than s2
+ */
 export function compare(s1: Specificity, s2: Specificity): number {
 	if (s1[0] === s2[0]) {
 		if (s1[1] === s2[1]) {
