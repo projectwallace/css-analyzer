@@ -20,7 +20,7 @@ import { parse_selector } from '@projectwallace/css-parser/parse-selector'
 
 type Specificity = [number, number, number]
 
-function compare(s1: Specificity, s2: Specificity): number {
+export function compare(s1: Specificity, s2: Specificity): number {
 	if (s1[0] === s2[0]) {
 		if (s1[1] === s2[1]) {
 			return s1[2] - s2[2]
