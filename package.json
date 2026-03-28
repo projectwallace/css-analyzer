@@ -17,8 +17,22 @@
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"exports": {
-		"types": "./dist/index.d.ts",
-		"default": "./dist/index.js"
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./selectors": {
+			"types": "./dist/selectors/index.d.ts",
+			"default": "./dist/selectors/index.js"
+		},
+		"./atrules": {
+			"types": "./dist/atrules/index.d.ts",
+			"default": "./dist/atrules/index.js"
+		},
+		"./values": {
+			"types": "./dist/values/index.d.ts",
+			"default": "./dist/values/index.js"
+		}
 	},
 	"engines": {
 		"node": ">=18.0.0"

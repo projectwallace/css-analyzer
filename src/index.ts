@@ -1031,6 +1031,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 /**
  * Compare specificity A to Specificity B
+ * @deprecated this one is the inverse of the one exported in /selectors/index.ts; wille be removed in next major version
  * @returns 0 when a==b, 1 when a<b, -1 when a>b
  */
 export function compareSpecificity(a: Specificity, b: Specificity): number {
