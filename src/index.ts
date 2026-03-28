@@ -41,7 +41,7 @@ import { AggregateCollection } from './aggregate-collection.js'
 import { endsWith, unquote } from './string-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import { isIe9Hack } from './values/browserhacks.js'
-import { basename, SPACING_RESET_PROPERTIES, border_radius_properties } from './properties/property-utils.js'
+import { basename, SPACING_RESET_PROPERTIES, border_radius_properties, shorthand_properties } from './properties/property-utils.js'
 
 export type Specificity = [number, number, number]
 
@@ -170,6 +170,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let propertyHacks = new Collection(useLocations)
 	let propertyVendorPrefixes = new Collection(useLocations)
 	let customProperties = new Collection(useLocations)
+	let shorthands = new Collection(useLocations)
 	let propertyComplexities = new AggregateCollection()
 
 	// Values
@@ -500,6 +501,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				propertyComplexities.push(2)
 			} else {
 				propertyComplexities.push(1)
+			}
+
+			if (shorthand_properties.has(normalizedProperty)) {
+				shorthands.p(property, propertyLoc)
 			}
 			//#endregion PROPERTIES
 
@@ -991,6 +996,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				importants: assign(importantCustomProperties.c(), {
 					ratio: ratio(importantCustomProperties.size(), customProperties.size()),
 				}),
+			}),
+			shorthands: assign(shorthands.c(), {
+				ratio: ratio(shorthands.size(), properties.size()),
 			}),
 			browserhacks: assign(propertyHacks.c(), {
 				ratio: ratio(propertyHacks.size(), properties.size()),
