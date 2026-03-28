@@ -84,6 +84,68 @@ describe('vendor prefixes', () => {
 	})
 })
 
+describe('shorthands', () => {
+	test('counts shorthand properties', () => {
+		const fixture = `
+      a {
+        margin: 0;
+        padding: 0;
+        color: red;
+        font: bold 1em/1.5 sans-serif;
+      }
+    `
+		const actual = analyze(fixture).properties.shorthands
+
+		expect(actual.total).toEqual(3)
+		expect(actual.totalUnique).toEqual(3)
+		expect(actual.unique).toEqual({ margin: 1, padding: 1, font: 1 })
+		expect(actual.ratio).toEqual(3 / 4)
+	})
+
+	test('counts duplicate shorthands', () => {
+		const fixture = `
+      a { margin: 0; }
+      b { margin: 10px; }
+    `
+		const actual = analyze(fixture).properties.shorthands
+
+		expect(actual.total).toEqual(2)
+		expect(actual.totalUnique).toEqual(1)
+		expect(actual.unique).toEqual({ margin: 2 })
+		expect(actual.uniquenessRatio).toEqual(1 / 2)
+	})
+
+	test('non-shorthand properties are not counted', () => {
+		const fixture = `a { color: red; font-size: 1em; }`
+		const actual = analyze(fixture).properties.shorthands
+
+		expect(actual.total).toEqual(0)
+		expect(actual.totalUnique).toEqual(0)
+		expect(actual.unique).toEqual({})
+		expect(actual.ratio).toEqual(0)
+	})
+
+	test('preserves original casing of shorthand property name', () => {
+		const fixture = `a { MARGIN: 0; }`
+		const actual = analyze(fixture).properties.shorthands
+
+		expect(actual.total).toEqual(1)
+		expect(actual.unique).toEqual({ MARGIN: 1 })
+	})
+
+	test('counts shorthands inside at-rules', () => {
+		const fixture = `
+      @media screen {
+        a { padding: 0; }
+      }
+    `
+		const actual = analyze(fixture).properties.shorthands
+
+		expect(actual.total).toEqual(1)
+		expect(actual.unique).toEqual({ padding: 1 })
+	})
+})
+
 describe('browserhacks', () => {
 	test('counts browser hacks', () => {
 		const fixture = `

@@ -32,6 +32,10 @@
 		"./values": {
 			"types": "./dist/values/index.d.ts",
 			"default": "./dist/values/index.js"
+		},
+		"./properties": {
+			"types": "./dist/properties/index.d.ts",
+			"default": "./dist/properties/index.js"
 		}
 	},
 	"engines": {
