@@ -30,8 +30,8 @@
 			"default": "./dist/atrules/index.js"
 		},
 		"./value": {
-			"types": "./dist/values/browserhacks.d.ts",
-			"default": "./dist/values/browserhacks.js"
+			"types": "./dist/values/index.d.ts",
+			"default": "./dist/values/index.js"
 		}
 	},
 	"engines": {
