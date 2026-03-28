@@ -1029,6 +1029,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	}
 }
 
+// TODO: discrepancy with named exports in /selectors/index.ts, but keeping these for backwards compatibility
 export {
 	calculate as calculateSpecificity,
 	compare as compareSpecificity,
