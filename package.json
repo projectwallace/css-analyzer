@@ -21,15 +21,15 @@
 			"types": "./dist/index.d.ts",
 			"default": "./dist/index.js"
 		},
-		"./selector": {
+		"./selectors": {
 			"types": "./dist/selectors/index.d.ts",
 			"default": "./dist/selectors/index.js"
 		},
-		"./atrule": {
+		"./atrules": {
 			"types": "./dist/atrules/index.d.ts",
 			"default": "./dist/atrules/index.js"
 		},
-		"./value": {
+		"./values": {
 			"types": "./dist/values/index.d.ts",
 			"default": "./dist/values/index.js"
 		}
