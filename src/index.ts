@@ -564,10 +564,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					return SKIP
 				} else if (normalizedProperty === 'font') {
 					if (!SYSTEM_FONTS.has(text)) {
-						let result = destructure(value, function (item) {
-							if (item.type === 'keyword') {
-								valueKeywords.p(item.value.toLowerCase(), valueLoc)
-							}
+						let result = destructure(value, function (keyword) {
+							valueKeywords.p(keyword.toLowerCase(), valueLoc)
 						})
 
 						if (!result) {
@@ -696,7 +694,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 							// Skip all identifier processing for font properties to avoid:
 							// 1. False positives for colors (e.g., "Black" as a font family vs. "black" the color)
-							// 2. Duplicate keywords (already extracted by destructure function)
+							// 2. Duplicate keywords (already extracted by destructure)
 							if (normalizedProperty === 'font' || normalizedProperty === 'font-family') {
 								return SKIP
 							}
@@ -749,7 +747,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 							if (endsWith('gradient', funcName)) {
 								gradients.p(valueNode.text, funcLoc)
-								return
 							}
 							// No SKIP here intentionally,
 							// otherwise we'll miss colors in linear-gradient(), var() fallbacks, etc.
