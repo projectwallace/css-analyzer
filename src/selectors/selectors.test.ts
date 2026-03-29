@@ -302,6 +302,10 @@ test('counts custom element selectors', () => {
 		event-date,
 		next-route-announcer,
 		Camel-Cased-Element {}
+
+		/* Not custom elements, but custom identifiers */
+		::view-transition-new(--light-box-img),
+		::view-transition-old(--light-box-img) {}
 	`
 	const actual = analyze(fixture).selectors.customElements
 

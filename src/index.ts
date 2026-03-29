@@ -395,7 +395,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			walk(node, (child) => {
 				if (child.type === ATTRIBUTE_SELECTOR) {
 					attributeSelectors.p(child.name?.toLowerCase() ?? '', loc)
-				} else if (child.type === TYPE_SELECTOR && child.name?.includes('-')) {
+				} else if (child.type === TYPE_SELECTOR && !child.name?.startsWith('--') && child.name?.includes('-')) {
 					customElementSelectors.p(child.name.toLowerCase(), loc)
 				} else if (child.type === PSEUDO_CLASS_SELECTOR) {
 					pseudoClasses.p(child.name?.toLowerCase() ?? '', loc)
