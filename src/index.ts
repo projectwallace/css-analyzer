@@ -31,7 +31,7 @@ import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isPrefixed, isAccessibility } from './selectors/utils.js'
 import { calculateForAST as calculateSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
-import { parseFontShorthand, SYSTEM_FONTS } from './values/parse-font-shorthand.js'
+import { parseFontShorthand, SYSTEM_FONTS } from './values/destructure-font-shorthand.js'
 import { keywords, isValueReset } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
@@ -694,7 +694,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 							// Skip all identifier processing for font properties to avoid:
 							// 1. False positives for colors (e.g., "Black" as a font family vs. "black" the color)
-							// 2. Duplicate keywords (already extracted by destructure function)
+							// 2. Duplicate keywords (already extracted by parseFontShorthand)
 							if (normalizedProperty === 'font' || normalizedProperty === 'font-family') {
 								return SKIP
 							}
