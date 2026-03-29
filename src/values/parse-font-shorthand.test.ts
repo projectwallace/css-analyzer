@@ -470,3 +470,29 @@ describe('pre-font-size modifiers', () => {
 		expect(fontFamilies.unique).toEqual({ '"Source Sans Pro", serif': 1 })
 	})
 })
+
+// ---------------------------------------------------------------------------
+// Real-world edge cases
+// ---------------------------------------------------------------------------
+
+describe('real-world edge cases', () => {
+	test('var() as font-size with numeric weight and long font stack (GitHub-style)', () => {
+		// font:400 var(--primer-text-title-size-large, 2rem) -apple-system,...
+		const css = `a { font:400 var(--primer-text-title-size-large, 2rem) -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"; }`
+		const { fontSizes, fontFamilies } = analyze(css).values
+		expect(fontSizes.unique).toEqual({ 'var(--primer-text-title-size-large, 2rem)': 1 })
+		expect(fontFamilies.unique).toEqual({
+			'-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"': 1,
+		})
+	})
+
+	test('percentage font-size with multi-word unquoted font family', () => {
+		// 100% Source Code Pro, Inconsolata, Menlo, monospace
+		const css = `a { font: 100% Source Code Pro, Inconsolata, Menlo, monospace; }`
+		const { fontSizes, fontFamilies } = analyze(css).values
+		expect(fontSizes.unique).toEqual({ '100%': 1 })
+		expect(fontFamilies.unique).toEqual({
+			'Source Code Pro, Inconsolata, Menlo, monospace': 1,
+		})
+	})
+})
