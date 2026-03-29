@@ -20,6 +20,7 @@ import {
 	type UniqueWithLocations,
 	type Location,
 	type Specificity,
+	type AnalysisPath,
 } from './index.js'
 
 describe('Public API', () => {
@@ -680,4 +681,167 @@ test('has metadata', () => {
 
 	expect(typeof actual.total).toBe('number')
 	expect(actual.total).toBeGreaterThan(0)
+})
+
+describe('include/exclude options', () => {
+	const CSS = `
+		@media screen and (min-width: 600px) {
+			.foo, #bar {
+				color: red;
+				font-size: 1rem;
+				background: linear-gradient(to bottom, #fff, #000);
+			}
+		}
+		@keyframes spin {
+			from { transform: rotate(0deg) }
+			to { transform: rotate(360deg) }
+		}
+	`
+
+	test('no options returns full analysis', () => {
+		const result = analyze(CSS)
+		expect(result.atrules.total).toBeGreaterThan(0)
+		expect(result.selectors.total).toBeGreaterThan(0)
+		expect(result.declarations.total).toBeGreaterThan(0)
+		expect(result.properties.total).toBeGreaterThan(0)
+		expect(result.values.colors.total).toBeGreaterThan(0)
+	})
+
+	test('include: atrules returns atrules data and zeroes elsewhere', () => {
+		const result = analyze(CSS, { include: ['atrules'] })
+		expect(result.atrules.total).toBeGreaterThan(0)
+		expect(result.atrules.media.total).toBeGreaterThan(0)
+		expect(result.atrules.keyframes.total).toBeGreaterThan(0)
+		// Excluded sections should be empty
+		expect(result.selectors.total).toBe(0)
+		expect(result.declarations.total).toBe(0)
+		expect(result.rules.total).toBe(0)
+	})
+
+	test('include: selectors.complexity only collects selector complexity', () => {
+		const result = analyze(CSS, { include: ['selectors.complexity'] })
+		expect(result.selectors.complexity.total).toBeGreaterThan(0)
+		// Other selector sub-features should be empty
+		expect(result.selectors.specificity.total).toBe(0)
+		expect(result.selectors.id.total).toBe(0)
+		expect(result.selectors.pseudoClasses.total).toBe(0)
+	})
+
+	test('include: multiple paths collects all specified sections', () => {
+		const result = analyze(CSS, { include: ['atrules', 'selectors.complexity'] })
+		expect(result.atrules.total).toBeGreaterThan(0)
+		expect(result.selectors.complexity.total).toBeGreaterThan(0)
+		expect(result.declarations.total).toBe(0)
+	})
+
+	test('exclude: values skips value analysis', () => {
+		const full = analyze(CSS)
+		const result = analyze(CSS, { exclude: ['values'] })
+		expect(result.values.colors.total).toBe(0)
+		expect(result.values.fontSizes.total).toBe(0)
+		// Other sections should still have data
+		expect(result.atrules.total).toBe(full.atrules.total)
+		expect(result.selectors.total).toBe(full.selectors.total)
+		expect(result.declarations.total).toBe(full.declarations.total)
+		expect(result.properties.total).toBe(full.properties.total)
+	})
+
+	test('exclude: atrules.media.browserhacks skips only media browserhacks', () => {
+		const full = analyze(CSS)
+		const result = analyze(CSS, { exclude: ['atrules.media.browserhacks'] })
+		expect(result.atrules.media.browserhacks.total).toBe(0)
+		// Other atrule data should still be present
+		expect(result.atrules.total).toBe(full.atrules.total)
+		expect(result.atrules.media.total).toBe(full.atrules.media.total)
+	})
+
+	test('include + exclude: include atrules then exclude atrules.media', () => {
+		const result = analyze(CSS, { include: ['atrules'], exclude: ['atrules.media'] })
+		expect(result.atrules.total).toBeGreaterThan(0)
+		expect(result.atrules.keyframes.total).toBeGreaterThan(0)
+		expect(result.atrules.media.total).toBe(0)
+		// Non-included sections should be empty
+		expect(result.selectors.total).toBe(0)
+	})
+
+	test('include: values.colors only collects color data', () => {
+		const result = analyze(CSS, { include: ['values.colors'] })
+		expect(result.values.colors.total).toBeGreaterThan(0)
+		expect(result.values.fontSizes.total).toBe(0)
+		expect(result.values.gradients.total).toBe(0)
+		// declarations.total is 0 because 'declarations' is not included
+		expect(result.declarations.total).toBe(0)
+	})
+
+	test('keyframes depth is always tracked even when atrules excluded', () => {
+		// When excluding atrules but including declarations, keyframe context must be
+		// tracked to correctly categorize importants in keyframes
+		const result = analyze(CSS, { include: ['declarations'] })
+		// Declarations inside keyframes should not be incorrectly flagged
+		expect(result.declarations.total).toBeGreaterThan(0)
+	})
+
+	test('selectors.total is 0 when selectors section is excluded', () => {
+		const full = analyze(CSS)
+		const result = analyze(CSS, { exclude: ['selectors'] })
+		// selectors.total is 0 since selectors section is excluded
+		expect(result.selectors.total).toBe(0)
+		// But sourceLinesOfCode still counts selector nodes via internal counter
+		expect(result.stylesheet.sourceLinesOfCode).toBe(full.stylesheet.sourceLinesOfCode)
+	})
+
+	test('exclude: properties still runs declaration counting', () => {
+		const full = analyze(CSS)
+		const result = analyze(CSS, { exclude: ['properties'] })
+		expect(result.properties.total).toBe(0)
+		expect(result.declarations.total).toBe(full.declarations.total)
+	})
+
+	test('exclude: selectors.specificity.items omits items array but keeps aggregate stats', () => {
+		const full = analyze(CSS)
+		const result = analyze(CSS, { exclude: ['selectors.specificity.items'] })
+		// Items array should be empty
+		expect(result.selectors.specificity.items).toEqual([])
+		// Aggregate stats should still be present
+		expect(result.selectors.specificity.total).toBe(full.selectors.specificity.total)
+		expect(result.selectors.specificity.max).toEqual(full.selectors.specificity.max)
+		expect(result.selectors.specificity.sum).toEqual(full.selectors.specificity.sum)
+	})
+
+	test('exclude: selectors.complexity.items omits items array but keeps aggregate stats', () => {
+		const full = analyze(CSS)
+		const result = analyze(CSS, { exclude: ['selectors.complexity.items'] })
+		expect(result.selectors.complexity.items).toEqual([])
+		expect(result.selectors.complexity.total).toBe(full.selectors.complexity.total)
+		expect(result.selectors.complexity.max).toBe(full.selectors.complexity.max)
+	})
+
+	test('exclude: rules.sizes.items omits items but keeps stats', () => {
+		const full = analyze(CSS)
+		const result = analyze(CSS, { exclude: ['rules.sizes.items'] })
+		expect(result.rules.sizes.items).toEqual([])
+		expect(result.rules.sizes.total).toBe(full.rules.sizes.total)
+	})
+
+	test('exclude: atrules.nesting.items omits items but keeps stats', () => {
+		const full = analyze(CSS)
+		const result = analyze(CSS, { exclude: ['atrules.nesting.items'] })
+		expect(result.atrules.nesting.items).toEqual([])
+		expect(result.atrules.nesting.total).toBe(full.atrules.nesting.total)
+	})
+
+	test('exclude: declarations.nesting.items omits items but keeps stats', () => {
+		const full = analyze(CSS)
+		const result = analyze(CSS, { exclude: ['declarations.nesting.items'] })
+		expect(result.declarations.nesting.items).toEqual([])
+		expect(result.declarations.nesting.total).toBe(full.declarations.nesting.total)
+	})
+
+	test('exported AnalysisPath type is used correctly', () => {
+		// Type-level test: verify include/exclude accept AnalysisPath values
+		const result1 = analyze(CSS, { include: ['atrules', 'selectors'] })
+		const result2 = analyze(CSS, { exclude: ['values.colors', 'selectors.specificity'] })
+		expect(result1).toBeDefined()
+		expect(result2).toBeDefined()
+	})
 })
