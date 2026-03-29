@@ -59,7 +59,7 @@ test('finds vendor prefixed values', () => {
   expect(actual).toEqual(expected)
 })
 
-test.skip('does not report var() fallback values as separate values', () => {
+test('does not report var() fallback values as separate values', () => {
   const fixture = `
     with-fallback {
       box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
