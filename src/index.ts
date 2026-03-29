@@ -694,7 +694,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 							// Skip all identifier processing for font properties to avoid:
 							// 1. False positives for colors (e.g., "Black" as a font family vs. "black" the color)
-							// 2. Duplicate keywords (already extracted by parseFontShorthand)
+							// 2. Duplicate keywords (already extracted by destructure)
 							if (normalizedProperty === 'font' || normalizedProperty === 'font-family') {
 								return SKIP
 							}
