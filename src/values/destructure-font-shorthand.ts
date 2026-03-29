@@ -70,7 +70,7 @@ const SLASH = 47 // '/'.charCodeAt(0)
  * @param value - The VALUE CSSNode for a `font` declaration
  * @param cb    - Called for every global CSS keyword found in the value (e.g. inherit)
  */
-export function parseFontShorthand(
+export function destructure(
 	value: CSSNode,
 	cb: (keyword: string) => void,
 ): { font_size?: string; line_height?: string; font_family?: string | null } | null {
@@ -79,7 +79,7 @@ export function parseFontShorthand(
 	if (children.length === 0) return null
 
 	// A lone var() could stand for the entire property — can't decompose it.
-	if (children.length === 1 && children[0].type === FUNCTION) {
+	if (children.length === 1 && children[0]?.type === FUNCTION) {
 		return null
 	}
 
@@ -100,25 +100,13 @@ export function parseFontShorthand(
 	// -----------------------------------------------------------------
 	let slash_index = -1
 	for (let i = 0; i < children.length; i++) {
-		if (children[i].type === OPERATOR && children[i].text.charCodeAt(0) === SLASH) {
+		if (children[i]?.type === OPERATOR && children[i]?.text.charCodeAt(0) === SLASH) {
 			slash_index = i
 			break
 		}
 	}
 
-	if (slash_index !== -1) {
-		// The node immediately before "/" is font-size.
-		// The node immediately after "/" is line-height.
-		// Everything after line-height is font-family.
-		if (slash_index > 0) {
-			font_size = children[slash_index - 1].text
-		}
-		const after_slash = slash_index + 1
-		if (after_slash < children.length) {
-			line_height = children[after_slash].text
-			font_family_start = after_slash + 1
-		}
-	} else {
+	if (slash_index === -1) {
 		// -----------------------------------------------------------------
 		// Step 2: no slash — scan left-to-right to locate font-size.
 		//
@@ -137,6 +125,7 @@ export function parseFontShorthand(
 		// -----------------------------------------------------------------
 		for (let i = 0; i < children.length; i++) {
 			const child = children[i]
+			if (!child) continue
 
 			if (child.type === DIMENSION) {
 				font_size = child.text
@@ -173,6 +162,18 @@ export function parseFontShorthand(
 
 			// NUMBER or anything else: skip (e.g. numeric font-weight).
 		}
+	} else {
+		// The node immediately before "/" is font-size.
+		// The node immediately after "/" is line-height.
+		// Everything after line-height is font-family.
+		if (slash_index > 0) {
+			font_size = children[slash_index - 1]!.text
+		}
+		const after_slash = slash_index + 1
+		if (after_slash < children.length) {
+			line_height = children[after_slash]!.text
+			font_family_start = after_slash + 1
+		}
 	}
 
 	// -----------------------------------------------------------------
@@ -181,8 +182,10 @@ export function parseFontShorthand(
 	let font_family: string | null = null
 	if (font_family_start >= 0 && font_family_start < children.length) {
 		const first = children[font_family_start]
-		const last = children[children.length - 1]
-		font_family = value.text.substring(first.start - value.start, last.end - value.start)
+		const last = children.at(-1)
+		if (first && last){
+			font_family = value.text.substring(first.start - value.start, last.end - value.start)
+		}
 	}
 
 	return { font_size, line_height, font_family }

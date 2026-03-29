@@ -31,7 +31,7 @@ import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isPrefixed, isAccessibility } from './selectors/utils.js'
 import { calculateForAST as calculateSpecificity } from './selectors/specificity.js'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
-import { parseFontShorthand, SYSTEM_FONTS } from './values/destructure-font-shorthand.js'
+import { destructure, SYSTEM_FONTS } from './values/destructure-font-shorthand.js'
 import { keywords, isValueReset } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
@@ -564,7 +564,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					return SKIP
 				} else if (normalizedProperty === 'font') {
 					if (!SYSTEM_FONTS.has(text)) {
-						let result = parseFontShorthand(value, function (keyword) {
+						let result = destructure(value, function (keyword) {
 							valueKeywords.p(keyword.toLowerCase(), valueLoc)
 						})
 
@@ -747,7 +747,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 							if (endsWith('gradient', funcName)) {
 								gradients.p(valueNode.text, funcLoc)
-								return
 							}
 							// No SKIP here intentionally,
 							// otherwise we'll miss colors in linear-gradient(), var() fallbacks, etc.
