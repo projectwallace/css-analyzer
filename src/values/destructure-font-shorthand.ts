@@ -1,7 +1,6 @@
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
-import type { CSSNode } from '@projectwallace/css-parser'
-import { DIMENSION, FUNCTION, IDENTIFIER, OPERATOR, STRING } from '@projectwallace/css-parser'
+import { is_dimension, is_function, is_identifier, is_operator, is_string, type Value } from '@projectwallace/css-parser'
 
 export const SYSTEM_FONTS = new KeywordSet([
 	'caption',
@@ -71,25 +70,26 @@ const SLASH = 47 // '/'.charCodeAt(0)
  * @param cb    - Called for every global CSS keyword found in the value (e.g. inherit)
  */
 export function destructure(
-	value: CSSNode,
+	value: Value,
 	cb: (keyword: string) => void,
 ): { font_size?: string; line_height?: string; font_family?: string | null } | null {
-	const children = value.children
-
-	if (children.length === 0) return null
+	if (!value.has_children) {
+		return null
+	}
 
 	// A lone var() could stand for the entire property — can't decompose it.
-	if (children.length === 1 && children[0]?.type === FUNCTION) {
+	if (value.child_count === 1 && is_function(value.first_child)) {
 		return null
 	}
 
 	// Report global keywords (inherit, initial, …) that appear anywhere in the value.
-	for (const child of children) {
-		if (child.type === IDENTIFIER && keywords.has(child.name ?? '')) {
+	for (const child of value) {
+		if (is_identifier(child) && keywords.has(child.name)) {
 			cb(child.name!)
 		}
 	}
 
+	let children = value.children
 	let font_size: string | undefined
 	let line_height: string | undefined
 	// Index of the first child node that belongs to font-family (-1 = none found)
@@ -99,8 +99,9 @@ export function destructure(
 	// Step 1: look for the "/" that separates font-size from line-height
 	// -----------------------------------------------------------------
 	let slash_index = -1
-	for (let i = 0; i < children.length; i++) {
-		if (children[i]?.type === OPERATOR && children[i]?.text.charCodeAt(0) === SLASH) {
+	for (let i = 0; i < value.child_count; i++) {
+		const child = children[i]
+		if (child && is_operator(child) && child.text.charCodeAt(0) === SLASH) {
 			slash_index = i
 			break
 		}
@@ -127,20 +128,20 @@ export function destructure(
 			const child = children[i]
 			if (!child) continue
 
-			if (child.type === DIMENSION) {
+			if (is_dimension(child)) {
 				font_size = child.text
 				font_family_start = i + 1
 				break
 			}
 
-			if (child.type === FUNCTION) {
+			if (is_function(child)) {
 				font_size = child.text
 				font_family_start = i + 1
 				break
 			}
 
-			if (child.type === IDENTIFIER) {
-				const name = child.name ?? ''
+			if (is_identifier(child)) {
+				const name = child.name
 				if (SIZE_KEYWORDS.has(name)) {
 					font_size = child.text
 					font_family_start = i + 1
@@ -154,7 +155,7 @@ export function destructure(
 				break
 			}
 
-			if (child.type === STRING) {
+			if (is_string(child)) {
 				// Quoted name: must be font-family, no font-size found.
 				font_family_start = i
 				break

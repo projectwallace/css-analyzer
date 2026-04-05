@@ -67,7 +67,7 @@
 		"code"
 	],
 	"dependencies": {
-		"@projectwallace/css-parser": "^0.13.8"
+		"@projectwallace/css-parser": "^0.14.8"
 	},
 	"devDependencies": {
 		"@codecov/rollup-plugin": "^1.9.1",

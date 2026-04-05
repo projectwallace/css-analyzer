@@ -1,12 +1,10 @@
 import { endsWith } from '../string-utils.js'
-import type { CSSNode } from '@projectwallace/css-parser'
-import { IDENTIFIER } from '@projectwallace/css-parser'
+import { type Value, is_identifier } from '@projectwallace/css-parser'
 
-export function isIe9Hack(node: CSSNode): boolean {
-	let children = node.children
-	if (children) {
-		let last = children.at(-1)
-		return last && last.type === IDENTIFIER && endsWith('\\9', last.text) ? true : false
+export function isIe9Hack(node: Value): boolean {
+	if (node.has_children) {
+		let last = node.children.at(-1)
+		return last && is_identifier(last) && endsWith('\\9', last.text) ? true : false
 	}
 	return false
 }

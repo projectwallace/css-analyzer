@@ -1,26 +1,25 @@
 import {
-	type CSSNode,
 	str_equals,
 	walk,
 	BREAK,
-	SUPPORTS_QUERY,
-	MEDIA_TYPE,
-	MEDIA_FEATURE,
 	DIMENSION,
 	NUMBER,
 	IDENTIFIER,
+	is_media_feature,
+	is_media_type,
+	is_supports_query,
+	type CSSNode,
 } from '@projectwallace/css-parser'
 
 /**
  * Check if an @supports atRule is a browserhack (Wallace parser version)
- * @param node - The Atrule CSSNode from Wallace parser
+ * @param prelude - The Atrule CSSNode from Wallace parser
  */
-export function isSupportsBrowserhack(node: CSSNode, on_hack: (hack: string) => void): void {
-	walk(node, function (n) {
+export function isSupportsBrowserhack(prelude: CSSNode, on_hack: (hack: string) => void): void {
+	walk(prelude, function (node) {
 		// Check SupportsQuery nodes for browserhack patterns
-		if (n.type === SUPPORTS_QUERY) {
-			const prelude = n.prelude || n.value || ''
-			const normalizedPrelude = prelude.toString().toLowerCase().replaceAll(/\s+/g, '')
+		if (is_supports_query(node)) {
+			const normalizedPrelude = node.value.toString().toLowerCase().replaceAll(/\s+/g, '')
 
 			// Check for known browserhack patterns
 			if (normalizedPrelude.includes('-webkit-appearance:none')) {
@@ -37,14 +36,14 @@ export function isSupportsBrowserhack(node: CSSNode, on_hack: (hack: string) => 
 
 /**
  * Check if a @media atRule is a browserhack (Wallace parser version)
- * @param node - The Atrule CSSNode from Wallace parser
+ * @param prelude - The Atrule CSSNode from Wallace parser
  * @returns true if the atrule is a browserhack
  */
-export function isMediaBrowserhack(node: CSSNode, on_hack: (hack: string) => void): void {
-	walk(node, function (n) {
+export function isMediaBrowserhack(prelude: CSSNode, on_hack: (hack: string) => void): void {
+	walk(prelude, function (node) {
 		// Check MediaType nodes for \0 prefix or \9 suffix
-		if (n.type === MEDIA_TYPE) {
-			const text = n.text || ''
+		if (is_media_type(node)) {
+			const text = node.value
 
 			if (text.startsWith('\\0')) {
 				on_hack('\\0')
@@ -58,8 +57,8 @@ export function isMediaBrowserhack(node: CSSNode, on_hack: (hack: string) => voi
 		}
 
 		// Check Feature nodes
-		if (n.type === MEDIA_FEATURE) {
-			const name = n.property || ''
+		if (is_media_feature(node)) {
+			const name = node.property
 
 			if (str_equals('-moz-images-in-menus', name)) {
 				on_hack('-moz-images-in-menus')
@@ -78,8 +77,8 @@ export function isMediaBrowserhack(node: CSSNode, on_hack: (hack: string) => voi
 			}
 
 			// Check for min-resolution with .001dpcm
-			if (str_equals('min-resolution', name) && n.has_children) {
-				for (const child of n) {
+			if (str_equals('min-resolution', name) && node.has_children) {
+				for (const child of node) {
 					if (child.type === DIMENSION && child.value === 0.001 && str_equals('dpcm', child.unit || '')) {
 						on_hack('min-resolution: .001dpcm')
 						return BREAK
@@ -88,8 +87,8 @@ export function isMediaBrowserhack(node: CSSNode, on_hack: (hack: string) => voi
 			}
 
 			// Check for -webkit-min-device-pixel-ratio with 0 or 10000
-			if (str_equals('-webkit-min-device-pixel-ratio', name) && n.has_children) {
-				for (const child of n) {
+			if (str_equals('-webkit-min-device-pixel-ratio', name) && node.has_children) {
+				for (const child of node) {
 					if (child.type === NUMBER && (child.value === 0 || child.value === 10000)) {
 						on_hack('-webkit-min-device-pixel-ratio')
 						return BREAK
@@ -98,8 +97,8 @@ export function isMediaBrowserhack(node: CSSNode, on_hack: (hack: string) => voi
 			}
 
 			// Check for \0 unit hack (appears as Identifier node)
-			if (n.has_children) {
-				for (const child of n) {
+			if (node.has_children) {
+				for (const child of node) {
 					if (child.type === IDENTIFIER && child.text === '\\0') {
 						on_hack('\\0')
 						return BREAK
