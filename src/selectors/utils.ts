@@ -28,7 +28,7 @@ export function isPrefixed(selector: CSSNode, on_selector: (prefix: string) => v
 				} else if (is_pseudo_element_selector(node)) {
 					prefix = '::'
 				}
-				on_selector(prefix + (node.name || node.text))
+				on_selector(prefix + node.name)
 			}
 		}
 	})

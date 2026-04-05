@@ -1,6 +1,6 @@
+import { is_dimension, is_function, is_identifier, is_operator, is_string, type Value } from '@projectwallace/css-parser'
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
-import { is_dimension, is_function, is_identifier, is_operator, is_string, type Value } from '@projectwallace/css-parser'
 
 export const SYSTEM_FONTS = new KeywordSet([
 	'caption',

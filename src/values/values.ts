@@ -1,5 +1,5 @@
-import { KeywordSet } from '../keyword-set.js'
 import { is_number, is_dimension, type Value } from '@projectwallace/css-parser'
+import { KeywordSet } from '../keyword-set.js'
 
 export const keywords = new KeywordSet([
 	'auto',

@@ -6,12 +6,6 @@ import {
 	str_starts_with,
 	walk,
 	parse,
-	CONTAINER_QUERY,
-	IDENTIFIER,
-	OPERATOR,
-	DIMENSION,
-	FUNCTION,
-	HASH,
 	is_atrule_prelude,
 	is_selector_list,
 	is_rule,
@@ -28,6 +22,11 @@ import {
 	is_pseudo_element_selector,
 	is_url,
 	is_media_feature,
+	is_container_query,
+	is_dimension,
+	is_hash,
+	is_function,
+	is_operator,
 } from '@projectwallace/css-parser'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isPrefixed, isAccessibility } from './selectors/utils.js'
@@ -37,12 +36,12 @@ import { destructure, SYSTEM_FONTS } from './values/destructure-font-shorthand.j
 import { keywords, isValueReset } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
+import { isIe9Hack } from './values/browserhacks.js'
 import { ContextCollection } from './context-collection.js'
 import { Collection, type Location } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
 import { endsWith, unquote } from './string-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
-import { isIe9Hack } from './values/browserhacks.js'
 import { basename, SPACING_RESET_PROPERTIES, border_radius_properties, shorthand_properties } from './properties/property-utils.js'
 
 export type Specificity = [number, number, number]
@@ -297,7 +296,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				} else if (normalized_name === 'container') {
 					let {prelude} = node
 					containers.p(prelude.text, toLoc(node))
-					if (prelude.first_child && prelude.first_child?.type === CONTAINER_QUERY) {
+					if (is_atrule_prelude(prelude) && is_container_query(prelude.first_child)) {
 						let container_query = prelude.first_child
 						let container_name = container_query.first_child
 						if (container_name && is_identifier(container_name)) {
@@ -630,7 +629,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					return SKIP
 				} else if (normalizedProperty === 'animation-duration' || normalizedProperty === 'transition-duration') {
 					for (let child of value.children) {
-						if (child.type !== OPERATOR) {
+						if (!is_operator(child)) {
 							let text = child.text
 							if (/var\(/i.test(text)) {
 								durations.p(text, valueLoc)
@@ -641,7 +640,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					}
 				} else if (normalizedProperty === 'transition-timing-function' || normalizedProperty === 'animation-timing-function') {
 					for (let child of value.children) {
-						if (child.type !== OPERATOR) {
+						if (!is_operator(child)) {
 							timingFunctions.p(child.text, valueLoc)
 						}
 					}
@@ -665,101 +664,102 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				let valueHasIe9Hack = isIe9Hack(value)
 
 				walk(value, (valueNode) => {
-					switch (valueNode.type) {
-						case DIMENSION: {
-							let unit = valueNode.unit.toLowerCase()
-							let loc = toLoc(valueNode)
-							units.push(unit, property, loc)
+					if (is_dimension(valueNode)) {
+						let unit = valueNode.unit.toLowerCase()
+						let loc = toLoc(valueNode)
+						units.push(unit, property, loc)
+						return SKIP
+					}
+
+					if (is_hash(valueNode)) {
+						// Use text property for the hash value
+						let hashText = valueNode.text
+						if (!hashText || !hashText.startsWith('#')) {
 							return SKIP
 						}
-						case HASH: {
-							// Use text property for the hash value
-							let hashText = valueNode.text
-							if (!hashText || !hashText.startsWith('#')) {
-								return SKIP
-							}
-							let hashValue = hashText.toLowerCase()
+						let hashValue = hashText.toLowerCase()
 
-							// If the full value has an IE9 hack, append it to the hash
-							if (valueHasIe9Hack && !hashValue.endsWith('\\9')) {
-								hashValue = hashValue + '\\9'
-							}
+						// If the full value has an IE9 hack, append it to the hash
+						if (valueHasIe9Hack && !hashValue.endsWith('\\9')) {
+							hashValue = hashValue + '\\9'
+						}
 
-							// Calculate hex length (excluding the # and any IE9 browserhack \9)
-							let hexLength = hashValue.length - 1 // Remove the # from length
-							if (endsWith('\\9', hashValue)) {
-								hexLength = hexLength - 2 // Remove the \9 from length
-							}
+						// Calculate hex length (excluding the # and any IE9 browserhack \9)
+						let hexLength = hashValue.length - 1 // Remove the # from length
+						if (endsWith('\\9', hashValue)) {
+							hexLength = hexLength - 2 // Remove the \9 from length
+						}
 
-							let hashLoc = toLoc(valueNode)
-							colors.push(hashValue, property, hashLoc)
-							colorFormats.p(`hex` + hexLength, hashLoc)
+						let hashLoc = toLoc(valueNode)
+						colors.push(hashValue, property, hashLoc)
+						colorFormats.p(`hex` + hexLength, hashLoc)
 
+						return SKIP
+					}
+
+					if (is_identifier(valueNode)) {
+						let identifierText = valueNode.text
+						let identifierLoc = toLoc(valueNode)
+
+						// Skip all identifier processing for font properties to avoid:
+						// 1. False positives for colors (e.g., "Black" as a font family vs. "black" the color)
+						// 2. Duplicate keywords (already extracted by destructure)
+						if (normalizedProperty === 'font' || normalizedProperty === 'font-family') {
 							return SKIP
 						}
-						case IDENTIFIER: {
-							let identifierText = valueNode.text
-							let identifierLoc = toLoc(valueNode)
 
-							// Skip all identifier processing for font properties to avoid:
-							// 1. False positives for colors (e.g., "Black" as a font family vs. "black" the color)
-							// 2. Duplicate keywords (already extracted by destructure)
-							if (normalizedProperty === 'font' || normalizedProperty === 'font-family') {
-								return SKIP
-							}
+						if (keywords.has(identifierText)) {
+							valueKeywords.p(identifierText.toLowerCase(), identifierLoc)
+						}
 
-							if (keywords.has(identifierText)) {
-								valueKeywords.p(identifierText.toLowerCase(), identifierLoc)
-							}
-
-							// Bail out if it can't be a color name
-							// 20 === 'lightgoldenrodyellow'.length
-							// 3 === 'red'.length
-							let nodeLen = identifierText.length
-							if (nodeLen > 20 || nodeLen < 3) {
-								return SKIP
-							}
-
-							// A keyword is most likely to be 'transparent' or 'currentColor'
-							if (colorKeywords.has(identifierText)) {
-								let colorKeyword = identifierText.toLowerCase()
-								colors.push(colorKeyword, property, identifierLoc)
-								colorFormats.p(colorKeyword, identifierLoc)
-								return
-							}
-
-							// Or it can be a named color
-							if (namedColors.has(identifierText)) {
-								colors.push(identifierText.toLowerCase(), property, identifierLoc)
-								colorFormats.p('named', identifierLoc)
-								return
-							}
-
-							// Or it can be a system color
-							if (systemColors.has(identifierText)) {
-								colors.push(identifierText.toLowerCase(), property, identifierLoc)
-								colorFormats.p('system', identifierLoc)
-								return
-							}
+						// Bail out if it can't be a color name
+						// 20 === 'lightgoldenrodyellow'.length
+						// 3 === 'red'.length
+						let nodeLen = identifierText.length
+						if (nodeLen > 20 || nodeLen < 3) {
 							return SKIP
 						}
-						case FUNCTION: {
-							let funcName = valueNode.name
-							let funcLoc = toLoc(valueNode)
 
-							// rgb(a), hsl(a), color(), hwb(), lch(), lab(), oklab(), oklch()
-							if (colorFunctions.has(funcName)) {
-								colors.push(valueNode.text, property, funcLoc)
-								colorFormats.p(funcName.toLowerCase(), funcLoc)
-								return
-							}
-
-							if (endsWith('gradient', funcName)) {
-								gradients.p(valueNode.text, funcLoc)
-							}
-							// No SKIP here intentionally,
-							// otherwise we'll miss colors in linear-gradient(), var() fallbacks, etc.
+						// A keyword is most likely to be 'transparent' or 'currentColor'
+						if (colorKeywords.has(identifierText)) {
+							let colorKeyword = identifierText.toLowerCase()
+							colors.push(colorKeyword, property, identifierLoc)
+							colorFormats.p(colorKeyword, identifierLoc)
+							return
 						}
+
+						// Or it can be a named color
+						if (namedColors.has(identifierText)) {
+							colors.push(identifierText.toLowerCase(), property, identifierLoc)
+							colorFormats.p('named', identifierLoc)
+							return
+						}
+
+						// Or it can be a system color
+						if (systemColors.has(identifierText)) {
+							colors.push(identifierText.toLowerCase(), property, identifierLoc)
+							colorFormats.p('system', identifierLoc)
+							return
+						}
+						return SKIP
+					}
+
+					if (is_function(valueNode)) {
+						let funcName = valueNode.name
+						let funcLoc = toLoc(valueNode)
+
+						// rgb(a), hsl(a), color(), hwb(), lch(), lab(), oklab(), oklch()
+						if (colorFunctions.has(funcName)) {
+							colors.push(valueNode.text, property, funcLoc)
+							colorFormats.p(funcName.toLowerCase(), funcLoc)
+							return
+						}
+
+						if (endsWith('gradient', funcName)) {
+							gradients.p(valueNode.text, funcLoc)
+						}
+						// No SKIP here intentionally,
+						// otherwise we'll miss colors in linear-gradient(), var() fallbacks, etc.
 					}
 				})
 			}

@@ -1,7 +1,6 @@
+import { type CSSNode, type Value, is_identifier, is_operator, is_dimension, is_function } from '@projectwallace/css-parser'
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
-import type { CSSNode, Value } from '@projectwallace/css-parser'
-import { is_identifier, is_operator, is_dimension, is_function } from '@projectwallace/css-parser'
 
 const TIMING_KEYWORDS = new KeywordSet(['linear', 'ease', 'ease-in', 'ease-out', 'ease-in-out', 'step-start', 'step-end'])
 

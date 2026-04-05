@@ -102,7 +102,7 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 						b += 1
 
 						// Get NODE_SELECTOR_NTH_OF which contains the "of" selector list
-						const nthOf = current.first_child as CSSNode // TODO: remove after css-parser 0.14.8 is released
+						const nthOf = current.first_child
 						if (is_nth_of_selector(nthOf) && nthOf.selector) {
 							// Use the convenience property to access the selector list directly
 							const max2 = max(calculate(nthOf.selector))
