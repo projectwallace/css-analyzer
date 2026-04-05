@@ -42,7 +42,7 @@
 		"node": ">=18.0.0"
 	},
 	"scripts": {
-		"lint": "oxlint --config .oxlintrc.json",
+		"lint": "oxlint --config .oxlintrc.json; oxfmt --check",
 		"lint-package": "publint",
 		"test": "vitest --coverage",
 		"check": "tsc --noEmit",
@@ -71,13 +71,13 @@
 	},
 	"devDependencies": {
 		"@codecov/rollup-plugin": "^1.9.1",
-		"@vitest/coverage-v8": "^4.0.18",
-		"knip": "^6.0.4",
-		"oxlint": "^1.43.0",
-		"prettier": "^3.6.2",
-		"publint": "^0.3.17",
-		"tsdown": "^0.21.0",
+		"@vitest/coverage-v8": "^4.1.2",
+		"knip": "^6.3.0",
+		"oxfmt": "^0.43.0",
+		"oxlint": "^1.58.0",
+		"publint": "^0.3.18",
+		"tsdown": "^0.21.7",
 		"typescript": "^6.0.2",
-		"vitest": "^4.0.18"
+		"vitest": "^4.1.2"
 	}
 }
