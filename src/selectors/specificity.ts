@@ -83,7 +83,7 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 						if (current.has_children) {
 							// The first child should be a NODE_SELECTOR_LIST
 							const childSelectorList = current.first_child
-							if (is_selector_list(childSelectorList)) {
+							if (childSelectorList && is_selector_list(childSelectorList)) {
 								// Calculate Specificity for all selectors in the list and get max
 								const max1 = max(calculate(childSelectorList))
 
@@ -103,7 +103,7 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 
 						// Get NODE_SELECTOR_NTH_OF which contains the "of" selector list
 						const nthOf = current.first_child
-						if (is_nth_of_selector(nthOf) && nthOf.selector) {
+						if (nthOf && is_nth_of_selector(nthOf) && nthOf.selector) {
 							// Use the convenience property to access the selector list directly
 							const max2 = max(calculate(nthOf.selector))
 
@@ -121,7 +121,7 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 						b += 1
 
 						const selector_list = current.first_child
-						const childSelector = selector_list.first_child
+						const childSelector = selector_list?.first_child
 						if (childSelector && is_selector(childSelector)) {
 							// Calculate specificity for parts before the first combinator
 							let childPart = childSelector.first_child
@@ -165,8 +165,8 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 						c += 1
 
 						const selector_list = current.first_child
-						const childSelector = selector_list.first_child
-						if (is_selector(childSelector)) {
+						const childSelector = selector_list?.first_child
+						if (childSelector && is_selector(childSelector)) {
 							// Calculate specificity for parts before the first combinator
 							let childPart = childSelector.first_child
 							while (childPart) {
