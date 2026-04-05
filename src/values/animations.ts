@@ -1,45 +1,41 @@
+import { type CSSNode, type Value, is_identifier, is_operator, is_dimension, is_function } from '@projectwallace/css-parser'
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
-import type { CSSNode } from '@projectwallace/css-parser'
-import { OPERATOR, DIMENSION, IDENTIFIER, FUNCTION } from '@projectwallace/css-parser'
 
 const TIMING_KEYWORDS = new KeywordSet(['linear', 'ease', 'ease-in', 'ease-out', 'ease-in-out', 'step-start', 'step-end'])
 
 const TIMING_FUNCTION_VALUES = new KeywordSet(['cubic-bezier', 'steps'])
 
-export function analyzeAnimation(children: CSSNode[], cb: ({ type, value }: { type: string; value: CSSNode }) => void) {
+export function analyzeAnimation(value: Value, cb: ({ type, value }: { type: string; value: CSSNode }) => void) {
 	let durationFound = false
 
-	for (let child of children) {
-		let type = child.type
-		let name = child.name
-
+	for (let node of value) {
 		// Right after a ',' we start over again
-		if (type === OPERATOR) {
+		if (is_operator(node)) {
 			durationFound = false
-		} else if (type === DIMENSION && durationFound === false) {
+		} else if (is_dimension(node) && durationFound === false) {
 			// The first Dimension is the duration, the second is the delay
 			durationFound = true
 			cb({
 				type: 'duration',
-				value: child,
+				value: node,
 			})
-		} else if (type === IDENTIFIER && name) {
-			if (TIMING_KEYWORDS.has(name)) {
+		} else if (is_identifier(node)) {
+			if (TIMING_KEYWORDS.has(node.name)) {
 				cb({
 					type: 'fn',
-					value: child,
+					value: node,
 				})
-			} else if (keywords.has(name)) {
+			} else if (keywords.has(node.name)) {
 				cb({
 					type: 'keyword',
-					value: child,
+					value: node,
 				})
 			}
-		} else if (type === FUNCTION && name && TIMING_FUNCTION_VALUES.has(name)) {
+		} else if (is_function(node) && TIMING_FUNCTION_VALUES.has(node.name)) {
 			cb({
 				type: 'fn',
-				value: child,
+				value: node,
 			})
 		}
 	}

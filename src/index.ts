@@ -6,26 +6,27 @@ import {
 	str_starts_with,
 	walk,
 	parse,
-	AT_RULE,
-	BLOCK,
-	DECLARATION,
-	STYLE_RULE,
-	SELECTOR_LIST,
-	SELECTOR,
-	URL,
-	MEDIA_FEATURE,
-	SUPPORTS_QUERY,
-	LAYER_NAME,
-	CONTAINER_QUERY,
-	IDENTIFIER,
-	OPERATOR,
-	DIMENSION,
-	FUNCTION,
-	HASH,
-	ATTRIBUTE_SELECTOR,
-	TYPE_SELECTOR,
-	PSEUDO_CLASS_SELECTOR,
-	PSEUDO_ELEMENT_SELECTOR,
+	is_atrule_prelude,
+	is_selector_list,
+	is_rule,
+	is_raw,
+	is_atrule,
+	is_selector,
+	is_declaration,
+	is_supports_query,
+	is_layer_name,
+	is_identifier,
+	is_attribute_selector,
+	is_type_selector,
+	is_pseudo_class_selector,
+	is_pseudo_element_selector,
+	is_url,
+	is_media_feature,
+	is_container_query,
+	is_dimension,
+	is_hash,
+	is_function,
+	is_operator,
 } from '@projectwallace/css-parser'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isPrefixed, isAccessibility } from './selectors/utils.js'
@@ -35,12 +36,12 @@ import { destructure, SYSTEM_FONTS } from './values/destructure-font-shorthand.j
 import { keywords, isValueReset } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
+import { isIe9Hack } from './values/browserhacks.js'
 import { ContextCollection } from './context-collection.js'
 import { Collection, type Location } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
 import { endsWith, unquote } from './string-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
-import { isIe9Hack } from './values/browserhacks.js'
 import { basename, SPACING_RESET_PROPERTIES, border_radius_properties, shorthand_properties } from './properties/property-utils.js'
 
 export type Specificity = [number, number, number]
@@ -216,7 +217,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 		let inKeyframes = keyframesDepth >= 0 && depth > keyframesDepth
 
 		// Count nodes and track nesting
-		if (node.type === AT_RULE) {
+		if (is_atrule(node)) {
 			let atruleLoc = toLoc(node)
 			atruleNesting.push(depth)
 			uniqueAtruleNesting.p(depth, atruleLoc)
@@ -229,10 +230,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				if (useLocations) {
 					fontfaces_with_loc.p(node.start, toLoc(node))
 				}
-				let block = node.children.find((child: CSSNode) => child.type === BLOCK)
+				let block = node.block
 				for (let descriptor of block?.children || []) {
-					if (descriptor.type === DECLARATION && descriptor.value) {
-						descriptors[descriptor.property!] = (descriptor.value as CSSNode).text
+					if (is_declaration(descriptor) && descriptor.value) {
+						descriptors[descriptor.property] = descriptor.value.text
 					}
 				}
 				atRuleComplexities.push(1)
@@ -240,7 +241,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			}
 			//#endregion
 
-			if (node.prelude === null || node.prelude === undefined) {
+			// oxlint-disable-next-line no-negated-condition
+			if (!node.has_prelude) {
 				if (normalized_name === 'layer') {
 					// @layer without a prelude is anonymous
 					layers.p('<anonymous>', toLoc(node))
@@ -252,6 +254,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				// All the AtRules in here MUST have a prelude, so we can count their names
 				if (normalized_name === 'media') {
 					medias.p(node.prelude.text, toLoc(node))
+
 					isMediaBrowserhack(node.prelude, (hack) => {
 						mediaBrowserhacks.p(hack, toLoc(node))
 						complexity++
@@ -281,20 +284,23 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				} else if (normalized_name === 'import') {
 					imports.p(node.prelude.text, toLoc(node))
 
-					if (node.prelude.has_children) {
+					if (is_atrule_prelude(node.prelude) && node.prelude.has_children) {
 						for (let child of node.prelude) {
-							if (child.type === SUPPORTS_QUERY && typeof child.value === 'string') {
+							if (is_supports_query(child)) {
 								supports.p(child.value, toLoc(child))
-							} else if (child.type === LAYER_NAME && typeof child.value === 'string') {
+							} else if (is_layer_name(child) && child.value) { // can be empty string
 								layers.p(child.value, toLoc(child))
 							}
 						}
 					}
 				} else if (normalized_name === 'container') {
-					containers.p(node.prelude.text, toLoc(node))
-					if (node.prelude.first_child?.type === CONTAINER_QUERY) {
-						if (node.prelude.first_child.first_child?.type === IDENTIFIER) {
-							containerNames.p(node.prelude.first_child.first_child.text, toLoc(node))
+					let {prelude} = node
+					containers.p(prelude.text, toLoc(node))
+					if (is_atrule_prelude(prelude) && is_container_query(prelude.first_child)) {
+						let container_query = prelude.first_child
+						let container_name = container_query.first_child
+						if (container_name && is_identifier(container_name)) {
+							containerNames.p(container_name.text, toLoc(node))
 						}
 					}
 				} else if (normalized_name === 'property') {
@@ -311,11 +317,11 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 				atRuleComplexities.push(complexity)
 			}
-		} else if (node.type === STYLE_RULE) {
+		} else if (is_rule(node)) {
 			// Handle keyframe rules specially
-			if (inKeyframes && node.prelude) {
-				if (node.prelude.type === SELECTOR_LIST && node.prelude.children.length > 0) {
-					for (let keyframe_selector of node.prelude.children) {
+			if (inKeyframes && node.has_prelude) {
+				if (is_selector_list(node.prelude) && node.prelude.child_count > 0) {
+					for (let keyframe_selector of node.prelude) {
 						keyframeSelectors.p(keyframe_selector.text, toLoc(keyframe_selector))
 					}
 				}
@@ -337,9 +343,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				let loc = toLoc(node)
 
 				// Find the SelectorList child and count Selector nodes inside it
-				if (node.prelude) {
-					for (const selector of node.prelude.children) {
-						if (selector.type === SELECTOR) {
+				if (node.has_prelude && is_selector_list(node.prelude)) {
+					for (const selector of node.prelude) {
+						if (is_selector(selector)) {
 							numSelectors++
 						}
 					}
@@ -347,8 +353,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 				// Count declarations in the block
 				if (node.block) {
-					for (const declaration of node.block.children) {
-						if (declaration.type === DECLARATION) {
+					for (const declaration of node.block) {
+						if (is_declaration(declaration)) {
 							numDeclarations++
 						}
 					}
@@ -367,7 +373,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				ruleNesting.push(depth)
 				uniqueRuleNesting.p(depth, loc)
 			}
-		} else if (node.type === SELECTOR) {
+		} else if (is_selector(node)) {
 			// Keyframe selectors are now handled at the Rule level, so skip them here
 			if (inKeyframes) {
 				return SKIP
@@ -393,14 +399,14 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			})
 
 			walk(node, (child) => {
-				if (child.type === ATTRIBUTE_SELECTOR) {
-					attributeSelectors.p(child.name?.toLowerCase() ?? '', loc)
-				} else if (child.type === TYPE_SELECTOR && !child.name?.startsWith('--') && child.name?.includes('-')) {
+				if (is_attribute_selector(child)) {
+					attributeSelectors.p(child.name.toLowerCase(), loc)
+				} else if (is_type_selector(child) && !child.name.startsWith('--') && child.name.includes('-')) {
 					customElementSelectors.p(child.name.toLowerCase(), loc)
-				} else if (child.type === PSEUDO_CLASS_SELECTOR) {
-					pseudoClasses.p(child.name?.toLowerCase() ?? '', loc)
-				} else if (child.type === PSEUDO_ELEMENT_SELECTOR) {
-					pseudoElements.p(child.name?.toLowerCase() ?? '', loc)
+				} else if (is_pseudo_class_selector(child)) {
+					pseudoClasses.p(child.name.toLowerCase(), loc)
+				} else if (is_pseudo_element_selector(child)) {
+					pseudoElements.p(child.name.toLowerCase(), loc)
 				}
 			})
 
@@ -445,9 +451,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			// with :where() or :is() that contain SelectorLists
 			// as children
 			return SKIP
-		} else if (node.type === DECLARATION) {
+		} else if (is_declaration(node)) {
 			totalDeclarations++
-			uniqueDeclarations.add(node.text)
+			let declaration = node.text
+			uniqueDeclarations.add(declaration)
 
 			let loc = toLoc(node)
 			let declarationDepth = depth > 0 ? depth - 1 : 0
@@ -458,7 +465,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			if (node.is_important) {
 				complexity++
 
-				let declaration = node.text
 				if (!declaration.toLowerCase().includes('!important')) {
 					valueBrowserhacks.p('!ie', toLoc(node.value as CSSNode))
 				}
@@ -511,7 +517,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			//#region VALUES
 			// Values are analyzed inside declaration because we need context, like which property is used
 			{
-				let value = node.value as CSSNode
+				let value = node.value
+				if (!value) return
+				if (is_raw(value)) return
 
 				let { text } = value
 				let valueLoc = toLoc(value)
@@ -609,7 +617,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						lineHeights.p(normalized, valueLoc)
 					}
 				} else if (normalizedProperty === 'transition' || normalizedProperty === 'animation') {
-					analyzeAnimation(value.children, function (item) {
+					analyzeAnimation(value, function (item) {
 						if (item.type === 'fn') {
 							timingFunctions.p(item.value.text.toLowerCase(), valueLoc)
 						} else if (item.type === 'duration') {
@@ -621,7 +629,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					return SKIP
 				} else if (normalizedProperty === 'animation-duration' || normalizedProperty === 'transition-duration') {
 					for (let child of value.children) {
-						if (child.type !== OPERATOR) {
+						if (!is_operator(child)) {
 							let text = child.text
 							if (/var\(/i.test(text)) {
 								durations.p(text, valueLoc)
@@ -632,7 +640,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					}
 				} else if (normalizedProperty === 'transition-timing-function' || normalizedProperty === 'animation-timing-function') {
 					for (let child of value.children) {
-						if (child.type !== OPERATOR) {
+						if (!is_operator(child)) {
 							timingFunctions.p(child.text, valueLoc)
 						}
 					}
@@ -641,7 +649,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				} else if (normalizedProperty === 'container') {
 					// The first identifier in the `container` shorthand is the container name
 					// Example: container: my-layout / inline-size;
-					if (value.first_child?.type === IDENTIFIER) {
+					if (value.first_child && is_identifier(value.first_child)) {
 						containerNames.p(value.first_child.text, valueLoc)
 					}
 				} else if (border_radius_properties.has(normalizedProperty)) {
@@ -656,108 +664,109 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				let valueHasIe9Hack = isIe9Hack(value)
 
 				walk(value, (valueNode) => {
-					switch (valueNode.type) {
-						case DIMENSION: {
-							let unit = valueNode.unit?.toLowerCase() ?? ''
-							let loc = toLoc(valueNode)
-							units.push(unit, property, loc)
+					if (is_dimension(valueNode)) {
+						let unit = valueNode.unit.toLowerCase()
+						let loc = toLoc(valueNode)
+						units.push(unit, property, loc)
+						return SKIP
+					}
+
+					if (is_hash(valueNode)) {
+						// Use text property for the hash value
+						let hashText = valueNode.text
+						if (!hashText || !hashText.startsWith('#')) {
 							return SKIP
 						}
-						case HASH: {
-							// Use text property for the hash value
-							let hashText = valueNode.text
-							if (!hashText || !hashText.startsWith('#')) {
-								return SKIP
-							}
-							let hashValue = hashText.toLowerCase()
+						let hashValue = hashText.toLowerCase()
 
-							// If the full value has an IE9 hack, append it to the hash
-							if (valueHasIe9Hack && !hashValue.endsWith('\\9')) {
-								hashValue = hashValue + '\\9'
-							}
+						// If the full value has an IE9 hack, append it to the hash
+						if (valueHasIe9Hack && !hashValue.endsWith('\\9')) {
+							hashValue = hashValue + '\\9'
+						}
 
-							// Calculate hex length (excluding the # and any IE9 browserhack \9)
-							let hexLength = hashValue.length - 1 // Remove the # from length
-							if (endsWith('\\9', hashValue)) {
-								hexLength = hexLength - 2 // Remove the \9 from length
-							}
+						// Calculate hex length (excluding the # and any IE9 browserhack \9)
+						let hexLength = hashValue.length - 1 // Remove the # from length
+						if (endsWith('\\9', hashValue)) {
+							hexLength = hexLength - 2 // Remove the \9 from length
+						}
 
-							let hashLoc = toLoc(valueNode)
-							colors.push(hashValue, property, hashLoc)
-							colorFormats.p(`hex` + hexLength, hashLoc)
+						let hashLoc = toLoc(valueNode)
+						colors.push(hashValue, property, hashLoc)
+						colorFormats.p(`hex` + hexLength, hashLoc)
 
+						return SKIP
+					}
+
+					if (is_identifier(valueNode)) {
+						let identifierText = valueNode.text
+						let identifierLoc = toLoc(valueNode)
+
+						// Skip all identifier processing for font properties to avoid:
+						// 1. False positives for colors (e.g., "Black" as a font family vs. "black" the color)
+						// 2. Duplicate keywords (already extracted by destructure)
+						if (normalizedProperty === 'font' || normalizedProperty === 'font-family') {
 							return SKIP
 						}
-						case IDENTIFIER: {
-							let identifierText = valueNode.text
-							let identifierLoc = toLoc(valueNode)
 
-							// Skip all identifier processing for font properties to avoid:
-							// 1. False positives for colors (e.g., "Black" as a font family vs. "black" the color)
-							// 2. Duplicate keywords (already extracted by destructure)
-							if (normalizedProperty === 'font' || normalizedProperty === 'font-family') {
-								return SKIP
-							}
+						if (keywords.has(identifierText)) {
+							valueKeywords.p(identifierText.toLowerCase(), identifierLoc)
+						}
 
-							if (keywords.has(identifierText)) {
-								valueKeywords.p(identifierText.toLowerCase(), identifierLoc)
-							}
-
-							// Bail out if it can't be a color name
-							// 20 === 'lightgoldenrodyellow'.length
-							// 3 === 'red'.length
-							let nodeLen = identifierText.length
-							if (nodeLen > 20 || nodeLen < 3) {
-								return SKIP
-							}
-
-							// A keyword is most likely to be 'transparent' or 'currentColor'
-							if (colorKeywords.has(identifierText)) {
-								let colorKeyword = identifierText.toLowerCase()
-								colors.push(colorKeyword, property, identifierLoc)
-								colorFormats.p(colorKeyword, identifierLoc)
-								return
-							}
-
-							// Or it can be a named color
-							if (namedColors.has(identifierText)) {
-								colors.push(identifierText.toLowerCase(), property, identifierLoc)
-								colorFormats.p('named', identifierLoc)
-								return
-							}
-
-							// Or it can be a system color
-							if (systemColors.has(identifierText)) {
-								colors.push(identifierText.toLowerCase(), property, identifierLoc)
-								colorFormats.p('system', identifierLoc)
-								return
-							}
+						// Bail out if it can't be a color name
+						// 20 === 'lightgoldenrodyellow'.length
+						// 3 === 'red'.length
+						let nodeLen = identifierText.length
+						if (nodeLen > 20 || nodeLen < 3) {
 							return SKIP
 						}
-						case FUNCTION: {
-							let funcName = valueNode.name as string
-							let funcLoc = toLoc(valueNode)
 
-							// rgb(a), hsl(a), color(), hwb(), lch(), lab(), oklab(), oklch()
-							if (colorFunctions.has(funcName)) {
-								colors.push(valueNode.text, property, funcLoc)
-								colorFormats.p(funcName.toLowerCase(), funcLoc)
-								return
-							}
-
-							if (endsWith('gradient', funcName)) {
-								gradients.p(valueNode.text, funcLoc)
-							}
-							// No SKIP here intentionally,
-							// otherwise we'll miss colors in linear-gradient(), var() fallbacks, etc.
+						// A keyword is most likely to be 'transparent' or 'currentColor'
+						if (colorKeywords.has(identifierText)) {
+							let colorKeyword = identifierText.toLowerCase()
+							colors.push(colorKeyword, property, identifierLoc)
+							colorFormats.p(colorKeyword, identifierLoc)
+							return
 						}
+
+						// Or it can be a named color
+						if (namedColors.has(identifierText)) {
+							colors.push(identifierText.toLowerCase(), property, identifierLoc)
+							colorFormats.p('named', identifierLoc)
+							return
+						}
+
+						// Or it can be a system color
+						if (systemColors.has(identifierText)) {
+							colors.push(identifierText.toLowerCase(), property, identifierLoc)
+							colorFormats.p('system', identifierLoc)
+							return
+						}
+						return SKIP
+					}
+
+					if (is_function(valueNode)) {
+						let funcName = valueNode.name
+						let funcLoc = toLoc(valueNode)
+
+						// rgb(a), hsl(a), color(), hwb(), lch(), lab(), oklab(), oklch()
+						if (colorFunctions.has(funcName)) {
+							colors.push(valueNode.text, property, funcLoc)
+							colorFormats.p(funcName.toLowerCase(), funcLoc)
+							return
+						}
+
+						if (endsWith('gradient', funcName)) {
+							gradients.p(valueNode.text, funcLoc)
+						}
+						// No SKIP here intentionally,
+						// otherwise we'll miss colors in linear-gradient(), var() fallbacks, etc.
 					}
 				})
 			}
 			//#endregion VALUES
-		} else if (node.type === URL) {
+		} else if (is_url(node)) {
 			let { value } = node
-			let embed = unquote((value as string) || '')
+			let embed = unquote(value ?? '')
 			if (str_starts_with(embed, 'data:')) {
 				let size = embed.length
 				let type = getEmbedType(embed)
@@ -789,10 +798,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					embedTypes.unique.set(type, item)
 				}
 			}
-		} else if (node.type === MEDIA_FEATURE) {
-			if (node.property) {
-				mediaFeatures.p(node.property.toLowerCase(), toLoc(node))
-			}
+		} else if (is_media_feature(node)) {
+			mediaFeatures.p(node.property?.toLowerCase(), toLoc(node))
 			return SKIP
 		}
 	})

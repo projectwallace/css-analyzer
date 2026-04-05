@@ -4,17 +4,20 @@
 // https://github.com/bramus/specificity/blob/80938c4cf77518a4d4abe559eb5a5ff919626c39/src/core/calculate.js
 
 import {
-	type CSSNode,
 	ID_SELECTOR,
 	ATTRIBUTE_SELECTOR,
 	CLASS_SELECTOR,
 	PSEUDO_CLASS_SELECTOR,
-	SELECTOR_LIST,
-	NTH_OF_SELECTOR,
-	SELECTOR,
 	COMBINATOR,
 	PSEUDO_ELEMENT_SELECTOR,
 	TYPE_SELECTOR,
+	type CSSNode,
+	type Selector,
+	type SelectorNode,
+	is_selector_list,
+	is_nth_of_selector,
+	is_selector,
+	is_combinator,
 } from '@projectwallace/css-parser'
 import { parse_selector } from '@projectwallace/css-parser/parse-selector'
 
@@ -37,7 +40,7 @@ function max(list: Specificity[]): Specificity {
 	return list.sort(compare).at(-1)!
 }
 
-export const calculateForAST = (selectorAST: CSSNode): Specificity => {
+export const calculateForAST = (selectorAST: Selector): Specificity => {
 	// https://www.w3.org/TR/selectors-4/#specificity-rules
 	let a = 0 /* ID Selectors */
 	let b = 0 /* Class selectors, Attributes selectors, and Pseudo-classes */
@@ -45,6 +48,7 @@ export const calculateForAST = (selectorAST: CSSNode): Specificity => {
 
 	// Iterate through all parts of the selector (children of NODE_SELECTOR)
 	let current = selectorAST.first_child
+
 	while (current) {
 		switch (current.type) {
 			case ID_SELECTOR:
@@ -57,7 +61,7 @@ export const calculateForAST = (selectorAST: CSSNode): Specificity => {
 				break
 
 			case PSEUDO_CLASS_SELECTOR:
-				switch (current.name?.toLowerCase()) {
+				switch (current.name.toLowerCase()) {
 					// "The specificity of a :where() pseudo-class is replaced by zero."
 					case 'where':
 						// Noop :)
@@ -79,7 +83,7 @@ export const calculateForAST = (selectorAST: CSSNode): Specificity => {
 						if (current.has_children) {
 							// The first child should be a NODE_SELECTOR_LIST
 							const childSelectorList = current.first_child
-							if (childSelectorList?.type === SELECTOR_LIST) {
+							if (is_selector_list(childSelectorList)) {
 								// Calculate Specificity for all selectors in the list and get max
 								const max1 = max(calculate(childSelectorList))
 
@@ -99,7 +103,7 @@ export const calculateForAST = (selectorAST: CSSNode): Specificity => {
 
 						// Get NODE_SELECTOR_NTH_OF which contains the "of" selector list
 						const nthOf = current.first_child
-						if (nthOf?.type === NTH_OF_SELECTOR && nthOf.selector) {
+						if (is_nth_of_selector(nthOf) && nthOf.selector) {
 							// Use the convenience property to access the selector list directly
 							const max2 = max(calculate(nthOf.selector))
 
@@ -116,24 +120,25 @@ export const calculateForAST = (selectorAST: CSSNode): Specificity => {
 					case 'host':
 						b += 1
 
-						const childSelector = current.first_child?.first_child
-						if (childSelector?.type === SELECTOR) {
+						const selector_list = current.first_child
+						const childSelector = selector_list.first_child
+						if (childSelector && is_selector(childSelector)) {
 							// Calculate specificity for parts before the first combinator
 							let childPart = childSelector.first_child
 							while (childPart) {
-								if (childPart.type === COMBINATOR) break
+								if (is_combinator(childPart)) break
 
 								// Calculate contribution from this part
 								const partSpecificity = calculateForAST({
 									type_name: 'Selector',
 									first_child: childPart,
 									has_children: true,
-								} as CSSNode)
+								} as Selector)
 								a += partSpecificity[0] ?? 0
 								b += partSpecificity[1] ?? 0
 								c += partSpecificity[2] ?? 0
 
-								childPart = childPart.next_sibling
+								childPart = childPart.next_sibling as SelectorNode
 							}
 						}
 						break
@@ -154,29 +159,30 @@ export const calculateForAST = (selectorAST: CSSNode): Specificity => {
 				break
 
 			case PSEUDO_ELEMENT_SELECTOR:
-				switch (current.name?.toLowerCase()) {
+				switch (current.name.toLowerCase()) {
 					// "The specificity of ::slotted() is that of a pseudo-element, plus the specificity of its argument."
 					case 'slotted':
 						c += 1
 
-						const childSelector = current.first_child?.first_child
-						if (childSelector?.type === SELECTOR) {
+						const selector_list = current.first_child
+						const childSelector = selector_list.first_child
+						if (is_selector(childSelector)) {
 							// Calculate specificity for parts before the first combinator
 							let childPart = childSelector.first_child
 							while (childPart) {
-								if (childPart.type === COMBINATOR) break
+								if (is_combinator(childPart)) break
 
 								// Calculate contribution from this part
 								const partSpecificity = calculateForAST({
 									type_name: 'Selector',
 									first_child: childPart,
 									has_children: true,
-								} as CSSNode)
+								} as Selector)
 								a += partSpecificity[0] ?? 0
 								b += partSpecificity[1] ?? 0
 								c += partSpecificity[2] ?? 0
 
-								childPart = childPart.next_sibling
+								childPart = childPart.next_sibling as SelectorNode
 							}
 						}
 						break
@@ -218,7 +224,7 @@ export const calculateForAST = (selectorAST: CSSNode): Specificity => {
 				break
 		}
 
-		current = current.next_sibling
+		current = current.next_sibling as SelectorNode
 	}
 
 	return [a, b, c]
@@ -239,7 +245,7 @@ const convertToAST = (source: string | CSSNode) => {
 	// The passed in argument was an Object.
 	// ~> Let's verify if it's a AST of the type NODE_SELECTOR_LIST
 	if (source instanceof Object) {
-		if (source.type === SELECTOR_LIST) {
+		if (is_selector_list(source)) {
 			return source
 		}
 
@@ -257,16 +263,14 @@ export const calculate = (selector: string | CSSNode): Specificity[] => {
 
 	// Make sure we have a SelectorList AST
 	// If not, an exception will be thrown
-	const ast = convertToAST(selector)
+	const selector_list = convertToAST(selector)
 
 	// SelectorList - the ast is always a SelectorList
 	// Its children are NODE_SELECTOR (type 5) nodes
 	// ~> Calculate Specificity for each NODE_SELECTOR
 	const specificities: Specificity[] = []
-	let selectorNode = ast.first_child
-	while (selectorNode) {
-		specificities.push(calculateForAST(selectorNode))
-		selectorNode = selectorNode.next_sibling
+	for (const selector_node of selector_list) {
+		specificities.push(calculateForAST(selector_node))
 	}
 	return specificities
 }
