@@ -16,11 +16,25 @@ import {
 } from '@projectwallace/css-parser'
 import { unquote } from '../string-utils.js'
 
-const PSEUDO_FUNCTIONS = new KeywordSet(['nth-child', 'where', 'not', 'is', 'has', 'nth-last-child', 'matches', '-webkit-any', '-moz-any'])
+const PSEUDO_FUNCTIONS = new KeywordSet([
+	'nth-child',
+	'where',
+	'not',
+	'is',
+	'has',
+	'nth-last-child',
+	'matches',
+	'-webkit-any',
+	'-moz-any',
+])
 
 export function isPrefixed(selector: CSSNode, on_selector: (prefix: string) => void): void {
 	walk(selector, function (node) {
-		if (is_pseudo_element_selector(node) || is_pseudo_class_selector(node) || is_type_selector(node)) {
+		if (
+			is_pseudo_element_selector(node) ||
+			is_pseudo_class_selector(node) ||
+			is_type_selector(node)
+		) {
 			if (node.is_vendor_prefixed) {
 				let prefix = ''
 				if (is_pseudo_class_selector(node)) {
@@ -37,13 +51,24 @@ export function isPrefixed(selector: CSSNode, on_selector: (prefix: string) => v
 /**
  * Check if a Wallace selector is an accessibility selector (has aria-* or role attribute)
  */
-export function isAccessibility(selector: CSSNode, on_selector: (a11y_selector: string) => void): void {
+export function isAccessibility(
+	selector: CSSNode,
+	on_selector: (a11y_selector: string) => void,
+): void {
 	function normalize(node: CSSNode) {
 		let clone = node.clone()
 		// We're intentionally not adding attr_flags here because they don't matter for normalization
 		// Also not lowercasing node.value because that DOES matter for CSS
 		if (clone.value) {
-			return '[' + clone.name?.toLowerCase() + clone.attr_operator + '"' + unquote(clone.value.toString()) + '"' + ']'
+			return (
+				'[' +
+				clone.name?.toLowerCase() +
+				clone.attr_operator +
+				'"' +
+				unquote(clone.value.toString()) +
+				'"' +
+				']'
+			)
 		}
 		return '[' + clone.name?.toLowerCase() + ']'
 	}
@@ -96,7 +121,11 @@ export function getComplexity(selector: CSSNode): number {
 		complexity++
 
 		// Check for vendor-prefixed pseudo-elements, type selectors, and pseudo-classes
-		if (is_pseudo_class_selector(node) || is_type_selector(node) || is_pseudo_element_selector(node)) {
+		if (
+			is_pseudo_class_selector(node) ||
+			is_type_selector(node) ||
+			is_pseudo_element_selector(node)
+		) {
 			if (node.is_vendor_prefixed) {
 				complexity++
 			}
@@ -151,7 +180,10 @@ export function getComplexity(selector: CSSNode): number {
 /**
  * Walk a selector node and trigger a callback every time a Combinator was found
  */
-export function getCombinators(selector: CSSNode, onMatch: ({ name, loc }: { name: string; loc: Location }) => void) {
+export function getCombinators(
+	selector: CSSNode,
+	onMatch: ({ name, loc }: { name: string; loc: Location }) => void,
+) {
 	walk(selector, function (node) {
 		if (is_combinator(node)) {
 			onMatch({

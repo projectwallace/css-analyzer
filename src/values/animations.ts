@@ -1,12 +1,30 @@
-import { type CSSNode, type Value, is_identifier, is_operator, is_dimension, is_function } from '@projectwallace/css-parser'
+import {
+	type CSSNode,
+	type Value,
+	is_identifier,
+	is_operator,
+	is_dimension,
+	is_function,
+} from '@projectwallace/css-parser'
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
 
-const TIMING_KEYWORDS = new KeywordSet(['linear', 'ease', 'ease-in', 'ease-out', 'ease-in-out', 'step-start', 'step-end'])
+const TIMING_KEYWORDS = new KeywordSet([
+	'linear',
+	'ease',
+	'ease-in',
+	'ease-out',
+	'ease-in-out',
+	'step-start',
+	'step-end',
+])
 
 const TIMING_FUNCTION_VALUES = new KeywordSet(['cubic-bezier', 'steps'])
 
-export function analyzeAnimation(value: Value, cb: ({ type, value }: { type: string; value: CSSNode }) => void) {
+export function analyzeAnimation(
+	value: Value,
+	cb: ({ type, value }: { type: string; value: CSSNode }) => void,
+) {
 	let durationFound = false
 
 	for (let node of value) {

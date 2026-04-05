@@ -180,6 +180,17 @@ export const systemColors = new KeywordSet([
 	'visitedtext',
 ])
 
-export const colorFunctions = new KeywordSet(['rgba', 'rgb', 'hsla', 'hsl', 'oklch', 'color', 'hwb', 'lch', 'lab', 'oklab'])
+export const colorFunctions = new KeywordSet([
+	'rgba',
+	'rgb',
+	'hsla',
+	'hsl',
+	'oklch',
+	'color',
+	'hwb',
+	'lch',
+	'lab',
+	'oklab',
+])
 
 export const colorKeywords = new KeywordSet(['transparent', 'currentcolor'])

@@ -12,7 +12,9 @@ export type CollectionCount<WithLocations extends boolean = false> = {
 	totalUnique: number
 	unique: Record<string, number>
 	uniquenessRatio: number
-} & (WithLocations extends true ? { uniqueWithLocations: UniqueWithLocations } : { uniqueWithLocations?: undefined })
+} & (WithLocations extends true
+	? { uniqueWithLocations: UniqueWithLocations }
+	: { uniqueWithLocations?: undefined })
 
 export class Collection<UseLocations extends boolean = false> {
 	#items: Map<string | number, number[]>

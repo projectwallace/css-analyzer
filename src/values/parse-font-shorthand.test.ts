@@ -162,7 +162,9 @@ describe('font-size', () => {
 	})
 
 	test('dimension before slash', () => {
-		const { fontSizes } = analyze(`a { font: normal normal 1em/1 "Source Sans Pro", serif; }`).values
+		const { fontSizes } = analyze(
+			`a { font: normal normal 1em/1 "Source Sans Pro", serif; }`,
+		).values
 		expect(fontSizes.unique).toEqual({ '1em': 1 })
 	})
 
@@ -262,7 +264,9 @@ describe('font-size', () => {
 
 describe('line-height', () => {
 	test('unitless number after slash', () => {
-		const { lineHeights } = analyze(`a { font: normal normal 1em/1 "Source Sans Pro", serif; }`).values
+		const { lineHeights } = analyze(
+			`a { font: normal normal 1em/1 "Source Sans Pro", serif; }`,
+		).values
 		expect(lineHeights.unique).toEqual({ '1': 1 })
 	})
 

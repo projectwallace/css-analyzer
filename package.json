@@ -1,19 +1,36 @@
 {
 	"name": "@projectwallace/css-analyzer",
-	"description": "The best CSS analyzer out there. Check design tokens, complexity, specificity, performance and more.",
 	"version": "9.6.0",
+	"description": "The best CSS analyzer out there. Check design tokens, complexity, specificity, performance and more.",
+	"keywords": [
+		"analytics",
+		"code",
+		"colors",
+		"css",
+		"designsystem",
+		"fonts",
+		"metrics",
+		"performance",
+		"projectwallace",
+		"quality",
+		"statistics",
+		"stats",
+		"styleguide",
+		"stylesheet",
+		"wallace"
+	],
+	"homepage": "https://github.com/projectwallace/css-analyzer",
+	"bugs": "https://github.com/projectwallace/css-analyzer/issues",
+	"license": "MIT",
 	"author": "Bart Veneman",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/projectwallace/css-analyzer.git"
 	},
-	"homepage": "https://github.com/projectwallace/css-analyzer",
-	"issues": "https://github.com/projectwallace/css-analyzer/issues",
-	"license": "MIT",
-	"type": "module",
 	"files": [
 		"dist"
 	],
+	"type": "module",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"exports": {
@@ -38,46 +55,29 @@
 			"default": "./dist/properties/index.js"
 		}
 	},
-	"engines": {
-		"node": ">=18.0.0"
-	},
 	"scripts": {
-		"lint": "oxlint --config .oxlintrc.json",
+		"lint": "oxlint --config .oxlintrc.json; oxfmt --check",
 		"lint-package": "publint",
 		"test": "vitest --coverage",
 		"check": "tsc --noEmit",
 		"build": "tsdown",
 		"knip": "knip"
 	},
-	"keywords": [
-		"projectwallace",
-		"wallace",
-		"css",
-		"stylesheet",
-		"stats",
-		"statistics",
-		"analytics",
-		"performance",
-		"styleguide",
-		"metrics",
-		"designsystem",
-		"fonts",
-		"colors",
-		"quality",
-		"code"
-	],
 	"dependencies": {
 		"@projectwallace/css-parser": "^0.14.8"
 	},
 	"devDependencies": {
 		"@codecov/rollup-plugin": "^1.9.1",
-		"@vitest/coverage-v8": "^4.0.18",
-		"knip": "^6.0.4",
-		"oxlint": "^1.43.0",
-		"prettier": "^3.6.2",
-		"publint": "^0.3.17",
-		"tsdown": "^0.21.0",
-		"typescript": "^5.9.3",
-		"vitest": "^4.0.18"
+		"@vitest/coverage-v8": "^4.1.2",
+		"knip": "^6.3.0",
+		"oxfmt": "^0.43.0",
+		"oxlint": "^1.58.0",
+		"publint": "^0.3.18",
+		"tsdown": "^0.21.7",
+		"typescript": "^6.0.2",
+		"vitest": "^4.1.2"
+	},
+	"engines": {
+		"node": ">=18.0.0"
 	}
 }
