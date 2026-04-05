@@ -545,7 +545,9 @@ test('tracks combinator locations', () => {
 		],
 	})
 
-	let as_strings = actual.uniqueWithLocations![' '].map((loc) => css.substring(loc.offset, loc.offset + loc.length))
+	let as_strings = actual.uniqueWithLocations![' '].map((loc) =>
+		css.substring(loc.offset, loc.offset + loc.length),
+	)
 	expect(as_strings).toEqual([' ', `\n`, ' ', ' '])
 })
 

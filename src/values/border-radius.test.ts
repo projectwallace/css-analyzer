@@ -64,13 +64,12 @@ test('finds simple values', () => {
 					'10px 5% / 20px 25em 30px 35em': 1,
 				},
 				uniquenessRatio: 1,
-			}
-		}
+			},
+		},
 	}
 
 	expect(actual).toEqual(expected)
 })
-
 
 test('finds vendor prefixed values', () => {
 	const fixture = `
@@ -103,7 +102,7 @@ test('finds vendor prefixed values', () => {
 					'10px': 1,
 				},
 				uniquenessRatio: 1,
-			}
+			},
 		},
 		uniquenessRatio: 1,
 	}
@@ -242,9 +241,8 @@ test('ignores keywords', () => {
 		unique: {},
 		totalUnique: 0,
 		itemsPerContext: {},
-		uniquenessRatio: 0
+		uniquenessRatio: 0,
 	}
 
 	expect(actual).toEqual(expected)
 })
-

@@ -1,4 +1,11 @@
-import { is_dimension, is_function, is_identifier, is_operator, is_string, type Value } from '@projectwallace/css-parser'
+import {
+	is_dimension,
+	is_function,
+	is_identifier,
+	is_operator,
+	is_string,
+	type Value,
+} from '@projectwallace/css-parser'
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
 
@@ -184,7 +191,7 @@ export function destructure(
 	if (font_family_start >= 0 && font_family_start < children.length) {
 		const first = children[font_family_start]
 		const last = children.at(-1)
-		if (first && last){
+		if (first && last) {
 			font_family = value.text.substring(first.start - value.start, last.end - value.start)
 		}
 	}

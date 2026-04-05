@@ -7,7 +7,7 @@ export default defineConfig({
 		'src/selectors/index.ts',
 		'src/atrules/index.ts',
 		'src/values/index.ts',
-		'src/properties/index.ts'
+		'src/properties/index.ts',
 	],
 	platform: 'neutral',
 	publint: true,

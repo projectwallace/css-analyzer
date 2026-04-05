@@ -79,7 +79,11 @@ export function isMediaBrowserhack(prelude: CSSNode, on_hack: (hack: string) => 
 			// Check for min-resolution with .001dpcm
 			if (str_equals('min-resolution', name) && node.has_children) {
 				for (const child of node) {
-					if (child.type === DIMENSION && child.value === 0.001 && str_equals('dpcm', child.unit || '')) {
+					if (
+						child.type === DIMENSION &&
+						child.value === 0.001 &&
+						str_equals('dpcm', child.unit || '')
+					) {
 						on_hack('min-resolution: .001dpcm')
 						return BREAK
 					}

@@ -1,19 +1,36 @@
 {
 	"name": "@projectwallace/css-analyzer",
-	"description": "The best CSS analyzer out there. Check design tokens, complexity, specificity, performance and more.",
 	"version": "9.6.0",
+	"description": "The best CSS analyzer out there. Check design tokens, complexity, specificity, performance and more.",
+	"keywords": [
+		"analytics",
+		"code",
+		"colors",
+		"css",
+		"designsystem",
+		"fonts",
+		"metrics",
+		"performance",
+		"projectwallace",
+		"quality",
+		"statistics",
+		"stats",
+		"styleguide",
+		"stylesheet",
+		"wallace"
+	],
+	"homepage": "https://github.com/projectwallace/css-analyzer",
+	"bugs": "https://github.com/projectwallace/css-analyzer/issues",
+	"license": "MIT",
 	"author": "Bart Veneman",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/projectwallace/css-analyzer.git"
 	},
-	"homepage": "https://github.com/projectwallace/css-analyzer",
-	"issues": "https://github.com/projectwallace/css-analyzer/issues",
-	"license": "MIT",
-	"type": "module",
 	"files": [
 		"dist"
 	],
+	"type": "module",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"exports": {
@@ -38,9 +55,6 @@
 			"default": "./dist/properties/index.js"
 		}
 	},
-	"engines": {
-		"node": ">=18.0.0"
-	},
 	"scripts": {
 		"lint": "oxlint --config .oxlintrc.json; oxfmt --check",
 		"lint-package": "publint",
@@ -49,23 +63,6 @@
 		"build": "tsdown",
 		"knip": "knip"
 	},
-	"keywords": [
-		"projectwallace",
-		"wallace",
-		"css",
-		"stylesheet",
-		"stats",
-		"statistics",
-		"analytics",
-		"performance",
-		"styleguide",
-		"metrics",
-		"designsystem",
-		"fonts",
-		"colors",
-		"quality",
-		"code"
-	],
 	"dependencies": {
 		"@projectwallace/css-parser": "^0.14.8"
 	},
@@ -79,5 +76,8 @@
 		"tsdown": "^0.21.7",
 		"typescript": "^6.0.2",
 		"vitest": "^4.1.2"
+	},
+	"engines": {
+		"node": ">=18.0.0"
 	}
 }

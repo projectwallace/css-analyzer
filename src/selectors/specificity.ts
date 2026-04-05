@@ -238,7 +238,9 @@ const convertToAST = (source: string | CSSNode) => {
 			return parse_selector(source)
 		} catch (e) {
 			const message = e instanceof Error ? e.message : String(e)
-			throw new TypeError(`Could not convert passed in source '${source}' to SelectorList: ${message}`)
+			throw new TypeError(
+				`Could not convert passed in source '${source}' to SelectorList: ${message}`,
+			)
 		}
 	}
 
@@ -252,7 +254,9 @@ const convertToAST = (source: string | CSSNode) => {
 		throw new TypeError(`Passed in source is an Object but no AST / AST of the type SelectorList`)
 	}
 
-	throw new TypeError(`Passed in source is not a String nor an Object. I don't know what to do with it.`)
+	throw new TypeError(
+		`Passed in source is not a String nor an Object. I don't know what to do with it.`,
+	)
 }
 
 export const calculate = (selector: string | CSSNode): Specificity[] => {
