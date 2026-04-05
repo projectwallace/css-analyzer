@@ -15,10 +15,8 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: 22
-          registry-url: https://registry.npmjs.org/
-      - run: npm install -g npm@latest
-      - run: npm install --ignore-scripts --no-audit --no-fund
+          node-version: 24
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npm test
       - run: npm run build
       - name: Bump version from release tag
