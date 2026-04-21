@@ -67,7 +67,7 @@
 		"@projectwallace/css-parser": "^0.14.8"
 	},
 	"devDependencies": {
-		"@codecov/rollup-plugin": "^1.9.1",
+		"@codecov/rollup-plugin": "^2.0.1",
 		"@vitest/coverage-v8": "^4.1.2",
 		"knip": "^6.3.0",
 		"oxfmt": "^0.46.0",
