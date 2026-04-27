@@ -36,7 +36,7 @@ import { destructure, SYSTEM_FONTS } from './values/destructure-font-shorthand.j
 import { keywords, isValueReset } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
-import { isIe9Hack } from './values/browserhacks.js'
+import { isIe9Hack, isValueBrowserhack } from './values/browserhacks.js'
 import { ContextCollection } from './context-collection.js'
 import { Collection, type Location } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
@@ -562,11 +562,15 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					complexity++
 				})
 
-				// i.e. `property: value\9`
-				if (isIe9Hack(value)) {
-					valueBrowserhacks.p('\\9', valueLoc)
-					text = text.slice(0, -2)
-					complexity++
+				// value browserhacks: progid:, \9, \7, alpha(), expression(), .htc
+				if (!is_custom(property)) {
+					isValueBrowserhack(value, (hack) => {
+						valueBrowserhacks.p(hack, valueLoc)
+						complexity++
+						if (hack === '\\9' || hack === '\\7') {
+							text = text.slice(0, -2)
+						}
+					})
 				}
 				//#endregion VALUE COMPLEXITY
 
