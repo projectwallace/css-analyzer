@@ -1,3 +1,7 @@
+// Hack references:
+// https://www.alwaystwisted.com/relicss/old-css
+// https://browserhacks.com/
+
 import {
 	type CSSNode,
 	type Value,
