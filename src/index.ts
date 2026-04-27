@@ -1106,6 +1106,8 @@ export { isHack as isPropertyHack } from './properties/property-utils.js'
 
 export { isValuePrefixed } from './values/vendor-prefix.js'
 
+export { isValueBrowserhack } from './values/browserhacks.js'
+
 export { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
 
 export { keywords as cssKeywords } from './values/values.js'
