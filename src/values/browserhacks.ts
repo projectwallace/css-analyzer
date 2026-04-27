@@ -1,4 +1,11 @@
-import { type CSSNode, type Value, is_identifier, is_function, is_url, walk } from '@projectwallace/css-parser'
+import {
+	type CSSNode,
+	type Value,
+	is_identifier,
+	is_function,
+	is_url,
+	walk,
+} from '@projectwallace/css-parser'
 import { endsWith, unquote } from '../string-utils.js'
 
 export function isIe9Hack(node: Value): boolean {
