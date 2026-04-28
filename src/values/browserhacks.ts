@@ -30,24 +30,19 @@ export function isIe9Hack(node: Value): boolean {
  * - https://www.alwaystwisted.com/relicss/old-css
  */
 export function isValueBrowserhack(node: Value, on_hack: (hack: string) => void): void {
+	let text = node.text
+
 	// filter: progid:DXImageTransform.Microsoft.gradient(...) — plain or within quotes
 	if (/progid:/i.test(node.text)) {
 		on_hack('progid:')
 	}
 
-	// Trailing \9 (IE9) and \7 (IE7) hacks — identifier appended at end of value
-	if (node.has_children) {
-		let last = node.first_child as CSSNode
-		while (last.has_next) {
-			last = last.next_sibling
-		}
-		if (is_identifier(last)) {
-			if (endsWith('\\9', last.text)) {
-				on_hack('\\9')
-			} else if (endsWith('\\7', last.text)) {
-				on_hack('\\7')
-			}
-		}
+	if (text.endsWith('\\9')) {
+		on_hack('\\9')
+	}
+
+	if (text.endsWith('\\7')) {
+		on_hack('\\7')
 	}
 
 	// alpha(), expression(), and behavior .htc hacks
