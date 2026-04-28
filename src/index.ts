@@ -36,7 +36,7 @@ import { destructure, SYSTEM_FONTS } from './values/destructure-font-shorthand.j
 import { keywords, isValueReset } from './values/values.js'
 import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
-import { isIe9Hack, isValueBrowserhack } from './values/browserhacks.js'
+import { isValueBrowserhack } from './values/browserhacks.js'
 import { ContextCollection } from './context-collection.js'
 import { Collection, type Location } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
@@ -688,9 +688,6 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					boxShadows.p(text, valueLoc)
 				}
 
-				// Check if the value has an IE9 browserhack before walking
-				let valueHasIe9Hack = isIe9Hack(value)
-
 				walk(value, (valueNode) => {
 					if (is_dimension(valueNode)) {
 						let unit = valueNode.unit.toLowerCase()
@@ -707,15 +704,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						}
 						let hashValue = hashText.toLowerCase()
 
-						// If the full value has an IE9 hack, append it to the hash
-						if (valueHasIe9Hack && !hashValue.endsWith('\\9')) {
-							hashValue = hashValue + '\\9'
-						}
-
 						// Calculate hex length (excluding the # and any IE9 browserhack \9)
 						let hexLength = hashValue.length - 1 // Remove the # from length
-						if (endsWith('\\9', hashValue)) {
-							hexLength = hexLength - 2 // Remove the \9 from length
+						if (endsWith('\\9', hashValue) || endsWith('\\7', hashValue)) {
+							hexLength = hexLength - 2 // Remove the \9 or \7 from length
 						}
 
 						let hashLoc = toLoc(valueNode)
