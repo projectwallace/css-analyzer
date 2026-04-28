@@ -9,6 +9,7 @@ import {
 	isSupportsBrowserhack,
 	isPropertyHack,
 	isValuePrefixed,
+	isValueBrowserhack,
 	hasVendorPrefix,
 	cssKeywords,
 	KeywordSet,
@@ -57,6 +58,10 @@ describe('Public API', () => {
 
 	test('exposes the "isValuePrefixed" method', () => {
 		expect(typeof isValuePrefixed).toBe('function')
+	})
+
+	test('exposes the "isValueBrowserhack" method', () => {
+		expect(typeof isValueBrowserhack).toBe('function')
 	})
 
 	test('exposes the "hasVendorPrefix" method', () => {

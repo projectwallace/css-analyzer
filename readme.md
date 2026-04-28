@@ -360,6 +360,13 @@ const isSpecificityEqual = compareSpecificity([0, 1, 0], [0, 1, 0]) === 0
 // => isSpecificityEqual: true
 ```
 
+## Acknowledgements
+
+Browser hack patterns for value detection were sourced from:
+
+- [Always Twisted - ReLiCSS Old CSS](https://www.alwaystwisted.com/relicss/old-css)
+- [Browserhacks](https://browserhacks.com/)
+
 ## Related projects
 
 - [CSS Code Quality Analyzer](https://github.com/projectwallace/css-code-quality) -

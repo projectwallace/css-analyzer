@@ -129,7 +129,7 @@ test('Counts hex format correctly when combined with a browserhack', () => {
 		total: 1,
 		totalUnique: 1,
 		unique: {
-			'#000\\9': 1,
+			'#000': 1,
 		},
 		uniquenessRatio: 1,
 		itemsPerContext: {
@@ -138,7 +138,7 @@ test('Counts hex format correctly when combined with a browserhack', () => {
 				totalUnique: 1,
 				uniquenessRatio: 1,
 				unique: {
-					'#000\\9': 1,
+					'#000': 1,
 				},
 			},
 		},
