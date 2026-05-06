@@ -14,6 +14,7 @@ import {
 	is_selector,
 	is_declaration,
 	is_supports_query,
+	is_supports_declaration,
 	is_layer_name,
 	is_identifier,
 	is_attribute_selector,
@@ -468,6 +469,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			// our specificity calculations in case of a selector
 			// with :where() or :is() that contain SelectorLists
 			// as children
+			return SKIP
+		} else if (is_supports_declaration(node)) {
+			// Prevent walking into a SupportsDeclaration.Declaration
 			return SKIP
 		} else if (is_declaration(node)) {
 			totalDeclarations++

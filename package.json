@@ -64,7 +64,7 @@
 		"knip": "knip"
 	},
 	"dependencies": {
-		"@projectwallace/css-parser": "^0.14.8"
+		"@projectwallace/css-parser": "^0.15.0"
 	},
 	"devDependencies": {
 		"@codecov/rollup-plugin": "^2.0.1",
