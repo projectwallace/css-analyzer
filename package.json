@@ -78,6 +78,11 @@
 		"vitest": "^4.1.2"
 	},
 	"engines": {
-		"node": ">=18.0.0"
+		"node": ">=18.0.0",
+		"pnpm": ">=11.0.0"
+	},
+	"packageManager": "pnpm@11.1.1",
+	"pnpm": {
+		"onlyBuiltDependencies": []
 	}
 }
