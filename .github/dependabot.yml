@@ -3,7 +3,7 @@
 
 version: 2
 updates:
-  - package-ecosystem: 'npm'
+  - package-ecosystem: 'npm' # pnpm is detected automatically via pnpm-lock.yaml
     directory: '/'
     schedule:
       interval: 'monthly'
