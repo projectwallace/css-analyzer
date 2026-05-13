@@ -32,4 +32,4 @@ jobs:
           git add package.json pnpm-lock.yaml
           git commit -m "chore: bump version to $VERSION"
           git push origin HEAD:$DEFAULT_BRANCH
-      - run: pnpm publish --access public --no-git-checks
+      - run: pnpm publish --no-git-checks

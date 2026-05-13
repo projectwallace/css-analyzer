@@ -55,6 +55,10 @@
 			"default": "./dist/properties/index.js"
 		}
 	},
+	"publishConfig": {
+		"access": "public",
+		"provenance": true
+	},
 	"scripts": {
 		"lint": "oxlint --config .oxlintrc.json; oxfmt --check",
 		"lint-package": "publint",
