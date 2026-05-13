@@ -6,20 +6,20 @@ updates:
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
-      interval: 'weekly'
+      interval: 'monthly'
     groups:
-      vite:
+      projectwallace:
         patterns:
-          - 'vitest'
-          - '@vitest/*'
-      oxc:
+          - '@projectwallace/*'
+      npm-all:
         patterns:
-          - 'oxlint'
-          - 'oxfmt'
+          - '*'
+        exclude-patterns:
+          - '@projectwallace/*'
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
-      interval: 'weekly'
+      interval: 'monthly'
     groups:
       github-actions:
         patterns:
