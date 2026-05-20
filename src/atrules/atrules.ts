@@ -2,12 +2,12 @@ import {
 	str_equals,
 	walk,
 	BREAK,
-	DIMENSION,
-	NUMBER,
-	IDENTIFIER,
+	is_identifier,
 	is_media_feature,
 	is_media_type,
 	is_supports_query,
+	is_dimension,
+	is_number,
 	type CSSNode,
 } from '@projectwallace/css-parser'
 
@@ -77,38 +77,32 @@ export function isMediaBrowserhack(prelude: CSSNode, on_hack: (hack: string) => 
 			}
 
 			// Check for min-resolution with .001dpcm
-			if (str_equals('min-resolution', name) && node.has_children) {
-				for (const child of node) {
-					if (
-						child.type === DIMENSION &&
-						child.value === 0.001 &&
-						str_equals('dpcm', child.unit || '')
-					) {
-						on_hack('min-resolution: .001dpcm')
-						return BREAK
-					}
+			if (str_equals('min-resolution', name) && node.value !== null && is_dimension(node.value)) {
+				const dimension = node.value
+				if (dimension.value === 0.001 && str_equals('dpcm', dimension.unit || '')) {
+					on_hack('min-resolution: .001dpcm')
+					return BREAK
 				}
 			}
 
 			// Check for -webkit-min-device-pixel-ratio with 0 or 10000
-			if (str_equals('-webkit-min-device-pixel-ratio', name) && node.has_children) {
-				for (const child of node) {
-					if (child.type === NUMBER && (child.value === 0 || child.value === 10000)) {
-						on_hack('-webkit-min-device-pixel-ratio')
-						return BREAK
-					}
+			if (
+				str_equals('-webkit-min-device-pixel-ratio', name) &&
+				node.value !== null &&
+				is_number(node.value)
+			) {
+				const num = node.value.value
+				if (num === 0 || num === 10000) {
+					on_hack('-webkit-min-device-pixel-ratio')
+					return BREAK
 				}
 			}
+		}
 
-			// Check for \0 unit hack (appears as Identifier node)
-			if (node.has_children) {
-				for (const child of node) {
-					if (child.type === IDENTIFIER && child.text === '\\0') {
-						on_hack('\\0')
-						return BREAK
-					}
-				}
-			}
+		// \0 inside a media feature value (e.g. min-width:0\0) — sibling of the numeric value
+		if (is_identifier(node) && node.text === '\\0') {
+			on_hack('\\0')
+			return BREAK
 		}
 	})
 }

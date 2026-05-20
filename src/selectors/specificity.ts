@@ -8,7 +8,6 @@ import {
 	ATTRIBUTE_SELECTOR,
 	CLASS_SELECTOR,
 	PSEUDO_CLASS_SELECTOR,
-	COMBINATOR,
 	PSEUDO_ELEMENT_SELECTOR,
 	TYPE_SELECTOR,
 	type CSSNode,
@@ -19,7 +18,7 @@ import {
 	is_selector,
 	is_combinator,
 } from '@projectwallace/css-parser'
-import { parse_selector } from '@projectwallace/css-parser/parse-selector'
+import { parse_selector_list } from '@projectwallace/css-parser/parse-selector'
 
 type Specificity = [number, number, number]
 
@@ -235,7 +234,7 @@ const convertToAST = (source: string | CSSNode) => {
 	// ~> Let's try and parse to an AST
 	if (typeof source === 'string') {
 		try {
-			return parse_selector(source)
+			return parse_selector_list(source)
 		} catch (e) {
 			const message = e instanceof Error ? e.message : String(e)
 			throw new TypeError(
