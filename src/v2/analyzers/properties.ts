@@ -23,6 +23,7 @@ export type PropertiesOptions = { locations?: boolean }
 export type PropertiesResult = {
 	total: number
 	totalUnique: number
+	unique: Record<string, number>
 	uniquenessRatio: number
 	prefixed: (CountResult | CountResultWithLocations) & { ratio: number }
 	custom: (CountResult | CountResultWithLocations) & {
@@ -94,6 +95,7 @@ export function properties(options: PropertiesOptions = {}): AnalyzerInstance<Pr
 			return {
 				total: t,
 				totalUnique: allResult.totalUnique,
+				unique: allResult.unique,
 				uniquenessRatio: allResult.uniquenessRatio,
 				prefixed: { ...prefixedResult, ratio: t === 0 ? 0 : prefixedResult.total / t },
 				custom: {
