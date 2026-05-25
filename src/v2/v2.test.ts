@@ -1,6 +1,17 @@
 import { test, expect, describe } from 'vitest'
-import { createPipeline, uniqueColors, declarationsPerRule } from './index.js'
-import type { CountResultWithLocations, NumericResultWithLocations } from './index.js'
+import {
+	createPipeline,
+	uniqueColors,
+	declarationsPerRule,
+	linesOfCode,
+	uniqueMediaFeatures,
+	embeddedContent,
+} from './index.js'
+import type {
+	CountResultWithLocations,
+	NumericResultWithLocations,
+	EmbeddedContentResultWithLocations,
+} from './index.js'
 
 const CSS = `
 :root { --brand: #f0f; }
@@ -108,6 +119,136 @@ describe('v2 pipeline — with locations', () => {
 		expect(CSS.slice(first.location.offset, first.location.offset + first.location.length)).toMatch(
 			/^:root\s*\{[^}]*\}/,
 		)
+	})
+})
+
+// ─── linesOfCode ────────────────────────────────────────────────────────────
+
+describe('linesOfCode', () => {
+	test('counts newline-terminated lines', () => {
+		const r = createPipeline({ loc: linesOfCode() }).run('a {\n  color: red;\n}\n')
+		expect(r.loc.total).toBe(4)
+	})
+
+	test('counts a single line with no newline', () => {
+		const r = createPipeline({ loc: linesOfCode() }).run('a { color: red }')
+		expect(r.loc.total).toBe(1)
+	})
+
+	test('empty string is 1 line', () => {
+		const r = createPipeline({ loc: linesOfCode() }).run('')
+		expect(r.loc.total).toBe(1)
+	})
+
+	test('counts correctly on the shared CSS fixture', () => {
+		const r = createPipeline({ loc: linesOfCode() }).run(CSS)
+		// CSS fixture has 22 lines (count \n occurrences + 1)
+		expect(r.loc.total).toBe(CSS.split('\n').length)
+	})
+})
+
+// ─── uniqueMediaFeatures ─────────────────────────────────────────────────────
+
+const MEDIA_CSS = `
+@media (min-width: 600px) { .a { color: red } }
+@media (max-width: 1200px) and (min-width: 400px) { .b { color: blue } }
+@media (hover: hover) { .c { color: green } }
+@media (min-width: 900px) { .d { color: pink } }
+`
+
+describe('uniqueMediaFeatures — without locations', () => {
+	const r = createPipeline({ mf: uniqueMediaFeatures() }).run(MEDIA_CSS)
+
+	test('counts total feature occurrences', () => {
+		// min-width (×3), max-width (×1), hover (×1)
+		expect(r.mf.total).toBe(5)
+	})
+
+	test('counts unique feature names', () => {
+		expect(r.mf.totalUnique).toBe(3)
+	})
+
+	test('min-width appears 3 times', () => {
+		expect(r.mf.unique['min-width']).toBe(3)
+	})
+
+	test('feature names are lowercased', () => {
+		expect(r.mf.unique['hover']).toBe(1)
+		expect(r.mf.unique['max-width']).toBe(1)
+	})
+})
+
+describe('uniqueMediaFeatures — with locations', () => {
+	const r = createPipeline({ mf: uniqueMediaFeatures({ locations: true }) }).run(MEDIA_CSS)
+
+	test('min-width has 3 location entries', () => {
+		const mf = r.mf as CountResultWithLocations
+		expect(mf.uniqueWithLocations['min-width']).toHaveLength(3)
+	})
+
+	test('locations have valid line/column/offset/length', () => {
+		const mf = r.mf as CountResultWithLocations
+		const loc = mf.uniqueWithLocations['hover']![0]!
+		expect(loc.line).toBeGreaterThan(0)
+		expect(loc.offset).toBeGreaterThanOrEqual(0)
+		expect(loc.length).toBeGreaterThan(0)
+	})
+})
+
+// ─── embeddedContent ─────────────────────────────────────────────────────────
+
+const GIF_DATA = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+const SVG_DATA = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22/%3E'
+
+const EMBED_CSS = `
+.a { background: url("${GIF_DATA}") }
+.b { background: url('${SVG_DATA}') }
+.c { background: url("${GIF_DATA}") }
+.d { background: url(https://example.com/img.png) }
+`
+
+describe('embeddedContent — without locations', () => {
+	const r = createPipeline({ ec: embeddedContent() }).run(EMBED_CSS)
+
+	test('counts only data URIs, not regular URLs', () => {
+		expect(r.ec.totalCount).toBe(3)
+	})
+
+	test('accumulates total byte size of all data URIs', () => {
+		expect(r.ec.totalSize).toBe(GIF_DATA.length * 2 + SVG_DATA.length)
+	})
+
+	test('sizeRatio is totalSize / css.length', () => {
+		expect(r.ec.sizeRatio).toBeCloseTo(r.ec.totalSize / EMBED_CSS.length)
+	})
+
+	test('groups by MIME type', () => {
+		expect(r.ec.unique['image/gif']!.count).toBe(2)
+		expect(r.ec.unique['image/svg+xml']!.count).toBe(1)
+	})
+
+	test('per-type size is cumulative', () => {
+		expect(r.ec.unique['image/gif']!.size).toBe(GIF_DATA.length * 2)
+	})
+
+	test('no locations field without option', () => {
+		expect('locations' in (r.ec.unique['image/gif'] ?? {})).toBe(false)
+	})
+})
+
+describe('embeddedContent — with locations', () => {
+	const r = createPipeline({ ec: embeddedContent({ locations: true }) }).run(EMBED_CSS)
+
+	test('each MIME type has one location per occurrence', () => {
+		const ec = r.ec as EmbeddedContentResultWithLocations
+		expect(ec.unique['image/gif']!.locations).toHaveLength(2)
+		expect(ec.unique['image/svg+xml']!.locations).toHaveLength(1)
+	})
+
+	test('location offset points at the url() token', () => {
+		const ec = r.ec as EmbeddedContentResultWithLocations
+		const loc = ec.unique['image/svg+xml']!.locations[0]!
+		expect(EMBED_CSS.slice(loc.offset, loc.offset + loc.length)).toMatch(/^url\(/)
 	})
 })
 

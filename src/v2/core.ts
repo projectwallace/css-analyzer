@@ -8,6 +8,8 @@ import { parse, walk, type AnyNode } from '@projectwallace/css-parser'
 
 export interface AnalyzerInstance<TResult> {
 	readonly subscribes: readonly number[]
+	/** Called with the raw CSS string before the AST walk. Use for string-level metrics. */
+	prepare?(css: string): void
 	visit(node: AnyNode): void
 	collect(): TResult
 }
@@ -32,8 +34,16 @@ export function createPipeline<T extends Record<string, AnalyzerInstance<unknown
 		}
 	}
 
+	// Collect analyzers that have a prepare() hook so we can call them once.
+	const prepareList: AnalyzerInstance<unknown>[] = []
+	for (const key in analyzers) {
+		if (analyzers[key]!.prepare) prepareList.push(analyzers[key]!)
+	}
+
 	return {
 		run(css: string): Results<T> {
+			for (let i = 0; i < prepareList.length; i++) prepareList[i]!.prepare!(css)
+
 			const ast = parse(css)
 			walk(ast, (node) => {
 				const handlers = dispatch.get(node.type)
