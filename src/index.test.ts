@@ -601,6 +601,12 @@ test('handles empty input gracefully', () => {
 					unique: {},
 					uniquenessRatio: 0,
 				},
+				names: {
+					total: 0,
+					totalUnique: 0,
+					unique: {},
+					uniquenessRatio: 0,
+				},
 			},
 			prefixes: {
 				total: 0,

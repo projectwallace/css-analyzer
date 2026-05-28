@@ -199,6 +199,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let lineHeights = new Collection(useLocations)
 	let timingFunctions = new Collection(useLocations)
 	let durations = new Collection(useLocations)
+	let animationNames = new Collection(useLocations)
 	let colors = new ContextCollection(useLocations)
 	let colorFormats = new Collection(useLocations)
 	let units = new ContextCollection(useLocations)
@@ -643,6 +644,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						lineHeights.p(normalized, valueLoc)
 					}
 				} else if (normalizedProperty === 'transition' || normalizedProperty === 'animation') {
+					let isAnimation = normalizedProperty === 'animation'
 					analyzeAnimation(value, function (item) {
 						if (item.type === 'fn') {
 							timingFunctions.p(item.value.text.toLowerCase(), valueLoc)
@@ -650,6 +652,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							durations.p(item.value.text.toLowerCase(), valueLoc)
 						} else if (item.type === 'keyword') {
 							valueKeywords.p(item.value.text.toLowerCase(), valueLoc)
+						} else if (item.type === 'name' && isAnimation) {
+							animationNames.p(item.value.text, valueLoc)
 						}
 					})
 					return SKIP
@@ -674,6 +678,12 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					for (let child of value.children) {
 						if (!is_operator(child)) {
 							timingFunctions.p(child.text, valueLoc)
+						}
+					}
+				} else if (normalizedProperty === 'animation-name') {
+					for (let child of value.children) {
+						if (is_identifier(child) && !keywords.has(child.name)) {
+							animationNames.p(child.text, valueLoc)
 						}
 					}
 				} else if (normalizedProperty === 'container-name') {
@@ -1054,6 +1064,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			animations: {
 				durations: durations.c(),
 				timingFunctions: timingFunctions.c(),
+				names: animationNames.c(),
 			},
 			prefixes: vendorPrefixedValues.c(),
 			browserhacks: valueBrowserhacks.c(),

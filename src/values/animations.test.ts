@@ -225,6 +225,14 @@ test('analyzes animations/transitions with value lists', () => {
 			},
 			uniquenessRatio: 5 / 8,
 		},
+		names: {
+			total: 4,
+			totalUnique: 1,
+			unique: {
+				ANIMATION_NAME: 4,
+			},
+			uniquenessRatio: 1 / 4,
+		},
 	}
 	expect(actual).toEqual(expected)
 })
@@ -285,12 +293,28 @@ test('does not emit name for infinite iteration-count', () => {
 
 test('does not emit name for timing-function keywords', () => {
 	const names: string[] = []
-	for (const kw of ['ease', 'linear', 'ease-in', 'ease-out', 'ease-in-out', 'step-start', 'step-end']) {
+	for (const kw of [
+		'ease',
+		'linear',
+		'ease-in',
+		'ease-out',
+		'ease-in-out',
+		'step-start',
+		'step-end',
+	]) {
 		analyzeAnimation(parse_value(`my-anim 1s ${kw}`), (item) => {
 			if (item.type === 'name') names.push(item.value.text)
 		})
 	}
-	expect(names).toEqual(['my-anim', 'my-anim', 'my-anim', 'my-anim', 'my-anim', 'my-anim', 'my-anim'])
+	expect(names).toEqual([
+		'my-anim',
+		'my-anim',
+		'my-anim',
+		'my-anim',
+		'my-anim',
+		'my-anim',
+		'my-anim',
+	])
 })
 
 test('does not emit name for none keyword', () => {
@@ -299,4 +323,12 @@ test('does not emit name for none keyword', () => {
 		if (item.type === 'name') names.push(item.value.text)
 	})
 	expect(names).toEqual([])
+})
+
+test('emits name for dashed-ident animation names', () => {
+	const names: string[] = []
+	analyzeAnimation(parse_value('--my-name 1s ease-in'), (item) => {
+		if (item.type === 'name') names.push(item.value.text)
+	})
+	expect(names).toEqual(['--my-name'])
 })
