@@ -21,6 +21,24 @@ const TIMING_KEYWORDS = new KeywordSet([
 
 const TIMING_FUNCTION_VALUES = new KeywordSet(['cubic-bezier', 'steps'])
 
+// All identifier keywords valid in an animation shorthand that are NOT the animation name
+const ANIMATION_NON_NAME_KEYWORDS = new KeywordSet([
+	// animation-direction
+	'normal',
+	'reverse',
+	'alternate',
+	'alternate-reverse',
+	// animation-fill-mode (none is covered by the global keywords set)
+	'forwards',
+	'backwards',
+	'both',
+	// animation-play-state
+	'running',
+	'paused',
+	// animation-iteration-count
+	'infinite',
+])
+
 export function analyzeAnimation(
 	value: Value,
 	cb: ({ type, value }: { type: string; value: CSSNode }) => void,
@@ -47,6 +65,11 @@ export function analyzeAnimation(
 			} else if (keywords.has(node.name)) {
 				cb({
 					type: 'keyword',
+					value: node,
+				})
+			} else if (!ANIMATION_NON_NAME_KEYWORDS.has(node.name)) {
+				cb({
+					type: 'name',
 					value: node,
 				})
 			}
