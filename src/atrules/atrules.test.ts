@@ -188,6 +188,68 @@ test('finds @layer', () => {
 			'<anonymous>': 2,
 		},
 		uniquenessRatio: 28 / 50,
+		defined: [
+			'reset',
+			'defaults',
+			'patterns',
+			'components',
+			'utilities',
+			'overrides',
+			'framework',
+			'two',
+			'three',
+			'one.two',
+			'one.three',
+			'reset.type',
+			'default.type',
+			'reset.media',
+			'default.media',
+			'default',
+			'themes',
+			'layouts',
+			'structures',
+		],
+		used: [
+			'test',
+			'test.abc',
+			'utilities',
+			'defaults',
+			'layer-1',
+			'layer-2',
+			'layer-3',
+			'sub-layer-1',
+			'sub-layer-2',
+			'one',
+			'three',
+			'two',
+			'one.three',
+			'one.two',
+			'components',
+		],
+		unused: [
+			'reset',
+			'patterns',
+			'overrides',
+			'framework',
+			'reset.type',
+			'default.type',
+			'reset.media',
+			'default.media',
+			'default',
+			'themes',
+			'layouts',
+			'structures',
+		],
+		unknown: [
+			'test',
+			'test.abc',
+			'layer-1',
+			'layer-2',
+			'layer-3',
+			'sub-layer-1',
+			'sub-layer-2',
+			'one',
+		],
 	}
 
 	expect(actual).toEqual(expected)
@@ -481,6 +543,10 @@ test('finds @imports', () => {
 			'reset.remedy': 1,
 		},
 		uniquenessRatio: 1,
+		defined: [],
+		used: ['named-layer', 'reset.remedy'],
+		unused: [],
+		unknown: ['named-layer', 'reset.remedy'],
 	}
 	expect(actual.layer).toEqual(expected_layers)
 })
@@ -716,6 +782,10 @@ test('analyzes @keyframes', () => {
 			animation: 4,
 		},
 		uniquenessRatio: 4 / 8,
+		defined: ['one', 'TWO', 'three', 'animation'],
+		used: [],
+		unused: ['one', 'TWO', 'three', 'animation'],
+		unknown: [],
 		prefixed: {
 			total: 4,
 			totalUnique: 3,
@@ -740,6 +810,10 @@ test('counts ratio correctly when no @keyframes present', () => {
 		totalUnique: 0,
 		unique: {},
 		uniquenessRatio: 0,
+		defined: [],
+		used: [],
+		unused: [],
+		unknown: [],
 		prefixed: {
 			total: 0,
 			totalUnique: 0,
@@ -824,7 +898,11 @@ test('analyzes container queries', () => {
 				'page-layout': 1,
 				'component-library': 1,
 			},
-			uniquenessRatio: 1 / 1,
+			uniquenessRatio: 1,
+			defined: [],
+			used: ['page-layout', 'component-library', 'card'],
+			unused: [],
+			unknown: ['page-layout', 'component-library', 'card'],
 		},
 	}
 
@@ -838,16 +916,18 @@ test('finds named containers in @container', () => {
     @container style(--responsive: true) {}
   `
 	const actual = analyze(fixture).atrules.container.names
-	const TOTAL = 2
-	const UNIQUE = 2
 	const expected = {
-		total: TOTAL,
-		totalUnique: TOTAL,
+		total: 2,
+		totalUnique: 2,
 		unique: {
 			test1: 1,
 			test2: 1,
 		},
-		uniquenessRatio: UNIQUE / TOTAL,
+		uniquenessRatio: 1,
+		defined: [],
+		used: ['test1', 'test2'],
+		unused: [],
+		unknown: ['test1', 'test2'],
 	}
 
 	expect(actual).toEqual(expected)
@@ -861,16 +941,18 @@ test('finds named containers in the `container-name` property', () => {
     }
   `
 	const actual = analyze(fixture).atrules.container.names
-	const TOTAL = 2
-	const UNIQUE = 2
 	const expected = {
-		total: TOTAL,
-		totalUnique: TOTAL,
+		total: 2,
+		totalUnique: 2,
 		unique: {
 			'my-layout': 1,
 			'my-component': 1,
 		},
-		uniquenessRatio: UNIQUE / TOTAL,
+		uniquenessRatio: 1,
+		defined: ['my-layout', 'my-component'],
+		used: [],
+		unused: ['my-layout', 'my-component'],
+		unknown: [],
 	}
 
 	expect(actual).toEqual(expected)
@@ -884,16 +966,18 @@ test('finds named containers in the `container` shorthand', () => {
     }
   `
 	const actual = analyze(fixture).atrules.container.names
-	const TOTAL = 2
-	const UNIQUE = 2
 	const expected = {
-		total: TOTAL,
-		totalUnique: TOTAL,
+		total: 2,
+		totalUnique: 2,
 		unique: {
 			'my-layout': 1,
 			'my-component': 1,
 		},
-		uniquenessRatio: UNIQUE / TOTAL,
+		uniquenessRatio: 1,
+		defined: ['my-layout', 'my-component'],
+		used: [],
+		unused: ['my-layout', 'my-component'],
+		unknown: [],
 	}
 
 	expect(actual).toEqual(expected)

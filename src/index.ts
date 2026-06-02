@@ -41,6 +41,7 @@ import { isValueBrowserhack } from './values/browserhacks.js'
 import { ContextCollection } from './context-collection.js'
 import { Collection, type Location } from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
+import { DefinedUsed } from './defined-used.js'
 import { endsWith, unquote } from './string-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import {
@@ -208,6 +209,12 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 	let borderRadiuses = new ContextCollection(useLocations)
 	let resets = new Collection(useLocations)
 
+	let customPropsTracking = new DefinedUsed()
+	let animationNamesTracking = new DefinedUsed()
+	let containerNamesTracking = new DefinedUsed()
+	let layerNamesTracking = new DefinedUsed()
+	let anchorNamesTracking = new DefinedUsed()
+
 	function toLoc(node: CSSNode): Location {
 		return {
 			line: node.line,
@@ -282,6 +289,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				} else if (normalized_name.endsWith('keyframes')) {
 					let prelude = node.prelude.text
 					keyframes.p(prelude, toLoc(node))
+					animationNamesTracking.define(prelude)
 
 					if (node.is_vendor_prefixed) {
 						prefixedKeyframes.p(`@${node.name?.toLowerCase()} ${node.prelude.text}`, toLoc(node))
@@ -293,6 +301,12 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				} else if (normalized_name === 'layer') {
 					for (let layer of node.prelude.text.split(',').map((s: string) => s.trim())) {
 						layers.p(layer, toLoc(node))
+						// @layer name { } places CSS into a layer (use); @layer a, b; orders layers (define)
+						if (node.block) {
+							layerNamesTracking.use(layer)
+						} else {
+							layerNamesTracking.define(layer)
+						}
 					}
 				} else if (normalized_name === 'import') {
 					imports.p(node.prelude.text, toLoc(node))
@@ -304,6 +318,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							} else if (is_layer_name(child) && child.value) {
 								// can be empty string
 								layers.p(child.value, toLoc(child))
+								layerNamesTracking.use(child.value)
 							}
 						}
 					}
@@ -315,10 +330,12 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						let container_name = container_query.first_child
 						if (container_name && is_identifier(container_name)) {
 							containerNames.p(container_name.text, toLoc(node))
+							containerNamesTracking.use(container_name.text)
 						}
 					}
 				} else if (normalized_name === 'property') {
 					registeredProperties.p(node.prelude.text, toLoc(node))
+					customPropsTracking.define(node.prelude.text)
 				} else if (normalized_name === 'function') {
 					let prelude = node.prelude.text
 					let name = prelude.includes('(')
@@ -520,6 +537,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				propertyVendorPrefixes.p(property, propertyLoc)
 			} else if (is_custom(property)) {
 				customProperties.p(property, propertyLoc)
+				customPropsTracking.define(property)
 				propertyComplexities.push(is_important ? 3 : 2)
 
 				if (is_important) {
@@ -654,6 +672,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							valueKeywords.p(item.value.text.toLowerCase(), valueLoc)
 						} else if (item.type === 'name' && isAnimation) {
 							animationNames.p(item.value.text, valueLoc)
+							animationNamesTracking.use(item.value.text)
 						}
 					})
 					return SKIP
@@ -684,15 +703,38 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					for (let child of value.children) {
 						if (is_identifier(child) && !keywords.has(child.name)) {
 							animationNames.p(child.text, valueLoc)
+							animationNamesTracking.use(child.text)
 						}
 					}
 				} else if (normalizedProperty === 'container-name') {
-					containerNames.p(text, valueLoc)
+					for (let child of value.children) {
+						if (is_identifier(child) && !keywords.has(child.name)) {
+							containerNames.p(child.text, toLoc(child))
+							containerNamesTracking.define(child.text)
+						}
+					}
 				} else if (normalizedProperty === 'container') {
 					// The first identifier in the `container` shorthand is the container name
 					// Example: container: my-layout / inline-size;
 					if (value.first_child && is_identifier(value.first_child)) {
 						containerNames.p(value.first_child.text, valueLoc)
+						if (!keywords.has(value.first_child.name)) {
+							containerNamesTracking.define(value.first_child.text)
+						}
+					}
+				} else if (normalizedProperty === 'anchor-name') {
+					for (let child of value.children) {
+						if (is_identifier(child) && str_starts_with(child.text, '--')) {
+							anchorNamesTracking.define(child.text)
+						}
+					}
+				} else if (normalizedProperty === 'position-anchor') {
+					if (
+						value.first_child &&
+						is_identifier(value.first_child) &&
+						str_starts_with(value.first_child.text, '--')
+					) {
+						anchorNamesTracking.use(value.first_child.text)
 					}
 				} else if (border_radius_properties.has(normalizedProperty)) {
 					borderRadiuses.push(text, property, valueLoc)
@@ -781,6 +823,27 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					if (is_function(valueNode)) {
 						let funcName = valueNode.name
 						let funcLoc = toLoc(valueNode)
+						let firstFuncChild = valueNode.first_child
+
+						// Track var(--custom-property) usage
+						if (
+							funcName === 'var' &&
+							firstFuncChild &&
+							is_identifier(firstFuncChild) &&
+							str_starts_with(firstFuncChild.text, '--')
+						) {
+							customPropsTracking.use(firstFuncChild.text)
+						}
+
+						// Track anchor(--name) and anchor-size(--name) usage
+						if (
+							(funcName === 'anchor' || funcName === 'anchor-size') &&
+							firstFuncChild &&
+							is_identifier(firstFuncChild) &&
+							str_starts_with(firstFuncChild.text, '--')
+						) {
+							anchorNamesTracking.use(firstFuncChild.text)
+						}
 
 						// rgb(a), hsl(a), color(), hwb(), lch(), lab(), oklab(), oklch()
 						if (colorFunctions.has(funcName)) {
@@ -907,15 +970,15 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			supports: assign(supports.c(), {
 				browserhacks: supportsBrowserhacks.c(),
 			}),
-			keyframes: assign(keyframes.c(), {
+			keyframes: assign(keyframes.c(), animationNamesTracking.analyze(), {
 				prefixed: assign(prefixedKeyframes.c(), {
 					ratio: ratio(prefixedKeyframes.size(), keyframes.size()),
 				}),
 			}),
 			container: assign(containers.c(), {
-				names: containerNames.c(),
+				names: assign(containerNames.c(), containerNamesTracking.analyze()),
 			}),
-			layer: layers.c(),
+			layer: assign(layers.c(), layerNamesTracking.analyze()),
 			property: registeredProperties.c(),
 			function: functions.c(),
 			scope: scopes.c(),
@@ -1035,7 +1098,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			prefixed: assign(propertyVendorPrefixes.c(), {
 				ratio: ratio(propertyVendorPrefixes.size(), properties.size()),
 			}),
-			custom: assign(customProperties.c(), {
+			custom: assign(customProperties.c(), customPropsTracking.analyze(), {
 				ratio: ratio(customProperties.size(), properties.size()),
 				importants: assign(importantCustomProperties.c(), {
 					ratio: ratio(importantCustomProperties.size(), customProperties.size()),
@@ -1048,6 +1111,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				ratio: ratio(propertyHacks.size(), properties.size()),
 			}),
 			complexity: propertyComplexity,
+			anchorNames: anchorNamesTracking.analyze(),
 		}),
 		values: {
 			colors: assign(colors.count(), {
@@ -1122,5 +1186,7 @@ export { keywords as cssKeywords } from './values/values.js'
 export { hasVendorPrefix } from './vendor-prefix.js'
 
 export { KeywordSet } from './keyword-set.js'
+
+export { DefinedUsed, type DefinedUsedResult } from './defined-used.js'
 
 export type { Location, UniqueWithLocations } from './collection.js'

@@ -217,6 +217,10 @@ test('handles empty input gracefully', () => {
 				totalUnique: 0,
 				unique: {},
 				uniquenessRatio: 0,
+				defined: [],
+				used: [],
+				unused: [],
+				unknown: [],
 				prefixed: {
 					total: 0,
 					totalUnique: 0,
@@ -235,6 +239,10 @@ test('handles empty input gracefully', () => {
 					totalUnique: 0,
 					unique: {},
 					uniquenessRatio: 0,
+					defined: [],
+					used: [],
+					unused: [],
+					unknown: [],
 				},
 			},
 			layer: {
@@ -242,6 +250,10 @@ test('handles empty input gracefully', () => {
 				totalUnique: 0,
 				unique: {},
 				uniquenessRatio: 0,
+				defined: [],
+				used: [],
+				unused: [],
+				unknown: [],
 			},
 			property: {
 				total: 0,
@@ -493,6 +505,10 @@ test('handles empty input gracefully', () => {
 				totalUnique: 0,
 				unique: {},
 				uniquenessRatio: 0,
+				defined: [],
+				used: [],
+				unused: [],
+				unknown: [],
 				ratio: 0,
 				importants: {
 					total: 0,
@@ -523,6 +539,12 @@ test('handles empty input gracefully', () => {
 				mode: 0,
 				range: 0,
 				sum: 0,
+			},
+			anchorNames: {
+				defined: [],
+				used: [],
+				unused: [],
+				unknown: [],
 			},
 		},
 		values: {
