@@ -25,7 +25,7 @@ export type CountResultWithLocations = CountResult & {
 
 export class CountCollection {
 	private interner = new StringInterner()
-	private counts = new GrowableUint32Array(32)
+	private counts = new GrowableUint32Array(64)
 	private locs: Map<number, LocationStore> | null
 	private totalCount = 0
 
@@ -41,7 +41,7 @@ export class CountCollection {
 		if (this.locs !== null) {
 			let store = this.locs.get(id)
 			if (!store) {
-				store = new LocationStore()
+				store = new LocationStore(8)
 				this.locs.set(id, store)
 			}
 			store.push(line, column, offset, length)
@@ -50,8 +50,13 @@ export class CountCollection {
 
 	collect(): CountResult | CountResultWithLocations {
 		const unique: Record<string, number> = {}
+		// Build the id→string reverse map as a side effect of the `unique` loop
+		// so we don't need a separate strings[] array in StringInterner.
+		const idToStr: string[] | null = this.locs !== null ? [] : null
+
 		for (const [str, id] of this.interner.entries()) {
 			unique[str] = this.counts.get(id)
+			if (idToStr !== null) idToStr[id] = str
 		}
 
 		const base: CountResult = {
@@ -65,7 +70,7 @@ export class CountCollection {
 
 		const uniqueWithLocations: Record<string, Location[]> = {}
 		for (const [id, store] of this.locs) {
-			uniqueWithLocations[this.interner.get(id)] = store.toArray()
+			uniqueWithLocations[idToStr![id]!] = store.toArray()
 		}
 		return { ...base, uniqueWithLocations }
 	}

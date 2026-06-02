@@ -31,23 +31,29 @@ type Results<T extends Record<string, AnalyzerInstance<unknown>>> = {
 
 export function createPipeline<T extends Record<string, AnalyzerInstance<unknown>>>(analyzers: T) {
 	// Precompute dispatch: node type → analyzers interested in it.
-	const dispatch = new Map<number, AnalyzerInstance<unknown>[]>()
+	const dispatchMap = new Map<number, AnalyzerInstance<unknown>[]>()
 	const prepareList: AnalyzerInstance<unknown>[] = []
 	const commentList: AnalyzerInstance<unknown>[] = []
 
 	for (const key in analyzers) {
 		const inst = analyzers[key]!
 		for (const nt of inst.subscribes) {
-			let bucket = dispatch.get(nt)
+			let bucket = dispatchMap.get(nt)
 			if (!bucket) {
 				bucket = []
-				dispatch.set(nt, bucket)
+				dispatchMap.set(nt, bucket)
 			}
 			bucket.push(inst)
 		}
 		if (inst.prepare) prepareList.push(inst)
 		if (inst.on_comment) commentList.push(inst)
 	}
+
+	// Convert Map to flat array keyed by node type (small dense integers → O(1) array access).
+	let maxType = 0
+	for (const t of dispatchMap.keys()) if (t > maxType) maxType = t
+	const dispatch: (AnalyzerInstance<unknown>[] | undefined)[] = new Array(maxType + 1).fill(undefined)
+	for (const [t, bucket] of dispatchMap) dispatch[t] = bucket
 
 	return {
 		run(css: string): Results<T> {
@@ -64,20 +70,27 @@ export function createPipeline<T extends Record<string, AnalyzerInstance<unknown
 
 			const ast = parse(css, parseOptions)
 
+			// Reuse one mutable context object — analyzers read it synchronously and must not retain it.
+			const ctx = { depth: 0, inKeyframes: false }
 			let keyframesDepth = -1
 			walk(ast, (node, depth) => {
 				if (keyframesDepth >= 0 && depth <= keyframesDepth) keyframesDepth = -1
-				const inKeyframes = keyframesDepth >= 0 && depth > keyframesDepth
 
-				if (is_atrule(node)) {
-					const name = node.name?.toLowerCase() ?? ''
-					if (name.endsWith('keyframes')) keyframesDepth = depth
+				// Only check for @keyframes when not already inside one.
+				if (keyframesDepth < 0 && is_atrule(node)) {
+					const name = node.name
+					if (name) {
+						const lc = name.toLowerCase()
+						if (lc === 'keyframes' || lc.endsWith('-keyframes')) keyframesDepth = depth
+					}
 				}
 
-				const ctx: WalkContext = { depth, inKeyframes }
-				const handlers = dispatch.get(node.type)
+				ctx.depth = depth
+				ctx.inKeyframes = keyframesDepth >= 0 && depth > keyframesDepth
+
+				const handlers = dispatch[node.type]
 				if (handlers !== undefined) {
-					for (let i = 0; i < handlers.length; i++) handlers[i]!.visit(node, ctx)
+					for (let i = 0; i < handlers.length; i++) handlers[i]!.visit(node, ctx as WalkContext)
 				}
 			})
 

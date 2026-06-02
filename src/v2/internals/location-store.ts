@@ -13,7 +13,7 @@ export class LocationStore {
 	private data: Uint32Array
 	private n: number
 
-	constructor(initialCapacity = 4) {
+	constructor(initialCapacity = 8) {
 		this.data = new Uint32Array(initialCapacity * 4)
 		this.n = 0
 	}

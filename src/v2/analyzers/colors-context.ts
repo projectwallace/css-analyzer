@@ -22,7 +22,76 @@ import {
 import { CountCollection, type CountResult, type CountResultWithLocations } from '../internals/count-collection.js'
 import type { AnalyzerInstance } from '../core.js'
 
-const SKIPS_COLOR_LOOKUP = new Set(['font', 'font-family'])
+const SKIPS_COLOR_LOOKUP = new Set([
+	// font shorthand (but NOT color, background, border, outline, etc.)
+	'font', 'font-family',
+	// typography — no color values possible
+	'font-size', 'font-weight', 'font-style', 'font-variant', 'font-stretch',
+	'font-kerning', 'font-size-adjust',
+	'line-height', 'letter-spacing', 'word-spacing', 'text-indent',
+	'text-align', 'text-align-last', 'text-transform', 'text-overflow',
+	'text-rendering', 'white-space', 'word-break', 'overflow-wrap', 'word-wrap',
+	'hyphens', 'tab-size', 'direction', 'unicode-bidi', 'writing-mode', 'text-orientation',
+	// layout
+	'display', 'position', 'float', 'clear',
+	'overflow', 'overflow-x', 'overflow-y', 'overflow-clip-margin',
+	'visibility', 'z-index', 'box-sizing', 'appearance', '-webkit-appearance',
+	// sizing
+	'width', 'height', 'min-width', 'max-width', 'min-height', 'max-height',
+	'inline-size', 'block-size', 'min-inline-size', 'max-inline-size', 'min-block-size', 'max-block-size',
+	// spacing
+	'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
+	'margin-block', 'margin-block-start', 'margin-block-end',
+	'margin-inline', 'margin-inline-start', 'margin-inline-end',
+	'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+	'padding-block', 'padding-block-start', 'padding-block-end',
+	'padding-inline', 'padding-inline-start', 'padding-inline-end',
+	// flex
+	'flex', 'flex-grow', 'flex-shrink', 'flex-basis', 'flex-direction', 'flex-wrap', 'flex-flow',
+	// grid
+	'grid-template-columns', 'grid-template-rows', 'grid-template-areas',
+	'grid-column', 'grid-row', 'grid-area',
+	'grid-auto-flow', 'grid-auto-columns', 'grid-auto-rows',
+	'grid-column-start', 'grid-column-end', 'grid-row-start', 'grid-row-end',
+	// alignment & gap
+	'align-items', 'align-content', 'align-self',
+	'justify-items', 'justify-content', 'justify-self',
+	'place-items', 'place-content', 'place-self',
+	'gap', 'row-gap', 'column-gap',
+	// stacking / compositing
+	'order', 'isolation', 'mix-blend-mode', 'background-blend-mode',
+	// transforms
+	'transform', 'transform-origin', 'transform-style', 'transform-box',
+	'perspective', 'perspective-origin', 'backface-visibility',
+	// transition & animation (timing, not color)
+	'transition', 'transition-property', 'transition-duration',
+	'transition-timing-function', 'transition-delay',
+	'animation', 'animation-name', 'animation-duration', 'animation-timing-function',
+	'animation-delay', 'animation-iteration-count', 'animation-direction',
+	'animation-fill-mode', 'animation-play-state',
+	// content & counters
+	'content', 'quotes', 'counter-increment', 'counter-reset', 'counter-set',
+	// list (type/position only — not list-style-image which can be a gradient)
+	'list-style-type', 'list-style-position',
+	// interaction / UX
+	'cursor', 'pointer-events', 'user-select', '-webkit-user-select',
+	'touch-action', 'resize', 'will-change',
+	// columns (widths/counts, not column-rule-color)
+	'columns', 'column-count', 'column-width', 'column-span', 'column-fill',
+	// table layout
+	'table-layout', 'border-collapse', 'border-spacing', 'caption-side', 'empty-cells',
+	'vertical-align',
+	// fragmentation
+	'break-before', 'break-after', 'break-inside',
+	'page-break-before', 'page-break-after', 'page-break-inside',
+	'orphans', 'widows',
+	// object fitting
+	'object-fit', 'object-position',
+	// opacity (number, not a color)
+	'opacity',
+	// clip (geometry, not color)
+	'clip-path',
+])
 
 export type ColorsContextOptions = { locations?: boolean }
 
