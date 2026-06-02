@@ -232,6 +232,15 @@ describe('Container names', () => {
 		let result = analyze(css).atrules.container.names
 		expect(result.used).toEqual([])
 	})
+
+	test('container-name with multiple names stores each name individually', () => {
+		let css = `.parent { container-name: sidebar main; }`
+		let result = analyze(css).atrules.container.names
+		expect(result.total).toEqual(2)
+		expect(result.totalUnique).toEqual(2)
+		expect(result.unique).toEqual({ sidebar: 1, main: 1 })
+		expect(result.defined).toEqual(['sidebar', 'main'])
+	})
 })
 
 describe('Layer names', () => {

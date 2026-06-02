@@ -707,9 +707,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						}
 					}
 				} else if (normalizedProperty === 'container-name') {
-					containerNames.p(text, valueLoc)
 					for (let child of value.children) {
 						if (is_identifier(child) && !keywords.has(child.name)) {
+							containerNames.p(child.text, toLoc(child))
 							containerNamesTracking.define(child.text)
 						}
 					}
@@ -1187,8 +1187,6 @@ export { hasVendorPrefix } from './vendor-prefix.js'
 
 export { KeywordSet } from './keyword-set.js'
 
-export { DefinedUsed } from './defined-used.js'
+export { DefinedUsed, type DefinedUsedResult } from './defined-used.js'
 
 export type { Location, UniqueWithLocations } from './collection.js'
-
-export type { DefinedUsedResult } from './defined-used.js'
