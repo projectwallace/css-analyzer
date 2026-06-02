@@ -181,6 +181,12 @@ describe('Animation names / keyframes', () => {
 		expect(result.defined).toEqual([])
 	})
 
+	test('animation-name: none is not tracked as a used animation name', () => {
+		let css = `.foo { animation-name: none; }`
+		let result = analyze(css).atrules.keyframes
+		expect(result.used).toEqual([])
+	})
+
 	test('handles vendor-prefixed @keyframes as defined', () => {
 		let css = `@-webkit-keyframes spin {}`
 		let result = analyze(css).atrules.keyframes
@@ -240,6 +246,13 @@ describe('Container names', () => {
 		expect(result.totalUnique).toEqual(2)
 		expect(result.unique).toEqual({ sidebar: 1, main: 1 })
 		expect(result.defined).toEqual(['sidebar', 'main'])
+	})
+
+	test('container-name: none is not tracked as a defined container name', () => {
+		let css = `.parent { container-name: none; }`
+		let result = analyze(css).atrules.container.names
+		expect(result.defined).toEqual([])
+		expect(result.total).toEqual(0)
 	})
 })
 
@@ -344,6 +357,12 @@ describe('Anchor names', () => {
 
 	test('anchor() without a named anchor does not track', () => {
 		let css = `.positioned { position: absolute; top: anchor(top); }`
+		let result = analyze(css).properties.anchorNames
+		expect(result.used).toEqual([])
+	})
+
+	test('position-anchor with a non-anchor value does not track', () => {
+		let css = `.positioned { position-anchor: auto; }`
 		let result = analyze(css).properties.anchorNames
 		expect(result.used).toEqual([])
 	})
