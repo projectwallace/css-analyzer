@@ -18,15 +18,18 @@ export class DefinedUsed {
 	}
 
 	analyze(): DefinedUsedResult {
-		let defined = [...this.#defined]
-		let used = [...this.#used]
-		let usedSet = this.#used
-		let definedSet = this.#defined
-		return {
-			defined,
-			used,
-			unused: defined.filter((n) => !usedSet.has(n)),
-			unknown: used.filter((n) => !definedSet.has(n)),
+		let defined: string[] = []
+		let unused: string[] = []
+		let used: string[] = []
+		let unknown: string[] = []
+		for (let name of this.#defined) {
+			defined.push(name)
+			if (!this.#used.has(name)) unused.push(name)
 		}
+		for (let name of this.#used) {
+			used.push(name)
+			if (!this.#defined.has(name)) unknown.push(name)
+		}
+		return { defined, used, unused, unknown }
 	}
 }
