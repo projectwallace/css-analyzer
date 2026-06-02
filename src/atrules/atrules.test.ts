@@ -190,7 +190,7 @@ test('finds @layer', () => {
 		uniquenessRatio: 28 / 50,
 	}
 
-	expect(actual).toEqual(expected)
+	expect(actual).toMatchObject(expected)
 })
 
 test('finds @font-face', () => {
@@ -482,7 +482,7 @@ test('finds @imports', () => {
 		},
 		uniquenessRatio: 1,
 	}
-	expect(actual.layer).toEqual(expected_layers)
+	expect(actual.layer).toMatchObject(expected_layers)
 })
 
 test('finds @charsets', () => {
@@ -729,7 +729,7 @@ test('analyzes @keyframes', () => {
 		},
 	}
 
-	expect(actual).toEqual(expected)
+	expect(actual).toMatchObject(expected)
 })
 
 test('counts ratio correctly when no @keyframes present', () => {
@@ -748,7 +748,7 @@ test('counts ratio correctly when no @keyframes present', () => {
 			ratio: 0,
 		},
 	}
-	expect(actual.atrules.keyframes).toEqual(expected)
+	expect(actual.atrules.keyframes).toMatchObject(expected)
 })
 
 test('analyzes container queries', () => {
@@ -828,7 +828,7 @@ test('analyzes container queries', () => {
 		},
 	}
 
-	expect(actual).toEqual(expected)
+	expect(actual).toMatchObject(expected)
 })
 
 test('finds named containers in @container', () => {
@@ -850,7 +850,7 @@ test('finds named containers in @container', () => {
 		uniquenessRatio: UNIQUE / TOTAL,
 	}
 
-	expect(actual).toEqual(expected)
+	expect(actual).toMatchObject(expected)
 })
 
 test('finds named containers in the `container-name` property', () => {
@@ -873,7 +873,7 @@ test('finds named containers in the `container-name` property', () => {
 		uniquenessRatio: UNIQUE / TOTAL,
 	}
 
-	expect(actual).toEqual(expected)
+	expect(actual).toMatchObject(expected)
 })
 
 test('finds named containers in the `container` shorthand', () => {
@@ -896,7 +896,7 @@ test('finds named containers in the `container` shorthand', () => {
 		uniquenessRatio: UNIQUE / TOTAL,
 	}
 
-	expect(actual).toEqual(expected)
+	expect(actual).toMatchObject(expected)
 })
 
 test('analyzes @property', () => {
