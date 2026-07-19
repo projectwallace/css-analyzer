@@ -430,6 +430,7 @@ test('finds @font-face (with locations)', () => {
 	expect(actual).toEqual(expected)
 })
 
+// oxlint-disable-next-line vitest/no-disabled-tests
 test.skip('handles @font-face encoding issues (GH-307)', () => {
 	// Actual CSS once found in a <style> tag on vistaprint.nl
 	// CSSTree parses it without errors, but analyzer failed on it;

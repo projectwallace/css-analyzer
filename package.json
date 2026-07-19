@@ -71,7 +71,7 @@
 		"@projectwallace/css-parser": "^0.16.0"
 	},
 	"devDependencies": {
-		"@codecov/rollup-plugin": "^2.0.1",
+		"@projectwallace/preset-oxlint": "^0.0.11",
 		"@vitest/coverage-v8": "^4.1.2",
 		"knip": "^6.3.0",
 		"oxfmt": "^0.57.0",
@@ -85,8 +85,5 @@
 		"node": ">=18.0.0",
 		"pnpm": ">=11.0.0"
 	},
-	"packageManager": "pnpm@11.1.1",
-	"pnpm": {
-		"onlyBuiltDependencies": []
-	}
+	"packageManager": "pnpm@11.1.1"
 }

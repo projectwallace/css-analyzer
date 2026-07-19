@@ -1,3 +1,4 @@
+// oxlint-disable vitest/no-conditional-in-test
 import { test } from 'vitest'
 import { expect } from 'vitest'
 import { analyze } from '../index.js'

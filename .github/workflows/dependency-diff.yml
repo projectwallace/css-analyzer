@@ -1,0 +1,75 @@
+name: Dependency Diff
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-base:
+    name: Pack base branch
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
+        with:
+          ref: main
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm run build
+      - run: pnpm pack --pack-destination ./base-packs
+      - uses: actions/upload-artifact@v7
+        with:
+          name: base-packages
+          path: ./base-packs/*.tgz
+
+  build-pr:
+    name: Pack PR branch
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm run build
+      - run: pnpm pack --pack-destination ./source-packs
+      - uses: actions/upload-artifact@v7
+        with:
+          name: source-packages
+          path: ./source-packs/*.tgz
+
+  diff-dependencies:
+    name: Diff dependencies
+    runs-on: ubuntu-latest
+    needs: [build-base, build-pr]
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v8
+        with:
+          name: base-packages
+          path: ./base-packs
+      - uses: actions/download-artifact@v8
+        with:
+          name: source-packages
+          path: ./source-packs
+      - uses: e18e/action-dependency-diff@8e9b8c1957ab066d36235a43f4c1ff1522e1bdbc # v1.6.1
+        with:
+          base-packages: './base-packs/*.tgz'
+          source-packages: './source-packs/*.tgz'
+          pack-size-threshold: -1
+          size-threshold: -1
+          duplicate-threshold: 3

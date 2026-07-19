@@ -62,23 +62,25 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 			case PSEUDO_CLASS_SELECTOR:
 				switch (current.name.toLowerCase()) {
 					// "The specificity of a :where() pseudo-class is replaced by zero."
-					case 'where':
+					case 'where': {
 						// Noop :)
 						break
+					}
 
 					case '-webkit-any':
-					case 'any':
+					case 'any': {
 						if (current.first_child) {
 							b += 1
 						}
 						break
+					}
 
 					// "The specificity of an :is(), :not(), or :has() pseudo-class is replaced by the specificity of the most specific complex selector in its selector list argument."
 					case '-moz-any':
 					case 'is':
 					case 'matches':
 					case 'not':
-					case 'has':
+					case 'has': {
 						if (current.has_children) {
 							// The first child should be a NODE_SELECTOR_LIST
 							const childSelectorList = current.first_child
@@ -94,10 +96,11 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 						}
 
 						break
+					}
 
 					// "The specificity of an :nth-child() or :nth-last-child() selector is the specificity of the pseudo class itself (counting as one pseudo-class selector) plus the specificity of the most specific complex selector in its selector list argument"
 					case 'nth-child':
-					case 'nth-last-child':
+					case 'nth-last-child': {
 						b += 1
 
 						// Get NODE_SELECTOR_NTH_OF which contains the "of" selector list
@@ -112,11 +115,11 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 							c += max2[2]
 						}
 						break
-
+					}
 					// "The specificity of :host is that of a pseudo-class. The specificity of :host() is that of a pseudo-class, plus the specificity of its argument."
 					// "The specificity of :host-context() is that of a pseudo-class, plus the specificity of its argument."
 					case 'host-context':
-					case 'host':
+					case 'host': {
 						b += 1
 
 						const selector_list = current.first_child
@@ -141,26 +144,28 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 							}
 						}
 						break
-
+					}
 					// Improper use of Pseudo-Class Selectors instead of a Pseudo-Element
 					// @ref https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements#index
 					case 'after':
 					case 'before':
 					case 'first-letter':
-					case 'first-line':
+					case 'first-line': {
 						c += 1
 						break
+					}
 
-					default:
+					default: {
 						b += 1
 						break
+					}
 				}
 				break
 
 			case PSEUDO_ELEMENT_SELECTOR:
 				switch (current.name.toLowerCase()) {
 					// "The specificity of ::slotted() is that of a pseudo-element, plus the specificity of its argument."
-					case 'slotted':
+					case 'slotted': {
 						c += 1
 
 						const selector_list = current.first_child
@@ -185,11 +190,12 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 							}
 						}
 						break
+					}
 
 					case 'view-transition-group':
 					case 'view-transition-image-pair':
 					case 'view-transition-old':
-					case 'view-transition-new':
+					case 'view-transition-new': {
 						// The specificity of a view-transition selector with a * argument is zero.
 						if (current.first_child?.text === '*') {
 							break
@@ -198,14 +204,16 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 						// as for other pseudo - elements, and is equivalent to a type selector.
 						c += 1
 						break
+					}
 
-					default:
+					default: {
 						c += 1
 						break
+					}
 				}
 				break
 
-			case TYPE_SELECTOR:
+			case TYPE_SELECTOR: {
 				// Omit namespace
 				let typeSelector = current.name ?? ''
 				if (typeSelector.includes('|')) {
@@ -217,10 +225,12 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 					c += 1
 				}
 				break
+			}
 
-			default:
+			default: {
 				// NOOP
 				break
+			}
 		}
 
 		current = current.next_sibling as SelectorNode
