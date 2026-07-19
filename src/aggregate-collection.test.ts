@@ -1,3 +1,5 @@
+// oxlint-disable prefer-single-call
+
 import { test, expect } from 'vitest'
 import { AggregateCollection } from './aggregate-collection.js'
 

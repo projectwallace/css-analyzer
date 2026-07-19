@@ -171,10 +171,6 @@ test('handles pseudo element selectors', () => {
 	expect(actual).toEqual(expected)
 })
 
-// TODO: test this whenever CSSTree contains 'native' specificity analysis
-// https://twitter.com/csstree/status/1386799196355825664
-test.skip('handles multiple :where or :is parts', () => {})
-
 test('calculates the lowest value', () => {
 	const fixture = `
     #test,

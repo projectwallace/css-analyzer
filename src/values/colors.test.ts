@@ -788,6 +788,7 @@ test('does not report false positives for color keywords', () => {
 })
 
 // Source: https://gist.github.com/lahmatiy/84c7fd877a78e561cac57e59e142c9e3
+// oxlint-disable-next-line vitest/no-disabled-tests
 test.skip('ignores color names that are not actual colors', () => {
 	const fixture = `
     test {
