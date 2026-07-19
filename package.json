@@ -72,14 +72,14 @@
 	},
 	"devDependencies": {
 		"@projectwallace/preset-oxlint": "^0.0.11",
-		"@vitest/coverage-v8": "^4.1.2",
-		"knip": "^6.3.0",
-		"oxfmt": "^0.57.0",
-		"oxlint": "^1.58.0",
-		"publint": "^0.3.18",
-		"tsdown": "^0.22.0",
+		"@vitest/coverage-v8": "^4.1.10",
+		"knip": "^6.27.0",
+		"oxfmt": "^0.59.0",
+		"oxlint": "^1.74.0",
+		"publint": "^0.3.21",
+		"tsdown": "^0.22.9",
 		"typescript": "^6.0.2",
-		"vitest": "^4.1.2"
+		"vitest": "^4.1.10"
 	},
 	"engines": {
 		"node": ">=18.0.0",
