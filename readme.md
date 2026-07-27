@@ -5,26 +5,23 @@
 </div>
 
 <div align="center">
-  <a href="https://npmjs.org/package/@projectwallace/css-analyzer">
-    <img src="https://badgen.net/npm/v/@projectwallace/css-analyzer" alt="version" />
-  </a>
-  <a href="https://npmjs.org/package/@projectwallace/css-analyzer">
-    <img src="https://badgen.now.sh/npm/dm/@projectwallace/css-analyzer" alt="downloads" />
-  </a>
-  <a href="https://packagephobia.com/result?p=%40projectwallace%2Fcss-analyzer">
-    <img src="https://packagephobia.com/badge?p=%40projectwallace%2Fcss-analyzer" alt="install size" />
-  </a>
+  <a href="https://npmjs.org/package/@projectwallace/css-analyzer"><img src="https://badgen.net/npm/v/@projectwallace/css-analyzer" alt="version" /></a>
+  <a href="https://npmjs.org/package/@projectwallace/css-analyzer"><img src="https://badgen.now.sh/npm/dm/@projectwallace/css-analyzer" alt="downloads" /></a>
+  <a href="https://packagephobia.com/result?p=%40projectwallace%2Fcss-analyzer"><img src="https://packagephobia.com/badge?p=%40projectwallace%2Fcss-analyzer" alt="install size" /></a>
 </div>
 
 <div align="center">
-A <b>CSS analyzer</b> that goes through your CSS to find all kinds of relevant statistics.
+Turn your CSS into <b>actionable stats</b> — specificity, complexity, design tokens, and 200+ more metrics.
 </div>
 
 ## Features
 
-- Extremely **detailed** (150+ metrics)
-- Super **[fast](/benchmark)**
-- Supports both NodeJS and browsers
+- Extremely **detailed** (200+ metrics)
+- **TypeScript** types built-in, zero config
+- Runs anywhere — **NodeJS and browsers**
+- Tiny footprint, only one dependency
+- **Design system** audit ready (token usage, uniqueness ratios)
+- Battle-tested — powers [Project Wallace](https://www.projectwallace.com)
 
 ## Install
 
@@ -52,25 +49,42 @@ const result = analyze(`
 ```
 
 <details>
-  <summary>More examples output can be found in <a href="src/__fixtures__">the fixtures folder</a> and looks roughly like this:</summary>
+  <summary>Output looks roughly like this:</summary>
 
 ```json
 {
 	"stylesheet": {
-		"sourceLinesOfCode": 5,
-		"linesOfCode": 8,
-		"size": 113,
+		"sourceLinesOfCode": 0,
+		"linesOfCode": 1,
+		"size": 0,
 		"comments": {
 			"total": 0,
 			"size": 0
-		}
+		},
+		"embeddedContent": {
+			"size": {
+				"total": 0,
+				"ratio": 0
+			},
+			"types": {
+				"total": 0,
+				"totalUnique": 0,
+				"uniquenessRatio": 0,
+				"unique": {}
+			}
+		},
+		"complexity": 0
 	},
 	"atrules": {
+		"total": 0,
+		"totalUnique": 0,
+		"unique": {},
+		"uniquenessRatio": 0,
 		"fontface": {
 			"total": 0,
 			"totalUnique": 0,
 			"unique": [],
-			"uniquenessRatio": 1
+			"uniquenessRatio": 0
 		},
 		"import": {
 			"total": 0,
@@ -82,7 +96,19 @@ const result = analyze(`
 			"total": 0,
 			"totalUnique": 0,
 			"unique": {},
-			"uniquenessRatio": 0
+			"uniquenessRatio": 0,
+			"browserhacks": {
+				"total": 0,
+				"totalUnique": 0,
+				"unique": {},
+				"uniquenessRatio": 0
+			},
+			"features": {
+				"total": 0,
+				"totalUnique": 0,
+				"unique": {},
+				"uniquenessRatio": 0
+			}
 		},
 		"charset": {
 			"total": 0,
@@ -94,22 +120,91 @@ const result = analyze(`
 			"total": 0,
 			"totalUnique": 0,
 			"unique": {},
-			"uniquenessRatio": 0
+			"uniquenessRatio": 0,
+			"browserhacks": {
+				"total": 0,
+				"totalUnique": 0,
+				"unique": {},
+				"uniquenessRatio": 0
+			}
 		},
 		"keyframes": {
 			"total": 0,
 			"totalUnique": 0,
 			"unique": {},
 			"uniquenessRatio": 0,
+			"defined": [],
+			"used": [],
+			"unused": [],
+			"unknown": [],
 			"prefixed": {
 				"total": 0,
 				"totalUnique": 0,
 				"unique": {},
 				"uniquenessRatio": 0,
-				"ratio": null
+				"ratio": 0
 			}
 		},
 		"container": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0,
+			"names": {
+				"total": 0,
+				"totalUnique": 0,
+				"unique": {},
+				"uniquenessRatio": 0,
+				"defined": [],
+				"used": [],
+				"unused": [],
+				"unknown": []
+			}
+		},
+		"layer": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0,
+			"defined": [],
+			"used": [],
+			"unused": [],
+			"unknown": []
+		},
+		"property": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
+		},
+		"function": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
+		},
+		"scope": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
+		},
+		"complexity": {
+			"min": 0,
+			"max": 0,
+			"mean": 0,
+			"mode": 0,
+			"range": 0,
+			"sum": 0
+		},
+		"nesting": {
+			"min": 0,
+			"max": 0,
+			"mean": 0,
+			"mode": 0,
+			"range": 0,
+			"sum": 0,
+			"items": [],
 			"total": 0,
 			"totalUnique": 0,
 			"unique": {},
@@ -117,60 +212,105 @@ const result = analyze(`
 		}
 	},
 	"rules": {
-		"total": 2,
+		"total": 0,
 		"empty": {
 			"total": 0,
 			"ratio": 0
 		},
-		"selectors": {
-			"min": 1,
-			"max": 1,
-			"mean": 1,
-			"mode": 1,
+		"sizes": {
+			"min": 0,
+			"max": 0,
+			"mean": 0,
+			"mode": 0,
 			"range": 0,
-			"sum": 2,
-			"items": [1, 1]
+			"sum": 0,
+			"items": [],
+			"unique": {},
+			"total": 0,
+			"totalUnique": 0,
+			"uniquenessRatio": 0
+		},
+		"nesting": {
+			"min": 0,
+			"max": 0,
+			"mean": 0,
+			"mode": 0,
+			"range": 0,
+			"sum": 0,
+			"items": [],
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
+		},
+		"selectors": {
+			"min": 0,
+			"max": 0,
+			"mean": 0,
+			"mode": 0,
+			"range": 0,
+			"sum": 0,
+			"items": [],
+			"unique": {},
+			"total": 0,
+			"totalUnique": 0,
+			"uniquenessRatio": 0
 		},
 		"declarations": {
-			"min": 1,
-			"max": 2,
-			"mean": 1.5,
-			"mode": 1.5,
-			"range": 1,
-			"sum": 3,
-			"items": [2, 1]
+			"min": 0,
+			"max": 0,
+			"mean": 0,
+			"mode": 0,
+			"range": 0,
+			"sum": 0,
+			"items": [],
+			"unique": {},
+			"total": 0,
+			"totalUnique": 0,
+			"uniquenessRatio": 0
 		}
 	},
 	"selectors": {
-		"total": 2,
-		"totalUnique": 2,
-		"uniquenessRatio": 1,
+		"total": 0,
+		"totalUnique": 0,
+		"uniquenessRatio": 0,
 		"specificity": {
-			"sum": [0, 2, 1],
-			"min": [0, 0, 1],
-			"max": [0, 2, 0],
-			"mean": [0, 1, 0.5],
-			"mode": [0, 1, 0.5],
-			"items": [
-				[0, 0, 1],
-				[0, 2, 0]
-			]
+			"min": [0, 0, 0],
+			"max": [0, 0, 0],
+			"sum": [0, 0, 0],
+			"mean": [0, 0, 0],
+			"mode": [0, 0, 0],
+			"items": [],
+			"unique": {},
+			"total": 0,
+			"totalUnique": 0,
+			"uniquenessRatio": 0
 		},
 		"complexity": {
-			"min": 1,
-			"max": 3,
-			"mean": 2,
-			"mode": 2,
-			"range": 2,
-			"sum": 4,
-			"total": 2,
-			"totalUnique": 2,
-			"unique": {
-				"1": 1,
-				"3": 1
-			},
-			"uniquenessRatio": 1,
-			"items": [1, 3]
+			"min": 0,
+			"max": 0,
+			"mean": 0,
+			"mode": 0,
+			"range": 0,
+			"sum": 0,
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0,
+			"items": []
+		},
+		"nesting": {
+			"min": 0,
+			"max": 0,
+			"mean": 0,
+			"mode": 0,
+			"range": 0,
+			"sum": 0,
+			"items": [],
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
 		},
 		"id": {
 			"total": 0,
@@ -179,6 +319,18 @@ const result = analyze(`
 			"uniquenessRatio": 0,
 			"ratio": 0
 		},
+		"pseudoClasses": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
+		},
+		"pseudoElements": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
+		},
 		"accessibility": {
 			"total": 0,
 			"totalUnique": 0,
@@ -186,20 +338,42 @@ const result = analyze(`
 			"uniquenessRatio": 0,
 			"ratio": 0
 		},
+		"attributes": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
+		},
+		"customElements": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
+		},
 		"keyframes": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
+		},
+		"prefixed": {
 			"total": 0,
 			"totalUnique": 0,
 			"unique": {},
 			"uniquenessRatio": 0,
 			"ratio": 0
+		},
+		"combinators": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
 		}
 	},
 	"declarations": {
-		"total": 3,
-		"unique": {
-			"total": 3,
-			"ratio": 1
-		},
+		"total": 0,
+		"totalUnique": 0,
+		"uniquenessRatio": 0,
 		"importants": {
 			"total": 0,
 			"ratio": 0,
@@ -207,17 +381,34 @@ const result = analyze(`
 				"total": 0,
 				"ratio": 0
 			}
+		},
+		"complexity": {
+			"min": 0,
+			"max": 0,
+			"mean": 0,
+			"mode": 0,
+			"range": 0,
+			"sum": 0
+		},
+		"nesting": {
+			"min": 0,
+			"max": 0,
+			"mean": 0,
+			"mode": 0,
+			"range": 0,
+			"sum": 0,
+			"items": [],
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
 		}
 	},
 	"properties": {
-		"total": 3,
-		"totalUnique": 3,
-		"unique": {
-			"color": 1,
-			"font-size": 1,
-			"background-color": 1
-		},
-		"uniquenessRatio": 1,
+		"total": 0,
+		"totalUnique": 0,
+		"unique": {},
+		"uniquenessRatio": 0,
 		"prefixed": {
 			"total": 0,
 			"totalUnique": 0,
@@ -230,6 +421,24 @@ const result = analyze(`
 			"totalUnique": 0,
 			"unique": {},
 			"uniquenessRatio": 0,
+			"defined": [],
+			"used": [],
+			"unused": [],
+			"unknown": [],
+			"ratio": 0,
+			"importants": {
+				"total": 0,
+				"totalUnique": 0,
+				"unique": {},
+				"uniquenessRatio": 0,
+				"ratio": 0
+			}
+		},
+		"shorthands": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0,
 			"ratio": 0
 		},
 		"browserhacks": {
@@ -238,35 +447,41 @@ const result = analyze(`
 			"unique": {},
 			"uniquenessRatio": 0,
 			"ratio": 0
+		},
+		"complexity": {
+			"min": 0,
+			"max": 0,
+			"mean": 0,
+			"mode": 0,
+			"range": 0,
+			"sum": 0
+		},
+		"anchorNames": {
+			"defined": [],
+			"used": [],
+			"unused": [],
+			"unknown": []
 		}
 	},
 	"values": {
 		"colors": {
-			"total": 2,
-			"totalUnique": 2,
-			"unique": {
-				"blue": 1,
-				"whitesmoke": 1
-			},
-			"uniquenessRatio": 1,
-			"itemsPerContext": {
-				"color": {
-					"total": 1,
-					"totalUnique": 1,
-					"unique": {
-						"blue": 1
-					},
-					"uniquenessRatio": 1
-				},
-				"background-color": {
-					"total": 1,
-					"totalUnique": 1,
-					"unique": {
-						"whitesmoke": 1
-					},
-					"uniquenessRatio": 1
-				}
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0,
+			"itemsPerContext": {},
+			"formats": {
+				"total": 0,
+				"totalUnique": 0,
+				"unique": {},
+				"uniquenessRatio": 0
 			}
+		},
+		"gradients": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
 		},
 		"fontFamilies": {
 			"total": 0,
@@ -275,12 +490,16 @@ const result = analyze(`
 			"uniquenessRatio": 0
 		},
 		"fontSizes": {
-			"total": 1,
-			"totalUnique": 1,
-			"unique": {
-				"100%": 1
-			},
-			"uniquenessRatio": 1
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
+		},
+		"lineHeights": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
 		},
 		"zindexes": {
 			"total": 0,
@@ -300,6 +519,13 @@ const result = analyze(`
 			"unique": {},
 			"uniquenessRatio": 0
 		},
+		"borderRadiuses": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"itemsPerContext": {},
+			"uniquenessRatio": 0
+		},
 		"animations": {
 			"durations": {
 				"total": 0,
@@ -312,9 +538,21 @@ const result = analyze(`
 				"totalUnique": 0,
 				"unique": {},
 				"uniquenessRatio": 0
+			},
+			"names": {
+				"total": 0,
+				"totalUnique": 0,
+				"unique": {},
+				"uniquenessRatio": 0
 			}
 		},
 		"prefixes": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
+		},
+		"browserhacks": {
 			"total": 0,
 			"totalUnique": 0,
 			"unique": {},
@@ -326,12 +564,33 @@ const result = analyze(`
 			"unique": {},
 			"uniquenessRatio": 0,
 			"itemsPerContext": {}
+		},
+		"complexity": {
+			"min": 0,
+			"max": 0,
+			"mean": 0,
+			"mode": 0,
+			"range": 0,
+			"sum": 0
+		},
+		"keywords": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
+		},
+		"resets": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
+		},
+		"displays": {
+			"total": 0,
+			"totalUnique": 0,
+			"unique": {},
+			"uniquenessRatio": 0
 		}
-	},
-	"__meta__": {
-		"parseTime": 4,
-		"analyzeTime": 5,
-		"total": 10
 	}
 }
 ```
@@ -369,10 +628,9 @@ Browser hack patterns for value detection were sourced from:
 
 ## Related projects
 
-- [CSS Code Quality Analyzer](https://github.com/projectwallace/css-code-quality) -
-  A Code Quality analyzer that tells you how maintainable, complex and performant your CSS is
+- [CSS Design Tokens](https://github.com/projectwallace/css-design-tokens) - Get DTCG tokens from CSS (uses this css-analyzer)
 - [Wallace CLI](https://github.com/projectwallace/wallace-cli) - CLI tool for
   @projectwallace/css-analyzer
-- [Constyble](https://github.com/projectwallace/constyble) - CSS Complexity linter
 - [Color Sorter](https://github.com/projectwallace/color-sorter) - Sort CSS colors
   by hue, saturation, lightness and opacity
+- [Project Wallace Stylelint plugin pack](https://github.com/projectwallace/stylelint-plugin) - Lint your CSS based on the metrics in this CSS analyzer
