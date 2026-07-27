@@ -2,6 +2,7 @@
 	"compilerOptions": {
 		// Base options:
 		"skipLibCheck": true,
+		// TODO: set to es2025 on next major version
 		"target": "es2022",
 		"verbatimModuleSyntax": true,
 		"allowJs": true,
@@ -22,6 +23,6 @@
 		// Code runs in the DOM
 		"lib": ["ES2022", "DOM", "DOM.Iterable"]
 	},
-	"include": ["src/index.ts"],
+	"include": ["src/**/*.ts"],
 	"exclude": ["node_modules"]
 }

@@ -281,6 +281,6 @@ test('correctly extracts embed types', () => {
 			`data:image/svg+xml,%3Csvg width='9' height='11' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3.55.246c.257-.329.647-.327.903 0l3.36 4.66c.256.329.256.864 0 1.192L4.45 10.75c-.257.329-.644.327-.9 0L.192 6.098c-.256-.329-.256-.865 0-1.192L3.55.246z' fill='%23fff'/%3E%3C/svg%3E`,
 		],
 	].forEach(([expected, fixture]) => {
-		expect(getEmbedType(fixture)).toBe(expected)
+		expect(getEmbedType(fixture!)).toBe(expected)
 	})
 })

@@ -10,4 +10,5 @@ export default defineConfig({
 	],
 	platform: 'neutral',
 	publint: true,
+	dts: true,
 })
