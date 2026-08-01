@@ -61,7 +61,6 @@
 	},
 	"scripts": {
 		"lint": "oxlint --config .oxlintrc.json; oxfmt --check",
-		"lint-package": "publint",
 		"test": "vitest --coverage",
 		"check": "tsc --noEmit",
 		"build": "tsdown",
@@ -73,12 +72,13 @@
 	"devDependencies": {
 		"@projectwallace/preset-oxlint": "^0.0.11",
 		"@vitest/coverage-v8": "^4.1.10",
-		"knip": "^6.29.0",
+		"knip": "^6.31.0",
 		"oxfmt": "^0.61.0",
 		"oxlint": "^1.75.0",
 		"publint": "^0.3.22",
 		"tsdown": "^0.22.14",
 		"typescript": "^7.0.2",
+		"vite": "^8.2.0",
 		"vitest": "^4.1.10"
 	},
 	"engines": {
