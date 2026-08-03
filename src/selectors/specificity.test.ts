@@ -171,6 +171,42 @@ test('handles pseudo element selectors', () => {
 	expect(actual).toEqual(expected)
 })
 
+test('handles the :host and :host-context pseudo classes', () => {
+	const fixture = `
+    :host(.foo), /* [0,2,0]: 1 for :host itself, 1 for .foo */
+    :host(.foo.bar), /* [0,3,0]: 1 for :host itself, 2 for .foo.bar */
+    :host-context(.foo), /* [0,2,0]: 1 for :host-context itself, 1 for .foo */
+    :host, /* [0,1,0]: bare :host is just a pseudo-class */
+    :host(div > .foo) /* [0,1,1]: only the compound selector before the combinator counts (div), not .foo */
+    {}
+  `
+	const actual = analyze(fixture).selectors.specificity.items
+	const expected = [
+		[0, 2, 0],
+		[0, 3, 0],
+		[0, 2, 0],
+		[0, 1, 0],
+		[0, 1, 1],
+	]
+	expect(actual).toEqual(expected)
+})
+
+test('handles the ::slotted pseudo element', () => {
+	const fixture = `
+    ::slotted(.foo), /* [0,1,1]: 1 for ::slotted itself, 1 for .foo */
+    ::slotted(div.foo), /* [0,1,2]: 1 for ::slotted itself, 1 for div, 1 for .foo */
+    ::slotted(span) /* [0,0,2]: 1 for ::slotted itself, 1 for span */
+    {}
+  `
+	const actual = analyze(fixture).selectors.specificity.items
+	const expected = [
+		[0, 1, 1],
+		[0, 1, 2],
+		[0, 0, 2],
+	]
+	expect(actual).toEqual(expected)
+})
+
 test('calculates the lowest value', () => {
 	const fixture = `
     #test,
