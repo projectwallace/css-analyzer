@@ -28,6 +28,7 @@ import {
 	is_hash,
 	is_function,
 	is_operator,
+	is_string,
 } from '@projectwallace/css-parser'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isPrefixed, isAccessibility } from './selectors/utils.js'
@@ -287,7 +288,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						complexity++
 					})
 				} else if (normalized_name.endsWith('keyframes')) {
-					let prelude = node.prelude.text
+					let prelude = unquote(node.prelude.text)
 					keyframes.p(prelude, toLoc(node))
 					animationNamesTracking.define(prelude)
 
@@ -671,8 +672,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						} else if (item.type === 'keyword') {
 							valueKeywords.p(item.value.text.toLowerCase(), valueLoc)
 						} else if (item.type === 'name' && isAnimation) {
-							animationNames.p(item.value.text, valueLoc)
-							animationNamesTracking.use(item.value.text)
+							let name = unquote(item.value.text)
+							animationNames.p(name, valueLoc)
+							animationNamesTracking.use(name)
 						}
 					})
 					return SKIP
@@ -704,6 +706,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						if (is_identifier(child) && !keywords.has(child.name)) {
 							animationNames.p(child.text, valueLoc)
 							animationNamesTracking.use(child.text)
+						} else if (is_string(child)) {
+							let name = unquote(child.text)
+							animationNames.p(name, valueLoc)
+							animationNamesTracking.use(name)
 						}
 					}
 				} else if (normalizedProperty === 'container-name') {
