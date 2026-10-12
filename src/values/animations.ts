@@ -5,6 +5,7 @@ import {
 	is_operator,
 	is_dimension,
 	is_function,
+	is_string,
 } from '@projectwallace/css-parser'
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
@@ -76,6 +77,12 @@ export function analyzeAnimation(
 		} else if (is_function(node) && TIMING_FUNCTION_VALUES.has(node.name)) {
 			cb({
 				type: 'fn',
+				value: node,
+			})
+		} else if (is_string(node)) {
+			// A quoted string is always a valid animation name, even when it's a reserved keyword (e.g. "none" or "infinite")
+			cb({
+				type: 'name',
 				value: node,
 			})
 		}

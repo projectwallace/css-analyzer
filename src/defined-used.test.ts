@@ -187,6 +187,55 @@ describe('Animation names / keyframes', () => {
 		expect(result.used).toEqual([])
 	})
 
+	test('tracks quoted animation-name references as used', () => {
+		let css = `.foo { animation-name: "slide in"; }`
+		let result = analyze(css).atrules.keyframes
+		expect(result.used).toEqual(['slide in'])
+	})
+
+	test('tracks quoted animation shorthand names as used', () => {
+		let css = `.foo { animation: "slide in" 1s ease; }`
+		let result = analyze(css).atrules.keyframes
+		expect(result.used).toEqual(['slide in'])
+	})
+
+	test('matches a quoted @keyframes definition with a quoted usage', () => {
+		let css = `
+			@keyframes "slide in" { from { opacity: 0; } to { opacity: 1; } }
+			.foo { animation-name: "slide in"; }
+		`
+		let result = analyze(css).atrules.keyframes
+		expect(result.defined).toEqual(['slide in'])
+		expect(result.used).toEqual(['slide in'])
+		expect(result.unused).toEqual([])
+		expect(result.unknown).toEqual([])
+	})
+
+	test('matches a quoted @keyframes definition with an unquoted usage and vice versa', () => {
+		let css = `
+			@keyframes spin { from { opacity: 0; } to { opacity: 1; } }
+			@keyframes "fade" { from { opacity: 0; } to { opacity: 1; } }
+			.foo {
+				animation-name: "spin";
+				animation: fade 1s;
+			}
+		`
+		let result = analyze(css).atrules.keyframes
+		expect(result.defined).toEqual(['spin', 'fade'])
+		expect(result.used).toEqual(['spin', 'fade'])
+		expect(result.unused).toEqual([])
+		expect(result.unknown).toEqual([])
+	})
+
+	test('quoted reserved keywords are tracked as used animation names, unlike their bare forms', () => {
+		// `none` on its own means "no animation", but a quoted `"none"` is a
+		// valid (if unusual) custom animation name per the CSS Animations spec.
+		let css = `.foo { animation-name: "none", "infinite", none; }`
+		let result = analyze(css).atrules.keyframes
+		expect(result.used).toEqual(['none', 'infinite'])
+		expect(result.unknown).toEqual(['none', 'infinite'])
+	})
+
 	test('handles vendor-prefixed @keyframes as defined', () => {
 		let css = `@-webkit-keyframes spin {}`
 		let result = analyze(css).atrules.keyframes

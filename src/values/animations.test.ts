@@ -333,3 +333,30 @@ test('emits name for dashed-ident animation names', () => {
 	})
 	expect(names).toEqual(['--my-name'])
 })
+
+test('emits name for quoted (string) animation names', () => {
+	const names: string[] = []
+	analyzeAnimation(parse_value('"slide in" 300ms ease-out'), (item) => {
+		if (item.type === 'name') names.push(item.value.text)
+	})
+	expect(names).toEqual(['"slide in"'])
+})
+
+test('emits name for each quoted animation in a value list', () => {
+	const names: string[] = []
+	analyzeAnimation(parse_value('"slide in" 1s, "fade out" 2s'), (item) => {
+		if (item.type === 'name') names.push(item.value.text)
+	})
+	expect(names).toEqual(['"slide in"', '"fade out"'])
+})
+
+test('emits name for a quoted keyword used as animation name', () => {
+	// Unlike the bare `none` keyword, a quoted "none" is a valid animation name
+	const names: string[] = []
+	for (const kw of ['none', 'infinite', 'paused', 'alternate', 'linear']) {
+		analyzeAnimation(parse_value(`"${kw}" 1s ease-in`), (item) => {
+			if (item.type === 'name') names.push(item.value.text)
+		})
+	}
+	expect(names).toEqual(['"none"', '"infinite"', '"paused"', '"alternate"', '"linear"'])
+})
