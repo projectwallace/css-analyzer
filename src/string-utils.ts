@@ -1,5 +1,3 @@
-import { str_equals, str_starts_with } from '@projectwallace/css-parser'
-
 export function unquote(str: string): string {
 	return str.replaceAll(/(?:^['"])|(?:['"]$)/g, '')
 }

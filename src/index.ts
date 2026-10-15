@@ -3,6 +3,7 @@ import {
 	type CSSNode,
 	is_custom,
 	SKIP,
+	str_equals,
 	str_starts_with,
 	walk,
 	parse,
@@ -730,7 +731,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					}
 				} else if (normalizedProperty === 'anchor-name') {
 					for (let child of value.children) {
-						if (is_identifier(child) && str_starts_with(child.text, '--')) {
+						if (is_identifier(child) && is_custom(child.text)) {
 							anchorNamesTracking.define(child.text)
 						}
 					}
@@ -738,7 +739,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					if (
 						value.first_child &&
 						is_identifier(value.first_child) &&
-						str_starts_with(value.first_child.text, '--')
+						is_custom(value.first_child.text)
 					) {
 						anchorNamesTracking.use(value.first_child.text)
 					}
@@ -832,21 +833,19 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						let firstFuncChild = valueNode.first_child
 
 						// Track var(--custom-property) usage
-						if (
-							funcName === 'var' &&
-							firstFuncChild &&
-							is_identifier(firstFuncChild) &&
-							str_starts_with(firstFuncChild.text, '--')
-						) {
-							customPropsTracking.use(firstFuncChild.text)
+						if (str_equals('var', funcName) && firstFuncChild && is_identifier(firstFuncChild)) {
+							let name = firstFuncChild.text
+							if (is_custom(name)) {
+								customPropsTracking.use(name)
+							}
 						}
 
 						// Track anchor(--name) and anchor-size(--name) usage
 						if (
-							(funcName === 'anchor' || funcName === 'anchor-size') &&
+							(str_equals('anchor', funcName) || str_equals('anchor-size', funcName)) &&
 							firstFuncChild &&
 							is_identifier(firstFuncChild) &&
-							str_starts_with(firstFuncChild.text, '--')
+							is_custom(firstFuncChild.text)
 						) {
 							anchorNamesTracking.use(firstFuncChild.text)
 						}
