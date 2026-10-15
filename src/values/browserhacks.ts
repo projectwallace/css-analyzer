@@ -4,6 +4,7 @@ import {
 	is_identifier,
 	is_function,
 	is_url,
+	str_equals,
 	walk,
 } from '@projectwallace/css-parser'
 import { endsWith, unquote } from '../string-utils.js'
@@ -48,10 +49,9 @@ export function isValueBrowserhack(node: Value, on_hack: (hack: string) => void)
 	// alpha(), expression(), and behavior .htc hacks
 	walk(node, function (child) {
 		if (is_function(child)) {
-			const name = child.name.toLowerCase()
-			if (name === 'alpha') {
+			if (str_equals('alpha', child.name)) {
 				on_hack('alpha()')
-			} else if (name === 'expression') {
+			} else if (str_equals('expression', child.name)) {
 				on_hack('expression()')
 			}
 		}

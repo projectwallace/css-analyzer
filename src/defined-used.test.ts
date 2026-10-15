@@ -91,6 +91,12 @@ describe('Custom properties', () => {
 		expect(result.used).toEqual(['--color'])
 	})
 
+	test('tracks VAR() references as used regardless of case', () => {
+		let css = `.foo { color: VAR(--color); }`
+		let result = analyze(css).properties.custom
+		expect(result.used).toEqual(['--color'])
+	})
+
 	test('identifies unused custom properties', () => {
 		let css = `:root { --color: red; --size: 16px; } .foo { color: var(--color); }`
 		let result = analyze(css).properties.custom
@@ -380,6 +386,12 @@ describe('Anchor names', () => {
 
 	test('tracks anchor-size() function as used', () => {
 		let css = `.positioned { position: absolute; width: anchor-size(--my-anchor width); }`
+		let result = analyze(css).properties.anchorNames
+		expect(result.used).toContain('--my-anchor')
+	})
+
+	test('tracks ANCHOR() and ANCHOR-SIZE() functions as used regardless of case', () => {
+		let css = `.positioned { position: absolute; top: ANCHOR(--my-anchor bottom); width: ANCHOR-SIZE(--my-anchor width); }`
 		let result = analyze(css).properties.anchorNames
 		expect(result.used).toContain('--my-anchor')
 	})
