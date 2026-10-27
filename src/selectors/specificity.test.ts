@@ -171,6 +171,38 @@ test('handles pseudo element selectors', () => {
 	expect(actual).toEqual(expected)
 })
 
+test('handles the ::part pseudo element', () => {
+	const fixture = `
+    ::part(my-ident),
+    ::part(first-ident second-ident)
+    {}
+  `
+	const actual = analyze(fixture).selectors.specificity.items
+	const expected = [
+		[0, 0, 1],
+		[0, 0, 1],
+	]
+	expect(actual).toEqual(expected)
+})
+
+test('handles the ::highlight pseudo element', () => {
+	const fixture = `
+    ::highlight,
+    ::highlight(),
+    ::highlight(my-ident),
+    ::highlight(*)
+    {}
+  `
+	const actual = analyze(fixture).selectors.specificity.items
+	const expected = [
+		[0, 0, 0],
+		[0, 0, 0],
+		[0, 0, 1],
+		[0, 0, 0],
+	]
+	expect(actual).toEqual(expected)
+})
+
 test('calculates the lowest value', () => {
 	const fixture = `
     #test,
