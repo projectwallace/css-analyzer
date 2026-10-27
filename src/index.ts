@@ -14,9 +14,7 @@ import {
 	is_atrule,
 	is_selector,
 	is_declaration,
-	is_supports_query,
 	is_supports_declaration,
-	is_layer_name,
 	is_identifier,
 	is_attribute_selector,
 	is_type_selector,
@@ -315,10 +313,14 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 					if (is_atrule_prelude(node.prelude) && node.prelude.has_children) {
 						for (let child of node.prelude) {
-							if (is_supports_query(child)) {
+							if (!is_function(child)) {
+								continue
+							}
+
+							if (str_equals('supports', child.name) && child.value) {
 								supports.p(child.value, toLoc(child))
-							} else if (is_layer_name(child) && child.value) {
-								// can be empty string
+							} else if (str_equals('layer', child.name) && child.value) {
+								// layer() can be empty
 								layers.p(child.value, toLoc(child))
 								layerNamesTracking.use(child.value)
 							}
@@ -869,7 +871,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 		} else if (is_url(node)) {
 			let { value } = node
 			let embed = unquote(value ?? '')
-			if (str_starts_with(embed, 'data:')) {
+			if (str_starts_with('data:', embed)) {
 				let size = embed.length
 				let type = getEmbedType(embed)
 

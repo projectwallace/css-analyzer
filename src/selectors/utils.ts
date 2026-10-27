@@ -76,7 +76,7 @@ export function isAccessibility(
 	walk(selector, function (node) {
 		if (is_attribute_selector(node)) {
 			const name = node.name || ''
-			if (str_equals('role', name) || str_starts_with(name, 'aria-')) {
+			if (str_equals('role', name) || str_starts_with('aria-', name)) {
 				on_selector(normalize(node))
 			}
 		}
