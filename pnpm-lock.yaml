@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@projectwallace/css-parser':
-        specifier: ~0.18.9
-        version: 0.18.9
+        specifier: ~0.19.0
+        version: 0.19.0
     devDependencies:
       '@projectwallace/preset-oxlint':
         specifier: ^0.0.11
@@ -564,8 +564,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@projectwallace/css-parser@0.18.9':
-    resolution: {integrity: sha512-euAUMV2madmhqCeTVNGbeewj8x0VhUIxVik/aGpyIrVBbKfzDV3IxEu/YDTYdUTkwrf+RZPyDkiYQhDuZMW/cg==}
+  '@projectwallace/css-parser@0.19.0':
+    resolution: {integrity: sha512-Sgb2uCRJbVfsEHbGaypNd8XnBcwtofc8vwDuxLrXXMQ1BeYT0X7Jr/DuFgbDX4cvQT9HusLXcNWT8JdjFzV/cw==}
     engines: {pnpm: '>=11.0.0'}
 
   '@projectwallace/preset-oxlint@0.0.11':
@@ -846,67 +846,79 @@ packages:
     resolution: {integrity: sha512-wdL2XmTiZixAOaHk9Z0JJZ8u9Qm8d333Zjpc6gaxXFX+UR5BlsfxZ7a2+2Rm71pamppsPYGUGFq2oVLbh6DISw==}
     cpu: [arm64]
     os: [android]
+    deprecated: yuku-codegen is pure JavaScript since 0.14
 
   '@yuku-core/binding-darwin-arm64@0.19.0':
     resolution: {integrity: sha512-7sNJa6XJhyetnTy64jw3NEi4YgUcezHk1G5GH9FSvXAuC8wIlbaOwT9lgq5qo5sspjrZJQlBR1TWflP49uRpMw==}
     cpu: [arm64]
     os: [darwin]
+    deprecated: yuku-codegen is pure JavaScript since 0.14
 
   '@yuku-core/binding-darwin-x64@0.19.0':
     resolution: {integrity: sha512-pTC7dYEc59isdyizc3nsuyFNBu2LU5wMYZ1be6UMr59PY/AJNtO1aBLWV0MgL/z7C1nv/2sX4TNjGgKLoeevJw==}
     cpu: [x64]
     os: [darwin]
+    deprecated: yuku-codegen is pure JavaScript since 0.14
 
   '@yuku-core/binding-freebsd-x64@0.19.0':
     resolution: {integrity: sha512-xrZjF6XOEwyLOiDIfrwDdRCS6ghxcJeirNC1KivQhVcUwlRonaU79S3/Uiyx3lBylPnT8qKJ3/aMT+H52nGTJQ==}
     cpu: [x64]
     os: [freebsd]
+    deprecated: yuku-codegen is pure JavaScript since 0.14
 
   '@yuku-core/binding-linux-arm-gnu@0.19.0':
     resolution: {integrity: sha512-0OyIH53C0I1CbADHn9FSdCfX5qbpeLwJhmOVhonFJNYheybOnkSJ50qGMfTJIb8y5zrwqvLs7FVBvz6Fk8maZg==}
     cpu: [arm]
     os: [linux]
     libc: [glibc]
+    deprecated: yuku-codegen is pure JavaScript since 0.14
 
   '@yuku-core/binding-linux-arm-musl@0.19.0':
     resolution: {integrity: sha512-z/iPfkCOCSXE34VXNt0uP1ORSW+4mEa9b5CiJcWZeqZH08g49bFU/jRM2T04f+Wpw5mJ6HIzNBiojxeAbrHjeg==}
     cpu: [arm]
     os: [linux]
     libc: [musl]
+    deprecated: yuku-codegen is pure JavaScript since 0.14
 
   '@yuku-core/binding-linux-arm64-gnu@0.19.0':
     resolution: {integrity: sha512-jLNTi+gzaRwBJ+gwhCJ+rDb5dmx/8hEBx93UWd7hjMSqPTL1D1wvVSvXVAldV5kALvju7b0/m51EHEhs4+I1fA==}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
+    deprecated: yuku-codegen is pure JavaScript since 0.14
 
   '@yuku-core/binding-linux-arm64-musl@0.19.0':
     resolution: {integrity: sha512-YwyPIdW/rN2Fmv0MTFWi47FaB3F9g+2b+sJISyAw83Yd60RWH4T3Nx6XkAHHVN+uKJNBAd6So7/BVihSiFYvuQ==}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
+    deprecated: yuku-codegen is pure JavaScript since 0.14
 
   '@yuku-core/binding-linux-x64-gnu@0.19.0':
     resolution: {integrity: sha512-/vskaAXVX3ESR43FiTdfiYS7z1b9uoQJwVQ/0RgUHgN2sWoAyCZs+aX4CgU7eKGIHTVfp9VFwv+c+2XchYiEtQ==}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
+    deprecated: yuku-codegen is pure JavaScript since 0.14
 
   '@yuku-core/binding-linux-x64-musl@0.19.0':
     resolution: {integrity: sha512-FuXL5igeSKib9Rye02TdH+D6SQezTyGxIATMu1Qsn/QywrzwpGl35OLpS2C1x5vpGLeVE2XgiLd5mVPFHmIglQ==}
     cpu: [x64]
     os: [linux]
     libc: [musl]
+    deprecated: yuku-codegen is pure JavaScript since 0.14
 
   '@yuku-core/binding-win32-arm64@0.19.0':
     resolution: {integrity: sha512-YuJAe7zEKT1Xa7LuHlhGJpPnYQeVtvo0rZvNjJRqkH0hQGOw4C8QeP30Tg5VKGzZfo2x8CjhjEhKt4TmLwfmdg==}
     cpu: [arm64]
     os: [win32]
+    deprecated: yuku-codegen is pure JavaScript since 0.14
 
   '@yuku-core/binding-win32-x64@0.19.0':
     resolution: {integrity: sha512-o8iY/mXwlRkedp0LNTr4+TEfXTPQwoNZmv6k+1WIAd1ZXEn8xJJTBCtB0osaVvdZo/x/cNmV16UrWrrGpM5Mvw==}
     cpu: [x64]
     os: [win32]
+    deprecated: yuku-codegen is pure JavaScript since 0.14
 
   '@yuku-toolchain/types@0.19.0':
     resolution: {integrity: sha512-tFkNbsP4WXX9UMUC5syJGdK9dPMLK0PPaIuXCcCYH75sZ8MrebfBZ2XvCILRTw8AgLivSSCfDa4R67iYBDa4Kg==}
@@ -1681,7 +1693,7 @@ snapshots:
   '@oxlint/binding-win32-x64-msvc@1.89.0':
     optional: true
 
-  '@projectwallace/css-parser@0.18.9': {}
+  '@projectwallace/css-parser@0.19.0': {}
 
   '@projectwallace/preset-oxlint@0.0.11(oxlint@1.89.0)':
     dependencies:
