@@ -206,6 +206,19 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 						break
 					}
 
+					case 'highlight': {
+						if (current.first_child) {
+							// The specificity of a ::highlight() selector with a * argument is zero.
+							if (current.first_child.text === '*') {
+								break
+							}
+							// The specificity of a ::highlight() selector with a <custom-ident> argument
+							// is equivalent to a type selector.
+							c += 1
+						}
+						break
+					}
+
 					default: {
 						c += 1
 						break
