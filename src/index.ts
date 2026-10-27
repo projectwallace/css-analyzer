@@ -44,7 +44,12 @@ import { AggregateCollection } from './aggregate-collection.js'
 import { DefinedUsed } from './defined-used.js'
 import { endsWith, unquote } from './string-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
-import { basename, SPACING_RESET_PROPERTIES, border_radius_properties, shorthand_properties } from './properties/property-utils.js'
+import {
+	basename,
+	SPACING_RESET_PROPERTIES,
+	border_radius_properties,
+	shorthand_properties,
+} from './properties/property-utils.js'
 
 export type Specificity = [number, number, number]
 
@@ -58,8 +63,14 @@ export type Options = {
 	useLocations?: boolean
 }
 
-export function analyze(css: string, options?: Options & { useLocations?: false | undefined }): ReturnType<typeof analyzeInternal<false>>
-export function analyze(css: string, options: Options & { useLocations: true }): ReturnType<typeof analyzeInternal<true>>
+export function analyze(
+	css: string,
+	options?: Options & { useLocations?: false | undefined },
+): ReturnType<typeof analyzeInternal<false>>
+export function analyze(
+	css: string,
+	options: Options & { useLocations: true },
+): ReturnType<typeof analyzeInternal<true>>
 export function analyze(css: string, options: Options = {}): any {
 	const useLocations = options.useLocations === true
 	if (useLocations) {
@@ -331,7 +342,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					customPropsTracking.define(node.prelude.text)
 				} else if (normalized_name === 'function') {
 					let prelude = node.prelude.text
-					let name = prelude.includes('(') ? prelude.slice(0, prelude.indexOf('(')).trim() : prelude.trim()
+					let name = prelude.includes('(')
+						? prelude.slice(0, prelude.indexOf('(')).trim()
+						: prelude.trim()
 					functions.p(name, toLoc(node))
 				} else if (normalized_name === 'charset') {
 					charsets.p(node.prelude.text.toLowerCase(), toLoc(node))
@@ -425,7 +438,11 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			walk(node, (child) => {
 				if (is_attribute_selector(child)) {
 					attributeSelectors.p(child.name.toLowerCase(), loc)
-				} else if (is_type_selector(child) && !child.name.startsWith('--') && child.name.includes('-')) {
+				} else if (
+					is_type_selector(child) &&
+					!child.name.startsWith('--') &&
+					child.name.includes('-')
+				) {
 					customElementSelectors.p(child.name.toLowerCase(), loc)
 				} else if (is_pseudo_class_selector(child)) {
 					pseudoClasses.p(child.name.toLowerCase(), loc)
@@ -664,7 +681,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						}
 					})
 					return SKIP
-				} else if (normalizedProperty === 'animation-duration' || normalizedProperty === 'transition-duration') {
+				} else if (
+					normalizedProperty === 'animation-duration' ||
+					normalizedProperty === 'transition-duration'
+				) {
 					for (let child of value.children) {
 						if (!is_operator(child)) {
 							let text = child.text
@@ -675,7 +695,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							}
 						}
 					}
-				} else if (normalizedProperty === 'transition-timing-function' || normalizedProperty === 'animation-timing-function') {
+				} else if (
+					normalizedProperty === 'transition-timing-function' ||
+					normalizedProperty === 'animation-timing-function'
+				) {
 					for (let child of value.children) {
 						if (!is_operator(child)) {
 							timingFunctions.p(child.text, valueLoc)
@@ -715,7 +738,11 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						}
 					}
 				} else if (normalizedProperty === 'position-anchor') {
-					if (value.first_child && is_identifier(value.first_child) && is_custom(value.first_child.text)) {
+					if (
+						value.first_child &&
+						is_identifier(value.first_child) &&
+						is_custom(value.first_child.text)
+					) {
 						anchorNamesTracking.use(value.first_child.text)
 					}
 				} else if (border_radius_properties.has(normalizedProperty)) {
@@ -900,10 +927,16 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 	return {
 		stylesheet: {
-			sourceLinesOfCode: atruleCount.total + totalSelectors + totalDeclarations + keyframeSelectors.size(),
+			sourceLinesOfCode:
+				atruleCount.total + totalSelectors + totalDeclarations + keyframeSelectors.size(),
 			linesOfCode,
 			size: cssLen,
-			complexity: atRuleComplexity.sum + selectorComplexity.sum + declarationComplexity.sum + propertyComplexity.sum + valueComplexity.sum,
+			complexity:
+				atRuleComplexity.sum +
+				selectorComplexity.sum +
+				declarationComplexity.sum +
+				propertyComplexity.sum +
+				valueComplexity.sum,
 			comments: {
 				total: totalComments,
 				size: commentsSize,
