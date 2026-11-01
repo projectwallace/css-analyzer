@@ -17,7 +17,7 @@ export class ContextCollection<UseLocations extends boolean = false> {
 	 * @param context Context to push Item to
 	 * @param node_location
 	 */
-	push(item: string, context: string, node_location: Location) {
+	push(item: string, context: string, node_location: Location): void {
 		this.#list.p(item, node_location)
 
 		if (!this.#contexts.has(context)) {
@@ -27,7 +27,9 @@ export class ContextCollection<UseLocations extends boolean = false> {
 		this.#contexts.get(context)!.p(item, node_location)
 	}
 
-	count() {
+	count(): CollectionCount<UseLocations> & {
+		itemsPerContext: { [k: string]: CollectionCount<UseLocations> }
+	} {
 		let itemsPerContext: Map<string, CollectionCount<UseLocations>> = new Map()
 
 		for (let [context, value] of this.#contexts.entries()) {

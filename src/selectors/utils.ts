@@ -183,7 +183,7 @@ export function getComplexity(selector: CSSNode): number {
 export function getCombinators(
 	selector: CSSNode,
 	onMatch: ({ name, loc }: { name: string; loc: Location }) => void,
-) {
+): void {
 	walk(selector, function (node) {
 		if (is_combinator(node)) {
 			onMatch({
