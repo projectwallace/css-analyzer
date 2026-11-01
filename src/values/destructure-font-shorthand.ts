@@ -9,7 +9,7 @@ import {
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
 
-export const SYSTEM_FONTS = new KeywordSet([
+export const SYSTEM_FONTS: KeywordSet = new KeywordSet([
 	'caption',
 	'icon',
 	'menu',

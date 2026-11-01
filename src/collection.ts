@@ -33,7 +33,7 @@ export class Collection<UseLocations extends boolean = false> {
 		this.#useLocations = useLocations
 	}
 
-	p(item: string | number, node_location: Location) {
+	p(item: string | number, node_location: Location): void {
 		let index = this.#total
 
 		if (this.#useLocations) {
@@ -56,7 +56,7 @@ export class Collection<UseLocations extends boolean = false> {
 		this.#total++
 	}
 
-	size() {
+	size(): number {
 		return this.#total
 	}
 

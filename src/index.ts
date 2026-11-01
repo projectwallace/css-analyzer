@@ -39,9 +39,14 @@ import { analyzeAnimation } from './values/animations.js'
 import { isValuePrefixed } from './values/vendor-prefix.js'
 import { isValueBrowserhack } from './values/browserhacks.js'
 import { ContextCollection } from './context-collection.js'
-import { Collection, type Location } from './collection.js'
+import {
+	Collection,
+	type CollectionCount,
+	type Location,
+	type UniqueWithLocations,
+} from './collection.js'
 import { AggregateCollection } from './aggregate-collection.js'
-import { DefinedUsed } from './defined-used.js'
+import { DefinedUsed, type DefinedUsedResult } from './defined-used.js'
 import { endsWith, unquote } from './string-utils.js'
 import { getEmbedType } from './stylesheet/stylesheet.js'
 import {
@@ -79,7 +84,624 @@ export function analyze(css: string, options: Options = {}): any {
 	return analyzeInternal(css, options, false)
 }
 
-function analyzeInternal<T extends boolean>(css: string, options: Options, useLocations: T) {
+function analyzeInternal<T extends boolean>(
+	css: string,
+	options: Options,
+	useLocations: T,
+): {
+	stylesheet: {
+		sourceLinesOfCode: number
+		linesOfCode: number
+		size: number
+		complexity: number
+		comments: {
+			total: number
+			size: number
+		}
+		embeddedContent: {
+			size: {
+				total: number
+				ratio: number
+			}
+			types: {
+				total: number
+				totalUnique: number
+				uniquenessRatio: number
+				unique: {
+					[k: string]: {
+						size: number
+						count: number
+						uniqueWithLocations?: Location[]
+					}
+				}
+			}
+		}
+	}
+	atrules: {
+		total: number
+		totalUnique: number
+		unique: Record<string, number>
+		uniquenessRatio: number
+	} & (T extends true
+		? {
+				uniqueWithLocations: UniqueWithLocations
+			}
+		: {
+				uniqueWithLocations?: undefined
+			}) & {
+			fontface: {
+				total: number
+				totalUnique: number
+				unique: Record<string, string>[]
+				uniquenessRatio: number
+			} & (
+				| {
+						uniqueWithLocations: UniqueWithLocations | undefined
+				  }
+				| {
+						uniqueWithLocations?: undefined
+				  }
+			)
+			import: CollectionCount<T>
+			media: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) & {
+					browserhacks: CollectionCount<T>
+					features: CollectionCount<T>
+				}
+			charset: CollectionCount<T>
+			supports: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) & {
+					browserhacks: CollectionCount<T>
+				}
+			keyframes: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) &
+				DefinedUsedResult & {
+					prefixed: {
+						total: number
+						totalUnique: number
+						unique: Record<string, number>
+						uniquenessRatio: number
+					} & (T extends true
+						? {
+								uniqueWithLocations: UniqueWithLocations
+							}
+						: {
+								uniqueWithLocations?: undefined
+							}) & {
+							ratio: number
+						}
+				}
+			container: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) & {
+					names: {
+						total: number
+						totalUnique: number
+						unique: Record<string, number>
+						uniquenessRatio: number
+					} & (T extends true
+						? {
+								uniqueWithLocations: UniqueWithLocations
+							}
+						: {
+								uniqueWithLocations?: undefined
+							}) &
+						DefinedUsedResult
+				}
+			layer: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) &
+				DefinedUsedResult
+			property: CollectionCount<T>
+			function: CollectionCount<T>
+			scope: CollectionCount<T>
+			complexity: {
+				min: number
+				max: number
+				mean: number
+				mode: number
+				range: number
+				sum: number
+			}
+			nesting: {
+				min: number
+				max: number
+				mean: number
+				mode: number
+				range: number
+				sum: number
+			} & {
+				items: number[]
+			} & {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+					? {
+							uniqueWithLocations: UniqueWithLocations
+						}
+					: {
+							uniqueWithLocations?: undefined
+						})
+		}
+	rules: {
+		total: number
+		empty: {
+			total: number
+			ratio: number
+		}
+		sizes: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		} & {
+			items: number[]
+		} & {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					})
+		nesting: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		} & {
+			items: number[]
+		} & {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					})
+		selectors: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		} & {
+			items: number[]
+		} & {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					})
+		declarations: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		} & {
+			items: number[]
+		} & {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					})
+	}
+	selectors: {
+		total: number
+		totalUnique: number
+		uniquenessRatio: number
+		specificity: {
+			/** @type Specificity */
+			min: number[]
+			/** @type Specificity */
+			max: number[]
+			/** @type Specificity */
+			sum: number[]
+			/** @type Specificity */
+			mean: number[]
+			/** @type Specificity */
+			mode: number[]
+			/** @type Specificity */
+			items: Specificity[]
+		} & {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					})
+		complexity: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		} & {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) & {
+				items: number[]
+			}
+		nesting: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		} & {
+			items: number[]
+		} & {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					})
+		id: {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+			? {
+					uniqueWithLocations: UniqueWithLocations
+				}
+			: {
+					uniqueWithLocations?: undefined
+				}) & {
+				ratio: number
+			}
+		pseudoClasses: CollectionCount<T>
+		pseudoElements: CollectionCount<T>
+		accessibility: {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+			? {
+					uniqueWithLocations: UniqueWithLocations
+				}
+			: {
+					uniqueWithLocations?: undefined
+				}) & {
+				ratio: number
+			}
+		attributes: CollectionCount<T>
+		customElements: CollectionCount<T>
+		keyframes: CollectionCount<T>
+		prefixed: {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+			? {
+					uniqueWithLocations: UniqueWithLocations
+				}
+			: {
+					uniqueWithLocations?: undefined
+				}) & {
+				ratio: number
+			}
+		combinators: CollectionCount<T>
+	}
+	declarations: {
+		total: number
+		totalUnique: number
+		uniquenessRatio: number
+		importants: {
+			total: number
+			ratio: number
+			inKeyframes: {
+				total: number
+				ratio: number
+			}
+		}
+		complexity: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		}
+		nesting: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		} & {
+			items: number[]
+		} & {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					})
+	}
+	properties: {
+		total: number
+		totalUnique: number
+		unique: Record<string, number>
+		uniquenessRatio: number
+	} & (T extends true
+		? {
+				uniqueWithLocations: UniqueWithLocations
+			}
+		: {
+				uniqueWithLocations?: undefined
+			}) & {
+			prefixed: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) & {
+					ratio: number
+				}
+			custom: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) &
+				DefinedUsedResult & {
+					ratio: number
+					importants: {
+						total: number
+						totalUnique: number
+						unique: Record<string, number>
+						uniquenessRatio: number
+					} & (T extends true
+						? {
+								uniqueWithLocations: UniqueWithLocations
+							}
+						: {
+								uniqueWithLocations?: undefined
+							}) & {
+							ratio: number
+						}
+				}
+			shorthands: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) & {
+					ratio: number
+				}
+			browserhacks: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) & {
+					ratio: number
+				}
+			complexity: {
+				min: number
+				max: number
+				mean: number
+				mode: number
+				range: number
+				sum: number
+			}
+			anchorNames: DefinedUsedResult
+		}
+	values: {
+		colors: {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+			? {
+					uniqueWithLocations: UniqueWithLocations
+				}
+			: {
+					uniqueWithLocations?: undefined
+				}) & {
+				itemsPerContext: {
+					[k: string]: CollectionCount<T>
+				}
+			} & {
+				formats: CollectionCount<T>
+			}
+		gradients: CollectionCount<T>
+		fontFamilies: CollectionCount<T>
+		fontSizes: CollectionCount<T>
+		lineHeights: CollectionCount<T>
+		zindexes: CollectionCount<T>
+		textShadows: CollectionCount<T>
+		boxShadows: CollectionCount<T>
+		borderRadiuses: {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+			? {
+					uniqueWithLocations: UniqueWithLocations
+				}
+			: {
+					uniqueWithLocations?: undefined
+				}) & {
+				itemsPerContext: {
+					[k: string]: CollectionCount<T>
+				}
+			}
+		animations: {
+			durations: CollectionCount<T>
+			timingFunctions: CollectionCount<T>
+			names: CollectionCount<T>
+		}
+		prefixes: CollectionCount<T>
+		browserhacks: CollectionCount<T>
+		units: {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+			? {
+					uniqueWithLocations: UniqueWithLocations
+				}
+			: {
+					uniqueWithLocations?: undefined
+				}) & {
+				itemsPerContext: {
+					[k: string]: CollectionCount<T>
+				}
+			}
+		complexity: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		}
+		keywords: CollectionCount<T>
+		resets: CollectionCount<T>
+		displays: CollectionCount<T>
+	}
+	__meta__: {
+		parseTime: number
+		analyzeTime: number
+		total: number
+	}
+} {
 	let start = Date.now()
 
 	// Stylesheet

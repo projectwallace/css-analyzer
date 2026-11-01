@@ -1,7 +1,7 @@
 import { is_number, is_dimension, type Value } from '@projectwallace/css-parser'
 import { KeywordSet } from '../keyword-set.js'
 
-export const keywords = new KeywordSet([
+export const keywords: KeywordSet = new KeywordSet([
 	'auto',
 	'none', // for `text-shadow`, `box-shadow` and `background`
 	'inherit',

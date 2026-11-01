@@ -47,16 +47,23 @@ export class AggregateCollection {
 	 * Add a new Integer at the end of this AggregateCollection
 	 * @param item - The item to add
 	 */
-	push(item: number) {
+	push(item: number): void {
 		this.#items.push(item)
 		this.#sum += item
 	}
 
-	size() {
+	size(): number {
 		return this.#items.length
 	}
 
-	aggregate() {
+	aggregate(): {
+		min: number
+		max: number
+		mean: number
+		mode: number
+		range: number
+		sum: number
+	} {
 		let len = this.#items.length
 
 		if (len === 0) {
@@ -88,7 +95,7 @@ export class AggregateCollection {
 		}
 	}
 
-	toArray() {
+	toArray(): number[] {
 		return this.#items
 	}
 }

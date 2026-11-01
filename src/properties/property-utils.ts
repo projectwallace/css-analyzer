@@ -1,7 +1,7 @@
 import { KeywordSet } from '../keyword-set.js'
 import { is_custom, is_vendor_prefixed } from '@projectwallace/css-parser'
 
-export const shorthand_properties = new Set([
+export const shorthand_properties: Set<string> = new Set([
 	'all',
 	'animation',
 	'background',
@@ -51,7 +51,7 @@ export const shorthand_properties = new Set([
 	'vertical-align',
 ])
 
-export const SPACING_RESET_PROPERTIES = new Set([
+export const SPACING_RESET_PROPERTIES: Set<string> = new Set([
 	'margin',
 	'margin-block',
 	'margin-inline',
@@ -76,7 +76,7 @@ export const SPACING_RESET_PROPERTIES = new Set([
 	'padding-inline-end',
 ])
 
-export const border_radius_properties = new KeywordSet([
+export const border_radius_properties: KeywordSet = new KeywordSet([
 	'border-radius',
 	'border-top-left-radius',
 	'border-top-right-radius',

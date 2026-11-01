@@ -5,8 +5,6 @@
 		// TODO: set to es2025 on next major version
 		"target": "es2022",
 		"verbatimModuleSyntax": true,
-		"allowJs": true,
-		"checkJs": true,
 		"moduleDetection": "force",
 
 		// Strictness
@@ -19,6 +17,8 @@
 		"moduleResolution": "bundler",
 		"allowSyntheticDefaultImports": true,
 		"noEmit": true,
+		"declaration": true,
+		"isolatedDeclarations": true,
 
 		// Code runs in the DOM
 		"lib": ["ES2022", "DOM", "DOM.Iterable"]

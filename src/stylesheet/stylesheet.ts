@@ -1,4 +1,4 @@
-export function getEmbedType(embed: string) {
+export function getEmbedType(embed: string): string {
 	// data:image/gif;base64,R0lG
 	let start = 5 // `data:`.length
 	let semicolon = embed.indexOf(';')

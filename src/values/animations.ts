@@ -43,7 +43,7 @@ const ANIMATION_NON_NAME_KEYWORDS = new KeywordSet([
 export function analyzeAnimation(
 	value: Value,
 	cb: ({ type, value }: { type: string; value: CSSNode }) => void,
-) {
+): void {
 	let durationFound = false
 
 	for (let node of value) {
