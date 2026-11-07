@@ -21,10 +21,16 @@ export function font_sizes(options: FontSizesOptions = {}): CollectorDef<CountRe
 				enter(_node, ctx) {
 					const text =
 						ctx.property === 'font' ? ctx.font_shorthand?.font_size : ctx.clean_value_text
-					if (text === undefined) return
-					if (options.skip_var && text.toLowerCase().includes('var(')) return
+					if (text === undefined) {
+						return
+					}
+					if (options.skip_var && text.toLowerCase().includes('var(')) {
+						return
+					}
 					// The font shorthand never reaches this point for system fonts and global keywords
-					if (ctx.property === 'font-size' && SYSTEM_FONTS.has(text)) return
+					if (ctx.property === 'font-size' && SYSTEM_FONTS.has(text)) {
+						return
+					}
 					counter.add(lowercase ? lowercase_unless_var(text) : text, ctx.at(ctx.value!))
 				},
 			},

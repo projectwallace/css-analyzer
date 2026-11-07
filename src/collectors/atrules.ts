@@ -30,7 +30,9 @@ import {
 /** Media features (`(min-width: 40em)`) anywhere in an at-rule prelude */
 function find_media_features(atrule: Atrule): MediaFeature[] {
 	const found: MediaFeature[] = []
-	if (!atrule.has_prelude) return found
+	if (!atrule.has_prelude) {
+		return found
+	}
 	walk(atrule.prelude, function (child) {
 		if (is_media_feature(child)) {
 			found.push(child)
@@ -53,11 +55,15 @@ function get_descriptors(atrule: Atrule): Record<string, string> {
 
 /** The container name in `@container name (min-width: 1px)` */
 function get_container_name(atrule: Atrule): string | undefined {
-	if (!atrule.has_prelude) return undefined
+	if (!atrule.has_prelude) {
+		return undefined
+	}
 	const prelude = atrule.prelude
 	if (is_atrule_prelude(prelude) && is_container_query(prelude.first_child)) {
 		const name = prelude.first_child.first_child
-		if (name && is_identifier(name)) return name.text
+		if (name && is_identifier(name)) {
+			return name.text
+		}
 	}
 	return undefined
 }
@@ -69,7 +75,9 @@ function get_import_functions(atrule: Atrule) {
 		return found
 	}
 	for (const child of atrule.prelude) {
-		if (!is_function(child) || !child.value) continue
+		if (!is_function(child) || !child.value) {
+			continue
+		}
 		if (str_equals('supports', child.name)) {
 			found.push({ name: 'supports', value: child.value, node: child })
 		} else if (str_equals('layer', child.name)) {
@@ -141,7 +149,9 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 			const container_tracking = new DefinedUsed()
 			const layer_tracking = new DefinedUsed()
 			const font_faces: AtrulesResult['font_faces'] = { total: 0, items: [] }
-			if (options.locations) font_faces.locations = []
+			if (options.locations) {
+				font_faces.locations = []
+			}
 
 			return {
 				parse: { values: true, atrule_preludes: true },
@@ -199,8 +209,11 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 						for (const layer of prelude_text.split(',').map((part) => part.trim())) {
 							layers.add(layer, ctx)
 							// `@layer name { }` places CSS into a layer (use); `@layer a, b;` orders layers (define)
-							if (has_block) layer_tracking.use(layer)
-							else layer_tracking.define(layer)
+							if (has_block) {
+								layer_tracking.use(layer)
+							} else {
+								layer_tracking.define(layer)
+							}
 						}
 					} else if (name === 'import') {
 						imports.add(prelude_text, ctx)
@@ -236,7 +249,9 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 				declaration: {
 					properties: new Set([...CONTAINER_PROPERTIES, ...ANIMATION_PROPERTIES]),
 					enter(_node, ctx) {
-						if (ctx.clean_value_text === undefined) return
+						if (ctx.clean_value_text === undefined) {
+							return
+						}
 						if (ctx.property === 'container-name') {
 							for (const item of get_list_items(ctx.value!)) {
 								if (is_identifier(item) && !keywords.has(item.text)) {
@@ -250,7 +265,9 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 							const first = get_first_identifier(ctx.value!)
 							if (first !== undefined) {
 								container_names.add(first, ctx.at(ctx.value!))
-								if (!keywords.has(first)) container_tracking.define(first)
+								if (!keywords.has(first)) {
+									container_tracking.define(first)
+								}
 							}
 						} else {
 							for (const animation_name of get_animation_names(ctx)) {

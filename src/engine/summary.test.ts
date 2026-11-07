@@ -6,7 +6,9 @@ const at = { loc: { line: 1, column: 1, offset: 0, length: 1 } }
 
 function count(values: number[]) {
 	const counter = create_counter()
-	for (const value of values) counter.add(String(value), at)
+	for (const value of values) {
+		counter.add(String(value), at)
+	}
 	return counter.result()
 }
 

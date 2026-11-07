@@ -19,9 +19,15 @@ export function font_families(options: FontFamiliesOptions = {}): CollectorDef<C
 				enter(_node, ctx) {
 					const text =
 						ctx.property === 'font' ? ctx.font_shorthand?.font_family : ctx.clean_value_text
-					if (!text) return
-					if (ctx.property === 'font-family' && SYSTEM_FONTS.has(text)) return
-					if (options.skip_var && text.toLowerCase().includes('var(')) return
+					if (!text) {
+						return
+					}
+					if (ctx.property === 'font-family' && SYSTEM_FONTS.has(text)) {
+						return
+					}
+					if (options.skip_var && text.toLowerCase().includes('var(')) {
+						return
+					}
 					counter.add(text, ctx.at(ctx.value!))
 				},
 			},

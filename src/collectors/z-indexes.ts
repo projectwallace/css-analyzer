@@ -12,7 +12,9 @@ export function z_indexes(options: CountOptions = {}): CollectorDef<CountResult>
 				properties: PROPERTIES,
 				enter(_node, ctx) {
 					const text = ctx.clean_value_text
-					if (text === undefined) return
+					if (text === undefined) {
+						return
+					}
 					counter.add(text, ctx.at(ctx.value!))
 				},
 			},

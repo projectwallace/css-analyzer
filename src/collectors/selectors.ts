@@ -62,21 +62,33 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 
 			return {
 				rule(node, ctx) {
-					if (!ctx.in_keyframes) return
+					if (!ctx.in_keyframes) {
+						return
+					}
 					const prelude = node.prelude
-					if (!prelude || !is_selector_list(prelude)) return
-					for (const item of prelude) keyframes.add(item.text, ctx.at(item))
+					if (!prelude || !is_selector_list(prelude)) {
+						return
+					}
+					for (const item of prelude) {
+						keyframes.add(item.text, ctx.at(item))
+					}
 				},
 				selector(node, ctx) {
-					if (ctx.in_keyframes) return
+					if (ctx.in_keyframes) {
+						return
+					}
 					const text = node.text
 
 					texts.add(text, ctx)
 					complexity.add(String(get_complexity(node)[0]), ctx)
 					nesting.add(String(Math.max(ctx.depth - 1, 0)), ctx)
 
-					for (const prefix of get_vendor_prefixes(node)) prefixed.add(prefix.toLowerCase(), ctx)
-					for (const item of get_accessibility_selectors(node)) accessibility.add(item, ctx)
+					for (const prefix of get_vendor_prefixes(node)) {
+						prefixed.add(prefix.toLowerCase(), ctx)
+					}
+					for (const item of get_accessibility_selectors(node)) {
+						accessibility.add(item, ctx)
+					}
 					walk(node, function (part) {
 						if (is_attribute_selector(part)) {
 							attributes.add(part.name.toLowerCase(), ctx)
@@ -99,7 +111,9 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 						}
 						combinators.add(combinator.name, at)
 					}
-					if (get_specificity(node)[0]![0] > 0) ids.add(text, ctx)
+					if (get_specificity(node)[0]![0] > 0) {
+						ids.add(text, ctx)
+					}
 				},
 				result: () => ({
 					...texts.result(),

@@ -10,7 +10,9 @@ export function gradients(options: CountOptions = {}): CollectorDef<CountResult>
 			value: {
 				types: ['function'],
 				enter(node, ctx) {
-					if (NO_VALUE_WALK.has(ctx.property)) return
+					if (NO_VALUE_WALK.has(ctx.property)) {
+						return
+					}
 					if (is_function(node) && ends_with('gradient', node.name)) {
 						counter.add(node.text, ctx.at(node))
 					}

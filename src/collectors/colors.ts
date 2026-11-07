@@ -42,13 +42,17 @@ export function colors(options: ColorsOptions = {}): CollectorDef<ColorsResult> 
 					types: ['hash', 'identifier', 'function'],
 					enter(node, ctx, kind) {
 						const property = ctx.property
-						if (NO_VALUE_WALK.has(property)) return
+						if (NO_VALUE_WALK.has(property)) {
+							return
+						}
 						const at = ctx.at(node)
 						const context = get_context_property(ctx, options.property)
 						const text = node.text
 
 						if (kind === 'hash') {
-							if (!text.startsWith('#')) return
+							if (!text.startsWith('#')) {
+								return
+							}
 							// Exclude the # and any IE hack (\9, \7) from the hex length
 							const hex_length =
 								text.length - (text.endsWith('\\9') || text.endsWith('\\7') ? 3 : 1)
@@ -56,9 +60,13 @@ export function colors(options: ColorsOptions = {}): CollectorDef<ColorsResult> 
 							formats.add('hex' + hex_length, at)
 						} else if (kind === 'identifier') {
 							// Font names like "Black" are not colors
-							if (property === 'font') return
+							if (property === 'font') {
+								return
+							}
 							// 3 === 'red'.length, 20 === 'lightgoldenrodyellow'.length
-							if (text.length > 20 || text.length < 3) return
+							if (text.length > 20 || text.length < 3) {
+								return
+							}
 
 							if (color_keywords.has(text)) {
 								counter.add(normalize(text), context, at)

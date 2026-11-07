@@ -30,8 +30,12 @@ export function as_selectors(input: Input): CSSNode[] {
 		}
 		return Array.from(list)
 	}
-	if (is_selector(input)) return [input]
-	if (is_selector_list(input)) return Array.from(input)
+	if (is_selector(input)) {
+		return [input]
+	}
+	if (is_selector_list(input)) {
+		return Array.from(input)
+	}
 	throw new TypeError('Passed in source is an Object but no AST / AST of the type SelectorList')
 }
 

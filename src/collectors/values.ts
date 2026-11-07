@@ -33,7 +33,9 @@ export function text_shadows(options: CountOptions = {}): CollectorDef<CountResu
 				properties: TEXT_SHADOW,
 				enter(_node, ctx) {
 					const text = ctx.clean_value_text
-					if (text !== undefined) counter.add(text, ctx.at(ctx.value!))
+					if (text !== undefined) {
+						counter.add(text, ctx.at(ctx.value!))
+					}
 				},
 			},
 		}
@@ -48,7 +50,9 @@ export function displays(options: CountOptions = {}): CollectorDef<CountResult> 
 			declaration: {
 				properties: DISPLAY,
 				enter(_node, ctx) {
-					if (!ctx.value) return
+					if (!ctx.value) {
+						return
+					}
 					const raw = ctx.value_text
 					const text = global_keywords.has(raw) ? raw.toLowerCase() : ctx.clean_value_text
 					counter.add(lowercase_unless_var(text!), ctx.at(ctx.value))
@@ -67,7 +71,9 @@ export function units(options: ContextCountOptions = {}): CollectorDef<ContextCo
 			value: {
 				types: ['dimension'],
 				enter(node, ctx) {
-					if (NO_VALUE_WALK.has(ctx.property)) return
+					if (NO_VALUE_WALK.has(ctx.property)) {
+						return
+					}
 					counter.add(
 						(node as Dimension).unit.toLowerCase(),
 						get_context_property(ctx, options.property),
@@ -86,7 +92,9 @@ export function keywords(options: CountOptions = {}): CollectorDef<CountResult> 
 		return {
 			parse: { values: true },
 			declaration(_node, ctx) {
-				if (!ctx.value) return
+				if (!ctx.value) {
+					return
+				}
 				const text = ctx.value_text
 				const at = ctx.at(ctx.value)
 
@@ -106,9 +114,15 @@ export function keywords(options: CountOptions = {}): CollectorDef<CountResult> 
 				types: ['identifier'],
 				enter(node, ctx) {
 					// Whole-value keywords and shorthands were handled above
-					if (NO_VALUE_WALK.has(ctx.property) || ctx.property === 'font') return
-					if (global_keywords.has(ctx.value_text)) return
-					if (global_keywords.has(node.text)) counter.add(node.text.toLowerCase(), ctx.at(node))
+					if (NO_VALUE_WALK.has(ctx.property) || ctx.property === 'font') {
+						return
+					}
+					if (global_keywords.has(ctx.value_text)) {
+						return
+					}
+					if (global_keywords.has(node.text)) {
+						counter.add(node.text.toLowerCase(), ctx.at(node))
+					}
 				},
 			},
 		}
@@ -123,8 +137,12 @@ export function resets(options: CountOptions = {}): CollectorDef<CountResult> {
 			declaration: {
 				properties: SPACING_RESET_PROPERTIES,
 				enter(_node, ctx) {
-					if (ctx.clean_value_text === undefined) return
-					if (is_value_reset(ctx.value!)) counter.add(ctx.property, ctx.at(ctx.value!))
+					if (ctx.clean_value_text === undefined) {
+						return
+					}
+					if (is_value_reset(ctx.value!)) {
+						counter.add(ctx.property, ctx.at(ctx.value!))
+					}
 				},
 			},
 		}
@@ -137,7 +155,9 @@ export function value_prefixes(options: CountOptions = {}): CollectorDef<CountRe
 		return {
 			parse: { values: true },
 			declaration(_node, ctx) {
-				if (ctx.clean_value_text === undefined) return
+				if (ctx.clean_value_text === undefined) {
+					return
+				}
 				for (const prefixed of get_prefixed_values(ctx.value!)) {
 					counter.add(prefixed.toLowerCase(), ctx.at(ctx.value!))
 				}
@@ -152,11 +172,15 @@ export function value_browserhacks(options: CountOptions = {}): CollectorDef<Cou
 		return {
 			parse: { values: true },
 			declaration(node, ctx) {
-				if (!ctx.value) return
+				if (!ctx.value) {
+					return
+				}
 				if (ctx.is_important && !node.text.toLowerCase().includes('!important')) {
 					counter.add('!ie', ctx.at(ctx.value))
 				}
-				if (ctx.clean_value_text === undefined || ctx.is_custom) return
+				if (ctx.clean_value_text === undefined || ctx.is_custom) {
+					return
+				}
 				for (const hack of get_value_browserhacks(ctx.value)) {
 					counter.add(hack, ctx.at(ctx.value))
 				}
@@ -174,11 +198,15 @@ export function value_complexity(options: CountOptions = {}): CollectorDef<Count
 		return {
 			parse: { values: true },
 			declaration(_node, ctx) {
-				if (!ctx.value) return
+				if (!ctx.value) {
+					return
+				}
 				let complexity = 1
 				if (ctx.clean_value_text !== undefined) {
 					complexity += get_prefixed_values(ctx.value).length
-					if (!ctx.is_custom) complexity += get_value_browserhacks(ctx.value).length
+					if (!ctx.is_custom) {
+						complexity += get_value_browserhacks(ctx.value).length
+					}
 				}
 				counter.add(String(complexity), ctx.at(ctx.value))
 			},
@@ -194,7 +222,9 @@ export function animation_names(options: CountOptions = {}): CollectorDef<CountR
 			declaration: {
 				properties: new Set(['animation', 'animation-name']),
 				enter(_node, ctx) {
-					for (const name of get_animation_names(ctx)) counter.add(name, ctx.at(ctx.value!))
+					for (const name of get_animation_names(ctx)) {
+						counter.add(name, ctx.at(ctx.value!))
+					}
 				},
 			},
 		}

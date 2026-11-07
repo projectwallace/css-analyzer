@@ -21,9 +21,13 @@ function find_hacks(
 	for (const prelude of as_prelude(name, input)) {
 		walk(prelude, function (node) {
 			const result = check(node, (hack) => hacks.push(hack))
-			if (result === BREAK) return BREAK
+			if (result === BREAK) {
+				return BREAK
+			}
 		})
-		if (hacks.length > 0) break
+		if (hacks.length > 0) {
+			break
+		}
 	}
 	return hacks
 }

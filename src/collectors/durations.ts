@@ -23,7 +23,9 @@ export function durations(options: DurationsOptions = {}): CollectorDef<CountRes
 			declaration: {
 				properties: PROPERTIES,
 				enter(_node, ctx) {
-					if (ctx.clean_value_text === undefined) return
+					if (ctx.clean_value_text === undefined) {
+						return
+					}
 					const at = ctx.at(ctx.value!)
 					const items =
 						ctx.property === 'transition' || ctx.property === 'animation'

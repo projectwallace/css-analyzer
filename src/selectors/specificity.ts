@@ -128,7 +128,9 @@ function selector_specificity(selector_ast: Selector): Specificity {
 							// Calculate specificity for parts before the first combinator
 							let child_part = child_selector.first_child
 							while (child_part) {
-								if (is_combinator(child_part)) break
+								if (is_combinator(child_part)) {
+									break
+								}
 
 								// Calculate contribution from this part
 								const part_specificity = selector_specificity({
@@ -174,7 +176,9 @@ function selector_specificity(selector_ast: Selector): Specificity {
 							// Calculate specificity for parts before the first combinator
 							let child_part = child_selector.first_child
 							while (child_part) {
-								if (is_combinator(child_part)) break
+								if (is_combinator(child_part)) {
+									break
+								}
 
 								// Calculate contribution from this part
 								const part_specificity = selector_specificity({

@@ -54,7 +54,9 @@ export function create_context(): ContextController {
 			offset: target.start,
 			length: target.length,
 		}
-		if (source !== undefined) loc.source = source
+		if (source !== undefined) {
+			loc.source = source
+		}
 		return loc
 	}
 
@@ -182,12 +184,16 @@ export function create_context(): ContextController {
 		enter_atrule(atrule) {
 			const name = basename((atrule as Atrule).name ?? '')
 			atrule_stack.push(name)
-			if (name === 'keyframes') keyframes_count++
+			if (name === 'keyframes') {
+				keyframes_count++
+			}
 			depth++
 		},
 		leave_atrule() {
 			const name = atrule_stack.pop()
-			if (name === 'keyframes') keyframes_count--
+			if (name === 'keyframes') {
+				keyframes_count--
+			}
 			depth--
 		},
 	}

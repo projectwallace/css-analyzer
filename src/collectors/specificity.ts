@@ -21,7 +21,9 @@ export function specificity(options: CountOptions = {}): CollectorDef<CountResul
 	return define_counting_collector(options, function setup(counter) {
 		return {
 			selector(node, ctx) {
-				if (ctx.in_keyframes) return
+				if (ctx.in_keyframes) {
+					return
+				}
 				counter.add(get_specificity(node)[0]!.join(','), ctx)
 			},
 		}
@@ -43,8 +45,12 @@ export function summarize_specificity(counts: CountResult): SpecificitySummary {
 		for (let i = 0; i < 3; i++) {
 			parts[i]!.set(value[i]!, (parts[i]!.get(value[i]!) ?? 0) + count)
 		}
-		if (min === undefined || compare_specificity(value, min) < 0) min = value
-		if (max === undefined || compare_specificity(value, max) > 0) max = value
+		if (min === undefined || compare_specificity(value, min) < 0) {
+			min = value
+		}
+		if (max === undefined || compare_specificity(value, max) > 0) {
+			max = value
+		}
 	}
 
 	const [a, b, c] = parts.map((frequencies) => summarize_frequencies(frequencies)) as [

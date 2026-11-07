@@ -69,7 +69,9 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 				},
 				declaration(_node, ctx) {
 					const raw = ctx.raw_property
-					if (!raw) return
+					if (!raw) {
+						return
+					}
 					current = ctx
 					names.add(ctx.property, property_at)
 
@@ -80,7 +82,9 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 						custom.add(raw, property_at)
 						custom_tracking.define(raw)
 						complexity.add(ctx.is_important ? '3' : '2', property_at)
-						if (ctx.is_important) custom_importants.add(raw, property_at)
+						if (ctx.is_important) {
+							custom_importants.add(raw, property_at)
+						}
 					} else if (ctx.is_browserhack) {
 						browserhacks.add(raw.charAt(0), property_at)
 						complexity.add('2', property_at)
@@ -88,10 +92,14 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 						complexity.add('1', property_at)
 					}
 
-					if (shorthand_properties.has(ctx.property)) shorthands.add(raw, property_at)
+					if (shorthand_properties.has(ctx.property)) {
+						shorthands.add(raw, property_at)
+					}
 
 					// Anchor names live in values
-					if (ctx.clean_value_text === undefined) return
+					if (ctx.clean_value_text === undefined) {
+						return
+					}
 					if (ctx.property === 'anchor-name') {
 						for (const item of get_list_items(ctx.value!)) {
 							if (is_identifier(item) && is_custom_name(item.text)) {
@@ -100,18 +108,27 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 						}
 					} else if (ctx.property === 'position-anchor') {
 						const name = get_first_identifier(ctx.value!)
-						if (name !== undefined && is_custom_name(name)) anchor_tracking.use(name)
+						if (name !== undefined && is_custom_name(name)) {
+							anchor_tracking.use(name)
+						}
 					}
 				},
 				value: {
 					types: ['function'],
 					enter(node) {
 						const name = is_function(node) ? node.name.toLowerCase() : ''
-						if (name !== 'var' && name !== 'anchor' && name !== 'anchor-size') return
+						if (name !== 'var' && name !== 'anchor' && name !== 'anchor-size') {
+							return
+						}
 						const first = get_first_identifier(node)
-						if (first === undefined || !is_custom_name(first)) return
-						if (name === 'var') custom_tracking.use(first)
-						else anchor_tracking.use(first)
+						if (first === undefined || !is_custom_name(first)) {
+							return
+						}
+						if (name === 'var') {
+							custom_tracking.use(first)
+						} else {
+							anchor_tracking.use(first)
+						}
 					},
 				},
 				result: () => ({

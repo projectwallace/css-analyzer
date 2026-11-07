@@ -30,20 +30,28 @@ export function rules(options: CountOptions = {}): CollectorDef<RulesResult> {
 			return {
 				parse: { selectors: true },
 				rule(node, ctx) {
-					if (ctx.in_keyframes) return
+					if (ctx.in_keyframes) {
+						return
+					}
 					total++
-					if (node.block?.is_empty) empty++
+					if (node.block?.is_empty) {
+						empty++
+					}
 
 					// Selectors are only found when selectors are parsed
 					let selector_count = 0
 					if (node.has_prelude && is_selector_list(node.prelude)) {
 						for (const selector of node.prelude) {
-							if (is_selector(selector)) selector_count++
+							if (is_selector(selector)) {
+								selector_count++
+							}
 						}
 					}
 					let declaration_count = 0
 					for (const child of node.block ?? []) {
-						if (is_declaration(child)) declaration_count++
+						if (is_declaration(child)) {
+							declaration_count++
+						}
 					}
 
 					sizes.add(String(selector_count + declaration_count), ctx)
