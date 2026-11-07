@@ -16,8 +16,12 @@ export const keywords: KeywordSet = new KeywordSet([
  */
 export function isValueReset(value: Value): boolean {
 	for (let node of value) {
-		if (is_number(node) && node.value === 0) continue
-		if (is_dimension(node) && node.value === 0) continue
+		if (is_number(node) && node.value === 0) {
+			continue
+		}
+		if (is_dimension(node) && node.value === 0) {
+			continue
+		}
 		return false
 	}
 

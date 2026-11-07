@@ -59,7 +59,9 @@ import {
 export type Specificity = [number, number, number]
 
 function ratio(part: number, total: number): number {
-	if (total === 0) return 0
+	if (total === 0) {
+		return 0
+	}
 	return part / total
 }
 
@@ -1145,7 +1147,9 @@ function analyzeInternal<T extends boolean>(
 			//#region PROPERTIES
 			let { is_important, property, is_browserhack, is_vendor_prefixed } = node
 
-			if (!property) return
+			if (!property) {
+				return
+			}
 
 			let propertyLoc = toLoc(node)
 			propertyLoc.length = property.length
@@ -1185,8 +1189,12 @@ function analyzeInternal<T extends boolean>(
 			// Values are analyzed inside declaration because we need context, like which property is used
 			{
 				let value = node.value
-				if (!value) return
-				if (is_raw(value)) return
+				if (!value) {
+					return
+				}
+				if (is_raw(value)) {
+					return
+				}
 
 				let { text } = value
 				let valueLoc = toLoc(value)

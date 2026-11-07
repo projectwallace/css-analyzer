@@ -133,7 +133,9 @@ export function destructure(
 		// -----------------------------------------------------------------
 		for (let i = 0; i < children.length; i++) {
 			const child = children[i]
-			if (!child) continue
+			if (!child) {
+				continue
+			}
 
 			if (is_dimension(child)) {
 				font_size = child.text

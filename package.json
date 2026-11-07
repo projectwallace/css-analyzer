@@ -70,7 +70,7 @@
 		"@projectwallace/css-parser": "~0.19.0"
 	},
 	"devDependencies": {
-		"@projectwallace/preset-oxlint": "^0.0.11",
+		"@projectwallace/preset-oxlint": "^0.0.12",
 		"@vitest/coverage-v8": "^5.0.5",
 		"knip": "^6.42.1",
 		"oxfmt": "^0.74.0",

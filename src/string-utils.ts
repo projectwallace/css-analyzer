@@ -27,7 +27,9 @@ function compareChar(referenceCode: number, testCode: number): boolean {
  * @returns true if `test` ends with `base`, false otherwise
  */
 export function endsWith(base: string, maybe: string): boolean {
-	if (base === maybe) return true
+	if (base === maybe) {
+		return true
+	}
 
 	let len = maybe.length
 	let offset = len - base.length

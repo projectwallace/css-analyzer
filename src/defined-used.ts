@@ -12,7 +12,9 @@ export class DefinedUsed {
 	#unknown = new Set<string>()
 
 	define(name: string): void {
-		if (this.#defined.has(name)) return
+		if (this.#defined.has(name)) {
+			return
+		}
 		this.#defined.add(name)
 		if (this.#used.has(name)) {
 			this.#unknown.delete(name)
@@ -22,7 +24,9 @@ export class DefinedUsed {
 	}
 
 	use(name: string): void {
-		if (this.#used.has(name)) return
+		if (this.#used.has(name)) {
+			return
+		}
 		this.#used.add(name)
 		if (this.#defined.has(name)) {
 			this.#unused.delete(name)
