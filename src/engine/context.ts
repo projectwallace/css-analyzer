@@ -8,6 +8,12 @@ import {
 	get_location,
 	is_custom_property,
 } from '../adapter/css-parser.js'
+import {
+	SYSTEM_FONTS,
+	destructure_font_shorthand,
+	type FontShorthand,
+} from '../values/destructure-font-shorthand.js'
+import { keywords } from '../values/values.js'
 import type { DeclarationContext, Location, LocationSource, StylesheetContext } from './types.js'
 
 export type ContextController = {
@@ -33,6 +39,10 @@ export function create_context(): ContextController {
 	let facts: DeclarationFacts | undefined
 	let value_node: AstNode | undefined
 	let value_loaded = false
+	let clean_loaded = false
+	let clean_text: string | undefined
+	let font_loaded = false
+	let font_result: FontShorthand | null = null
 	let view_node: AstNode | undefined
 	let keyframes_count = 0
 	const atrule_stack: string[] = []
@@ -94,6 +104,32 @@ export function create_context(): ContextController {
 		get value_text() {
 			return get_declaration_value_text(node!)
 		},
+		get clean_value_text() {
+			if (!clean_loaded) {
+				clean_loaded = true
+				const text = ctx.value_text
+				if (ctx.value && !keywords.has(text)) {
+					clean_text =
+						!ctx.is_custom && (text.endsWith('\\9') || text.endsWith('\\7'))
+							? text.slice(0, -2)
+							: text
+				} else {
+					clean_text = undefined
+				}
+			}
+			return clean_text
+		},
+		get font_shorthand() {
+			if (!font_loaded) {
+				font_loaded = true
+				const text = ctx.clean_value_text
+				font_result =
+					ctx.property === 'font' && text !== undefined && !SYSTEM_FONTS.has(text)
+						? destructure_font_shorthand(ctx.value!)
+						: null
+			}
+			return font_result
+		},
 		get value() {
 			if (!value_loaded) {
 				value_node = get_declaration_value(node!)
@@ -119,6 +155,8 @@ export function create_context(): ContextController {
 			facts = undefined
 			value_node = undefined
 			value_loaded = false
+			clean_loaded = false
+			font_loaded = false
 		},
 		enter_rule(rule) {
 			rule_stack.push(rule)

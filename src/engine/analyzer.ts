@@ -28,7 +28,7 @@ type DeclarationSubscription = {
 
 type ValueSubscription = {
 	properties: ReadonlySet<string> | undefined
-	enter: (node: AstNode, ctx: DeclarationContext) => void
+	enter: (node: AstNode, ctx: DeclarationContext, kind: ValueKind) => void
 }
 
 /** Results remember which collectors produced them so `merge(a, b)` needs no extra arguments */
@@ -101,7 +101,7 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 			if (!handlers) return
 			for (const handler of handlers) {
 				if (!handler.properties || handler.properties.has(ctx.property)) {
-					handler.enter(value_node, ctx)
+					handler.enter(value_node, ctx, kind)
 				}
 			}
 		})

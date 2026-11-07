@@ -16,6 +16,7 @@ export type {
 	CollectorInstance,
 	CollectorMap,
 	Context,
+	ContextCountOptions,
 	ContextCountResult,
 	CountEntry,
 	CountOptions,

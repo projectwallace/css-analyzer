@@ -4,6 +4,8 @@ export default defineConfig({
 	entry: [
 		'src/index.ts',
 		'src/engine/index.ts',
+		'src/collectors/index.ts',
+		'src/presets/index.ts',
 		'src/selectors/index.ts',
 		'src/atrules/index.ts',
 		'src/values/index.ts',

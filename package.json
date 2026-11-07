@@ -43,6 +43,14 @@
 			"types": "./dist/engine/index.d.ts",
 			"default": "./dist/engine/index.js"
 		},
+		"./collectors": {
+			"types": "./dist/collectors/index.d.ts",
+			"default": "./dist/collectors/index.js"
+		},
+		"./presets": {
+			"types": "./dist/presets/index.d.ts",
+			"default": "./dist/presets/index.js"
+		},
 		"./selectors": {
 			"types": "./dist/selectors/index.d.ts",
 			"default": "./dist/selectors/index.js"

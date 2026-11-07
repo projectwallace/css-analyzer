@@ -1,4 +1,5 @@
 import type { AstNode, Location, ParseOptions, ValueKind } from '../adapter/css-parser.js'
+import type { FontShorthand } from '../values/destructure-font-shorthand.js'
 
 export type { AstNode, Location, ParseOptions, ValueKind }
 
@@ -24,6 +25,11 @@ export type ContextCountResult = CountResult & {
 
 export type CountOptions = {
 	locations?: boolean
+}
+
+export type ContextCountOptions = CountOptions & {
+	/** Also count per context (e.g. per property). Without it `by_context` stays empty. */
+	contexts?: boolean
 }
 
 /** Facts and structure about the node that is currently visited */
@@ -58,6 +64,16 @@ export type DeclarationContext = Context & {
 	readonly value_text: string
 	/** Parsed value node, `undefined` when values are not parsed (see `parse.values`) */
 	readonly value: AstNode | undefined
+	/**
+	 * Value text without a trailing IE hack (`\\9`, `\\7`). `undefined` when the value is not parsed
+	 * or is a global keyword (`inherit`, `initial`, `none`, ...).
+	 */
+	readonly clean_value_text: string | undefined
+	/**
+	 * The `font` shorthand split into size, line-height and family; shared by every collector that asks.
+	 * `null` for other properties, system fonts, global keywords and values that cannot be split (`var()`).
+	 */
+	readonly font_shorthand: FontShorthand | null
 }
 
 export type DeclarationHandler = (node: AstNode, ctx: DeclarationContext) => void
@@ -80,7 +96,7 @@ export type CollectorInstance<T> = {
 	value?: {
 		types: readonly ValueKind[]
 		properties?: ReadonlySet<string>
-		enter: (node: AstNode, ctx: DeclarationContext) => void
+		enter: (node: AstNode, ctx: DeclarationContext, kind: ValueKind) => void
 	}
 	/** Called for every comment. Only works when the engine parses the input itself. */
 	comment?: (loc: Location) => void

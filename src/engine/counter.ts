@@ -1,4 +1,5 @@
 import type {
+	ContextCountOptions,
 	ContextCountResult,
 	CountEntry,
 	CountOptions,
@@ -63,8 +64,9 @@ export function create_counter(options: CountOptions = {}): Counter {
 	return { add, result }
 }
 
-export function create_context_counter(options: CountOptions = {}): ContextCounter {
+export function create_context_counter(options: ContextCountOptions = {}): ContextCounter {
 	const locations = options.locations === true
+	const track_contexts = options.contexts === true
 	const map = new Map<string, CountEntry>()
 	const contexts = new Map<string, { map: Map<string, CountEntry>; total: number }>()
 	let total = 0
@@ -72,6 +74,7 @@ export function create_context_counter(options: CountOptions = {}): ContextCount
 	function add(item: string, context: string, at: LocationSource): void {
 		total++
 		add_to(map, item, at, locations)
+		if (!track_contexts) return
 		let scoped = contexts.get(context)
 		if (!scoped) {
 			scoped = { map: new Map(), total: 0 }
