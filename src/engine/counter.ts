@@ -127,7 +127,7 @@ export function merge_counts(a: CountResult, b: CountResult): CountResult {
 	}
 	const merged: CountResult = { total: a.total + b.total, total_unique: unique.size, unique }
 	if (a.sequence || b.sequence) {
-		merged.sequence = [...(a.sequence ?? []), ...(b.sequence ?? [])]
+		merged.sequence = (a.sequence ?? []).concat(b.sequence ?? [])
 	}
 	return merged
 }

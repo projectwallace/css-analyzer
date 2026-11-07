@@ -93,8 +93,9 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 						if (is_attribute_selector(part)) {
 							attributes.add(part.name.toLowerCase(), ctx)
 						} else if (is_type_selector(part)) {
-							if (!part.name.startsWith('--') && part.name.includes('-')) {
-								custom_elements.add(part.name.toLowerCase(), ctx)
+							const name = part.name
+							if (!name.startsWith('--') && name.includes('-')) {
+								custom_elements.add(name.toLowerCase(), ctx)
 							}
 						} else if (is_pseudo_class_selector(part)) {
 							pseudo_classes.add(part.name.toLowerCase(), ctx)

@@ -278,7 +278,7 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 										column: comment.column,
 										offset: comment.start,
 										length: comment.length,
-										...(options.source === undefined ? {} : { source: options.source }),
+										source: options.source,
 									}
 									for (const handler of comment_handlers) {
 										handler(loc)

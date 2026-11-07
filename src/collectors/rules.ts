@@ -34,21 +34,23 @@ export function rules(options: CountOptions = {}): CollectorDef<RulesResult> {
 						return
 					}
 					total++
-					if (node.block?.is_empty) {
+					const block = node.block
+					if (block?.is_empty) {
 						empty++
 					}
 
 					// Selectors are only found when selectors are parsed
 					let selector_count = 0
-					if (node.has_prelude && is_selector_list(node.prelude)) {
-						for (const selector of node.prelude) {
+					const prelude = node.prelude
+					if (prelude && is_selector_list(prelude)) {
+						for (const selector of prelude) {
 							if (is_selector(selector)) {
 								selector_count++
 							}
 						}
 					}
 					let declaration_count = 0
-					for (const child of node.block ?? []) {
+					for (const child of block ?? []) {
 						if (is_declaration(child)) {
 							declaration_count++
 						}

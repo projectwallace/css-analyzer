@@ -17,7 +17,19 @@ import type {
 	CountOptions,
 	CountResult,
 	DeclarationContext,
+	Location,
 } from '../engine/types.js'
+
+/** Join two optional location lists; `undefined` when neither has any */
+export function concat_locations(
+	a: Location[] | undefined,
+	b: Location[] | undefined,
+): Location[] | undefined {
+	if (!a && !b) {
+		return undefined
+	}
+	return (a ?? []).concat(b ?? [])
+}
 
 export type Normalize = 'lowercase' | 'none'
 

@@ -185,9 +185,10 @@ function selector_specificity(selector_ast: Selector): Specificity {
 					}
 
 					case 'highlight': {
-						if (current.first_child) {
+						const argument = current.first_child
+						if (argument) {
 							// The specificity of a ::highlight() selector with a * argument is zero.
-							if (current.first_child.text === '*') {
+							if (argument.text === '*') {
 								break
 							}
 							// The specificity of a ::highlight() selector with a <custom-ident> argument

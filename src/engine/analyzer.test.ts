@@ -236,9 +236,9 @@ test('locations are opt-in per collector and carry the source', () => {
 	expect(result.without.unique.get('color')).toEqual({ count: 1 })
 })
 
-test('locations omit `source` when none is given', () => {
+test('locations have no `source` when none is given', () => {
 	const { props } = analyze('a { color: red }', { props: declared_properties({ locations: true }) })
-	expect(props.unique.get('color')?.locations?.[0]).not.toHaveProperty('source')
+	expect(props.unique.get('color')?.locations?.[0]?.source).toBeUndefined()
 })
 
 test('add() aggregates multiple inputs', () => {
