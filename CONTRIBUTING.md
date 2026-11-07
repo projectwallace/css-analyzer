@@ -33,4 +33,4 @@ Write unit tests: small, fast and next to the code they test.
 ## Performance
 
 - Avoid repeated CSS node property reads: each `.text`, `.name`, `.column` etc. makes the css-parser node read from its memory arena. Read it once and keep it in a `const`.
-- Compare names case-insensitively with `str_equals('var', node.name)` from `@projectwallace/css-parser`, not with `node.name.toLowerCase() === 'var'`. It does not allocate a new string.
+- Compare names case-insensitively with `str_equals('var', node.name)` from `@projectwallace/css-parser`, not with `node.name.toLowerCase() === 'var'`. Likewise `str_index_of('var(', text) !== -1` instead of `text.toLowerCase().includes('var(')`. They do not allocate a new string.

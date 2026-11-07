@@ -1,3 +1,4 @@
+import { str_index_of } from '@projectwallace/css-parser'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.js'
 import { SYSTEM_FONTS } from '../values/destructure-font-shorthand.js'
 import { define_counting_collector, lowercase_unless_var, type Normalize } from './shared.js'
@@ -24,7 +25,7 @@ export function font_sizes(options: FontSizesOptions = {}): CollectorDef<CountRe
 					if (text === undefined) {
 						return
 					}
-					if (options.skip_var && text.toLowerCase().includes('var(')) {
+					if (options.skip_var && str_index_of('var(', text) !== -1) {
 						return
 					}
 					// The font shorthand never reaches this point for system fonts and global keywords

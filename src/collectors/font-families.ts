@@ -1,3 +1,4 @@
+import { str_index_of } from '@projectwallace/css-parser'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.js'
 import { SYSTEM_FONTS } from '../values/destructure-font-shorthand.js'
 import { define_counting_collector } from './shared.js'
@@ -25,7 +26,7 @@ export function font_families(options: FontFamiliesOptions = {}): CollectorDef<C
 					if (ctx.property === 'font-family' && SYSTEM_FONTS.has(text)) {
 						return
 					}
-					if (options.skip_var && text.toLowerCase().includes('var(')) {
+					if (options.skip_var && str_index_of('var(', text) !== -1) {
 						return
 					}
 					counter.add(text, ctx.at(ctx.value!))

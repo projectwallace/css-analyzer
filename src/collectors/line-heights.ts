@@ -1,3 +1,4 @@
+import { str_index_of } from '@projectwallace/css-parser'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.js'
 import { define_counting_collector, lowercase_unless_var, type Normalize } from './shared.js'
 
@@ -23,7 +24,7 @@ export function line_heights(options: LineHeightsOptions = {}): CollectorDef<Cou
 					if (text === undefined) {
 						return
 					}
-					if (options.skip_var && text.toLowerCase().includes('var(')) {
+					if (options.skip_var && str_index_of('var(', text) !== -1) {
 						return
 					}
 					counter.add(lowercase ? lowercase_unless_var(text) : text, ctx.at(ctx.value!))
