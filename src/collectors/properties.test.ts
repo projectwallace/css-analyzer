@@ -1,5 +1,30 @@
-import { test, expect, describe } from 'vitest'
-import { analyze_compat as analyze } from '../presets/compat.js'
+import { describe, test, expect } from 'vitest'
+import { analyze } from '../engine/analyzer.js'
+import { plain } from '../test-utils.js'
+import { summarize_numbers } from '../engine/summary.js'
+import { properties } from './properties.js'
+
+/** Property results with the shape the old tests were written for */
+function run(css: string) {
+	const { result } = analyze(css, { result: properties() })
+	const { min, max, mean, mode, range, sum } = summarize_numbers(result.complexity)
+	return {
+		...plain(result),
+		prefixed: plain(result.prefixed),
+		custom: {
+			...plain(result.custom),
+			defined: result.custom.defined,
+			used: result.custom.used,
+			unused: result.custom.unused,
+			unknown: result.custom.unknown,
+			importants: plain(result.custom.importants),
+		},
+		shorthands: plain(result.shorthands),
+		browserhacks: plain(result.browserhacks),
+		complexity: { min, max, mean, mode, range, sum },
+		anchor_names: result.anchor_names,
+	}
+}
 
 test('counts totals', () => {
 	const fixture = `
@@ -14,7 +39,7 @@ test('counts totals', () => {
       }
     }
   `
-	const actual = analyze(fixture).properties.total
+	const actual = run(fixture).total
 
 	expect(actual).toEqual(3)
 })
@@ -33,16 +58,15 @@ test('calculates uniqueness', () => {
       }
     }
   `
-	const actual = analyze(fixture).properties
+	const actual = run(fixture)
 	const expected = {
 		margin: 2,
 		'--custom': 2,
 	}
 
-	expect(actual.totalUnique).toEqual(2)
+	expect(actual.total_unique).toEqual(2)
 	expect(actual.total).toEqual(4)
 	expect(actual.unique).toEqual(expected)
-	expect(actual.uniquenessRatio).toEqual(2 / 4)
 })
 
 describe('vendor prefixes', () => {
@@ -63,7 +87,7 @@ describe('vendor prefixes', () => {
       }
     }
   `
-		const actual = analyze(fixture).properties.prefixed
+		const actual = run(fixture).prefixed
 		const expected = {
 			'-webkit-border-radius': 1,
 			'-khtml-border-radius': 1,
@@ -71,15 +95,14 @@ describe('vendor prefixes', () => {
 		}
 
 		expect(actual.total).toEqual(4)
-		expect(actual.totalUnique).toEqual(3)
+		expect(actual.total_unique).toEqual(3)
 		expect(actual.unique).toEqual(expected)
-		expect(actual.ratio).toEqual(4 / 5)
 	})
 
 	test('normalizes to basename', () => {
 		const fixture = `test { -webkit-line-clamp: 3; }`
 		const expected = { 'line-clamp': 1 }
-		const actual = analyze(fixture).properties.unique
+		const actual = run(fixture).unique
 		expect(actual).toEqual(expected)
 	})
 })
@@ -94,12 +117,11 @@ describe('shorthands', () => {
         font: bold 1em/1.5 sans-serif;
       }
     `
-		const actual = analyze(fixture).properties.shorthands
+		const actual = run(fixture).shorthands
 
 		expect(actual.total).toEqual(3)
-		expect(actual.totalUnique).toEqual(3)
+		expect(actual.total_unique).toEqual(3)
 		expect(actual.unique).toEqual({ margin: 1, padding: 1, font: 1 })
-		expect(actual.ratio).toEqual(3 / 4)
 	})
 
 	test('counts duplicate shorthands', () => {
@@ -107,27 +129,25 @@ describe('shorthands', () => {
       a { margin: 0; }
       b { margin: 10px; }
     `
-		const actual = analyze(fixture).properties.shorthands
+		const actual = run(fixture).shorthands
 
 		expect(actual.total).toEqual(2)
-		expect(actual.totalUnique).toEqual(1)
+		expect(actual.total_unique).toEqual(1)
 		expect(actual.unique).toEqual({ margin: 2 })
-		expect(actual.uniquenessRatio).toEqual(1 / 2)
 	})
 
 	test('non-shorthand properties are not counted', () => {
 		const fixture = `a { color: red; font-size: 1em; }`
-		const actual = analyze(fixture).properties.shorthands
+		const actual = run(fixture).shorthands
 
 		expect(actual.total).toEqual(0)
-		expect(actual.totalUnique).toEqual(0)
+		expect(actual.total_unique).toEqual(0)
 		expect(actual.unique).toEqual({})
-		expect(actual.ratio).toEqual(0)
 	})
 
 	test('preserves original casing of shorthand property name', () => {
 		const fixture = `a { MARGIN: 0; }`
-		const actual = analyze(fixture).properties.shorthands
+		const actual = run(fixture).shorthands
 
 		expect(actual.total).toEqual(1)
 		expect(actual.unique).toEqual({ MARGIN: 1 })
@@ -139,7 +159,7 @@ describe('shorthands', () => {
         a { padding: 0; }
       }
     `
-		const actual = analyze(fixture).properties.shorthands
+		const actual = run(fixture).shorthands
 
 		expect(actual.total).toEqual(1)
 		expect(actual.unique).toEqual({ padding: 1 })
@@ -165,16 +185,15 @@ describe('browserhacks', () => {
       }
     }
   `
-		const actual = analyze(fixture).properties.browserhacks
+		const actual = run(fixture).browserhacks
 		const expected = {
 			'*': 3,
 			_: 1,
 		}
 
 		expect(actual.total).toEqual(4)
-		expect(actual.totalUnique).toEqual(2)
+		expect(actual.total_unique).toEqual(2)
 		expect(actual.unique).toEqual(expected)
-		expect(actual.ratio).toEqual(4 / 6)
 	})
 
 	test('normalizes browserhacks props to basename', () => {
@@ -187,7 +206,7 @@ describe('browserhacks', () => {
         --custom: 1;
       }
     `
-		const actual = analyze(fixture).properties
+		const actual = run(fixture)
 		const expected = {
 			margin: 2,
 			zoom: 1,
@@ -196,7 +215,7 @@ describe('browserhacks', () => {
 		}
 
 		expect(actual.unique).toEqual(expected)
-		expect(actual.totalUnique).toEqual(4)
+		expect(actual.total_unique).toEqual(4)
 	})
 })
 
@@ -222,16 +241,15 @@ describe('custom properties', () => {
         }
       }
     `
-		const actual = analyze(fixture).properties.custom
+		const actual = run(fixture).custom
 		const expected = {
 			'--yellow-400': 2,
 			'--green-400': 1,
 		}
 
 		expect(actual.total).toEqual(3)
-		expect(actual.totalUnique).toEqual(2)
+		expect(actual.total_unique).toEqual(2)
 		expect(actual.unique).toEqual(expected)
-		expect(actual.ratio).toEqual(3 / 6)
 	})
 
 	test('normalizing properties does not lowercase custom properties', () => {
@@ -240,7 +258,7 @@ describe('custom properties', () => {
         --testMe: 1;
       }
     `
-		const actual = analyze(fixture).properties.custom
+		const actual = run(fixture).custom
 		const expected = {
 			'--testMe': 1,
 		}
@@ -251,22 +269,22 @@ describe('custom properties', () => {
 
 describe('property complexity', () => {
 	test('regular property', () => {
-		const actual = analyze('a { property: 1 }').properties.complexity
+		const actual = run('a { property: 1 }').complexity
 		expect(actual.sum).toBe(1)
 	})
 
 	test('custom property', () => {
-		const actual = analyze('a { --property: 1 }').properties.complexity
+		const actual = run('a { --property: 1 }').complexity
 		expect(actual.sum).toBe(2)
 	})
 
 	test('browserhack property', () => {
-		const actual = analyze('a { *property: 1 }').properties.complexity
+		const actual = run('a { *property: 1 }').complexity
 		expect(actual.sum).toBe(2)
 	})
 
 	test('vendor prefixed property', () => {
-		const actual = analyze('a { -o-property: 1 }').properties.complexity
+		const actual = run('a { -o-property: 1 }').complexity
 		expect(actual.sum).toBe(2)
 	})
 
@@ -279,7 +297,7 @@ describe('property complexity', () => {
       -webkit-property: 2;
     }
   `
-		const actual = analyze(fixture).properties.complexity
+		const actual = run(fixture).complexity
 
 		expect.soft(actual.max).toEqual(2)
 		expect.soft(actual.mean).toEqual(1.75)
@@ -314,12 +332,10 @@ test('counts the amount of !important used on custom properties', () => {
       }
     }
   `
-	const actual = analyze(fixture).properties.custom.importants
+	const actual = run(fixture).custom.importants
 
 	expect(actual.total).toEqual(3)
-	expect(actual.totalUnique).toEqual(2)
-	expect(actual.uniquenessRatio).toEqual(2 / 3)
-	expect(actual.ratio).toEqual(3 / 6)
+	expect(actual.total_unique).toEqual(2)
 	expect(actual.unique).toEqual({
 		'--color2': 2,
 		'--color3': 1,

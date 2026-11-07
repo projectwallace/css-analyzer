@@ -1,24 +1,38 @@
-import { test, expect } from 'vitest'
-import { analyze_compat as analyze } from '../presets/compat.js'
+import { describe, test, expect } from 'vitest'
+import { analyze } from '../engine/analyzer.js'
+import { plain, series } from '../test-utils.js'
+import { rules } from './rules.js'
+
+/** Rule results with the shape the old tests were written for */
+function run(css: string) {
+	const { result } = analyze(css, { result: rules({ sequence: true }) })
+	return {
+		total: result.total,
+		empty: { total: result.empty },
+		sizes: series(result.sizes),
+		nesting: series(result.nesting),
+		selectors: series(result.selectors),
+		declarations: series(result.declarations),
+	}
+}
 
 test('should count rules', () => {
-	const actual = analyze(`
+	const actual = run(`
     html {
       color: black;
     }
     test {}
-  `).rules.total
+  `).total
 	expect(actual).toEqual(2)
 })
 
 test('should handle CSS without rules', () => {
 	const fixture = `@media (min-width: 0px) {}`
-	const actual = analyze(fixture).rules
+	const actual = run(fixture)
 	const expected = {
 		total: 0,
 		empty: {
 			total: 0,
-			ratio: 0,
 		},
 		sizes: {
 			min: 0,
@@ -30,8 +44,7 @@ test('should handle CSS without rules', () => {
 			items: [],
 			unique: {},
 			total: 0,
-			totalUnique: 0,
-			uniquenessRatio: 0,
+			total_unique: 0,
 		},
 		selectors: {
 			min: 0,
@@ -43,8 +56,7 @@ test('should handle CSS without rules', () => {
 			items: [],
 			unique: {},
 			total: 0,
-			totalUnique: 0,
-			uniquenessRatio: 0,
+			total_unique: 0,
 		},
 		declarations: {
 			min: 0,
@@ -56,8 +68,7 @@ test('should handle CSS without rules', () => {
 			items: [],
 			unique: {},
 			total: 0,
-			totalUnique: 0,
-			uniquenessRatio: 0,
+			total_unique: 0,
 		},
 		nesting: {
 			min: 0,
@@ -68,16 +79,15 @@ test('should handle CSS without rules', () => {
 			sum: 0,
 			items: [],
 			total: 0,
-			totalUnique: 0,
+			total_unique: 0,
 			unique: {},
-			uniquenessRatio: 0,
 		},
 	}
 	expect(actual).toEqual(expected)
 })
 
 test('counts sizes of rules', () => {
-	const actual = analyze(`
+	const actual = run(`
     x {
       a: 1;
     }
@@ -102,7 +112,7 @@ test('counts sizes of rules', () => {
         }
       }
     }
-  `).rules.sizes
+  `).sizes
 
 	const expected = {
 		min: 2,
@@ -119,69 +129,68 @@ test('counts sizes of rules', () => {
 			3: 1,
 		},
 		total: 4,
-		totalUnique: 4,
-		uniquenessRatio: 4 / 4,
+		total_unique: 4,
 	}
 	expect(actual).toEqual(expected)
 })
 
 test('should count empty rules', () => {
-	expect(analyze(`test{}`).rules.empty.total).toEqual(1)
-	expect(analyze('@media print {}').rules.empty.total).toEqual(0)
+	expect(run(`test{}`).empty.total).toEqual(1)
+	expect(run('@media print {}').empty.total).toEqual(0)
 	expect(
-		analyze(`
+		run(`
     @media print {
       empty {}
     }
-  `).rules.empty.total,
+  `).empty.total,
 	).toEqual(1)
-	expect(analyze('test { color: red; }').rules.empty.total).toEqual(0)
+	expect(run('test { color: red; }').empty.total).toEqual(0)
 })
 
 test('calculate the minimum selectors', () => {
 	expect(
-		analyze(`
+		run(`
     html {}
     a,
     b {}
-  `).rules.selectors.min,
+  `).selectors.min,
 	).toEqual(1)
 })
 
 test('calculate the maximum selectors', () => {
 	expect(
-		analyze(`
+		run(`
     html {}
     a,
     b {}
-  `).rules.selectors.max,
+  `).selectors.max,
 	).toEqual(2)
 })
 
 test('calculate the mode of selectors', () => {
 	expect(
-		analyze(`
+		run(`
     html {}
     a,
     b {}
     x {}
-  `).rules.selectors.mode,
+  `).selectors.mode,
 	).toEqual(1)
 })
 
 test('calculate the mean of selectors', () => {
 	expect(
-		analyze(`
+		run(`
     html {}
     a,
     b {}
-  `).rules.selectors.mean,
+  `).selectors.mean,
 	).toEqual(1.5)
 })
 
 test('calculate the range of selectors', () => {
 	expect(
-		analyze(`
+		run(`
     html {}
 
     a,
@@ -190,36 +199,36 @@ test('calculate the range of selectors', () => {
     a,
     b,
     c {}
-  `).rules.selectors.range,
+  `).selectors.range,
 	).toEqual(2)
 })
 
 test('calculate the minimum declarations', () => {
 	expect(
-		analyze(`
+		run(`
     html {}
     test {
       color: red;
     }
-  `).rules.declarations.min,
+  `).declarations.min,
 	).toEqual(0)
-	expect(analyze('@media print {}').rules.declarations.min).toEqual(0)
+	expect(run('@media print {}').declarations.min).toEqual(0)
 })
 
 test('calculate the maximum declarations', () => {
 	expect(
-		analyze(`
+		run(`
     html {}
     test {
       a: 1;
       b: 2;
       c: 3;
     }
-  `).rules.declarations.max,
+  `).declarations.max,
 	).toEqual(3)
 
 	expect(
-		analyze(`
+		run(`
     html {}
     test {
       a: 1;
@@ -235,13 +244,13 @@ test('calculate the maximum declarations', () => {
         d: 4;
       }
     }
-  `).rules.declarations.max,
+  `).declarations.max,
 	).toEqual(4)
 })
 
 test('calculate the mode of declarations', () => {
 	expect(
-		analyze(`
+		run(`
     html {
       a: 1;
     }
@@ -252,13 +261,13 @@ test('calculate the mode of declarations', () => {
       a: 1;
       b: 2;
     }
-  `).rules.declarations.mode,
+  `).declarations.mode,
 	).toEqual(1)
 })
 
 test('calculate the mean of declarations', () => {
 	expect(
-		analyze(`
+		run(`
     html {
       a: 1;
     }
@@ -271,13 +280,13 @@ test('calculate the mean of declarations', () => {
       b: 2;
       c: 3;
     }
-  `).rules.declarations.mean,
+  `).declarations.mean,
 	).toEqual(2)
 })
 
 test('calculate the range of declarations', () => {
 	expect(
-		analyze(`
+		run(`
     html {
       a: 1;
     }
@@ -290,12 +299,12 @@ test('calculate the range of declarations', () => {
       b: 2;
       c: 3;
     }
-  `).rules.declarations.range,
+  `).declarations.range,
 	).toEqual(2)
 })
 
 test('return a list of declaration counts per rule', () => {
-	const actual = analyze(`
+	const actual = run(`
     html {
       a: 1;
     }
@@ -318,13 +327,13 @@ test('return a list of declaration counts per rule', () => {
         d {}
       }
     }
-  `).rules.declarations.items
+  `).declarations.items
 	const expected = [1, 2, 3, 2, 0]
 	expect(actual).toEqual(expected)
 })
 
 test('return a list of selectors counts per rule', () => {
-	const actual = analyze(`
+	const actual = run(`
     x {
       a: 1;
     }
@@ -349,13 +358,13 @@ test('return a list of selectors counts per rule', () => {
         }
       }
     }
-  `).rules.declarations.items
+  `).declarations.items
 	const expected = [1, 2, 3, 2]
 	expect(actual).toEqual(expected)
 })
 
 test('counts unique numbers of selectors per rule', () => {
-	const result = analyze(`
+	const result = run(`
     x {
       a: 1;
     }
@@ -380,19 +389,18 @@ test('counts unique numbers of selectors per rule', () => {
         }
       }
     }
-  `).rules.selectors
+  `).selectors
 
 	expect(result.unique).toEqual({
 		1: 2,
 		2: 1,
 		3: 1,
 	})
-	expect(result.totalUnique).toEqual(3)
-	expect(result.uniquenessRatio).toEqual(3 / 4)
+	expect(result.total_unique).toEqual(3)
 })
 
 test('counts unique numbers of declarations per rule', () => {
-	const result = analyze(`
+	const result = run(`
     x {
       a: 1;
     }
@@ -417,15 +425,14 @@ test('counts unique numbers of declarations per rule', () => {
         }
       }
     }
-  `).rules.declarations
+  `).declarations
 
 	expect(result.unique).toEqual({
 		1: 1,
 		2: 2,
 		3: 1,
 	})
-	expect(result.totalUnique).toEqual(3)
-	expect(result.uniquenessRatio).toEqual(3 / 4)
+	expect(result.total_unique).toEqual(3)
 })
 
 test('tracks nesting depth', () => {
@@ -456,7 +463,7 @@ test('tracks nesting depth', () => {
       }
     }
   `
-	const actual = analyze(fixture).rules.nesting
+	const actual = run(fixture).nesting
 	const expected = {
 		min: 0,
 		max: 2,
@@ -466,13 +473,12 @@ test('tracks nesting depth', () => {
 		sum: 3,
 		items: [0, 0, 1, 2],
 		total: 4,
-		totalUnique: 3,
+		total_unique: 3,
 		unique: {
 			0: 2,
 			1: 1,
 			2: 1,
 		},
-		uniquenessRatio: 3 / 4,
 	}
 	expect(actual).toEqual(expected)
 })

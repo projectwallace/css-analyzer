@@ -1,5 +1,24 @@
-import { test, expect } from 'vitest'
-import { analyze_compat as analyze } from '../presets/compat.js'
+import { describe, test, expect } from 'vitest'
+import { analyze } from '../engine/analyzer.js'
+import { series } from '../test-utils.js'
+import { summarize_numbers } from '../engine/summary.js'
+import { declarations } from './declarations.js'
+
+/** Declaration results with the shape the old tests were written for */
+function run(css: string) {
+	const { result } = analyze(css, { result: declarations({ sequence: true }) })
+	const { min, max, mean, mode, range, sum } = summarize_numbers(result.complexity)
+	return {
+		total: result.total,
+		total_unique: result.total_unique,
+		importants: {
+			total: result.importants.total,
+			in_keyframes: { total: result.importants.in_keyframes },
+		},
+		complexity: { min, max, mean, mode, range, sum },
+		nesting: series(result.nesting),
+	}
+}
 
 test('handles empty values', () => {
 	const css = `
@@ -9,7 +28,7 @@ test('handles empty values', () => {
     }
   `
 
-	expect(() => analyze(css)).not.toThrowError()
+	expect(() => run(css)).not.toThrowError()
 })
 
 test('should be counted', () => {
@@ -42,11 +61,10 @@ test('should be counted', () => {
       }
     }
   `
-	const actual = analyze(fixture).declarations
+	const actual = run(fixture)
 
 	expect(actual.total).toEqual(6)
-	expect(actual.totalUnique).toEqual(5)
-	expect(actual.uniquenessRatio).toEqual(5 / 6)
+	expect(actual.total_unique).toEqual(5)
 })
 
 test('should count !importants', () => {
@@ -79,13 +97,11 @@ test('should count !importants', () => {
       }
     }
   `
-	const actual = analyze(fixture).declarations.importants
+	const actual = run(fixture).importants
 	const expected = {
 		total: 4,
-		ratio: 0.5,
-		inKeyframes: {
+		in_keyframes: {
 			total: 0,
-			ratio: 0,
 		},
 	}
 
@@ -108,13 +124,12 @@ test('should calculate !importants within @keyframes', () => {
       }
     }
   `
-	const result = analyze(fixture)
-	const actual = result.declarations.importants
+	const result = run(fixture)
+	const actual = result.importants
 
 	expect(actual.total).toEqual(2)
-	expect(actual.inKeyframes).toEqual({
+	expect(actual.in_keyframes).toEqual({
 		total: 1,
-		ratio: 1 / 2,
 	})
 })
 
@@ -131,7 +146,7 @@ test('should count complexity', () => {
       }
     }
   `
-	const actual = analyze(css).declarations.complexity
+	const actual = run(css).complexity
 	const expected = {
 		min: 1,
 		max: 3,
@@ -171,7 +186,7 @@ test('tracks nesting depth', () => {
       }
     }
   `
-	const actual = analyze(fixture).declarations.nesting
+	const actual = run(fixture).nesting
 	const expected = {
 		min: 0,
 		max: 2,
@@ -181,13 +196,12 @@ test('tracks nesting depth', () => {
 		sum: 4,
 		items: [0, 0, 1, 0, 1, 2],
 		total: 6,
-		totalUnique: 3,
+		total_unique: 3,
 		unique: {
 			0: 3,
 			1: 2,
 			2: 1,
 		},
-		uniquenessRatio: 3 / 6,
 	}
 	expect(actual).toEqual(expected)
 })
