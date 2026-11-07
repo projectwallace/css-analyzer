@@ -285,7 +285,7 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 				types: ['function'],
 				enter(node) {
 					// var(--x) is a use of a registered custom property
-					if (!is_function(node) || node.name.toLowerCase() !== 'var') {
+					if (!is_function(node) || !str_equals('var', node.name)) {
 						return
 					}
 					const first = get_first_identifier(node)
