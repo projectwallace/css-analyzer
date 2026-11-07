@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest'
-import { DefinedUsed, merge_defined_used } from './defined-used.js'
+import { DefinedUsed } from './defined-used.js'
 import { analyze } from './engine/analyzer.js'
 import { plain } from './test-utils.js'
 import { atrules } from './collectors/atrules.js'
@@ -444,19 +444,5 @@ describe('Public API exports', () => {
 	test('exports DefinedUsed class', () => {
 		expect(typeof DefinedUsed).toBe('function')
 		expect(new DefinedUsed().constructor.name).toBe('DefinedUsed')
-	})
-})
-
-describe('merge_defined_used', () => {
-	test('combines what is defined and used and recomputes the rest', () => {
-		const a = { defined: ['a', 'b'], used: ['a'], unused: ['b'], unknown: [] }
-		const b = { defined: ['c'], used: ['b', 'x'], unused: ['c'], unknown: ['b', 'x'] }
-
-		expect(merge_defined_used(a, b)).toEqual({
-			defined: ['a', 'b', 'c'],
-			used: ['a', 'b', 'x'],
-			unused: ['c'],
-			unknown: ['x'],
-		})
 	})
 })

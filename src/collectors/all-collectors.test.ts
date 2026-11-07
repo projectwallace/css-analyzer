@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { analyze, create_analyzer, merge } from '../engine/analyzer.js'
+import { analyze, create_analyzer } from '../engine/analyzer.js'
 import {
 	animation_names,
 	atrules,
@@ -58,31 +58,27 @@ const b = `
 .c > .d { --z: 3px; width: 10px; animation: fade 1s; display: -webkit-box }
 `
 
-test('merging two runs equals adding both inputs to one analyzer', () => {
-	const merged = merge(
-		analyze(a, collectors(), { source: 'a.css' }),
-		analyze(b, collectors(), { source: 'b.css' }),
-	)
-	const incremental = create_analyzer(collectors())
+test('every collector works across several added inputs', () => {
+	const analyzer = create_analyzer(collectors())
 		.add(a, { source: 'a.css' })
 		.add(b, { source: 'b.css' })
-		.result()
+	const result = analyzer.result()
 
-	for (const key of Object.keys(incremental) as (keyof typeof incremental)[]) {
-		expect({ [key]: merged[key] }).toEqual({ [key]: incremental[key] })
-	}
+	expect(result.z_indexes.unique.get('1')?.locations?.[0]?.source).toBe('a.css')
+	expect(result.z_indexes.unique.get('2')?.locations?.[0]?.source).toBe('b.css')
+	expect(result.rules.total).toBe(4)
 })
 
-test('defined and used names are combined across files', () => {
-	const only_a = analyze('@keyframes spin { to { opacity: 1 } }', collectors())
-	const only_b = analyze('a { animation: spin 1s; animation-name: other }', collectors())
-	expect(only_a.atrules.keyframes.unused).toEqual(['spin'])
-	expect(only_b.atrules.keyframes.unknown).toEqual(['spin', 'other'])
+test('defined and used names are combined across added inputs', () => {
+	const analyzer = create_analyzer(collectors())
+	analyzer.add('@keyframes spin { to { opacity: 1 } }')
+	expect(analyzer.result().atrules.keyframes.unused).toEqual(['spin'])
 
-	const merged = merge(only_a, only_b)
-	expect(merged.atrules.keyframes.defined).toEqual(['spin'])
-	expect(merged.atrules.keyframes.unused).toEqual([])
-	expect(merged.atrules.keyframes.unknown).toEqual(['other'])
+	analyzer.add('a { animation: spin 1s; animation-name: other }')
+	const { keyframes } = analyzer.result().atrules
+	expect(keyframes.defined).toEqual(['spin'])
+	expect(keyframes.unused).toEqual([])
+	expect(keyframes.unknown).toEqual(['other'])
 })
 
 test('every collector works with locations and a source', () => {

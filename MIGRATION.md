@@ -55,6 +55,6 @@ Removed: `isIe9Hack` (use `get_value_browserhacks`), `hasVendorPrefix`, `cssKeyw
 
 ## New
 
-- Collectors, `create_analyzer()` for many inputs, and `merge()` for independent results.
+- Collectors and `create_analyzer()` for many inputs.
 - Your own collectors with `define_collector()`.
 - Presets for design tokens and for everything (`analyze_all`).

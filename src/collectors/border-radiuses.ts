@@ -1,5 +1,5 @@
 import { define_collector } from '../engine/define-collector.js'
-import { create_context_counter, merge_context_counts } from '../engine/counter.js'
+import { create_context_counter } from '../engine/counter.js'
 import type { CollectorDef, ContextCountOptions, ContextCountResult } from '../engine/types.js'
 import { get_context_property } from './shared.js'
 import { border_radius_properties } from '../properties/property-utils.js'
@@ -24,5 +24,5 @@ export function border_radiuses(
 			},
 			result: () => counter.result(),
 		}
-	}, merge_context_counts)
+	})
 }

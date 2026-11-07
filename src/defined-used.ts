@@ -44,15 +44,3 @@ export class DefinedUsed {
 		}
 	}
 }
-
-/** Combine two results: what is defined or used anywhere counts, unused/unknown are recomputed */
-export function merge_defined_used(a: DefinedUsedResult, b: DefinedUsedResult): DefinedUsedResult {
-	const defined = new Set([...a.defined, ...b.defined])
-	const used = new Set([...a.used, ...b.used])
-	return {
-		defined: [...defined],
-		used: [...used],
-		unused: [...defined].filter((name) => !used.has(name)),
-		unknown: [...used].filter((name) => !defined.has(name)),
-	}
-}

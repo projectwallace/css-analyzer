@@ -109,9 +109,6 @@ type ValueSubscription = {
 	enter: (node: CSSNode, ctx: DeclarationContext, kind: ValueKind) => void
 }
 
-/** Results remember which collectors produced them so `merge(a, b)` needs no extra arguments */
-const registry = new WeakMap<object, CollectorMap>()
-
 export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer<C> {
 	const keys = Object.keys(collectors) as (keyof C & string)[]
 	const instances: CollectorInstance<unknown>[] = keys.map((key) => collectors[key]!.create())
@@ -313,7 +310,6 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 			keys.forEach(function (key, index) {
 				result[key] = instances[index]!.result()
 			})
-			registry.set(result, collectors)
 			return result as ResultOf<C>
 		},
 	}
@@ -327,26 +323,4 @@ export function analyze<C extends CollectorMap>(
 	options?: AddOptions,
 ): ResultOf<C> {
 	return create_analyzer(collectors).add(input, options).result()
-}
-
-/**
- * Combine two results that were computed independently (workers, separate pages, coverage runs).
- * Pass `collectors` explicitly for results that lost their origin (e.g. after structuredClone).
- */
-export function merge<R extends object>(a: R, b: R, collectors?: CollectorMap): R {
-	const map = collectors ?? registry.get(a) ?? registry.get(b)
-	if (!map) {
-		throw new Error(
-			'merge(): cannot find the collectors for these results. Pass them as the third argument.',
-		)
-	}
-	const merged: Record<string, unknown> = {}
-	for (const key of Object.keys(map)) {
-		merged[key] = map[key]!.merge(
-			(a as Record<string, unknown>)[key],
-			(b as Record<string, unknown>)[key],
-		)
-	}
-	registry.set(merged, map)
-	return merged as R
 }

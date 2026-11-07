@@ -158,7 +158,6 @@ export type CollectorInstance<T> = {
 
 export type CollectorDef<T> = {
 	create(): CollectorInstance<T>
-	merge(a: T, b: T): T
 }
 
 // oxlint-disable-next-line no-explicit-any
