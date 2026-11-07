@@ -51,7 +51,7 @@ test('result() is a stable snapshot', () => {
 })
 
 test('context counter counts per context', () => {
-	const counter = create_context_counter()
+	const counter = create_context_counter({ contexts: true })
 	counter.add('red', 'color', at)
 	counter.add('red', 'background-color', at)
 	counter.add('blue', 'color', at)
@@ -88,9 +88,9 @@ test('merge_counts does not mutate its inputs', () => {
 })
 
 test('merge_context_counts merges contexts', () => {
-	const a = create_context_counter()
+	const a = create_context_counter({ contexts: true })
 	a.add('red', 'color', at)
-	const b = create_context_counter()
+	const b = create_context_counter({ contexts: true })
 	b.add('red', 'color', at)
 	b.add('red', 'fill', at)
 
@@ -106,4 +106,11 @@ test('summarize derives the uniqueness ratio', () => {
 	counter.add('a', at)
 	expect(summarize(counter.result()).uniqueness_ratio).toBe(0.5)
 	expect(summarize(create_counter().result()).uniqueness_ratio).toBe(0)
+})
+
+test('context counter only tracks contexts when asked', () => {
+	const counter = create_context_counter()
+	counter.add('red', 'color', at)
+	expect(counter.result().total).toBe(1)
+	expect(counter.result().by_context.size).toBe(0)
 })

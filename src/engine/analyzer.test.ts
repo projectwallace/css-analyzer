@@ -331,3 +331,63 @@ test('CollectorInstance can be typed standalone', () => {
 	const instance: CollectorInstance<number> = { result: () => 1 }
 	expect(instance.result()).toBe(1)
 })
+
+test('value handlers learn the kind of node they got', () => {
+	const kinds: string[] = []
+	const kinds_collector = define_collector<number>(
+		() => ({
+			value: {
+				types: ['hash', 'function', 'dimension', 'identifier'],
+				enter(_node, _ctx, kind) {
+					kinds.push(kind)
+				},
+			},
+			result: () => 0,
+		}),
+		(a) => a,
+	)
+	analyze('a { margin: 1px solid; color: #fff; background: url(a.png), linear-gradient(red) }', {
+		kinds_collector,
+	})
+	expect(kinds).toEqual(['dimension', 'identifier', 'hash', 'function', 'identifier'])
+})
+
+test('clean_value_text drops IE hacks and is undefined for global keywords', () => {
+	const seen: (string | undefined)[] = []
+	const clean = define_collector<number>(
+		() => ({
+			parse: { values: true },
+			declaration(_node, ctx) {
+				seen.push(ctx.clean_value_text)
+			},
+			result: () => 0,
+		}),
+		(a) => a,
+	)
+	analyze('a { width: 1px\\9; --x: 1px\\9; color: inherit; margin: 0 }', { clean })
+	expect(seen).toEqual(['1px', '1px\\9', undefined, '0'])
+})
+
+test('font_shorthand is split once and is null for everything else', () => {
+	const seen: unknown[] = []
+	const shorthand = define_collector<number>(
+		() => ({
+			parse: { values: true },
+			declaration(_node, ctx) {
+				seen.push(ctx.font_shorthand, ctx.font_shorthand)
+			},
+			result: () => 0,
+		}),
+		(a) => a,
+	)
+	analyze('a { font: 12px/1.5 Arial; color: red; font: caption }', { shorthand })
+	expect(seen[0]).toBe(seen[1])
+	expect(seen[0]).toEqual({
+		font_size: '12px',
+		line_height: '1.5',
+		font_family: 'Arial',
+		keywords: [],
+	})
+	expect(seen[2]).toBeNull()
+	expect(seen[4]).toBeNull()
+})

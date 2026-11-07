@@ -18,6 +18,7 @@ import {
 	walk,
 	SKIP,
 	is_raw,
+	is_operator,
 	STYLESHEET,
 	STYLE_RULE,
 	AT_RULE,
@@ -239,4 +240,14 @@ export function as_selectors(input: Input): AstNode[] {
 /** Nodes of an at-rule prelude. A string is parsed as the prelude of the at-rule called `name`. */
 export function as_prelude(name: string, input: Input): AstNode[] {
 	return typeof input === 'string' ? parse_atrule_prelude(name, input) : [input]
+}
+
+/** `name` of identifiers, functions, at-rules, ... (empty string if the node has none) */
+export function get_name(node: AstNode): string {
+	return (node as { name?: string }).name ?? ''
+}
+
+/** The items of a comma/slash separated value, without the separators */
+export function get_list_items(value: AstNode): AstNode[] {
+	return Array.from(value as Value).filter((child) => !is_operator(child))
 }
