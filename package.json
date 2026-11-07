@@ -31,12 +31,17 @@
 		"dist"
 	],
 	"type": "module",
+	"sideEffects": false,
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
 			"default": "./dist/index.js"
+		},
+		"./next": {
+			"types": "./dist/engine/index.d.ts",
+			"default": "./dist/engine/index.js"
 		},
 		"./selectors": {
 			"types": "./dist/selectors/index.d.ts",
