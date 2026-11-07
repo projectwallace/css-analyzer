@@ -1,4 +1,5 @@
 import { create_counter, merge_counts } from '../engine/counter.js'
+import { without_sequence } from './shared.js'
 import { define_collector } from '../engine/define-collector.js'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.js'
 
@@ -17,8 +18,8 @@ export type DeclarationsResult = CountResult & {
 export function declarations(options: CountOptions = {}): CollectorDef<DeclarationsResult> {
 	return define_collector<DeclarationsResult>(
 		function init() {
-			const texts = create_counter(options)
-			const complexity = create_counter(options)
+			const texts = create_counter(without_sequence(options))
+			const complexity = create_counter(without_sequence(options))
 			const nesting = create_counter(options)
 			let importants = 0
 			let importants_in_keyframes = 0

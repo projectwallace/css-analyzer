@@ -17,6 +17,8 @@ export type CountResult = {
 	total: number
 	total_unique: number
 	unique: Map<string, CountEntry>
+	/** Every counted item in the order it was found. Only present with `{ sequence: true }`. */
+	sequence?: string[]
 }
 
 export type ContextCountResult = CountResult & {
@@ -25,11 +27,18 @@ export type ContextCountResult = CountResult & {
 
 export type CountOptions = {
 	locations?: boolean
+	/** Also keep every counted item in order (`result.sequence`). Costs memory; off by default. */
+	sequence?: boolean
 }
 
 export type ContextCountOptions = CountOptions & {
 	/** Also count per context (e.g. per property). Without it `by_context` stays empty. */
 	contexts?: boolean
+	/**
+	 * How properties are named in `by_context`: `normalized` (default: lowercase, no vendor prefix or hack
+	 * character, so `-webkit-box-shadow` is `box-shadow`) or `as_written`.
+	 */
+	property?: 'normalized' | 'as_written'
 }
 
 /** Facts and structure about the node that is currently visited */

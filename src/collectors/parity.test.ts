@@ -1,6 +1,7 @@
 import { test, expect, describe } from 'vitest'
 import { analyze as analyze_legacy } from '../index.js'
 import { analyze } from '../engine/analyzer.js'
+import { stylesheet_fixture as fixture } from '../test-fixture.js'
 import { basename } from '../properties/property-utils.js'
 import { summarize_numbers } from '../engine/summary.js'
 import type { CountResult } from '../engine/types.js'
@@ -73,46 +74,6 @@ function defined_used(result: {
 		unknown: result.unknown,
 	}
 }
-
-const fixture = `@charset "UTF-8";
-@import url("a.css") layer(base) supports(display: grid) screen and (min-width: 40em);
-@import "b.css";
-@layer reset, base;
-@layer base { a { color: red } }
-@layer { b { color: blue } }
-@property --registered { syntax: "<color>"; inherits: false; initial-value: red }
-@function --double(--x) { result: calc(var(--x) * 2) }
-@scope (.card) to (.content) { img { border: 1px solid } }
-@font-face { font-family: "Face"; src: url(data:font/woff2;base64,AAAA) format("woff2"); font-display: swap }
-@font-face { font-family: "Two"; src: url(two.woff2) }
-@container sidebar (min-width: 400px) { .c { color: green } }
-@container (min-width: 10px) { .c2 { color: green } }
-@supports (-webkit-appearance: none) { .s { display: -webkit-box } }
-@supports (display: grid) and (not (display: inline)) { .s2 { display: Grid } }
-@media screen and (min-width: 40em) and (max-width: 60em) { .m { margin: 0 } }
-@media \\0screen { .hack { color: red } }
-@media (-ms-high-contrast: none) { .hack2 { color: red } }
-@-webkit-keyframes pulse { from { opacity: 0 } to { opacity: 1 } }
-@keyframes pulse { 0% { opacity: 0 } 50% { opacity: .5 !important } 100% { opacity: 1 } }
-@keyframes "unused" { from { top: 0 } }
-
-:root { --brand: #f00; --unused: 1px; --imp: red !important; --used: 2px }
-/* a comment */
-html, body { margin: 0; padding: 0 0 0 0; color: var(--brand); width: calc(var(--used) + var(--missing)) }
-.card, ul li:nth-child(2n+1) > a[href^="http"]:hover::before { color: red\\9; *zoom: 1; _height: 1px }
-#id.cls:not(.x, #y) ~ my-element + x-foo::-webkit-scrollbar { -webkit-transition: all 1s; transition: all 1s ease }
-[role="button"], [aria-hidden=true], [data-x] { filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#80000000'); background: -webkit-linear-gradient(red, blue) }
-.empty {}
-.parent { color: red; .child { color: blue; &:hover { color: green } } }
-.shadow { text-shadow: 0 0 1px #000, 1px 1px red; box-shadow: none; display: none; display: FLEX; display: var(--d) }
-.units { width: 10PX; height: 2.5em; margin: -1rem 5% 0 auto; transform: rotate(45deg) translate(1Q) }
-.anim { animation: spin 1s ease-in-out infinite, "quoted name" 2s; animation-name: pulse, fade; transition: opacity 1S, transform 2s inherit }
-.anchor { anchor-name: --a, --b; position-anchor: --a; top: anchor(--b top); width: anchor-size(--missing width) }
-.contain { container-name: sidebar main; container: layout / inline-size; container-type: size }
-.kw { color: inherit; font: inherit; border: initial; width: AUTO }
-.important { color: red !important; margin: 0!IMPORTANT; padding: 1px !ie }
-.bg { background: url(data:image/gif;base64,R0lGODlhAQABAAAAACw=) no-repeat, url("x.png"), url(data:image/svg+xml;utf8,<svg></svg>) }
-`
 
 describe('parity of all remaining 9.x metrics', () => {
 	const legacy = analyze_legacy(fixture)

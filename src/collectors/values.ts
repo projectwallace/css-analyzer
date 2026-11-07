@@ -17,6 +17,7 @@ import {
 	NO_VALUE_WALK,
 	define_counting_collector,
 	get_animation_names,
+	get_context_property,
 	lowercase_unless_var,
 } from './shared.js'
 
@@ -67,7 +68,11 @@ export function units(options: ContextCountOptions = {}): CollectorDef<ContextCo
 				types: ['dimension'],
 				enter(node, ctx) {
 					if (NO_VALUE_WALK.has(ctx.property)) return
-					counter.add(get_unit(node).toLowerCase(), ctx.property, ctx.at(node))
+					counter.add(
+						get_unit(node).toLowerCase(),
+						get_context_property(ctx, options.property),
+						ctx.at(node),
+					)
 				},
 			},
 			result: () => counter.result(),
