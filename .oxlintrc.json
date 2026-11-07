@@ -4,5 +4,38 @@
 		"no-null": "allow",
 		"no-warning-comments": "allow",
 		"max-depth": ["warn", 6]
-	}
+	},
+	"overrides": [
+		{
+			"files": ["src/engine/**/*.ts", "src/adapter/**/*.ts"],
+			"rules": {
+				"prefer-const": "error",
+				"no-var": "error",
+				"func-style": [
+					"error",
+					"declaration",
+					{
+						"allowArrowFunctions": false
+					}
+				]
+			}
+		},
+		{
+			"files": ["src/engine/**/*.ts"],
+			"excludeFiles": ["src/engine/**/*.test.ts"],
+			"rules": {
+				"no-restricted-imports": [
+					"error",
+					{
+						"patterns": [
+							{
+								"group": ["@projectwallace/css-parser", "@projectwallace/css-parser/*"],
+								"message": "Only src/adapter/css-parser.ts may import the parser. Use the adapter."
+							}
+						]
+					}
+				]
+			}
+		}
+	]
 }
