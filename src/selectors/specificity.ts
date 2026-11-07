@@ -128,7 +128,9 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 							// Calculate specificity for parts before the first combinator
 							let childPart = childSelector.first_child
 							while (childPart) {
-								if (is_combinator(childPart)) break
+								if (is_combinator(childPart)) {
+									break
+								}
 
 								// Calculate contribution from this part
 								const partSpecificity = calculateForAST({
@@ -174,7 +176,9 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 							// Calculate specificity for parts before the first combinator
 							let childPart = childSelector.first_child
 							while (childPart) {
-								if (is_combinator(childPart)) break
+								if (is_combinator(childPart)) {
+									break
+								}
 
 								// Calculate contribution from this part
 								const partSpecificity = calculateForAST({

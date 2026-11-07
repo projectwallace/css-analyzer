@@ -241,7 +241,9 @@ test('analyzes animations/transitions with value lists', () => {
 test('emits name for custom animation name identifier', () => {
 	const names: string[] = []
 	analyzeAnimation(parse_value('slide-in 300ms ease-out forwards'), (item) => {
-		if (item.type === 'name') names.push(item.value.text)
+		if (item.type === 'name') {
+			names.push(item.value.text)
+		}
 	})
 	expect(names).toEqual(['slide-in'])
 })
@@ -249,7 +251,9 @@ test('emits name for custom animation name identifier', () => {
 test('emits name for each animation in a value list', () => {
 	const names: string[] = []
 	analyzeAnimation(parse_value('slide-in 1s, fade-out 2s'), (item) => {
-		if (item.type === 'name') names.push(item.value.text)
+		if (item.type === 'name') {
+			names.push(item.value.text)
+		}
 	})
 	expect(names).toEqual(['slide-in', 'fade-out'])
 })
@@ -258,7 +262,9 @@ test('does not emit name for animation direction keywords', () => {
 	const names: string[] = []
 	for (const kw of ['normal', 'reverse', 'alternate', 'alternate-reverse']) {
 		analyzeAnimation(parse_value(`my-anim 1s ${kw}`), (item) => {
-			if (item.type === 'name') names.push(item.value.text)
+			if (item.type === 'name') {
+				names.push(item.value.text)
+			}
 		})
 	}
 	expect(names).toEqual(['my-anim', 'my-anim', 'my-anim', 'my-anim'])
@@ -268,7 +274,9 @@ test('does not emit name for animation fill-mode keywords', () => {
 	const names: string[] = []
 	for (const kw of ['forwards', 'backwards', 'both']) {
 		analyzeAnimation(parse_value(`my-anim 1s ${kw}`), (item) => {
-			if (item.type === 'name') names.push(item.value.text)
+			if (item.type === 'name') {
+				names.push(item.value.text)
+			}
 		})
 	}
 	expect(names).toEqual(['my-anim', 'my-anim', 'my-anim'])
@@ -278,7 +286,9 @@ test('does not emit name for animation play-state keywords', () => {
 	const names: string[] = []
 	for (const kw of ['running', 'paused']) {
 		analyzeAnimation(parse_value(`my-anim 1s ${kw}`), (item) => {
-			if (item.type === 'name') names.push(item.value.text)
+			if (item.type === 'name') {
+				names.push(item.value.text)
+			}
 		})
 	}
 	expect(names).toEqual(['my-anim', 'my-anim'])
@@ -287,7 +297,9 @@ test('does not emit name for animation play-state keywords', () => {
 test('does not emit name for infinite iteration-count', () => {
 	const names: string[] = []
 	analyzeAnimation(parse_value('my-anim 1s infinite'), (item) => {
-		if (item.type === 'name') names.push(item.value.text)
+		if (item.type === 'name') {
+			names.push(item.value.text)
+		}
 	})
 	expect(names).toEqual(['my-anim'])
 })
@@ -304,7 +316,9 @@ test('does not emit name for timing-function keywords', () => {
 		'step-end',
 	]) {
 		analyzeAnimation(parse_value(`my-anim 1s ${kw}`), (item) => {
-			if (item.type === 'name') names.push(item.value.text)
+			if (item.type === 'name') {
+				names.push(item.value.text)
+			}
 		})
 	}
 	expect(names).toEqual([
@@ -321,7 +335,9 @@ test('does not emit name for timing-function keywords', () => {
 test('does not emit name for none keyword', () => {
 	const names: string[] = []
 	analyzeAnimation(parse_value('none'), (item) => {
-		if (item.type === 'name') names.push(item.value.text)
+		if (item.type === 'name') {
+			names.push(item.value.text)
+		}
 	})
 	expect(names).toEqual([])
 })
@@ -329,7 +345,9 @@ test('does not emit name for none keyword', () => {
 test('emits name for dashed-ident animation names', () => {
 	const names: string[] = []
 	analyzeAnimation(parse_value('--my-name 1s ease-in'), (item) => {
-		if (item.type === 'name') names.push(item.value.text)
+		if (item.type === 'name') {
+			names.push(item.value.text)
+		}
 	})
 	expect(names).toEqual(['--my-name'])
 })
@@ -337,7 +355,9 @@ test('emits name for dashed-ident animation names', () => {
 test('emits name for quoted (string) animation names', () => {
 	const names: string[] = []
 	analyzeAnimation(parse_value('"slide in" 300ms ease-out'), (item) => {
-		if (item.type === 'name') names.push(item.value.text)
+		if (item.type === 'name') {
+			names.push(item.value.text)
+		}
 	})
 	expect(names).toEqual(['"slide in"'])
 })
@@ -345,7 +365,9 @@ test('emits name for quoted (string) animation names', () => {
 test('emits name for each quoted animation in a value list', () => {
 	const names: string[] = []
 	analyzeAnimation(parse_value('"slide in" 1s, "fade out" 2s'), (item) => {
-		if (item.type === 'name') names.push(item.value.text)
+		if (item.type === 'name') {
+			names.push(item.value.text)
+		}
 	})
 	expect(names).toEqual(['"slide in"', '"fade out"'])
 })
@@ -355,7 +377,9 @@ test('emits name for a quoted keyword used as animation name', () => {
 	const names: string[] = []
 	for (const kw of ['none', 'infinite', 'paused', 'alternate', 'linear']) {
 		analyzeAnimation(parse_value(`"${kw}" 1s ease-in`), (item) => {
-			if (item.type === 'name') names.push(item.value.text)
+			if (item.type === 'name') {
+				names.push(item.value.text)
+			}
 		})
 	}
 	expect(names).toEqual(['"none"', '"infinite"', '"paused"', '"alternate"', '"linear"'])

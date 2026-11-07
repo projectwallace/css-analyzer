@@ -92,7 +92,9 @@ export const border_radius_properties: KeywordSet = new KeywordSet([
  * @see https://github.com/csstree/csstree/blob/master/lib/utils/names.js#L69
  */
 export function isHack(property: string): boolean {
-	if (is_custom(property) || is_vendor_prefixed(property)) return false
+	if (is_custom(property) || is_vendor_prefixed(property)) {
+		return false
+	}
 
 	let code = property.charCodeAt(0)
 
