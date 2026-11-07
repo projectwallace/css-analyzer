@@ -1,62 +1,46 @@
-import {
-	type CSSNode,
-	type Value,
-	is_identifier,
-	is_function,
-	is_url,
-	str_equals,
-	walk,
-} from '@projectwallace/css-parser'
-import { endsWith, unquote } from '../string-utils.js'
+import { is_identifier, is_function, is_url, str_equals, walk } from '@projectwallace/css-parser'
+import { ends_with, unquote } from '../string-utils.js'
+import { type Input, as_value } from '../input.js'
 
 /**
- * @deprecated Will be removed in next major version. Use `isValueBrowserhack()` instead.
- */
-export function isIe9Hack(node: Value): boolean {
-	if (node.has_children) {
-		let last = node.first_child as CSSNode
-		while (last.has_next) {
-			last = last.next_sibling
-		}
-		return is_identifier(last) && endsWith('\\9', last.text)
-	}
-	return false
-}
-
-/**
- * Is a CSS value a browserhack?
+ * Find the browserhacks in a CSS value: `progid:`, `\9`, `\7`, `alpha()`, `expression()`, `.htc`
  *
  * Browserhacks sourced from:
  * - https://browserhacks.com/
  * - https://www.alwaystwisted.com/relicss/old-css
  */
-export function isValueBrowserhack(node: Value, on_hack: (hack: string) => void): void {
-	let text = node.text
+export function get_value_browserhacks(input: Input): string[] {
+	const node = as_value(input)
+	const hacks: string[] = []
+	const text = node.text
 
 	// filter: progid:DXImageTransform.Microsoft.gradient(...) — plain or within quotes
-	if (/progid:/i.test(node.text)) {
-		on_hack('progid:')
+	if (/progid:/i.test(text)) {
+		hacks.push('progid:')
 	}
 
 	if (text.endsWith('\\9')) {
-		on_hack('\\9')
+		hacks.push('\\9')
 	}
 
 	if (text.endsWith('\\7')) {
-		on_hack('\\7')
+		hacks.push('\\7')
 	}
 
 	// alpha(), expression(), and behavior .htc hacks
 	walk(node, function (child) {
 		if (is_function(child)) {
-			if (str_equals('alpha', child.name)) {
-				on_hack('alpha()')
-			} else if (str_equals('expression', child.name)) {
-				on_hack('expression()')
+			const name = child.name
+			if (str_equals('alpha', name)) {
+				hacks.push('alpha()')
+			} else if (str_equals('expression', name)) {
+				hacks.push('expression()')
 			}
 		}
-		if (is_url(child) && endsWith('.htc', unquote(child.value ?? ''))) {
-			on_hack('.htc')
+		if (is_url(child) && ends_with('.htc', unquote(child.value ?? ''))) {
+			hacks.push('.htc')
 		}
 	})
+
+	return hacks
 }

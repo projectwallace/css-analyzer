@@ -3,6 +3,9 @@
 	"rules": {
 		"no-null": "allow",
 		"no-warning-comments": "allow",
-		"max-depth": ["warn", 6]
+		"max-depth": ["warn", 6],
+		"prefer-const": "error",
+		"no-var": "error",
+		"func-style": ["error", "declaration", { "allowArrowFunctions": false }]
 	}
 }
