@@ -113,6 +113,9 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 				if (needs_declarations) visit_declaration(node)
 				// Value nodes are handled by the single value walk above
 				return true
+			case 'supports_declaration':
+				// `@supports (display: grid)`: a condition, not a declaration
+				return true
 			case 'rule':
 				controller.set_node(node)
 				for (const handler of rule_handlers) handler(node, ctx as Context)

@@ -56,6 +56,10 @@ export type StylesheetContext = Context & {
 export type DeclarationContext = Context & {
 	/** Normalized property: lowercased, without vendor prefix or hack character (custom properties untouched) */
 	readonly property: string
+	/** Property as written (`-WEBKIT-Transition`) */
+	readonly raw_property: string
+	/** Location of the property name only */
+	readonly property_loc: Location
 	readonly is_custom: boolean
 	readonly is_important: boolean
 	readonly is_browserhack: boolean
