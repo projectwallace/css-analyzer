@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
+import { analyze, merge } from '../engine/analyzer.js'
 import { plain, series } from '../test-utils.js'
 import { summarize_numbers } from '../engine/summary.js'
 import { atrules } from './atrules.js'
@@ -1113,4 +1113,30 @@ test('tracks nesting depth', () => {
 		},
 	}
 	expect(actual).toEqual(expected)
+})
+
+test('tracks registered custom properties as defined (@property) and used (var())', () => {
+	const css = `
+		@property --a { syntax: '<color>'; inherits: false; initial-value: red }
+		@property --b { syntax: '<length>'; inherits: false; initial-value: 0px }
+		.x { color: var(--a); width: calc(var(--c) + 1px); font: var(--d, 12px) serif }
+	`
+	const { result } = analyze(css, { result: atrules() })
+
+	expect(result.properties.total).toBe(2)
+	expect(result.properties.defined).toEqual(['--a', '--b'])
+	expect(result.properties.used).toEqual(['--a', '--c', '--d'])
+	expect(result.properties.unused).toEqual(['--b'])
+	expect(result.properties.unknown).toEqual(['--c', '--d'])
+})
+
+test('registered custom property tracking merges across files', () => {
+	const collectors = { result: atrules() }
+	const merged = merge(
+		analyze('@property --a { syntax: "*"; inherits: false }', collectors),
+		analyze('.x { color: var(--a) }', collectors),
+	)
+	expect(merged.result.properties.defined).toEqual(['--a'])
+	expect(merged.result.properties.unused).toEqual([])
+	expect(merged.result.properties.unknown).toEqual([])
 })

@@ -63,8 +63,9 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 			return {
 				parse: { values: true, atrule_preludes: true },
 				atrule(node) {
-					if (basename(node.name) === 'property' && node.has_prelude) {
-						custom_tracking.define(node.prelude.text)
+					const prelude = node.has_prelude ? node.prelude : undefined
+					if (prelude && basename(node.name) === 'property') {
+						custom_tracking.define(prelude.text)
 					}
 				},
 				declaration(_node, ctx) {
@@ -102,8 +103,9 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 					}
 					if (ctx.property === 'anchor-name') {
 						for (const item of get_list_items(ctx.value!)) {
-							if (is_identifier(item) && is_custom_name(item.text)) {
-								anchor_tracking.define(item.text)
+							const text = is_identifier(item) ? item.text : undefined
+							if (text !== undefined && is_custom_name(text)) {
+								anchor_tracking.define(text)
 							}
 						}
 					} else if (ctx.property === 'position-anchor') {

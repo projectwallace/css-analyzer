@@ -35,6 +35,8 @@ export function create_context(): ContextController {
 	let css = ''
 	let node: CSSNode | undefined
 	let property_cache: string | undefined
+	let raw_property_cache: string | undefined
+	let value_text_cache: string | undefined
 	let value_node: Value | undefined
 	let value_loaded = false
 	let clean_loaded = false
@@ -48,16 +50,13 @@ export function create_context(): ContextController {
 	let depth = 0
 
 	function get_location(target: CSSNode): Location {
-		const loc: Location = {
+		return {
 			line: target.line,
 			column: target.column,
 			offset: target.start,
 			length: target.length,
+			source,
 		}
-		if (source !== undefined) {
-			loc.source = source
-		}
-		return loc
 	}
 
 	const view: LocationSource = {
@@ -97,7 +96,8 @@ export function create_context(): ContextController {
 			return property_cache
 		},
 		get raw_property() {
-			return (node as Declaration).property ?? ''
+			raw_property_cache ??= (node as Declaration).property ?? ''
+			return raw_property_cache
 		},
 		get property_loc() {
 			return { ...get_location(node!), length: ctx.raw_property.length }
@@ -115,7 +115,8 @@ export function create_context(): ContextController {
 			return (node as Declaration).is_vendor_prefixed
 		},
 		get value_text() {
-			return (node as Declaration).value?.text ?? ''
+			value_text_cache ??= (node as Declaration).value?.text ?? ''
+			return value_text_cache
 		},
 		get clean_value_text() {
 			if (!clean_loaded) {
@@ -168,6 +169,8 @@ export function create_context(): ContextController {
 		set_node(next) {
 			node = next
 			property_cache = undefined
+			raw_property_cache = undefined
+			value_text_cache = undefined
 			value_node = undefined
 			value_loaded = false
 			clean_loaded = false

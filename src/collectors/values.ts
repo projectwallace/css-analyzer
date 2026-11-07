@@ -120,8 +120,9 @@ export function keywords(options: CountOptions = {}): CollectorDef<CountResult> 
 					if (global_keywords.has(ctx.value_text)) {
 						return
 					}
-					if (global_keywords.has(node.text)) {
-						counter.add(node.text.toLowerCase(), ctx.at(node))
+					const text = node.text
+					if (global_keywords.has(text)) {
+						counter.add(text.toLowerCase(), ctx.at(node))
 					}
 				},
 			},

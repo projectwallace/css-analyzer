@@ -2,6 +2,7 @@ import { is_url, str_starts_with } from '@projectwallace/css-parser'
 import { define_collector } from '../engine/define-collector.js'
 import type { CollectorDef, Location } from '../engine/types.js'
 import { unquote } from '../string-utils.js'
+import { concat_locations } from './shared.js'
 import { get_embed_type } from '../stylesheet/stylesheet.js'
 
 export type EmbeddedType = { count: number; size: number; locations?: Location[] }
@@ -69,7 +70,8 @@ export function stylesheet(options: StylesheetOptions = {}): CollectorDef<Styles
 						entry.count++
 						entry.size += embed.length
 						if (locations) {
-							;(entry.locations ??= []).push(ctx.at(node).loc)
+							entry.locations ??= []
+							entry.locations.push(ctx.at(node).loc)
 						}
 						types.set(type, entry)
 					},
@@ -84,7 +86,7 @@ export function stylesheet(options: StylesheetOptions = {}): CollectorDef<Styles
 						types: new Map(
 							[...types].map(([type, entry]) => [
 								type,
-								{ ...entry, ...(entry.locations ? { locations: entry.locations.slice() } : {}) },
+								{ count: entry.count, size: entry.size, locations: entry.locations?.slice() },
 							]),
 						),
 					},
@@ -99,13 +101,12 @@ export function stylesheet(options: StylesheetOptions = {}): CollectorDef<Styles
 					if (existing) {
 						existing.count += entry.count
 						existing.size += entry.size
-						if (entry.locations) {
-							existing.locations = [...(existing.locations ?? []), ...entry.locations]
-						}
+						existing.locations = concat_locations(existing.locations, entry.locations)
 					} else {
 						types.set(type, {
-							...entry,
-							...(entry.locations ? { locations: entry.locations.slice() } : {}),
+							count: entry.count,
+							size: entry.size,
+							locations: entry.locations?.slice(),
 						})
 					}
 				}

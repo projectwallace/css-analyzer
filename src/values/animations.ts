@@ -67,11 +67,12 @@ export function analyze_animation(input: Input): AnimationParts {
 			duration_found = true
 			parts.durations.push(node.text)
 		} else if (is_identifier(node)) {
-			if (TIMING_KEYWORDS.has(node.name)) {
+			const name = node.name
+			if (TIMING_KEYWORDS.has(name)) {
 				parts.timing_functions.push(node.text)
-			} else if (keywords.has(node.name)) {
+			} else if (keywords.has(name)) {
 				parts.keywords.push(node.text)
-			} else if (!ANIMATION_NON_NAME_KEYWORDS.has(node.name)) {
+			} else if (!ANIMATION_NON_NAME_KEYWORDS.has(name)) {
 				parts.names.push(node.text)
 			}
 		} else if (is_function(node) && TIMING_FUNCTION_VALUES.has(node.name)) {

@@ -16,7 +16,7 @@ export type Location = {
 	column: number
 	offset: number
 	length: number
-	/** File name, only present when the input was added with `{ source }` */
+	/** File name, `undefined` unless the input was added with `{ source }` */
 	source?: string
 }
 

@@ -15,7 +15,7 @@ export function get_value_browserhacks(input: Input): string[] {
 	const text = node.text
 
 	// filter: progid:DXImageTransform.Microsoft.gradient(...) — plain or within quotes
-	if (/progid:/i.test(node.text)) {
+	if (/progid:/i.test(text)) {
 		hacks.push('progid:')
 	}
 
@@ -30,9 +30,10 @@ export function get_value_browserhacks(input: Input): string[] {
 	// alpha(), expression(), and behavior .htc hacks
 	walk(node, function (child) {
 		if (is_function(child)) {
-			if (str_equals('alpha', child.name)) {
+			const name = child.name
+			if (str_equals('alpha', name)) {
 				hacks.push('alpha()')
-			} else if (str_equals('expression', child.name)) {
+			} else if (str_equals('expression', name)) {
 				hacks.push('expression()')
 			}
 		}
