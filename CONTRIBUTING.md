@@ -29,3 +29,8 @@ Write unit tests: small, fast and next to the code they test.
 - Test a utility by calling it directly, with text (and with a parsed node when that matters). Prefer `test.each` tables over long fixtures.
 - Use `plain()` and `series()` from `src/test-utils.ts` to compare count results with `toEqual()`.
 - Integration tests are few and live with the presets: `src/presets/presets.test.ts`.
+
+## Performance
+
+- Avoid repeated CSS node property reads: each `.text`, `.name`, `.column` etc. makes the css-parser node read from its memory arena. Read it once and keep it in a `const`.
+- Compare names case-insensitively with `str_equals('var', node.name)` from `@projectwallace/css-parser`, not with `node.name.toLowerCase() === 'var'`. It does not allocate a new string.
