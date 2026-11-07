@@ -1,5 +1,5 @@
 import { type Dimension, str_index_of } from '@projectwallace/css-parser'
-import { create_context_counter } from '../engine/counter.js'
+import { create_context_counter, merge_context_counts } from '../engine/counter.js'
 import { define_collector } from '../engine/define-collector.js'
 import type {
 	CollectorDef,
@@ -83,7 +83,7 @@ export function units(options: ContextCountOptions = {}): CollectorDef<ContextCo
 			},
 			result: () => counter.result(),
 		}
-	})
+	}, merge_context_counts)
 }
 
 /** Global keywords (`inherit`, `none`, `auto`, ...) used as values, lowercased */

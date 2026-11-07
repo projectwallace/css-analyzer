@@ -9,7 +9,7 @@ import {
 import { analyze_animation } from '../values/animations.js'
 import { keywords } from '../values/values.js'
 import { unquote } from '../string-utils.js'
-import { create_counter } from '../engine/counter.js'
+import { create_counter, merge_counts } from '../engine/counter.js'
 import { define_collector } from '../engine/define-collector.js'
 import type { Counter } from '../engine/counter.js'
 import type {
@@ -18,7 +18,19 @@ import type {
 	CountOptions,
 	CountResult,
 	DeclarationContext,
+	Location,
 } from '../engine/types.js'
+
+/** Join two optional location lists; `undefined` when neither has any */
+export function concat_locations(
+	a: Location[] | undefined,
+	b: Location[] | undefined,
+): Location[] | undefined {
+	if (!a && !b) {
+		return undefined
+	}
+	return (a ?? []).concat(b ?? [])
+}
 
 export type Normalize = 'lowercase' | 'none'
 
@@ -46,7 +58,7 @@ export function define_counting_collector(
 	return define_collector<CountResult>(function init() {
 		const counter = create_counter(options)
 		return { ...setup(counter), result: () => counter.result() }
-	})
+	}, merge_counts)
 }
 
 /** Animation names of an `animation` or `animation-name` declaration (quotes removed) */

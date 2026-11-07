@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { create_counter } from './counter.js'
+import { create_counter, merge_counts } from './counter.js'
 import { summarize_frequencies, summarize_numbers } from './summary.js'
 
 const at = { loc: { line: 1, column: 1, offset: 0, length: 1 } }
@@ -46,6 +46,14 @@ test('an empty count summarizes to zeros', () => {
 		mode: 0,
 		median: 0,
 	})
+})
+
+test('summarizing merged counts equals summarizing all values', () => {
+	const a = [1, 2, 2, 9]
+	const b = [2, 3, 3, 3]
+	expect(summarize_numbers(merge_counts(count(a), count(b)))).toEqual(
+		summarize_numbers(count([...a, ...b])),
+	)
 })
 
 test('summarize_frequencies takes plain frequency maps', () => {

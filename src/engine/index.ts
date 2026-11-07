@@ -1,6 +1,12 @@
-export { analyze, create_analyzer } from './analyzer.js'
+export { analyze, create_analyzer, merge } from './analyzer.js'
 export { define_collector } from './define-collector.js'
-export { create_counter, create_context_counter, summarize } from './counter.js'
+export {
+	create_counter,
+	create_context_counter,
+	merge_counts,
+	merge_context_counts,
+	summarize,
+} from './counter.js'
 export { summarize_frequencies, summarize_numbers, type NumberSummary } from './summary.js'
 export type { Counter, ContextCounter } from './counter.js'
 export type {

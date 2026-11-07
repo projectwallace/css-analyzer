@@ -92,14 +92,19 @@ Use `summarize_numbers(result.sizes)` for min, max, mean, mode, median, range an
 ### Many stylesheets
 
 ```js
-import { create_analyzer } from '@projectwallace/css-analyzer'
+import { create_analyzer, merge, analyze } from '@projectwallace/css-analyzer'
 
 // One analyzer, many inputs. `source` ends up in the locations.
 const analyzer = create_analyzer({ colors: colors({ locations: true }) })
 analyzer.add(css_a, { source: 'a.css' })
 analyzer.add(css_b, { source: 'b.css' })
 analyzer.result()
+
+// Or analyze separately (workers, one per page, ...) and merge later
+const combined = merge(analyze(css_a, collectors), analyze(css_b, collectors))
 ```
+
+Results of `merge()` equal the result of adding both inputs to one analyzer. If a result lost its origin (for example after `structuredClone`), pass the collectors as a third argument: `merge(a, b, collectors)`.
 
 ### Already parsed?
 
@@ -137,20 +142,28 @@ Options (all optional): `locations`, `sequence` (numeric series), `contexts` (`c
 ### Write your own collector
 
 ```js
-import { analyze, define_collector, create_counter } from '@projectwallace/css-analyzer'
+import {
+	analyze,
+	define_collector,
+	create_counter,
+	merge_counts,
+} from '@projectwallace/css-analyzer'
 
 function important_declarations() {
-	return define_collector(function init() {
-		const counter = create_counter()
-		return {
-			declaration(node, ctx) {
-				if (ctx.is_important) counter.add(ctx.property, ctx)
-			},
-			result() {
-				return counter.result()
-			},
-		}
-	})
+	return define_collector(
+		function init() {
+			const counter = create_counter()
+			return {
+				declaration(node, ctx) {
+					if (ctx.is_important) counter.add(ctx.property, ctx)
+				},
+				result() {
+					return counter.result()
+				},
+			}
+		},
+		merge_counts, // how to combine two results
+	)
 }
 
 analyze(css, { important: important_declarations() })

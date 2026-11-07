@@ -105,6 +105,54 @@ export function create_context_counter(options: ContextCountOptions = {}): Conte
 	return { add, result }
 }
 
+export function merge_counts(a: CountResult, b: CountResult): CountResult {
+	const unique = new Map<string, CountEntry>()
+	for (const source of [a.unique, b.unique]) {
+		for (const [item, entry] of source) {
+			const existing = unique.get(item)
+			if (!existing) {
+				unique.set(
+					item,
+					entry.locations
+						? { count: entry.count, locations: entry.locations.slice() }
+						: { count: entry.count },
+				)
+				continue
+			}
+			existing.count += entry.count
+			if (entry.locations) {
+				existing.locations = (existing.locations ?? []).concat(entry.locations)
+			}
+		}
+	}
+	const merged: CountResult = { total: a.total + b.total, total_unique: unique.size, unique }
+	if (a.sequence || b.sequence) {
+		merged.sequence = (a.sequence ?? []).concat(b.sequence ?? [])
+	}
+	return merged
+}
+
+export function merge_context_counts(
+	a: ContextCountResult,
+	b: ContextCountResult,
+): ContextCountResult {
+	const by_context = new Map<string, CountResult>()
+	for (const source of [a.by_context, b.by_context]) {
+		for (const [context, counts] of source) {
+			const existing = by_context.get(context)
+			by_context.set(
+				context,
+				existing ? merge_counts(existing, counts) : merge_counts(counts, empty()),
+			)
+		}
+	}
+	return { ...merge_counts(a, b), by_context }
+}
+
+function empty(): CountResult {
+	return { total: 0, total_unique: 0, unique: new Map() }
+}
+
 /** Derived numbers for a count result. Kept out of the core so unused stats cost nothing. */
 export function summarize(counts: CountResult): { uniqueness_ratio: number } {
 	return {

@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { analyze, create_analyzer } from '../engine/analyzer.js'
+import { analyze, create_analyzer, merge } from '../engine/analyzer.js'
 import { atrules, declarations, rules, selectors, specificity } from './index.js'
 
 const css = `
@@ -34,13 +34,15 @@ test('sequence is off by default and only kept for the numeric series', () => {
 	expect(result.selectors.nesting.sequence).toBeDefined()
 })
 
-test('sequences are joined when inputs are added', () => {
+test('sequences are joined when results are merged or inputs are added', () => {
 	const collectors = { rules: rules({ sequence: true }) }
 	const a = 'a { color: red }'
 	const b = '.b { color: red; margin: 0 }'
 
+	const merged = merge(analyze(a, collectors), analyze(b, collectors))
 	const incremental = create_analyzer(collectors).add(a).add(b).result()
 
+	expect(merged.rules.sizes.sequence).toEqual(['2', '3'])
 	expect(incremental.rules.sizes.sequence).toEqual(['2', '3'])
 })
 

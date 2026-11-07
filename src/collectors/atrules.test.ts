@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { analyze, create_analyzer } from '../engine/analyzer.js'
+import { analyze, merge } from '../engine/analyzer.js'
 import { plain, series } from '../test-utils.js'
 import { summarize_numbers } from '../engine/summary.js'
 import { atrules } from './atrules.js'
@@ -1130,13 +1130,13 @@ test('tracks registered custom properties as defined (@property) and used (var()
 	expect(result.properties.unknown).toEqual(['--c', '--d'])
 })
 
-test('registered custom property tracking works across added inputs', () => {
-	const analyzer = create_analyzer({ result: atrules() })
-	analyzer.add('@property --a { syntax: "*"; inherits: false }')
-	analyzer.add('.x { color: var(--a) }')
-	const { result } = analyzer.result()
-
-	expect(result.properties.defined).toEqual(['--a'])
-	expect(result.properties.unused).toEqual([])
-	expect(result.properties.unknown).toEqual([])
+test('registered custom property tracking merges across files', () => {
+	const collectors = { result: atrules() }
+	const merged = merge(
+		analyze('@property --a { syntax: "*"; inherits: false }', collectors),
+		analyze('.x { color: var(--a) }', collectors),
+	)
+	expect(merged.result.properties.defined).toEqual(['--a'])
+	expect(merged.result.properties.unused).toEqual([])
+	expect(merged.result.properties.unknown).toEqual([])
 })
