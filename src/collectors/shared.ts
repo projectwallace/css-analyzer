@@ -62,3 +62,16 @@ export function get_animation_names(ctx: DeclarationContext): string[] {
 	}
 	return names
 }
+
+/** Options for counters that only need counts (sequences are for numeric series) */
+export function without_sequence(options: CountOptions): CountOptions {
+	return { locations: options.locations }
+}
+
+/** The property to count under, following the `property` option of context collectors */
+export function get_context_property(
+	ctx: DeclarationContext,
+	mode: 'normalized' | 'as_written' | undefined,
+): string {
+	return mode === 'as_written' ? ctx.raw_property : ctx.property
+}

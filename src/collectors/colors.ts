@@ -13,7 +13,7 @@ import type {
 	CountResult,
 } from '../engine/types.js'
 import { color_functions, color_keywords, named_colors, system_colors } from '../values/colors.js'
-import { NO_VALUE_WALK, type Normalize } from './shared.js'
+import { NO_VALUE_WALK, get_context_property, type Normalize } from './shared.js'
 
 export type ColorsOptions = ContextCountOptions & {
 	/** `lowercase` (default) lowercases hex colors and color names. Color functions are always kept as written. */
@@ -44,6 +44,7 @@ export function colors(options: ColorsOptions = {}): CollectorDef<ColorsResult> 
 						const property = ctx.property
 						if (NO_VALUE_WALK.has(property)) return
 						const at = ctx.at(node)
+						const context = get_context_property(ctx, options.property)
 						const text = node.text
 
 						if (kind === 'hash') {
@@ -51,7 +52,7 @@ export function colors(options: ColorsOptions = {}): CollectorDef<ColorsResult> 
 							// Exclude the # and any IE hack (\9, \7) from the hex length
 							const hex_length =
 								text.length - (text.endsWith('\\9') || text.endsWith('\\7') ? 3 : 1)
-							counter.add(normalize(text), property, at)
+							counter.add(normalize(text), context, at)
 							formats.add('hex' + hex_length, at)
 						} else if (kind === 'identifier') {
 							// Font names like "Black" are not colors
@@ -60,19 +61,19 @@ export function colors(options: ColorsOptions = {}): CollectorDef<ColorsResult> 
 							if (text.length > 20 || text.length < 3) return
 
 							if (color_keywords.has(text)) {
-								counter.add(normalize(text), property, at)
+								counter.add(normalize(text), context, at)
 								formats.add(text.toLowerCase(), at)
 							} else if (named_colors.has(text)) {
-								counter.add(normalize(text), property, at)
+								counter.add(normalize(text), context, at)
 								formats.add('named', at)
 							} else if (system_colors.has(text)) {
-								counter.add(normalize(text), property, at)
+								counter.add(normalize(text), context, at)
 								formats.add('system', at)
 							}
 						} else {
 							const name = get_name(node)
 							if (color_functions.has(name)) {
-								counter.add(text, property, at)
+								counter.add(text, context, at)
 								formats.add(name.toLowerCase(), at)
 							}
 						}

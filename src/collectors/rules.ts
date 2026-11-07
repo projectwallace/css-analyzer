@@ -13,7 +13,10 @@ export type RulesResult = {
 	declarations: CountResult
 }
 
-/** Rules (keyframe steps are not rules): how many, how big, how nested. */
+/**
+ * Rules (keyframe steps are not rules): how many, how big, how nested.
+ * Pass `{ sequence: true }` to also get the numbers in source order (for charts).
+ */
 export function rules(options: CountOptions = {}): CollectorDef<RulesResult> {
 	return define_collector<RulesResult>(
 		function init() {

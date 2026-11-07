@@ -18,7 +18,7 @@ import type { CollectorDef, CountOptions, CountResult, Location } from '../engin
 import { unquote } from '../string-utils.js'
 import { get_media_browserhacks, get_supports_browserhacks } from '../atrules/atrules.js'
 import { keywords } from '../values/values.js'
-import { get_animation_names } from './shared.js'
+import { get_animation_names, without_sequence } from './shared.js'
 
 export type AtrulesResult = CountResult & {
 	font_faces: {
@@ -60,23 +60,23 @@ const ANIMATION_PROPERTIES = new Set(['animation', 'animation-name'])
 export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult> {
 	return define_collector<AtrulesResult>(
 		function init() {
-			const names = create_counter(options)
-			const imports = create_counter(options)
-			const medias = create_counter(options)
-			const media_browserhacks = create_counter(options)
-			const media_features = create_counter(options)
-			const charsets = create_counter(options)
-			const supports = create_counter(options)
-			const supports_browserhacks = create_counter(options)
-			const keyframes = create_counter(options)
-			const prefixed_keyframes = create_counter(options)
-			const containers = create_counter(options)
-			const container_names = create_counter(options)
-			const layers = create_counter(options)
-			const registered = create_counter(options)
-			const functions = create_counter(options)
-			const scopes = create_counter(options)
-			const complexity = create_counter(options)
+			const names = create_counter(without_sequence(options))
+			const imports = create_counter(without_sequence(options))
+			const medias = create_counter(without_sequence(options))
+			const media_browserhacks = create_counter(without_sequence(options))
+			const media_features = create_counter(without_sequence(options))
+			const charsets = create_counter(without_sequence(options))
+			const supports = create_counter(without_sequence(options))
+			const supports_browserhacks = create_counter(without_sequence(options))
+			const keyframes = create_counter(without_sequence(options))
+			const prefixed_keyframes = create_counter(without_sequence(options))
+			const containers = create_counter(without_sequence(options))
+			const container_names = create_counter(without_sequence(options))
+			const layers = create_counter(without_sequence(options))
+			const registered = create_counter(without_sequence(options))
+			const functions = create_counter(without_sequence(options))
+			const scopes = create_counter(without_sequence(options))
+			const complexity = create_counter(without_sequence(options))
 			const nesting = create_counter(options)
 			const keyframes_tracking = new DefinedUsed()
 			const container_tracking = new DefinedUsed()

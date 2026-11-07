@@ -49,16 +49,20 @@ function to_result(map: Map<string, CountEntry>, total: number): CountResult {
 
 export function create_counter(options: CountOptions = {}): Counter {
 	const locations = options.locations === true
+	const sequence: string[] | undefined = options.sequence === true ? [] : undefined
 	const map = new Map<string, CountEntry>()
 	let total = 0
 
 	function add(item: string, at: LocationSource): void {
 		total++
+		sequence?.push(item)
 		add_to(map, item, at, locations)
 	}
 
 	function result(): CountResult {
-		return to_result(map, total)
+		const counted = to_result(map, total)
+		if (sequence) counted.sequence = sequence.slice()
+		return counted
 	}
 
 	return { add, result }
@@ -115,7 +119,9 @@ export function merge_counts(a: CountResult, b: CountResult): CountResult {
 			}
 		}
 	}
-	return { total: a.total + b.total, total_unique: unique.size, unique }
+	const merged: CountResult = { total: a.total + b.total, total_unique: unique.size, unique }
+	if (a.sequence || b.sequence) merged.sequence = [...(a.sequence ?? []), ...(b.sequence ?? [])]
+	return merged
 }
 
 export function merge_context_counts(

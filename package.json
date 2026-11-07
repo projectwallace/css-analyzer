@@ -75,6 +75,7 @@
 	"scripts": {
 		"lint": "oxlint --config .oxlintrc.json; oxfmt --check",
 		"test": "vitest --coverage",
+		"test:compat": "vitest run --config vitest.compat.config.ts",
 		"check": "tsc --noEmit",
 		"build": "tsdown",
 		"knip": "knip"
