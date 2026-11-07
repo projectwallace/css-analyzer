@@ -18,7 +18,7 @@ import {
 	is_selector,
 	is_combinator,
 } from '@projectwallace/css-parser'
-import { type Input, as_selectors } from '../adapter/css-parser.js'
+import { type Input, as_selectors } from '../input.js'
 
 export type Specificity = [number, number, number]
 

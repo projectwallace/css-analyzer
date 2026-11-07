@@ -1,14 +1,12 @@
 import {
-	type AstNode,
-	type DeclarationFacts,
-	get_atrule_name,
-	get_declaration_facts,
-	get_declaration_value,
-	get_declaration_value_text,
-	get_location,
-	get_raw_property,
-	is_custom_property,
-} from '../adapter/css-parser.js'
+	type Atrule,
+	type CSSNode,
+	type Declaration,
+	type Value,
+	is_custom,
+	is_raw,
+} from '@projectwallace/css-parser'
+import { basename } from '../properties/property-utils.js'
 import {
 	SYSTEM_FONTS,
 	destructure_font_shorthand,
@@ -21,12 +19,11 @@ export type ContextController = {
 	/** One shared, mutable object: valid only during the handler call it is passed to */
 	readonly ctx: DeclarationContext & StylesheetContext
 	begin(source: string | undefined, css: string): void
-	set_node(node: AstNode): void
-	enter_rule(node: AstNode): void
+	set_node(node: CSSNode): void
+	enter_rule(node: CSSNode): void
 	leave_rule(): void
-	enter_atrule(node: AstNode): void
+	enter_atrule(node: CSSNode): void
 	leave_atrule(): void
-	location_of(node: AstNode): Location
 }
 
 /**
@@ -36,28 +33,34 @@ export type ContextController = {
 export function create_context(): ContextController {
 	let source: string | undefined
 	let css = ''
-	let node: AstNode | undefined
-	let facts: DeclarationFacts | undefined
-	let value_node: AstNode | undefined
+	let node: CSSNode | undefined
+	let property_cache: string | undefined
+	let value_node: Value | undefined
 	let value_loaded = false
 	let clean_loaded = false
 	let clean_text: string | undefined
 	let font_loaded = false
 	let font_result: FontShorthand | null = null
-	let view_node: AstNode | undefined
+	let view_node: CSSNode | undefined
 	let keyframes_count = 0
 	const atrule_stack: string[] = []
-	const rule_stack: AstNode[] = []
+	const rule_stack: CSSNode[] = []
 	let depth = 0
 
-	function get_facts(): DeclarationFacts {
-		facts ??= get_declaration_facts(node!)
-		return facts
+	function get_location(target: CSSNode): Location {
+		const loc: Location = {
+			line: target.line,
+			column: target.column,
+			offset: target.start,
+			length: target.length,
+		}
+		if (source !== undefined) loc.source = source
+		return loc
 	}
 
 	const view: LocationSource = {
 		get loc(): Location {
-			return get_location(view_node!, source)
+			return get_location(view_node!)
 		},
 	}
 
@@ -81,35 +84,36 @@ export function create_context(): ContextController {
 			return keyframes_count > 0
 		},
 		get loc() {
-			return get_location(node!, source)
+			return get_location(node!)
 		},
 		at(other) {
 			view_node = other
 			return view
 		},
 		get property() {
-			return get_facts().property
+			property_cache ??= basename(ctx.raw_property)
+			return property_cache
 		},
 		get raw_property() {
-			return get_raw_property(node!)
+			return (node as Declaration).property ?? ''
 		},
 		get property_loc() {
-			return { ...get_location(node!, source), length: get_raw_property(node!).length }
+			return { ...get_location(node!), length: ctx.raw_property.length }
 		},
 		get is_custom() {
-			return is_custom_property(node!)
+			return is_custom(ctx.raw_property)
 		},
 		get is_important() {
-			return get_facts().is_important
+			return (node as Declaration).is_important
 		},
 		get is_browserhack() {
-			return get_facts().is_browserhack
+			return (node as Declaration).is_browserhack
 		},
 		get is_vendor_prefixed() {
-			return get_facts().is_vendor_prefixed
+			return (node as Declaration).is_vendor_prefixed
 		},
 		get value_text() {
-			return get_declaration_value_text(node!)
+			return (node as Declaration).value?.text ?? ''
 		},
 		get clean_value_text() {
 			if (!clean_loaded) {
@@ -139,7 +143,9 @@ export function create_context(): ContextController {
 		},
 		get value() {
 			if (!value_loaded) {
-				value_node = get_declaration_value(node!)
+				// Values that were not parsed (see `parse.values`) are RAW nodes
+				const value = (node as Declaration).value
+				value_node = value && !is_raw(value) ? (value as Value) : undefined
 				value_loaded = true
 			}
 			return value_node
@@ -159,7 +165,7 @@ export function create_context(): ContextController {
 		},
 		set_node(next) {
 			node = next
-			facts = undefined
+			property_cache = undefined
 			value_node = undefined
 			value_loaded = false
 			clean_loaded = false
@@ -174,7 +180,7 @@ export function create_context(): ContextController {
 			depth--
 		},
 		enter_atrule(atrule) {
-			const name = get_atrule_name(atrule)
+			const name = basename((atrule as Atrule).name ?? '')
 			atrule_stack.push(name)
 			if (name === 'keyframes') keyframes_count++
 			depth++
@@ -183,9 +189,6 @@ export function create_context(): ContextController {
 			const name = atrule_stack.pop()
 			if (name === 'keyframes') keyframes_count--
 			depth--
-		},
-		location_of(other) {
-			return get_location(other, source)
 		},
 	}
 }

@@ -12,7 +12,7 @@ export type { Counter, ContextCounter } from './counter.js'
 export type {
 	AddOptions,
 	Analyzer,
-	AstNode,
+	CSSNode,
 	CollectorDef,
 	CollectorInstance,
 	CollectorMap,

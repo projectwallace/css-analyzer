@@ -1,4 +1,11 @@
-import { get_prelude_items, get_selector_parts } from '../adapter/css-parser.js'
+import {
+	is_attribute_selector,
+	is_pseudo_class_selector,
+	is_pseudo_element_selector,
+	is_selector_list,
+	is_type_selector,
+	walk,
+} from '@projectwallace/css-parser'
 import { create_counter, merge_counts } from '../engine/counter.js'
 import { without_sequence } from './shared.js'
 import { define_collector } from '../engine/define-collector.js'
@@ -56,9 +63,9 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 			return {
 				rule(node, ctx) {
 					if (!ctx.in_keyframes) return
-					for (const item of get_prelude_items(node)) {
-						keyframes.add(item.text, ctx.at(item))
-					}
+					const prelude = node.prelude
+					if (!prelude || !is_selector_list(prelude)) return
+					for (const item of prelude) keyframes.add(item.text, ctx.at(item))
 				},
 				selector(node, ctx) {
 					if (ctx.in_keyframes) return
@@ -70,20 +77,19 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 
 					for (const prefix of get_vendor_prefixes(node)) prefixed.add(prefix.toLowerCase(), ctx)
 					for (const item of get_accessibility_selectors(node)) accessibility.add(item, ctx)
-					for (const part of get_selector_parts(node)) {
-						const name = part.name.toLowerCase()
-						if (part.kind === 'attribute') {
-							attributes.add(name, ctx)
-						} else if (part.kind === 'type') {
+					walk(node, function (part) {
+						if (is_attribute_selector(part)) {
+							attributes.add(part.name.toLowerCase(), ctx)
+						} else if (is_type_selector(part)) {
 							if (!part.name.startsWith('--') && part.name.includes('-')) {
-								custom_elements.add(name, ctx)
+								custom_elements.add(part.name.toLowerCase(), ctx)
 							}
-						} else if (part.kind === 'pseudo_class') {
-							pseudo_classes.add(name, ctx)
-						} else {
-							pseudo_elements.add(name, ctx)
+						} else if (is_pseudo_class_selector(part)) {
+							pseudo_classes.add(part.name.toLowerCase(), ctx)
+						} else if (is_pseudo_element_selector(part)) {
+							pseudo_elements.add(part.name.toLowerCase(), ctx)
 						}
-					}
+					})
 					for (const combinator of get_combinators(node)) {
 						const at: LocationSource = {
 							loc:

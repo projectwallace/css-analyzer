@@ -10,7 +10,7 @@ import {
 	is_number,
 	type AnyNode,
 } from '@projectwallace/css-parser'
-import { type Input, as_prelude } from '../adapter/css-parser.js'
+import { type Input, as_prelude } from '../input.js'
 
 function find_hacks(
 	name: string,

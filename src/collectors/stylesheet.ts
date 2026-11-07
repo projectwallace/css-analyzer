@@ -1,6 +1,7 @@
-import { get_data_uri } from '../adapter/css-parser.js'
+import { is_url, str_starts_with } from '@projectwallace/css-parser'
 import { define_collector } from '../engine/define-collector.js'
 import type { CollectorDef, Location } from '../engine/types.js'
+import { unquote } from '../string-utils.js'
 import { get_embed_type } from '../stylesheet/stylesheet.js'
 
 export type EmbeddedType = { count: number; size: number; locations?: Location[] }
@@ -54,8 +55,9 @@ export function stylesheet(options: StylesheetOptions = {}): CollectorDef<Styles
 				value: {
 					types: ['url'],
 					enter(node, ctx) {
-						const embed = get_data_uri(node)
-						if (embed === undefined) return
+						if (!is_url(node)) return
+						const embed = unquote(node.value ?? '')
+						if (!str_starts_with('data:', embed)) return
 						embedded_total++
 						embedded_size += embed.length
 						const type = get_embed_type(embed)

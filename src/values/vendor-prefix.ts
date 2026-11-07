@@ -1,5 +1,5 @@
 import { is_function, is_identifier, walk } from '@projectwallace/css-parser'
-import { type Input, as_value } from '../adapter/css-parser.js'
+import { type Input, as_value } from '../input.js'
 
 /**
  * Find vendor prefixed identifiers and functions in a CSS value.

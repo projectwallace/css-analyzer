@@ -1,4 +1,10 @@
-import { get_list_items, get_name, get_value_kind } from '../adapter/css-parser.js'
+import {
+	type CSSNode,
+	type Value,
+	is_identifier,
+	is_operator,
+	is_string,
+} from '@projectwallace/css-parser'
 import { analyze_animation } from '../values/animations.js'
 import { keywords } from '../values/values.js'
 import { unquote } from '../string-utils.js'
@@ -53,10 +59,9 @@ export function get_animation_names(ctx: DeclarationContext): string[] {
 
 	const names: string[] = []
 	for (const item of get_list_items(ctx.value!)) {
-		const kind = get_value_kind(item)
-		if (kind === 'identifier' && !keywords.has(get_name(item))) {
+		if (is_identifier(item) && !keywords.has(item.name)) {
 			names.push(item.text)
-		} else if (kind === 'string') {
+		} else if (is_string(item)) {
 			names.push(unquote(item.text))
 		}
 	}
@@ -74,4 +79,15 @@ export function get_context_property(
 	mode: 'normalized' | 'as_written' | undefined,
 ): string {
 	return mode === 'as_written' ? ctx.raw_property : ctx.property
+}
+
+/** The items of a comma/slash separated value, without the separators */
+export function get_list_items(value: Value): CSSNode[] {
+	return Array.from(value).filter((child) => !is_operator(child))
+}
+
+/** Text of the first child when that child is an identifier (e.g. `--x` in `var(--x)`) */
+export function get_first_identifier(node: CSSNode): string | undefined {
+	const first = node.first_child
+	return first && is_identifier(first) ? first.text : undefined
 }

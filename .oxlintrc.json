@@ -1,13 +1,20 @@
 {
-	"extends": ["./node_modules/@projectwallace/preset-oxlint/index.json"],
+	"extends": [
+		"./node_modules/@projectwallace/preset-oxlint/index.json"
+	],
 	"rules": {
 		"no-null": "allow",
 		"no-warning-comments": "allow",
-		"max-depth": ["warn", 6]
+		"max-depth": [
+			"warn",
+			6
+		]
 	},
 	"overrides": [
 		{
-			"files": ["src/**/*.ts"],
+			"files": [
+				"src/**/*.ts"
+			],
 			"rules": {
 				"prefer-const": "error",
 				"no-var": "error",
@@ -16,23 +23,6 @@
 					"declaration",
 					{
 						"allowArrowFunctions": false
-					}
-				]
-			}
-		},
-		{
-			"files": ["src/engine/**/*.ts"],
-			"excludeFiles": ["src/engine/**/*.test.ts"],
-			"rules": {
-				"no-restricted-imports": [
-					"error",
-					{
-						"patterns": [
-							{
-								"group": ["@projectwallace/css-parser", "@projectwallace/css-parser/*"],
-								"message": "Only src/adapter/css-parser.ts may import the parser. Use the adapter."
-							}
-						]
 					}
 				]
 			}

@@ -1,6 +1,6 @@
 import { analyze } from '../engine/analyzer.js'
 import { summarize_numbers } from '../engine/summary.js'
-import type { AddOptions, AstNode, ContextCountResult, CountResult } from '../engine/types.js'
+import type { AddOptions, CSSNode, ContextCountResult, CountResult } from '../engine/types.js'
 import { summarize_specificity } from '../collectors/specificity.js'
 import type { DefinedUsedResult } from '../defined-used.js'
 import { all_collectors, type AllCollectors, type AllResult } from './all.js'
@@ -381,6 +381,6 @@ export const compat_collectors: AllCollectors = {
 /**
  * The 9.x report: same nested shape and camelCase keys, without `useLocations` and `__meta__`. Prefer `analyze_all()` or single collectors for new code.
  */
-export function analyze_compat(input: string | AstNode, options?: AddOptions): CompatAnalysis {
+export function analyze_compat(input: string | CSSNode, options?: AddOptions): CompatAnalysis {
 	return to_compat(analyze(input, compat_collectors, options))
 }
