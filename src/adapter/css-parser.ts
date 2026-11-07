@@ -184,7 +184,8 @@ export function walk_ast(
 /** Visit every node inside a declaration value (the root VALUE node is not reported) */
 export function walk_value(value: AstNode, visit: (node: AstNode, kind: ValueKind) => void): void {
 	walk(value, function (node) {
-		if (node !== value) visit(node, get_value_kind(node))
+		// The callback also receives the VALUE node itself
+		if (node.type !== value.type || node.start !== value.start) visit(node, get_value_kind(node))
 	})
 }
 

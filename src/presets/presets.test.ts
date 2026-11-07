@@ -34,6 +34,36 @@ describe('analyze_compat', () => {
 	})
 })
 
+test('counts Source Lines of Code (derived from at-rules, selectors and declarations)', () => {
+	const fixture = `
+    rule {
+      color: green;
+      color: orange !important;
+    }
+
+    @media print {
+      @media (min-width: 1000px) {
+        @supports (display: grid) {
+          @keyframes test {
+            from {
+              opacity: 1;
+            }
+            to {
+              opacity: 0;
+            }
+          }
+
+          another-rule {
+            color: purple;
+          }
+        }
+      }
+    }
+  `
+	const actual = analyze_compat(fixture).stylesheet.sourceLinesOfCode
+	expect(actual).toBe(13)
+})
+
 describe('analyze_all', () => {
 	test('has one snake_case key per collector', () => {
 		const report = analyze_all('a { color: red }')
