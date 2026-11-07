@@ -26,7 +26,9 @@ export function plain(
 			[...result.by_context].map(([context, counts]) => [context, plain(counts)]),
 		)
 	}
-	if (result.formats) counted.formats = plain(result.formats)
+	if (result.formats) {
+		counted.formats = plain(result.formats)
+	}
 	return counted
 }
 

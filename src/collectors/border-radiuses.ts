@@ -16,7 +16,9 @@ export function border_radiuses(
 				properties: border_radius_properties.set,
 				enter(_node, ctx) {
 					const text = ctx.clean_value_text
-					if (text === undefined) return
+					if (text === undefined) {
+						return
+					}
 					counter.add(text, get_context_property(ctx, options.property), ctx.at(ctx.value!))
 				},
 			},

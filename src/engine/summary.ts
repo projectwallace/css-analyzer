@@ -30,7 +30,9 @@ const EMPTY: NumberSummary = {
  */
 export function summarize_frequencies(frequencies: ReadonlyMap<number, number>): NumberSummary {
 	const values = [...frequencies.keys()].sort((a, b) => a - b)
-	if (values.length === 0) return { ...EMPTY }
+	if (values.length === 0) {
+		return { ...EMPTY }
+	}
 
 	let total = 0
 	let sum = 0
@@ -59,8 +61,12 @@ export function summarize_frequencies(frequencies: ReadonlyMap<number, number>):
 	let upper = 0
 	for (const value of values) {
 		const next = seen + frequencies.get(value)!
-		if (seen <= lower_index && lower_index < next) lower = value
-		if (seen <= upper_index && upper_index < next) upper = value
+		if (seen <= lower_index && lower_index < next) {
+			lower = value
+		}
+		if (seen <= upper_index && upper_index < next) {
+			upper = value
+		}
 		seen = next
 	}
 

@@ -127,14 +127,28 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 	const parse_options: ParseOptions = { selectors: false, values: false, atrule_preludes: false }
 
 	for (const instance of instances) {
-		if (instance.parse?.selectors) parse_options.selectors = true
-		if (instance.parse?.values) parse_options.values = true
-		if (instance.parse?.atrule_preludes) parse_options.atrule_preludes = true
+		if (instance.parse?.selectors) {
+			parse_options.selectors = true
+		}
+		if (instance.parse?.values) {
+			parse_options.values = true
+		}
+		if (instance.parse?.atrule_preludes) {
+			parse_options.atrule_preludes = true
+		}
 
-		if (instance.stylesheet) stylesheet_handlers.push(instance.stylesheet)
-		if (instance.rule) rule_handlers.push(instance.rule)
-		if (instance.atrule) atrule_handlers.push(instance.atrule)
-		if (instance.comment) comment_handlers.push(instance.comment)
+		if (instance.stylesheet) {
+			stylesheet_handlers.push(instance.stylesheet)
+		}
+		if (instance.rule) {
+			rule_handlers.push(instance.rule)
+		}
+		if (instance.atrule) {
+			atrule_handlers.push(instance.atrule)
+		}
+		if (instance.comment) {
+			comment_handlers.push(instance.comment)
+		}
 		if (instance.selector) {
 			selector_handlers.push(instance.selector)
 			parse_options.selectors = true
@@ -170,16 +184,24 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 			}
 		}
 
-		if (value_handlers.size === 0) return
+		if (value_handlers.size === 0) {
+			return
+		}
 		const value = ctx.value
-		if (!value) return
+		if (!value) {
+			return
+		}
 
 		walk(value, function (value_node) {
 			// The callback also receives the VALUE node itself
-			if (value_node.type === value.type && value_node.start === value.start) return
+			if (value_node.type === value.type && value_node.start === value.start) {
+				return
+			}
 			const kind = get_value_kind(value_node)
 			const handlers = value_handlers.get(kind)
-			if (!handlers) return
+			if (!handlers) {
+				return
+			}
 			for (const handler of handlers) {
 				if (!handler.properties || handler.properties.has(ctx.property)) {
 					handler.enter(value_node, ctx, kind)
@@ -191,7 +213,9 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 	function enter(node: CSSNode, kind: NodeKind): boolean | void {
 		switch (kind) {
 			case 'declaration':
-				if (needs_declarations) visit_declaration(node as Declaration)
+				if (needs_declarations) {
+					visit_declaration(node as Declaration)
+				}
 				// Value nodes are handled by the single value walk above
 				return true
 			case 'supports_declaration':
@@ -199,18 +223,24 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 				return true
 			case 'rule':
 				controller.set_node(node)
-				for (const handler of rule_handlers) handler(node as Rule, ctx as Context)
+				for (const handler of rule_handlers) {
+					handler(node as Rule, ctx as Context)
+				}
 				controller.enter_rule(node)
 				break
 			case 'atrule':
 				controller.set_node(node)
-				for (const handler of atrule_handlers) handler(node as Atrule, ctx as Context)
+				for (const handler of atrule_handlers) {
+					handler(node as Atrule, ctx as Context)
+				}
 				controller.enter_atrule(node)
 				break
 			case 'selector':
 				if (selector_handlers.length > 0) {
 					controller.set_node(node)
-					for (const handler of selector_handlers) handler(node as Selector, ctx as Context)
+					for (const handler of selector_handlers) {
+						handler(node as Selector, ctx as Context)
+					}
 				}
 				// Selectors nested in :is(), :not(), ... belong to the selector that holds them
 				return true
@@ -220,8 +250,11 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 	}
 
 	function leave(_node: CSSNode, kind: NodeKind): void {
-		if (kind === 'rule') controller.leave_rule()
-		else if (kind === 'atrule') controller.leave_atrule()
+		if (kind === 'rule') {
+			controller.leave_rule()
+		} else if (kind === 'atrule') {
+			controller.leave_atrule()
+		}
 	}
 
 	const analyzer: Analyzer<C> = {
@@ -247,7 +280,9 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 										length: comment.length,
 										...(options.source === undefined ? {} : { source: options.source }),
 									}
-									for (const handler of comment_handlers) handler(loc)
+									for (const handler of comment_handlers) {
+										handler(loc)
+									}
 								},
 				})
 			} else {
@@ -258,8 +293,9 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 
 			if (stylesheet_handlers.length > 0) {
 				controller.set_node(ast)
-				for (const handler of stylesheet_handlers)
+				for (const handler of stylesheet_handlers) {
 					handler(ast as StyleSheet, ctx as StylesheetContext)
+				}
 			}
 
 			traverse(ast, {

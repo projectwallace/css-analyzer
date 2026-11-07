@@ -3,22 +3,10 @@
 	"rules": {
 		"no-null": "allow",
 		"no-warning-comments": "allow",
-		"max-depth": ["warn", 6]
-	},
-	"overrides": [
-		{
-			"files": ["src/**/*.ts"],
-			"rules": {
-				"prefer-const": "error",
-				"no-var": "error",
-				"func-style": [
-					"error",
-					"declaration",
-					{
-						"allowArrowFunctions": false
-					}
-				]
-			}
-		}
-	]
+		"max-depth": ["warn", 6],
+		"curly": "error",
+		"prefer-const": "error",
+		"no-var": "error",
+		"func-style": ["error", "declaration", { "allowArrowFunctions": false }]
+	}
 }

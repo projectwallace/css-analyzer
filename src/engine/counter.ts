@@ -27,7 +27,9 @@ function add_to(
 	const entry = map.get(item)
 	if (entry) {
 		entry.count++
-		if (locations) entry.locations!.push(at.loc)
+		if (locations) {
+			entry.locations!.push(at.loc)
+		}
 		return
 	}
 	map.set(item, locations ? { count: 1, locations: [at.loc] } : { count: 1 })
@@ -61,7 +63,9 @@ export function create_counter(options: CountOptions = {}): Counter {
 
 	function result(): CountResult {
 		const counted = to_result(map, total)
-		if (sequence) counted.sequence = sequence.slice()
+		if (sequence) {
+			counted.sequence = sequence.slice()
+		}
 		return counted
 	}
 
@@ -78,7 +82,9 @@ export function create_context_counter(options: ContextCountOptions = {}): Conte
 	function add(item: string, context: string, at: LocationSource): void {
 		total++
 		add_to(map, item, at, locations)
-		if (!track_contexts) return
+		if (!track_contexts) {
+			return
+		}
 		let scoped = contexts.get(context)
 		if (!scoped) {
 			scoped = { map: new Map(), total: 0 }
@@ -120,7 +126,9 @@ export function merge_counts(a: CountResult, b: CountResult): CountResult {
 		}
 	}
 	const merged: CountResult = { total: a.total + b.total, total_unique: unique.size, unique }
-	if (a.sequence || b.sequence) merged.sequence = [...(a.sequence ?? []), ...(b.sequence ?? [])]
+	if (a.sequence || b.sequence) {
+		merged.sequence = [...(a.sequence ?? []), ...(b.sequence ?? [])]
+	}
 	return merged
 }
 

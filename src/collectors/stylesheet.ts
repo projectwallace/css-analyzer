@@ -55,16 +55,22 @@ export function stylesheet(options: StylesheetOptions = {}): CollectorDef<Styles
 				value: {
 					types: ['url'],
 					enter(node, ctx) {
-						if (!is_url(node)) return
+						if (!is_url(node)) {
+							return
+						}
 						const embed = unquote(node.value ?? '')
-						if (!str_starts_with('data:', embed)) return
+						if (!str_starts_with('data:', embed)) {
+							return
+						}
 						embedded_total++
 						embedded_size += embed.length
 						const type = get_embed_type(embed)
 						const entry = types.get(type) ?? { count: 0, size: 0 }
 						entry.count++
 						entry.size += embed.length
-						if (locations) (entry.locations ??= []).push(ctx.at(node).loc)
+						if (locations) {
+							;(entry.locations ??= []).push(ctx.at(node).loc)
+						}
 						types.set(type, entry)
 					},
 				},
@@ -93,8 +99,9 @@ export function stylesheet(options: StylesheetOptions = {}): CollectorDef<Styles
 					if (existing) {
 						existing.count += entry.count
 						existing.size += entry.size
-						if (entry.locations)
+						if (entry.locations) {
 							existing.locations = [...(existing.locations ?? []), ...entry.locations]
+						}
 					} else {
 						types.set(type, {
 							...entry,

@@ -20,8 +20,12 @@ export function line_heights(options: LineHeightsOptions = {}): CollectorDef<Cou
 				enter(_node, ctx) {
 					const text =
 						ctx.property === 'font' ? ctx.font_shorthand?.line_height : ctx.clean_value_text
-					if (text === undefined) return
-					if (options.skip_var && text.toLowerCase().includes('var(')) return
+					if (text === undefined) {
+						return
+					}
+					if (options.skip_var && text.toLowerCase().includes('var(')) {
+						return
+					}
 					counter.add(lowercase ? lowercase_unless_var(text) : text, ctx.at(ctx.value!))
 				},
 			},

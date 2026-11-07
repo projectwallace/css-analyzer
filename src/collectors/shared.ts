@@ -51,11 +51,15 @@ export function define_counting_collector(
 
 /** Animation names of an `animation` or `animation-name` declaration (quotes removed) */
 export function get_animation_names(ctx: DeclarationContext): string[] {
-	if (ctx.clean_value_text === undefined) return []
+	if (ctx.clean_value_text === undefined) {
+		return []
+	}
 	if (ctx.property === 'animation') {
 		return analyze_animation(ctx.value!).names.map((name) => unquote(name))
 	}
-	if (ctx.property !== 'animation-name') return []
+	if (ctx.property !== 'animation-name') {
+		return []
+	}
 
 	const names: string[] = []
 	for (const item of get_list_items(ctx.value!)) {
