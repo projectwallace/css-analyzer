@@ -1,4 +1,4 @@
-import { get_name } from '../adapter/css-parser.js'
+import { is_function } from '@projectwallace/css-parser'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.js'
 import { ends_with } from '../string-utils.js'
 import { NO_VALUE_WALK, define_counting_collector } from './shared.js'
@@ -11,7 +11,7 @@ export function gradients(options: CountOptions = {}): CollectorDef<CountResult>
 				types: ['function'],
 				enter(node, ctx) {
 					if (NO_VALUE_WALK.has(ctx.property)) return
-					if (ends_with('gradient', get_name(node))) {
+					if (is_function(node) && ends_with('gradient', node.name)) {
 						counter.add(node.text, ctx.at(node))
 					}
 				},

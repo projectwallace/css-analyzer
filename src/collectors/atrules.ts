@@ -1,16 +1,17 @@
 import {
-	find_media_features,
-	get_atrule_name,
-	get_atrule_parts,
-	get_container_query_name,
-	get_descriptors,
-	get_feature_name,
-	get_first_identifier,
-	get_import_functions,
-	get_list_items,
-	get_prelude,
-	get_value_kind,
-} from '../adapter/css-parser.js'
+	type Atrule,
+	type CSSNode,
+	type MediaFeature,
+	SKIP,
+	is_atrule_prelude,
+	is_container_query,
+	is_declaration,
+	is_function,
+	is_identifier,
+	is_media_feature,
+	str_equals,
+	walk,
+} from '@projectwallace/css-parser'
 import { DefinedUsed, merge_defined_used, type DefinedUsedResult } from '../defined-used.js'
 import { create_counter, merge_counts } from '../engine/counter.js'
 import { define_collector } from '../engine/define-collector.js'
@@ -18,7 +19,65 @@ import type { CollectorDef, CountOptions, CountResult, Location } from '../engin
 import { unquote } from '../string-utils.js'
 import { get_media_browserhacks, get_supports_browserhacks } from '../atrules/atrules.js'
 import { keywords } from '../values/values.js'
-import { get_animation_names, without_sequence } from './shared.js'
+import { basename } from '../properties/property-utils.js'
+import {
+	get_animation_names,
+	get_first_identifier,
+	get_list_items,
+	without_sequence,
+} from './shared.js'
+
+/** Media features (`(min-width: 40em)`) anywhere in an at-rule prelude */
+function find_media_features(atrule: Atrule): MediaFeature[] {
+	const found: MediaFeature[] = []
+	if (!atrule.has_prelude) return found
+	walk(atrule.prelude, function (child) {
+		if (is_media_feature(child)) {
+			found.push(child)
+			return SKIP
+		}
+	})
+	return found
+}
+
+/** `property: value` descriptors inside an at-rule block (e.g. `@font-face`) */
+function get_descriptors(atrule: Atrule): Record<string, string> {
+	const descriptors: Record<string, string> = Object.create(null)
+	for (const child of atrule.block?.children ?? []) {
+		if (is_declaration(child) && child.value) {
+			descriptors[child.property] = child.value.text
+		}
+	}
+	return descriptors
+}
+
+/** The container name in `@container name (min-width: 1px)` */
+function get_container_name(atrule: Atrule): string | undefined {
+	if (!atrule.has_prelude) return undefined
+	const prelude = atrule.prelude
+	if (is_atrule_prelude(prelude) && is_container_query(prelude.first_child)) {
+		const name = prelude.first_child.first_child
+		if (name && is_identifier(name)) return name.text
+	}
+	return undefined
+}
+
+/** `supports(...)` and `layer(...)` in an `@import` prelude */
+function get_import_functions(atrule: Atrule) {
+	const found: { name: 'supports' | 'layer'; value: string; node: CSSNode }[] = []
+	if (!atrule.has_prelude || !is_atrule_prelude(atrule.prelude) || !atrule.prelude.has_children) {
+		return found
+	}
+	for (const child of atrule.prelude) {
+		if (!is_function(child) || !child.value) continue
+		if (str_equals('supports', child.name)) {
+			found.push({ name: 'supports', value: child.value, node: child })
+		} else if (str_equals('layer', child.name)) {
+			found.push({ name: 'layer', value: child.value, node: child })
+		}
+	}
+	return found
+}
 
 export type AtrulesResult = CountResult & {
 	font_faces: {
@@ -87,18 +146,16 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 			return {
 				parse: { values: true, atrule_preludes: true },
 				atrule(node, ctx) {
-					const name = get_atrule_name(node)
-					const {
-						prelude_text,
-						has_block,
-						is_vendor_prefixed,
-						name: raw_name,
-					} = get_atrule_parts(node)
+					const name = basename(node.name)
+					const prelude_text = node.has_prelude ? node.prelude.text : undefined
+					const has_block = Boolean(node.block)
+					const is_vendor_prefixed = node.is_vendor_prefixed
+					const raw_name = node.name
 					names.add(name, ctx)
 					nesting.add(String(ctx.depth), ctx)
 
 					for (const feature of find_media_features(node)) {
-						media_features.add(get_feature_name(feature), ctx.at(feature))
+						media_features.add(feature.property.toLowerCase(), ctx.at(feature))
 					}
 
 					if (name === 'font-face') {
@@ -120,13 +177,13 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 					let weight = 1
 					if (name === 'media') {
 						medias.add(prelude_text, ctx)
-						for (const hack of get_media_browserhacks(get_prelude(node)!)) {
+						for (const hack of get_media_browserhacks(node.prelude!)) {
 							media_browserhacks.add(hack, ctx)
 							weight++
 						}
 					} else if (name === 'supports') {
 						supports.add(prelude_text, ctx)
-						for (const hack of get_supports_browserhacks(get_prelude(node)!)) {
+						for (const hack of get_supports_browserhacks(node.prelude!)) {
 							supports_browserhacks.add(hack, ctx)
 							weight++
 						}
@@ -158,7 +215,7 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 						}
 					} else if (name === 'container') {
 						containers.add(prelude_text, ctx)
-						const container_name = get_container_query_name(node)
+						const container_name = get_container_name(node)
 						if (container_name !== undefined) {
 							container_names.add(container_name, ctx)
 							container_tracking.use(container_name)
@@ -182,7 +239,7 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 						if (ctx.clean_value_text === undefined) return
 						if (ctx.property === 'container-name') {
 							for (const item of get_list_items(ctx.value!)) {
-								if (get_value_kind(item) === 'identifier' && !keywords.has(item.text)) {
+								if (is_identifier(item) && !keywords.has(item.text)) {
 									container_names.add(item.text, ctx.at(item))
 									container_tracking.define(item.text)
 								}

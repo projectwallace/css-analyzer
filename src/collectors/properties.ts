@@ -1,11 +1,4 @@
-import {
-	get_atrule_name,
-	get_name,
-	get_first_identifier,
-	get_list_items,
-	get_atrule_parts,
-	get_value_kind,
-} from '../adapter/css-parser.js'
+import { is_function, is_identifier } from '@projectwallace/css-parser'
 import { DefinedUsed, merge_defined_used, type DefinedUsedResult } from '../defined-used.js'
 import { create_counter, merge_counts } from '../engine/counter.js'
 import { define_collector } from '../engine/define-collector.js'
@@ -16,7 +9,8 @@ import type {
 	DeclarationContext,
 	LocationSource,
 } from '../engine/types.js'
-import { shorthand_properties } from '../properties/property-utils.js'
+import { basename, shorthand_properties } from '../properties/property-utils.js'
+import { get_first_identifier, get_list_items } from './shared.js'
 
 export type PropertiesResult = CountResult & {
 	/** Vendor prefixed properties, as written */
@@ -69,9 +63,8 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 			return {
 				parse: { values: true, atrule_preludes: true },
 				atrule(node) {
-					const { prelude_text } = get_atrule_parts(node)
-					if (get_atrule_name(node) === 'property' && prelude_text !== undefined) {
-						custom_tracking.define(prelude_text)
+					if (basename(node.name) === 'property' && node.has_prelude) {
+						custom_tracking.define(node.prelude.text)
 					}
 				},
 				declaration(_node, ctx) {
@@ -101,7 +94,7 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 					if (ctx.clean_value_text === undefined) return
 					if (ctx.property === 'anchor-name') {
 						for (const item of get_list_items(ctx.value!)) {
-							if (get_value_kind(item) === 'identifier' && is_custom_name(item.text)) {
+							if (is_identifier(item) && is_custom_name(item.text)) {
 								anchor_tracking.define(item.text)
 							}
 						}
@@ -113,7 +106,7 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 				value: {
 					types: ['function'],
 					enter(node) {
-						const name = get_name(node).toLowerCase()
+						const name = is_function(node) ? node.name.toLowerCase() : ''
 						if (name !== 'var' && name !== 'anchor' && name !== 'anchor-size') return
 						const first = get_first_identifier(node)
 						if (first === undefined || !is_custom_name(first)) return

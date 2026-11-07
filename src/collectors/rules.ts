@@ -1,4 +1,4 @@
-import { get_rule_parts } from '../adapter/css-parser.js'
+import { is_declaration, is_selector, is_selector_list } from '@projectwallace/css-parser'
 import { create_counter, merge_counts } from '../engine/counter.js'
 import { define_collector } from '../engine/define-collector.js'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.js'
@@ -32,12 +32,24 @@ export function rules(options: CountOptions = {}): CollectorDef<RulesResult> {
 				rule(node, ctx) {
 					if (ctx.in_keyframes) return
 					total++
-					const parts = get_rule_parts(node)
-					if (parts.is_empty) empty++
-					sizes.add(String(parts.selectors.length + parts.declarations), ctx)
+					if (node.block?.is_empty) empty++
+
+					// Selectors are only found when selectors are parsed
+					let selector_count = 0
+					if (node.has_prelude && is_selector_list(node.prelude)) {
+						for (const selector of node.prelude) {
+							if (is_selector(selector)) selector_count++
+						}
+					}
+					let declaration_count = 0
+					for (const child of node.block ?? []) {
+						if (is_declaration(child)) declaration_count++
+					}
+
+					sizes.add(String(selector_count + declaration_count), ctx)
 					nesting.add(String(ctx.depth), ctx)
-					selectors.add(String(parts.selectors.length), ctx)
-					declarations.add(String(parts.declarations), ctx)
+					selectors.add(String(selector_count), ctx)
+					declarations.add(String(declaration_count), ctx)
 				},
 				result: () => ({
 					total,

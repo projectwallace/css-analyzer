@@ -16,7 +16,7 @@ pnpm build
 - `snake_case` for functions, variables, parameters, options and result keys. `PascalCase` for types and classes.
 - `const` wherever possible; `let` only for bindings that are reassigned.
 - Functions are declarations (`function my_fn() {}`), never `const my_fn = () => {}`. Arrow functions are fine as inline callbacks.
-- Only `src/adapter/css-parser.ts` talks to `@projectwallace/css-parser` for the engine; everything in `src/engine` goes through the adapter.
+- The engine and collectors use `@projectwallace/css-parser` directly. Swapping the parser is not a goal; if it ever is, that is a refactor for then.
 
 `pnpm lint` enforces most of this.
 

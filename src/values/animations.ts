@@ -7,7 +7,7 @@ import {
 } from '@projectwallace/css-parser'
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
-import { type Input, as_value } from '../adapter/css-parser.js'
+import { type Input, as_value } from '../input.js'
 
 const TIMING_KEYWORDS = new KeywordSet([
 	'linear',

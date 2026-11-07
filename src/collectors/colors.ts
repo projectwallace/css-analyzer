@@ -1,4 +1,4 @@
-import { get_name } from '../adapter/css-parser.js'
+import { is_function } from '@projectwallace/css-parser'
 import {
 	create_context_counter,
 	create_counter,
@@ -71,7 +71,7 @@ export function colors(options: ColorsOptions = {}): CollectorDef<ColorsResult> 
 								formats.add('system', at)
 							}
 						} else {
-							const name = get_name(node)
+							const name = is_function(node) ? node.name : ''
 							if (color_functions.has(name)) {
 								counter.add(text, context, at)
 								formats.add(name.toLowerCase(), at)

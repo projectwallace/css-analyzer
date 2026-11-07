@@ -1,4 +1,4 @@
-import { get_unit } from '../adapter/css-parser.js'
+import type { Dimension } from '@projectwallace/css-parser'
 import { create_context_counter, merge_context_counts } from '../engine/counter.js'
 import { define_collector } from '../engine/define-collector.js'
 import type {
@@ -69,7 +69,7 @@ export function units(options: ContextCountOptions = {}): CollectorDef<ContextCo
 				enter(node, ctx) {
 					if (NO_VALUE_WALK.has(ctx.property)) return
 					counter.add(
-						get_unit(node).toLowerCase(),
+						(node as Dimension).unit.toLowerCase(),
 						get_context_property(ctx, options.property),
 						ctx.at(node),
 					)

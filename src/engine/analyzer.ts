@@ -1,13 +1,32 @@
 import {
-	type AstNode,
-	type NodeKind,
-	type ParseOptions,
-	type ValueKind,
-	get_text,
-	parse_css,
-	walk_ast,
-	walk_value,
-} from '../adapter/css-parser.js'
+	type Atrule,
+	type CSSNode,
+	type Declaration,
+	type Rule,
+	type Selector,
+	type StyleSheet,
+	AT_RULE,
+	DECLARATION,
+	DIMENSION,
+	FUNCTION,
+	HASH,
+	IDENTIFIER,
+	NUMBER,
+	OPERATOR,
+	PARENTHESIS,
+	RATIO,
+	SELECTOR,
+	SKIP,
+	STRING,
+	STYLE_RULE,
+	STYLESHEET,
+	SUPPORTS_DECLARATION,
+	UNICODE_RANGE,
+	URL,
+	parse,
+	traverse,
+	walk,
+} from '@projectwallace/css-parser'
 import { create_context } from './context.js'
 import type {
 	AddOptions,
@@ -19,7 +38,66 @@ import type {
 	DeclarationHandler,
 	ResultOf,
 	StylesheetContext,
+	ParseOptions,
+	ValueKind,
 } from './types.js'
+
+type NodeKind =
+	| 'stylesheet'
+	| 'rule'
+	| 'atrule'
+	| 'selector'
+	| 'declaration'
+	| 'supports_declaration'
+	| 'other'
+
+function get_kind(node: CSSNode): NodeKind {
+	switch (node.type) {
+		case STYLE_RULE:
+			return 'rule'
+		case AT_RULE:
+			return 'atrule'
+		case DECLARATION:
+			return 'declaration'
+		case SUPPORTS_DECLARATION:
+			return 'supports_declaration'
+		case SELECTOR:
+			return 'selector'
+		case STYLESHEET:
+			return 'stylesheet'
+		default:
+			return 'other'
+	}
+}
+
+function get_value_kind(node: CSSNode): ValueKind {
+	switch (node.type) {
+		case HASH:
+			return 'hash'
+		case FUNCTION:
+			return 'function'
+		case IDENTIFIER:
+			return 'identifier'
+		case DIMENSION:
+			return 'dimension'
+		case NUMBER:
+			return 'number'
+		case STRING:
+			return 'string'
+		case URL:
+			return 'url'
+		case OPERATOR:
+			return 'operator'
+		case PARENTHESIS:
+			return 'parenthesis'
+		case UNICODE_RANGE:
+			return 'unicode_range'
+		case RATIO:
+			return 'ratio'
+		default:
+			return 'other'
+	}
+}
 
 type DeclarationSubscription = {
 	properties: ReadonlySet<string> | undefined
@@ -28,7 +106,7 @@ type DeclarationSubscription = {
 
 type ValueSubscription = {
 	properties: ReadonlySet<string> | undefined
-	enter: (node: AstNode, ctx: DeclarationContext, kind: ValueKind) => void
+	enter: (node: CSSNode, ctx: DeclarationContext, kind: ValueKind) => void
 }
 
 /** Results remember which collectors produced them so `merge(a, b)` needs no extra arguments */
@@ -83,7 +161,7 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 	const controller = create_context()
 	const ctx = controller.ctx
 
-	function visit_declaration(node: AstNode): void {
+	function visit_declaration(node: Declaration): void {
 		controller.set_node(node)
 
 		for (const handler of declaration_handlers) {
@@ -96,7 +174,10 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 		const value = ctx.value
 		if (!value) return
 
-		walk_value(value, function (value_node, kind) {
+		walk(value, function (value_node) {
+			// The callback also receives the VALUE node itself
+			if (value_node.type === value.type && value_node.start === value.start) return
+			const kind = get_value_kind(value_node)
 			const handlers = value_handlers.get(kind)
 			if (!handlers) return
 			for (const handler of handlers) {
@@ -107,10 +188,10 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 		})
 	}
 
-	function enter(node: AstNode, kind: NodeKind): boolean | void {
+	function enter(node: CSSNode, kind: NodeKind): boolean | void {
 		switch (kind) {
 			case 'declaration':
-				if (needs_declarations) visit_declaration(node)
+				if (needs_declarations) visit_declaration(node as Declaration)
 				// Value nodes are handled by the single value walk above
 				return true
 			case 'supports_declaration':
@@ -118,18 +199,18 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 				return true
 			case 'rule':
 				controller.set_node(node)
-				for (const handler of rule_handlers) handler(node, ctx as Context)
+				for (const handler of rule_handlers) handler(node as Rule, ctx as Context)
 				controller.enter_rule(node)
 				break
 			case 'atrule':
 				controller.set_node(node)
-				for (const handler of atrule_handlers) handler(node, ctx as Context)
+				for (const handler of atrule_handlers) handler(node as Atrule, ctx as Context)
 				controller.enter_atrule(node)
 				break
 			case 'selector':
 				if (selector_handlers.length > 0) {
 					controller.set_node(node)
-					for (const handler of selector_handlers) handler(node, ctx as Context)
+					for (const handler of selector_handlers) handler(node as Selector, ctx as Context)
 				}
 				// Selectors nested in :is(), :not(), ... belong to the selector that holds them
 				return true
@@ -138,47 +219,57 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 		}
 	}
 
-	function leave(_node: AstNode, kind: NodeKind): void {
+	function leave(_node: CSSNode, kind: NodeKind): void {
 		if (kind === 'rule') controller.leave_rule()
 		else if (kind === 'atrule') controller.leave_atrule()
 	}
 
 	const analyzer: Analyzer<C> = {
 		parse_options,
-		add(input: string | AstNode, options: AddOptions = {}): Analyzer<C> {
-			let ast: AstNode
+		add(input: string | CSSNode, options: AddOptions = {}): Analyzer<C> {
+			let ast: CSSNode
 			let css: string
 			if (typeof input === 'string') {
 				css = input
 				controller.begin(options.source, css)
-				ast = parse_css(
-					css,
-					parse_options,
-					comment_handlers.length === 0
-						? undefined
-						: function (comment) {
-								const loc = {
-									line: comment.line,
-									column: comment.column,
-									offset: comment.start,
-									length: comment.length,
-									...(options.source === undefined ? {} : { source: options.source }),
-								}
-								for (const handler of comment_handlers) handler(loc)
-							},
-				)
+				ast = parse(css, {
+					parse_selectors: parse_options.selectors,
+					parse_values: parse_options.values,
+					parse_atrule_preludes: parse_options.atrule_preludes,
+					on_comment:
+						comment_handlers.length === 0
+							? undefined
+							: function (comment) {
+									const loc = {
+										line: comment.line,
+										column: comment.column,
+										offset: comment.start,
+										length: comment.length,
+										...(options.source === undefined ? {} : { source: options.source }),
+									}
+									for (const handler of comment_handlers) handler(loc)
+								},
+				})
 			} else {
 				ast = input
-				css = get_text(ast)
+				css = ast.text
 				controller.begin(options.source, css)
 			}
 
 			if (stylesheet_handlers.length > 0) {
 				controller.set_node(ast)
-				for (const handler of stylesheet_handlers) handler(ast, ctx as StylesheetContext)
+				for (const handler of stylesheet_handlers)
+					handler(ast as StyleSheet, ctx as StylesheetContext)
 			}
 
-			walk_ast(ast, enter, leave)
+			traverse(ast, {
+				enter(node) {
+					return enter(node, get_kind(node)) === true ? SKIP : undefined
+				},
+				leave(node) {
+					leave(node, get_kind(node))
+				},
+			})
 			return analyzer
 		},
 		result(): ResultOf<C> {
@@ -195,7 +286,7 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 }
 
 export function analyze<C extends CollectorMap>(
-	input: string | AstNode,
+	input: string | CSSNode,
 	collectors: C,
 	options?: AddOptions,
 ): ResultOf<C> {

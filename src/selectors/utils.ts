@@ -14,7 +14,8 @@ import {
 	is_combinator,
 } from '@projectwallace/css-parser'
 import { unquote } from '../string-utils.js'
-import { type Input, type Location, as_selectors } from '../adapter/css-parser.js'
+import { type Input, as_selectors } from '../input.js'
+import type { Location } from '../engine/types.js'
 
 const PSEUDO_FUNCTIONS = new KeywordSet([
 	'nth-child',

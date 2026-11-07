@@ -1,7 +1,46 @@
-import type { AstNode, Location, ParseOptions, ValueKind } from '../adapter/css-parser.js'
+import type {
+	Atrule,
+	CSSNode,
+	Declaration,
+	Rule,
+	Selector,
+	StyleSheet,
+	Value,
+} from '@projectwallace/css-parser'
 import type { FontShorthand } from '../values/destructure-font-shorthand.js'
 
-export type { AstNode, Location, ParseOptions, ValueKind }
+export type { CSSNode }
+
+export type Location = {
+	line: number
+	column: number
+	offset: number
+	length: number
+	/** File name, only present when the input was added with `{ source }` */
+	source?: string
+}
+
+/** What the parser has to parse: the engine asks only for what the collectors need */
+export type ParseOptions = {
+	selectors: boolean
+	values: boolean
+	atrule_preludes: boolean
+}
+
+/** The kind of node inside a declaration value */
+export type ValueKind =
+	| 'hash'
+	| 'function'
+	| 'identifier'
+	| 'dimension'
+	| 'number'
+	| 'string'
+	| 'url'
+	| 'operator'
+	| 'parenthesis'
+	| 'unicode_range'
+	| 'ratio'
+	| 'other'
 
 /** Anything that can tell the location of the node that is being processed */
 export type LocationSource = { readonly loc: Location }
@@ -49,12 +88,12 @@ export type Context = {
 	readonly depth: number
 	/** Lowercased, unprefixed names of the enclosing at-rules, outermost first */
 	readonly atrule_stack: readonly string[]
-	readonly parent_rule: AstNode | undefined
+	readonly parent_rule: CSSNode | undefined
 	readonly in_keyframes: boolean
 	/** Location of the current node */
 	readonly loc: Location
 	/** Location view for any other node; the returned object is reused, read `.loc` right away */
-	at(node: AstNode): LocationSource
+	at(node: CSSNode): LocationSource
 }
 
 export type StylesheetContext = Context & {
@@ -76,7 +115,7 @@ export type DeclarationContext = Context & {
 	/** Raw value text, also available when values are not parsed */
 	readonly value_text: string
 	/** Parsed value node, `undefined` when values are not parsed (see `parse.values`) */
-	readonly value: AstNode | undefined
+	readonly value: Value | undefined
 	/**
 	 * Value text without a trailing IE hack (`\\9`, `\\7`). `undefined` when the value is not parsed
 	 * or is a global keyword (`inherit`, `initial`, `none`, ...).
@@ -89,15 +128,15 @@ export type DeclarationContext = Context & {
 	readonly font_shorthand: FontShorthand | null
 }
 
-export type DeclarationHandler = (node: AstNode, ctx: DeclarationContext) => void
+export type DeclarationHandler = (node: Declaration, ctx: DeclarationContext) => void
 
 export type CollectorInstance<T> = {
 	/** Extra parsing this collector needs. Selectors/values are implied by `selector`/`value` subscriptions. */
 	parse?: Partial<ParseOptions>
-	stylesheet?: (node: AstNode, ctx: StylesheetContext) => void
-	rule?: (node: AstNode, ctx: Context) => void
-	atrule?: (node: AstNode, ctx: Context) => void
-	selector?: (node: AstNode, ctx: Context) => void
+	stylesheet?: (node: StyleSheet, ctx: StylesheetContext) => void
+	rule?: (node: Rule, ctx: Context) => void
+	atrule?: (node: Atrule, ctx: Context) => void
+	selector?: (node: Selector, ctx: Context) => void
 	declaration?:
 		| DeclarationHandler
 		| {
@@ -109,7 +148,7 @@ export type CollectorInstance<T> = {
 	value?: {
 		types: readonly ValueKind[]
 		properties?: ReadonlySet<string>
-		enter: (node: AstNode, ctx: DeclarationContext, kind: ValueKind) => void
+		enter: (node: CSSNode, ctx: DeclarationContext, kind: ValueKind) => void
 	}
 	/** Called for every comment. Only works when the engine parses the input itself. */
 	comment?: (loc: Location) => void
@@ -137,6 +176,6 @@ export type AddOptions = {
 export type Analyzer<C extends CollectorMap> = {
 	/** Parse options the collectors need; use them when you parse the AST yourself */
 	readonly parse_options: ParseOptions
-	add(input: string | AstNode, options?: AddOptions): Analyzer<C>
+	add(input: string | CSSNode, options?: AddOptions): Analyzer<C>
 	result(): ResultOf<C>
 }

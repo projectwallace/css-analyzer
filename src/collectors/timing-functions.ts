@@ -1,7 +1,11 @@
-import { get_list_items } from '../adapter/css-parser.js'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.js'
 import { analyze_animation } from '../values/animations.js'
-import { define_counting_collector, lowercase_unless_var, type Normalize } from './shared.js'
+import {
+	define_counting_collector,
+	get_list_items,
+	lowercase_unless_var,
+	type Normalize,
+} from './shared.js'
 
 export type TimingFunctionsOptions = CountOptions & {
 	normalize?: Normalize

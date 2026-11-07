@@ -7,7 +7,7 @@ import {
 	type Value,
 } from '@projectwallace/css-parser'
 import { KeywordSet } from '../keyword-set.js'
-import { type Input, as_value } from '../adapter/css-parser.js'
+import { type Input, as_value } from '../input.js'
 import { keywords } from './values.js'
 
 export const SYSTEM_FONTS: KeywordSet = new KeywordSet([

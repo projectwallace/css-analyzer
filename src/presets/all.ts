@@ -1,5 +1,5 @@
 import { analyze } from '../engine/analyzer.js'
-import type { AddOptions, AstNode, ResultOf } from '../engine/types.js'
+import type { AddOptions, CSSNode, ResultOf } from '../engine/types.js'
 import {
 	animation_names,
 	atrules,
@@ -94,6 +94,6 @@ export type AllResult = ResultOf<AllCollectors>
  * Run every collector. The result is flat: one key per collector (`result.colors`, `result.atrules`, ...).
  * Combine results of separate runs with `merge()`.
  */
-export function analyze_all(input: string | AstNode, options?: AddOptions): AllResult {
+export function analyze_all(input: string | CSSNode, options?: AddOptions): AllResult {
 	return analyze(input, all_collectors, options)
 }

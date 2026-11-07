@@ -2,7 +2,7 @@ import { test, expect, expectTypeOf } from 'vitest'
 import { analyze, create_analyzer, merge } from './analyzer.js'
 import { define_collector } from './define-collector.js'
 import { create_counter, merge_counts } from './counter.js'
-import { parse_css } from '../adapter/css-parser.js'
+import { parse } from '@projectwallace/css-parser'
 import type { CollectorInstance, CountOptions, CountResult } from './types.js'
 
 // Toy collectors: they exercise the contract the same way built-ins will
@@ -270,7 +270,12 @@ test('result() can be taken at any time and stays stable', () => {
 
 test('accepts an already parsed AST', () => {
 	const collectors = { colors: hash_colors(), rules: rule_count() }
-	const ast = parse_css('a { color: #fff }', create_analyzer(collectors).parse_options)
+	const { selectors, values, atrule_preludes } = create_analyzer(collectors).parse_options
+	const ast = parse('a { color: #fff }', {
+		parse_selectors: selectors,
+		parse_values: values,
+		parse_atrule_preludes: atrule_preludes,
+	})
 	const result = analyze(ast, collectors)
 	expect(result.colors.total).toBe(1)
 	expect(result.rules).toBe(1)
