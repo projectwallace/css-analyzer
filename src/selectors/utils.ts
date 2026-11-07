@@ -96,6 +96,8 @@ export function getComplexity(selector: CSSNode): number {
 		walk(tree, function (node) {
 			if (is_selector(node)) {
 				complexities.push(getComplexity(node))
+				// getComplexity already counted everything nested inside this selector
+				return SKIP
 			}
 		})
 	}

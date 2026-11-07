@@ -123,3 +123,15 @@ test('calculates total complexity', () => {
 	const actual = analyze(fixture).selectors.complexity.sum
 	expect(actual).toBe(11)
 })
+
+test.each([
+	[':is(.a)', 2],
+	[':is(:is(.a))', 3],
+	[':is(:is(:is(.a)))', 4],
+	[':where(:not(.a))', 3],
+	['.x:has(:is(.a, .b))', 5],
+	[':is(.a :is(.b))', 5],
+	[':is(.a, :is(.b))', 4],
+])('does not double count nested selectors in %s', (selector, expected) => {
+	expect(analyze(`${selector}{}`).selectors.complexity.max).toBe(expected)
+})
