@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import { analyze } from '../index'
+import { analyze_compat as analyze } from '../presets/compat.js'
 
 test('counts', () => {
 	// Test data from https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#syntax

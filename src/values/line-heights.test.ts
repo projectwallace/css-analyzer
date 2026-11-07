@@ -1,6 +1,6 @@
 import { describe, test } from 'vitest'
 import { expect } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze_compat as analyze } from '../presets/compat.js'
 
 test('recognizes line-height', () => {
 	const fixture = `

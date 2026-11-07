@@ -1,5 +1,4 @@
 import { test, expect, describe } from 'vitest'
-import { analyze as analyze_legacy } from '../index.js'
 import { analyze, create_analyzer, merge } from '../engine/analyzer.js'
 import { colors } from './colors.js'
 import { specificity, summarize_specificity } from './specificity.js'
@@ -16,15 +15,18 @@ const fixture = `
 `
 
 describe('max-unique-z-indexes', () => {
-	test('matches the 9.x analyzer', () => {
-		const legacy = analyze_legacy(fixture).values.zindexes
+	test('counts every z-index value (the same numbers as 9.x)', () => {
 		const { z } = analyze(fixture, { z: z_indexes() })
 
-		expect(Object.fromEntries([...z.unique].map(([item, { count }]) => [item, count]))).toEqual(
-			legacy.unique,
-		)
-		expect(z.total).toBe(legacy.total)
-		expect(z.total_unique).toBe(legacy.totalUnique)
+		expect(Object.fromEntries([...z.unique].map(([item, { count }]) => [item, count]))).toEqual({
+			'1': 1,
+			'3': 1,
+			'7': 1,
+			'10': 2,
+			'var(--layer)': 1,
+		})
+		expect(z.total).toBe(6)
+		expect(z.total_unique).toBe(5)
 	})
 
 	test('reports where each value lives so a rule can point at it', () => {
@@ -46,20 +48,26 @@ describe('max-unique-colors', () => {
 })
 
 describe('max-average-selector-specificity', () => {
-	test('matches the 9.x analyzer', () => {
-		const legacy = analyze_legacy(fixture).selectors.specificity
+	test('summarizes like the 9.x analyzer', () => {
 		const { s } = analyze(fixture, { s: specificity() })
 		const summary = summarize_specificity(s)
 
-		expect(summary.total).toBe(s.total)
-		expect(summary.min).toEqual(legacy.min)
-		expect(summary.max).toEqual(legacy.max)
-		expect(summary.sum).toEqual(legacy.sum)
-		expect(summary.mean).toEqual(legacy.mean)
-		expect(summary.mode).toEqual(legacy.mode)
-		expect(Object.fromEntries([...s.unique].map(([item, { count }]) => [item, count]))).toEqual(
-			legacy.unique,
-		)
+		expect(summary).toEqual({
+			total: 8,
+			min: [0, 0, 1],
+			max: [1, 1, 1],
+			sum: [2, 8, 8],
+			mean: [0.25, 1, 1],
+			mode: [0, 1, 0.5],
+		})
+		expect(Object.fromEntries([...s.unique].map(([item, { count }]) => [item, count]))).toEqual({
+			'0,0,1': 1,
+			'1,1,1': 2,
+			'0,2,0': 2,
+			'0,1,2': 1,
+			'0,1,0': 1,
+			'0,0,3': 1,
+		})
 	})
 
 	test('does not count selectors inside :is(), :not() or keyframes twice', () => {

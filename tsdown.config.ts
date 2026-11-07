@@ -3,7 +3,6 @@ import { defineConfig } from 'tsdown'
 export default defineConfig({
 	entry: [
 		'src/index.ts',
-		'src/engine/index.ts',
 		'src/collectors/index.ts',
 		'src/presets/index.ts',
 		'src/selectors/index.ts',

@@ -25,7 +25,6 @@ jobs:
           node-version: 24
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
-      - run: pnpm run test:compat
 
   check:
     name: Check types

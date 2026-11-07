@@ -7,7 +7,7 @@
 	},
 	"overrides": [
 		{
-			"files": ["src/engine/**/*.ts", "src/adapter/**/*.ts"],
+			"files": ["src/**/*.ts"],
 			"rules": {
 				"prefer-const": "error",
 				"no-var": "error",

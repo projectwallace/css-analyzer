@@ -1,7 +1,7 @@
 // oxlint-disable vitest/no-conditional-in-test
 import { test } from 'vitest'
 import { expect } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze_compat as analyze } from '../presets/compat.js'
 import { parse_value } from '@projectwallace/css-parser/parse-value'
 import { analyze_animation } from './animations.js'
 

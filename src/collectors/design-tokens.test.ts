@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest'
-import { analyze as analyze_legacy } from '../index.js'
+import golden from '../presets/golden/tokens.json'
 import { analyze, create_analyzer, merge } from '../engine/analyzer.js'
 import { tokens_fixture as fixture } from '../test-fixture.js'
 import { basename } from '../properties/property-utils.js'
@@ -36,8 +36,8 @@ function fold_by_basename(
 	return folded
 }
 
-describe('parity with the 9.x analyzer', () => {
-	const legacy = analyze_legacy(fixture)
+describe('parity with the 9.x analyzer (golden output of 9.9.6)', () => {
+	const legacy = golden
 	const tokens = analyze_design_tokens(fixture)
 
 	test('colors', () => {

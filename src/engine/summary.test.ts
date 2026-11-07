@@ -1,5 +1,4 @@
 import { test, expect } from 'vitest'
-import { AggregateCollection } from '../aggregate-collection.js'
 import { create_counter, merge_counts } from './counter.js'
 import { summarize_frequencies, summarize_numbers } from './summary.js'
 
@@ -11,19 +10,17 @@ function count(values: number[]) {
 	return counter.result()
 }
 
-const samples = [
-	[1, 2, 25, 3, 4, 4],
-	[5],
-	[1, 1, 2, 2],
-	[3, 3, 3, 1, 2],
-	[0, 0, 0],
-	[10, 20, 30, 40],
+// Expected values are the aggregates the 9.x analyzer produced for the same numbers
+const samples: [number[], Omit<ReturnType<typeof summarize_numbers>, 'total' | 'median'>][] = [
+	[[1, 2, 25, 3, 4, 4], { min: 1, max: 25, range: 24, mean: 39 / 6, mode: 4, sum: 39 }],
+	[[5], { min: 5, max: 5, range: 0, mean: 5, mode: 5, sum: 5 }],
+	[[1, 1, 2, 2], { min: 1, max: 2, range: 1, mean: 1.5, mode: 1.5, sum: 6 }],
+	[[3, 3, 3, 1, 2], { min: 1, max: 3, range: 2, mean: 2.4, mode: 3, sum: 12 }],
+	[[0, 0, 0], { min: 0, max: 0, range: 0, mean: 0, mode: 0, sum: 0 }],
+	[[10, 20, 30, 40], { min: 10, max: 40, range: 30, mean: 25, mode: 25, sum: 100 }],
 ]
 
-test.each(samples)('matches the 9.x aggregate for %j', (...values) => {
-	const aggregate = new AggregateCollection()
-	for (const value of values) aggregate.push(value)
-	const expected = aggregate.aggregate()
+test.each(samples)('summarizes %j like 9.x', (values, expected) => {
 	const { total, median, ...actual } = summarize_numbers(count(values))
 
 	expect(actual).toEqual(expected)

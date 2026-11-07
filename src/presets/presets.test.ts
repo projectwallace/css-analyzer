@@ -1,30 +1,21 @@
 import { test, expect, describe } from 'vitest'
-import { analyze as analyze_legacy } from '../index.js'
+import golden_empty from './golden/empty.json'
+import golden_single from './golden/single.json'
+import golden_stylesheet from './golden/stylesheet.json'
+import golden_tokens from './golden/tokens.json'
 import { analyze, create_analyzer, merge } from '../engine/analyzer.js'
 import { stylesheet_fixture, tokens_fixture } from '../test-fixture.js'
 import { all_collectors, analyze_all, analyze_compat, analyze_design_tokens } from './index.js'
 
-/** What 9.x added that v10 intentionally dropped */
-function without_removed_fields(value: unknown): unknown {
-	if (Array.isArray(value)) return value.map((item) => without_removed_fields(item))
-	if (value !== null && typeof value === 'object') {
-		return Object.fromEntries(
-			Object.entries(value)
-				.filter(([key]) => key !== '__meta__' && key !== 'uniqueWithLocations')
-				.map(([key, item]) => [key, without_removed_fields(item)]),
-		)
-	}
-	return value
-}
-
 describe('analyze_compat', () => {
+	// The golden files are the output of the 9.9.6 analyzer, minus `__meta__` and locations
 	test.each([
-		['the stylesheet fixture', stylesheet_fixture],
-		['the design tokens fixture', tokens_fixture],
-		['an empty stylesheet', ''],
-		['a stylesheet with a single rule', 'a { color: red }'],
-	])('gives the 9.x report for %s', (_name, css) => {
-		expect(analyze_compat(css)).toEqual(without_removed_fields(analyze_legacy(css)))
+		['the stylesheet fixture', stylesheet_fixture, golden_stylesheet],
+		['the design tokens fixture', tokens_fixture, golden_tokens],
+		['an empty stylesheet', '', golden_empty],
+		['a stylesheet with a single rule', 'a { color: red }', golden_single],
+	])('gives the 9.x report for %s', (_name, css, golden) => {
+		expect(analyze_compat(css)).toEqual(golden)
 	})
 
 	test('uses camelCase keys and the nested 9.x shape', () => {
@@ -53,10 +44,9 @@ describe('analyze_all', () => {
 
 	test('holds the same data as the 9.x report', () => {
 		const report = analyze_all(stylesheet_fixture)
-		const legacy = analyze_legacy(stylesheet_fixture)
-		expect(report.rules.total).toBe(legacy.rules.total)
-		expect(report.colors.total).toBe(legacy.values.colors.total)
-		expect(report.atrules.total).toBe(legacy.atrules.total)
+		expect(report.rules.total).toBe(golden_stylesheet.rules.total)
+		expect(report.colors.total).toBe(golden_stylesheet.values.colors.total)
+		expect(report.atrules.total).toBe(golden_stylesheet.atrules.total)
 	})
 
 	test('results of separate runs merge, and equal the incremental result', () => {

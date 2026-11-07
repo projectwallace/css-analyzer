@@ -63,7 +63,7 @@ export function get_vendor_prefixes(input: Input): string[] {
 export function get_accessibility_selectors(input: Input): string[] {
 	const found: string[] = []
 	function normalize(node: CSSNode) {
-		let clone = node.clone()
+		const clone = node.clone()
 		// We're intentionally not adding attr_flags here because they don't matter for normalization
 		// Also not lowercasing node.value because that DOES matter for CSS
 		if (clone.value) {
