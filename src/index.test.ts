@@ -47,7 +47,14 @@ describe('Public API', () => {
 
 	test('presets', () => {
 		expect(Object.keys(presets).sort()).toEqual(
-			['all_collectors', 'analyze_all', 'analyze_design_tokens', 'design_tokens_collectors'].sort(),
+			[
+				'all_collectors',
+				'analyze_all',
+				'analyze_compat',
+				'analyze_design_tokens',
+				'compat_collectors',
+				'design_tokens_collectors',
+			].sort(),
 		)
 	})
 

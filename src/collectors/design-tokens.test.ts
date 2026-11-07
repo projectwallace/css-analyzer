@@ -1,4 +1,5 @@
 import { test, expect, describe } from 'vitest'
+import golden from '../presets/golden/tokens.json'
 import { analyze, create_analyzer, merge } from '../engine/analyzer.js'
 import { tokens_fixture as fixture } from '../test-fixture.js'
 import { basename } from '../properties/property-utils.js'
@@ -20,6 +21,81 @@ import {
 function counts(result: CountResult): Record<string, number> {
 	return Object.fromEntries([...result.unique].map(([item, { count }]) => [item, count]))
 }
+
+/** Legacy contexts use the property as written; normalize them like the new collectors do */
+function fold_by_basename(
+	contexts: Record<string, { unique: Record<string, number> }>,
+): Record<string, Record<string, number>> {
+	const folded: Record<string, Record<string, number>> = {}
+	for (const [property, context] of Object.entries(contexts)) {
+		const target = (folded[basename(property)] ??= {})
+		for (const [color, count] of Object.entries(context.unique)) {
+			target[color] = (target[color] ?? 0) + count
+		}
+	}
+	return folded
+}
+
+describe('parity with the 9.x analyzer (golden output of 9.9.6)', () => {
+	const legacy = golden
+	const tokens = analyze_design_tokens(fixture)
+
+	test('colors', () => {
+		expect(counts(tokens.colors)).toEqual(legacy.values.colors.unique)
+		expect(tokens.colors.total).toBe(legacy.values.colors.total)
+		expect(tokens.colors.total_unique).toBe(legacy.values.colors.totalUnique)
+	})
+
+	test('color formats', () => {
+		expect(counts(tokens.colors.formats)).toEqual(legacy.values.colors.formats.unique)
+	})
+
+	test('colors per property (properties are normalized: vendor prefixes merge)', () => {
+		const expected = fold_by_basename(legacy.values.colors.itemsPerContext)
+
+		expect(Object.keys(expected).sort()).toEqual([...tokens.colors.by_context.keys()].sort())
+		for (const [property, expected_counts] of Object.entries(expected)) {
+			expect(counts(tokens.colors.by_context.get(property)!)).toEqual(expected_counts)
+		}
+	})
+
+	test('font sizes', () => {
+		expect(counts(tokens.font_sizes)).toEqual(legacy.values.fontSizes.unique)
+	})
+
+	test('font families', () => {
+		expect(counts(tokens.font_families)).toEqual(legacy.values.fontFamilies.unique)
+	})
+
+	test('line heights', () => {
+		expect(counts(tokens.line_heights)).toEqual(legacy.values.lineHeights.unique)
+	})
+
+	test('gradients', () => {
+		expect(counts(tokens.gradients)).toEqual(legacy.values.gradients.unique)
+	})
+
+	test('box shadows', () => {
+		expect(counts(tokens.box_shadows)).toEqual(legacy.values.boxShadows.unique)
+	})
+
+	test('border radiuses', () => {
+		expect(counts(tokens.radii)).toEqual(legacy.values.borderRadiuses.unique)
+		for (const [property, expected] of Object.entries(
+			legacy.values.borderRadiuses.itemsPerContext,
+		)) {
+			expect(counts(tokens.radii.by_context.get(property)!)).toEqual(expected.unique)
+		}
+	})
+
+	test('durations', () => {
+		expect(counts(tokens.durations)).toEqual(legacy.values.animations.durations.unique)
+	})
+
+	test('timing functions', () => {
+		expect(counts(tokens.easings)).toEqual(legacy.values.animations.timingFunctions.unique)
+	})
+})
 
 describe('options', () => {
 	test('locations point at the value node (or the token for colors and gradients)', () => {

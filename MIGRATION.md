@@ -1,5 +1,20 @@
 # Migrating from 9.x to 10
 
+## The quick way
+
+```diff
+-import { analyze } from '@projectwallace/css-analyzer'
++import { analyze_compat as analyze } from '@projectwallace/css-analyzer/presets'
+```
+
+`analyze_compat(css)` returns the 9.x report: the same nested shape, camelCase keys and numbers (including ordered `items`). It runs every collector, so it is as expensive as 9.x was. Moving to collectors is where the speed-up and the smaller bundles come from.
+
+What it does **not** have:
+
+- the `useLocations` option (use `locations: true` on a collector instead)
+- `__meta__` (parse and analyze timings)
+- `uniqueWithLocations`
+
 ## From `analyze()` to collectors
 
 | 9.x                                           | 10                                                                                 |
@@ -57,4 +72,4 @@ Removed: `isIe9Hack` (use `get_value_browserhacks`), `hasVendorPrefix`, `cssKeyw
 
 - Collectors, `create_analyzer()` for many inputs, and `merge()` for independent results.
 - Your own collectors with `define_collector()`.
-- Presets for design tokens and for everything (`analyze_all`).
+- Presets for design tokens, everything, and 9.x compatibility.

@@ -113,13 +113,18 @@ Results of `merge()` equal the result of adding both inputs to one analyzer. If 
 ### Presets
 
 ```js
-import { analyze_design_tokens, analyze_all } from '@projectwallace/css-analyzer/presets'
+import {
+	analyze_design_tokens,
+	analyze_all,
+	analyze_compat,
+} from '@projectwallace/css-analyzer/presets'
 
 analyze_design_tokens(css) // colors, font sizes/families, line heights, gradients, shadows, radii, durations, easings
 analyze_all(css) // every collector, flat: result.colors, result.atrules, result.selectors, ...
+analyze_compat(css) // the 9.x report: nested, camelCase, same numbers
 ```
 
-Each preset also exists as a collector map (`design_tokens_collectors`, `all_collectors`) that you can spread, narrow or extend:
+Each preset also exists as a collector map (`design_tokens_collectors`, `all_collectors`, `compat_collectors`) that you can spread, narrow or extend:
 `analyze(css, { ...design_tokens_collectors, z: z_indexes() })`.
 
 ### Collectors
@@ -188,7 +193,7 @@ Also: `get_complexity`, `get_vendor_prefixes`, `get_accessibility_selectors`, `g
 
 ## Upgrading from 9.x
 
-See [MIGRATION.md](./MIGRATION.md).
+See [MIGRATION.md](./MIGRATION.md). Short version: replace `analyze(css)` with `analyze_compat(css)` from `@projectwallace/css-analyzer/presets` to get the same report, then move to collectors at your own pace.
 
 ## Acknowledgements
 
