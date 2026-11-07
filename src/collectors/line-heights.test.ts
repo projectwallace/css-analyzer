@@ -1,6 +1,11 @@
-import { describe, test } from 'vitest'
-import { expect } from 'vitest'
-import { analyze_compat as analyze } from '../presets/compat.js'
+import { test, expect, describe } from 'vitest'
+import { analyze } from '../engine/analyzer.js'
+import { plain } from '../test-utils.js'
+import { line_heights } from './line-heights.js'
+
+function run(css: string) {
+	return plain(analyze(css, { result: line_heights() }).result)
+}
 
 test('recognizes line-height', () => {
 	const fixture = `
@@ -15,10 +20,10 @@ test('recognizes line-height', () => {
       font-size: 12px;
     }
   `
-	const actual = analyze(fixture).values.lineHeights
+	const actual = run(fixture)
 	const expected = {
 		total: 5,
-		totalUnique: 5,
+		total_unique: 5,
 		unique: {
 			'1': 1,
 			'100%': 1,
@@ -26,7 +31,6 @@ test('recognizes line-height', () => {
 			'2em': 1,
 			normal: 1,
 		},
-		uniquenessRatio: 5 / 5,
 	}
 
 	expect(actual).toEqual(expected)
@@ -50,36 +54,35 @@ test('extracts the `font` shorthand', () => {
       font-size: 12px;
     }
   `
-	const actual = analyze(fixture).values.lineHeights
+	const actual = run(fixture)
 	const expected = {
 		total: 7,
-		totalUnique: 3,
+		total_unique: 3,
 		unique: {
 			'1': 5,
 			'1.5': 1,
 			'0': 1,
 		},
-		uniquenessRatio: 3 / 7,
 	}
 	expect(actual).toEqual(expected)
 })
 
 describe('normalizing', () => {
 	test('line-height', () => {
-		const actual = analyze(`test { line-height: 1EM }`).values.lineHeights.unique
+		const actual = run(`test { line-height: 1EM }`).unique
 		expect(actual).toEqual({ '1em': 1 })
 	})
 
 	test('font shorthand', () => {
-		const actual = analyze(`test { font: 10PX/1EM serif }`).values.lineHeights.unique
+		const actual = run(`test { font: 10PX/1EM serif }`).unique
 		expect(actual).toEqual({ '1em': 1 })
 	})
 
 	test('leaves var() intact', () => {
-		const actual = analyze(`test {
+		const actual = run(`test {
 			line-height: var(--lineHeight1);
 			line-height: VAR(--lineHeight2);
-		}`).values.lineHeights.unique
+		}`).unique
 		expect(actual).toEqual({
 			'var(--lineHeight1)': 1,
 			'VAR(--lineHeight2)': 1,
@@ -95,12 +98,11 @@ test('handles system fonts', () => {
       font: large menu;  /* use a font family named "menu" */
     }
   `
-	const actual = analyze(fixture).values.lineHeights
+	const actual = run(fixture)
 	const expected = {
 		total: 0,
-		totalUnique: 0,
+		total_unique: 0,
 		unique: {},
-		uniquenessRatio: 0,
 	}
 
 	expect(actual).toEqual(expected)
@@ -123,12 +125,11 @@ test('ignores keywords and global values', () => {
       font: unset;
 		}
 	`
-	const actual = analyze(fixture).values.fontFamilies
+	const actual = run(fixture)
 	const expected = {
 		total: 0,
-		totalUnique: 0,
+		total_unique: 0,
 		unique: {},
-		uniquenessRatio: 0,
 	}
 
 	expect(actual).toEqual(expected)

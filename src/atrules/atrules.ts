@@ -37,14 +37,14 @@ export function get_supports_browserhacks(input: Input): string[] {
 	return find_hacks('supports', input, function (node, on_hack) {
 		// Check SupportsQuery nodes for browserhack patterns
 		if (is_supports_query(node)) {
-			const normalizedPrelude = node.value.toString().toLowerCase().replaceAll(/\s+/g, '')
+			const normalized_prelude = node.value.toString().toLowerCase().replaceAll(/\s+/g, '')
 
 			// Check for known browserhack patterns
-			if (normalizedPrelude.includes('-webkit-appearance:none')) {
+			if (normalized_prelude.includes('-webkit-appearance:none')) {
 				on_hack('-webkit-appearance: none')
 				return BREAK
 			}
-			if (normalizedPrelude.includes('-moz-appearance:meterbar')) {
+			if (normalized_prelude.includes('-moz-appearance:meterbar')) {
 				on_hack('-moz-appearance: meterbar')
 				return BREAK
 			}

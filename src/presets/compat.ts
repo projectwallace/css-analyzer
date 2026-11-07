@@ -156,9 +156,9 @@ function count(result: CountResult): CompatCount {
 }
 
 function count_with_contexts(result: ContextCountResult): CompatContextCount {
-	const itemsPerContext: Record<string, CompatCount> = {}
-	for (const [context, counts] of result.by_context) itemsPerContext[context] = count(counts)
-	return { ...count(result), itemsPerContext }
+	const items_per_context: Record<string, CompatCount> = {}
+	for (const [context, counts] of result.by_context) items_per_context[context] = count(counts)
+	return { ...count(result), itemsPerContext: items_per_context }
 }
 
 function aggregate(result: CountResult): CompatAggregate {

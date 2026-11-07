@@ -1,7 +1,13 @@
+import { test, expect } from 'vitest'
+import { analyze } from '../engine/analyzer.js'
+import { plain } from '../test-utils.js'
+import { font_families } from './font-families.js'
+
+function run(css: string) {
+	return plain(analyze(css, { result: font_families() }).result)
+}
+
 // oxlint-disable no-unused-expressions
-import { test } from 'vitest'
-import { expect } from 'vitest'
-import { analyze_compat as analyze } from '../presets/compat.js'
 
 test('recognizes a font-family', () => {
 	const fixture = `
@@ -19,10 +25,10 @@ test('recognizes a font-family', () => {
       font-size: 12px;
     }
   `
-	const actual = analyze(fixture).values.fontFamilies
+	const actual = run(fixture)
 	const expected = {
 		total: 7,
-		totalUnique: 7,
+		total_unique: 7,
 		unique: {
 			'"Droid Sans", serif': 1,
 			'sans-serif': 1,
@@ -32,7 +38,6 @@ test('recognizes a font-family', () => {
 			'Consolas, "Liberation Mono", Menlo, Courier, monospace': 1,
 			'-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"': 1,
 		},
-		uniquenessRatio: 7 / 7,
 	}
 
 	expect(actual).toEqual(expected)
@@ -59,10 +64,10 @@ test('extracts the `font` shorthand', () => {
       font-size: 123456789px;
     }
   `
-	const actual = analyze(fixture).values.fontFamilies
+	const actual = run(fixture)
 	const expected = {
 		total: 11,
-		totalUnique: 7,
+		total_unique: 7,
 		unique: {
 			[`'Noto Sans'`]: 1,
 			'"Source Sans Pro", serif': 1,
@@ -72,7 +77,6 @@ test('extracts the `font` shorthand', () => {
 			a: 1,
 			'var(--fontStack-monospace, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace)': 1,
 		},
-		uniquenessRatio: 7 / 11,
 	}
 	expect(actual).toEqual(expected)
 })
@@ -84,7 +88,7 @@ test('does not crash on `12px var(...)', () => {
     }
   `
 	expect(() => {
-		analyze(fixture).values.fontFamilies
+		run(fixture)
 	}).not.toThrow()
 })
 
@@ -95,14 +99,10 @@ test('does not crash on 14px "Inter Var", sans-serif, 700', () => {
     }
   `
 	expect(() => {
-		analyze(fixture).values.fontFamilies
+		run(fixture)
 	}).not.toThrow()
-	const { fontFamilies, fontSizes } = analyze(fixture).values
-	expect(fontFamilies.unique).toEqual({
+	expect(run(fixture).unique).toEqual({
 		'"Inter Var", sans-serif, 700': 1,
-	})
-	expect(fontSizes.unique).toEqual({
-		'14px': 1,
 	})
 })
 
@@ -113,7 +113,7 @@ test('does not crash on var(--x, )', () => {
     }
   `
 	expect(() => {
-		analyze(fixture).values.fontFamilies
+		run(fixture)
 	}).not.toThrowError()
 })
 
@@ -125,14 +125,13 @@ test('handles system fonts', () => {
       font: large menu;  /* use a font family named "menu" */
     }
   `
-	const actual = analyze(fixture).values.fontFamilies
+	const actual = run(fixture)
 	const expected = {
 		total: 1,
-		totalUnique: 1,
+		total_unique: 1,
 		unique: {
 			menu: 1,
 		},
-		uniquenessRatio: 1 / 1,
 	}
 
 	expect(actual).toEqual(expected)
@@ -155,12 +154,11 @@ test('ignores keywords and global values', () => {
       font: unset;
     }
   `
-	const actual = analyze(fixture).values.fontFamilies
+	const actual = run(fixture)
 	const expected = {
 		total: 0,
-		totalUnique: 0,
+		total_unique: 0,
 		unique: {},
-		uniquenessRatio: 0,
 	}
 
 	expect(actual).toEqual(expected)

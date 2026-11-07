@@ -39,14 +39,14 @@ function max(list: Specificity[]): Specificity {
 	return list.sort(compare_specificity).at(-1)!
 }
 
-function selector_specificity(selectorAST: Selector): Specificity {
+function selector_specificity(selector_ast: Selector): Specificity {
 	// https://www.w3.org/TR/selectors-4/#specificity-rules
 	let a = 0 /* ID Selectors */
 	let b = 0 /* Class selectors, Attributes selectors, and Pseudo-classes */
 	let c = 0 /* Type selectors and Pseudo-elements */
 
 	// Iterate through all parts of the selector (children of NODE_SELECTOR)
-	let current = selectorAST.first_child
+	let current = selector_ast.first_child
 
 	while (current) {
 		switch (current.type) {
@@ -83,10 +83,10 @@ function selector_specificity(selectorAST: Selector): Specificity {
 					case 'has': {
 						if (current.has_children) {
 							// The first child should be a NODE_SELECTOR_LIST
-							const childSelectorList = current.first_child
-							if (childSelectorList && is_selector_list(childSelectorList)) {
+							const child_selector_list = current.first_child
+							if (child_selector_list && is_selector_list(child_selector_list)) {
 								// Calculate Specificity for all selectors in the list and get max
-								const max1 = max(get_specificity(childSelectorList))
+								const max1 = max(get_specificity(child_selector_list))
 
 								// Adjust orig specificity
 								a += max1[0]
@@ -104,10 +104,10 @@ function selector_specificity(selectorAST: Selector): Specificity {
 						b += 1
 
 						// Get NODE_SELECTOR_NTH_OF which contains the "of" selector list
-						const nthOf = current.first_child
-						if (nthOf && is_nth_of_selector(nthOf) && nthOf.selector) {
+						const nth_of = current.first_child
+						if (nth_of && is_nth_of_selector(nth_of) && nth_of.selector) {
 							// Use the convenience property to access the selector list directly
-							const max2 = max(get_specificity(nthOf.selector))
+							const max2 = max(get_specificity(nth_of.selector))
 
 							// Adjust orig specificity
 							a += max2[0]
@@ -123,26 +123,24 @@ function selector_specificity(selectorAST: Selector): Specificity {
 						b += 1
 
 						const selector_list = current.first_child
-						const childSelector = selector_list?.first_child
-						if (childSelector && is_selector(childSelector)) {
+						const child_selector = selector_list?.first_child
+						if (child_selector && is_selector(child_selector)) {
 							// Calculate specificity for parts before the first combinator
-							let childPart = childSelector.first_child
-							while (childPart) {
-								if (is_combinator(childPart)) {
-									break
-								}
+							let child_part = child_selector.first_child
+							while (child_part) {
+								if (is_combinator(child_part)) break
 
 								// Calculate contribution from this part
-								const partSpecificity = selector_specificity({
+								const part_specificity = selector_specificity({
 									type_name: 'Selector',
-									first_child: childPart,
+									first_child: child_part,
 									has_children: true,
 								} as Selector)
-								a += partSpecificity[0] ?? 0
-								b += partSpecificity[1] ?? 0
-								c += partSpecificity[2] ?? 0
+								a += part_specificity[0] ?? 0
+								b += part_specificity[1] ?? 0
+								c += part_specificity[2] ?? 0
 
-								childPart = childPart.next_sibling as SelectorNode
+								child_part = child_part.next_sibling as SelectorNode
 							}
 						}
 						break
@@ -171,26 +169,24 @@ function selector_specificity(selectorAST: Selector): Specificity {
 						c += 1
 
 						const selector_list = current.first_child
-						const childSelector = selector_list?.first_child
-						if (childSelector && is_selector(childSelector)) {
+						const child_selector = selector_list?.first_child
+						if (child_selector && is_selector(child_selector)) {
 							// Calculate specificity for parts before the first combinator
-							let childPart = childSelector.first_child
-							while (childPart) {
-								if (is_combinator(childPart)) {
-									break
-								}
+							let child_part = child_selector.first_child
+							while (child_part) {
+								if (is_combinator(child_part)) break
 
 								// Calculate contribution from this part
-								const partSpecificity = selector_specificity({
+								const part_specificity = selector_specificity({
 									type_name: 'Selector',
-									first_child: childPart,
+									first_child: child_part,
 									has_children: true,
 								} as Selector)
-								a += partSpecificity[0] ?? 0
-								b += partSpecificity[1] ?? 0
-								c += partSpecificity[2] ?? 0
+								a += part_specificity[0] ?? 0
+								b += part_specificity[1] ?? 0
+								c += part_specificity[2] ?? 0
 
-								childPart = childPart.next_sibling as SelectorNode
+								child_part = child_part.next_sibling as SelectorNode
 							}
 						}
 						break
@@ -232,13 +228,13 @@ function selector_specificity(selectorAST: Selector): Specificity {
 
 			case TYPE_SELECTOR: {
 				// Omit namespace
-				let typeSelector = current.name ?? ''
-				if (typeSelector.includes('|')) {
-					typeSelector = typeSelector.split('|')[1] ?? ''
+				let type_selector = current.name ?? ''
+				if (type_selector.includes('|')) {
+					type_selector = type_selector.split('|')[1] ?? ''
 				}
 
 				// "Ignore the universal selector"
-				if (typeSelector !== '*') {
+				if (type_selector !== '*') {
 					c += 1
 				}
 				break

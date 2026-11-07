@@ -1,6 +1,11 @@
-import { test } from 'vitest'
-import { expect } from 'vitest'
-import { analyze_compat as analyze } from '../presets/compat.js'
+import { test, expect } from 'vitest'
+import { analyze } from '../engine/analyzer.js'
+import { plain } from '../test-utils.js'
+import { z_indexes } from './z-indexes.js'
+
+function run(css: string) {
+	return plain(analyze(css, { result: z_indexes() }).result)
+}
 
 test('finds simple values', () => {
 	const fixture = `
@@ -15,10 +20,10 @@ test('finds simple values', () => {
       z-index: calc(var(--model-z-index) - 1);
     }
   `
-	const actual = analyze(fixture).values.zindexes
+	const actual = run(fixture)
 	const expected = {
 		total: 7,
-		totalUnique: 6,
+		total_unique: 6,
 		unique: {
 			'0': 2,
 			'1': 1,
@@ -27,7 +32,6 @@ test('finds simple values', () => {
 			'-100': 1,
 			'calc(var(--model-z-index) - 1)': 1,
 		},
-		uniquenessRatio: 6 / 7,
 	}
 
 	expect(actual).toEqual(expected)
@@ -46,12 +50,11 @@ test('ignores global CSS keywords', () => {
       z-index: unset;
     }
   `
-	const actual = analyze(fixture).values.zindexes
+	const actual = run(fixture)
 	const expected = {
 		total: 0,
-		totalUnique: 0,
+		total_unique: 0,
 		unique: {},
-		uniquenessRatio: 0,
 	}
 
 	expect(actual).toEqual(expected)

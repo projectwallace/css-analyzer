@@ -1,9 +1,14 @@
-import { test } from 'vitest'
-import { expect } from 'vitest'
-import { analyze_compat as analyze } from '../presets/compat.js'
+import { test, expect } from 'vitest'
+import { analyze } from '../engine/analyzer.js'
+import { plain } from '../test-utils.js'
+import { colors } from './colors.js'
+
+function run(css: string) {
+	return plain(analyze(css, { result: colors({ contexts: true, property: 'as_written' }) }).result)
+}
 
 test('finds hex colors', () => {
-	const actual = analyze(`
+	const actual = run(`
     test {
       color: #000;
       color: #1111;
@@ -34,11 +39,11 @@ test('finds hex colors', () => {
     #not-a-color {
       margin: 0;
     }
-  `).values.colors
+  `)
 
 	const expected = {
 		total: 10,
-		totalUnique: 9,
+		total_unique: 9,
 		unique: {
 			'#000': 1,
 			'#1111': 1,
@@ -50,12 +55,10 @@ test('finds hex colors', () => {
 			'#777': 1,
 			'#aabbcc': 1,
 		},
-		uniquenessRatio: 9 / 10,
-		itemsPerContext: {
+		by_context: {
 			color: {
 				total: 4,
-				totalUnique: 4,
-				uniquenessRatio: 1,
+				total_unique: 4,
 				unique: {
 					'#000': 1,
 					'#1111': 1,
@@ -65,40 +68,35 @@ test('finds hex colors', () => {
 			},
 			background: {
 				total: 2,
-				totalUnique: 1,
-				uniquenessRatio: 1 / 2,
+				total_unique: 1,
 				unique: {
 					'#444': 2,
 				},
 			},
 			'box-shadow': {
 				total: 1,
-				totalUnique: 1,
-				uniquenessRatio: 1,
+				total_unique: 1,
 				unique: {
 					'#555': 1,
 				},
 			},
 			'outline-color': {
 				total: 1,
-				totalUnique: 1,
-				uniquenessRatio: 1,
+				total_unique: 1,
 				unique: {
 					'#666': 1,
 				},
 			},
 			test: {
 				total: 1,
-				totalUnique: 1,
-				uniquenessRatio: 1,
+				total_unique: 1,
 				unique: {
 					'#777': 1,
 				},
 			},
 			casing: {
 				total: 1,
-				totalUnique: 1,
-				uniquenessRatio: 1,
+				total_unique: 1,
 				unique: {
 					'#aabbcc': 1,
 				},
@@ -106,37 +104,34 @@ test('finds hex colors', () => {
 		},
 		formats: {
 			total: 10,
-			totalUnique: 4,
+			total_unique: 4,
 			unique: {
 				hex3: 6,
 				hex4: 1,
 				hex6: 2,
 				hex8: 1,
 			},
-			uniquenessRatio: 4 / 10,
 		},
 	}
 	expect(actual).toEqual(expected)
 })
 
 test('Counts hex format correctly when combined with a browserhack', () => {
-	const actual = analyze(`
+	const actual = run(`
     a {
       color: #000\\9;
     }
   `)
 	const expected = {
 		total: 1,
-		totalUnique: 1,
+		total_unique: 1,
 		unique: {
 			'#000': 1,
 		},
-		uniquenessRatio: 1,
-		itemsPerContext: {
+		by_context: {
 			color: {
 				total: 1,
-				totalUnique: 1,
-				uniquenessRatio: 1,
+				total_unique: 1,
 				unique: {
 					'#000': 1,
 				},
@@ -144,18 +139,17 @@ test('Counts hex format correctly when combined with a browserhack', () => {
 		},
 		formats: {
 			total: 1,
-			totalUnique: 1,
+			total_unique: 1,
 			unique: {
 				hex3: 1,
 			},
-			uniquenessRatio: 1,
 		},
 	}
-	expect(actual.values.colors).toEqual(expected)
+	expect(actual).toEqual(expected)
 })
 
 test('finds hsl(a) colors', () => {
-	const actual = analyze(`
+	const actual = run(`
     test {
       color: hsl(1, 20%, 30%);
       color: hsl(1 20% 30% / 1);
@@ -201,11 +195,11 @@ test('finds hsl(a) colors', () => {
       color: hsl(270 60% 50% / .15);
       color: hsl(270 60% 50% / 15%);
     }
-  `).values.colors
+  `)
 
 	const expected = {
 		total: 24,
-		totalUnique: 23,
+		total_unique: 23,
 		unique: {
 			'hsl(1, 20%, 30%)': 1,
 			'hsl(1 20% 30% / 1)': 1,
@@ -231,11 +225,10 @@ test('finds hsl(a) colors', () => {
 			'hsl(270 60% 50% / .15)': 1,
 			'hsl(270 60% 50% / 15%)': 1,
 		},
-		uniquenessRatio: 23 / 24,
-		itemsPerContext: {
+		by_context: {
 			color: {
 				total: 19,
-				totalUnique: 19,
+				total_unique: 19,
 				unique: {
 					'hsl(1, 20%, 30%)': 1,
 					'hsl(1 20% 30% / 1)': 1,
@@ -257,56 +250,50 @@ test('finds hsl(a) colors', () => {
 					'hsl(270 60% 50% / .15)': 1,
 					'hsl(270 60% 50% / 15%)': 1,
 				},
-				uniquenessRatio: 1,
 			},
 			background: {
 				total: 2,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'hsl(3, 20%, 30%)': 2,
 				},
-				uniquenessRatio: 0.5,
 			},
 			'box-shadow': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'hsl(4, 20%, 30%)': 1,
 				},
-				uniquenessRatio: 1,
 			},
 			'outline-color': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'hsl(5, 20%, 30%)': 1,
 				},
-				uniquenessRatio: 1,
 			},
 			test: {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'hsl(6, 20%, 30%)': 1,
 				},
-				uniquenessRatio: 1,
 			},
 		},
 		formats: {
 			total: 24,
-			totalUnique: 2,
+			total_unique: 2,
 			unique: {
 				hsl: 20,
 				hsla: 4,
 			},
-			uniquenessRatio: 2 / 24,
 		},
 	}
 	expect(actual).toEqual(expected)
 })
 
 test('finds rgb(a) colors', () => {
-	const actual = analyze(`
+	const actual = run(`
     test {
       color: rgb(1, 1, 1);
       color: rgba(2, 2, 2, 0.2);
@@ -345,11 +332,11 @@ test('finds rgb(a) colors', () => {
     test-exotic-numbers {
       color: rgba(1e2, .5e1, .5e0, +.25e2%);
     }
-  `).values.colors
+  `)
 
 	const expected = {
 		total: 17,
-		totalUnique: 16,
+		total_unique: 16,
 		unique: {
 			'rgb(1, 1, 1)': 1,
 			'rgba(2, 2, 2, 0.2)': 1,
@@ -368,11 +355,10 @@ test('finds rgb(a) colors', () => {
 			'rgba(255, 0, 153.6, 1)': 1,
 			'rgba(1e2, .5e1, .5e0, +.25e2%)': 1,
 		},
-		uniquenessRatio: 16 / 17,
-		itemsPerContext: {
+		by_context: {
 			color: {
 				total: 12,
-				totalUnique: 12,
+				total_unique: 12,
 				unique: {
 					'rgb(1, 1, 1)': 1,
 					'rgba(2, 2, 2, 0.2)': 1,
@@ -387,56 +373,50 @@ test('finds rgb(a) colors', () => {
 					'rgba(255, 0, 153.6, 1)': 1,
 					'rgba(1e2, .5e1, .5e0, +.25e2%)': 1,
 				},
-				uniquenessRatio: 1,
 			},
 			background: {
 				total: 2,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'rgb(5, 5, 5)': 2,
 				},
-				uniquenessRatio: 0.5,
 			},
 			'box-shadow': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'rgb(6,6,6)': 1,
 				},
-				uniquenessRatio: 1,
 			},
 			'outline-color': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'rgb(7,7,7)': 1,
 				},
-				uniquenessRatio: 1,
 			},
 			test: {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'rgb(8,8,8)': 1,
 				},
-				uniquenessRatio: 1,
 			},
 		},
 		formats: {
 			total: 17,
-			totalUnique: 2,
+			total_unique: 2,
 			unique: {
 				rgb: 9,
 				rgba: 8,
 			},
-			uniquenessRatio: 2 / 17,
 		},
 	}
 	expect(actual).toEqual(expected)
 })
 
 test('finds LCH() colors', () => {
-	const actual = analyze(`
+	const actual = run(`
     .lch {
       /* Source: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/lch() */
       color: lch(29.2345% 44.2 27);
@@ -455,7 +435,7 @@ test('finds LCH() colors', () => {
   `)
 	const expected = {
 		total: 8,
-		totalUnique: 8,
+		total_unique: 8,
 		unique: {
 			'lch(29.2345% 44.2 27)': 1,
 			'lch(52.2345% 72.2 56.2)': 1,
@@ -470,11 +450,10 @@ test('finds LCH() colors', () => {
 			'lch(52.2345% 72.2 56.2 / 0.5)': 1,
 			'lch(52.2345% 72.2 56.2 / 50%)': 1,
 		},
-		uniquenessRatio: 1,
-		itemsPerContext: {
+		by_context: {
 			color: {
 				total: 8,
-				totalUnique: 8,
+				total_unique: 8,
 				unique: {
 					'lch(29.2345% 44.2 27)': 1,
 					'lch(52.2345% 72.2 56.2)': 1,
@@ -485,24 +464,22 @@ test('finds LCH() colors', () => {
 					'lch(52.2345% 72.2 56.2 / 0.5)': 1,
 					'lch(52.2345% 72.2 56.2 / 50%)': 1,
 				},
-				uniquenessRatio: 1,
 			},
 		},
 		formats: {
 			total: 8,
-			totalUnique: 1,
+			total_unique: 1,
 			unique: {
 				lch: 8,
 			},
-			uniquenessRatio: 1 / 8,
 		},
 	}
 
-	expect(actual.values.colors).toEqual(expected)
+	expect(actual).toEqual(expected)
 })
 
 test('finds LAB() colors', () => {
-	const actual = analyze(`
+	const actual = run(`
     .lch {
       /* Source: https://drafts.csswg.org/css-color/#specifying-lab-lch */
       color: lab(52.2345% 40.1645 59.9971);
@@ -524,7 +501,7 @@ test('finds LAB() colors', () => {
   `)
 	const expected = {
 		total: 11,
-		totalUnique: 11,
+		total_unique: 11,
 		unique: {
 			'lab(52.2345% 40.1645 59.9971)': 1,
 			'lab(60.2345% -5.3654 58.956)': 1,
@@ -542,11 +519,10 @@ test('finds LAB() colors', () => {
 			'lab(52.2345% 40.1645 59.9971 / 0.5)': 1,
 			'lab(52.2345% 40.1645 59.9971 / 50%)': 1,
 		},
-		uniquenessRatio: 1,
-		itemsPerContext: {
+		by_context: {
 			color: {
 				total: 11,
-				totalUnique: 11,
+				total_unique: 11,
 				unique: {
 					'lab(52.2345% 40.1645 59.9971)': 1,
 					'lab(60.2345% -5.3654 58.956)': 1,
@@ -560,24 +536,22 @@ test('finds LAB() colors', () => {
 					'lab(52.2345% 40.1645 59.9971 / 0.5)': 1,
 					'lab(52.2345% 40.1645 59.9971 / 50%)': 1,
 				},
-				uniquenessRatio: 1,
 			},
 		},
 		formats: {
 			total: 11,
-			totalUnique: 1,
+			total_unique: 1,
 			unique: {
 				lab: 11,
 			},
-			uniquenessRatio: 1 / 11,
 		},
 	}
 
-	expect(actual.values.colors).toEqual(expected)
+	expect(actual).toEqual(expected)
 })
 
 test('finds hwb() colors', () => {
-	const actual = analyze(`
+	const actual = run(`
     .hwb {
       color: hwb(194 0% 0%);
       color: hwb(194, 0%, 0%);
@@ -592,8 +566,7 @@ test('finds hwb() colors', () => {
   `)
 	const expected = {
 		total: 7,
-		totalUnique: 7,
-		uniquenessRatio: 1,
+		total_unique: 7,
 		unique: {
 			'hwb(194 0% 0%)': 1,
 			'hwb(194, 0%, 0%)': 1,
@@ -605,10 +578,10 @@ test('finds hwb() colors', () => {
 			'hwb(194 0% 0% / 0.5)': 1,
 			'hwb(194 0% 0% / 50%)': 1,
 		},
-		itemsPerContext: {
+		by_context: {
 			color: {
 				total: 7,
-				totalUnique: 7,
+				total_unique: 7,
 				unique: {
 					'hwb(194 0% 0%)': 1,
 					'hwb(194, 0%, 0%)': 1,
@@ -618,24 +591,22 @@ test('finds hwb() colors', () => {
 					'hwb(194 0% 0% / 0.5)': 1,
 					'hwb(194 0% 0% / 50%)': 1,
 				},
-				uniquenessRatio: 1,
 			},
 		},
 		formats: {
 			total: 7,
-			totalUnique: 1,
+			total_unique: 1,
 			unique: {
 				hwb: 7,
 			},
-			uniquenessRatio: 1 / 7,
 		},
 	}
 
-	expect(actual.values.colors).toEqual(expected)
+	expect(actual).toEqual(expected)
 })
 
 test('finds color() colors', () => {
-	const actual = analyze(`
+	const actual = run(`
     .colors {
       color: color(rec2020 0.42053 0.979780 0.00579);
       color: color(display-p3 -0.6112 1.0079 -0.2192);
@@ -645,107 +616,98 @@ test('finds color() colors', () => {
   `)
 	const expected = {
 		total: 4,
-		totalUnique: 4,
+		total_unique: 4,
 		unique: {
 			'color(rec2020 0.42053 0.979780 0.00579)': 1,
 			'color(display-p3 -0.6112 1.0079 -0.2192)': 1,
 			'color(profoto-rgb 0.4835 0.9167 0.2188)': 1,
 			'color(xyz-d50 0.2005 0.14089 0.4472)': 1,
 		},
-		uniquenessRatio: 1,
-		itemsPerContext: {
+		by_context: {
 			color: {
 				total: 4,
-				totalUnique: 4,
+				total_unique: 4,
 				unique: {
 					'color(rec2020 0.42053 0.979780 0.00579)': 1,
 					'color(display-p3 -0.6112 1.0079 -0.2192)': 1,
 					'color(profoto-rgb 0.4835 0.9167 0.2188)': 1,
 					'color(xyz-d50 0.2005 0.14089 0.4472)': 1,
 				},
-				uniquenessRatio: 1,
 			},
 		},
 		formats: {
 			total: 4,
-			totalUnique: 1,
+			total_unique: 1,
 			unique: {
 				color: 4,
 			},
-			uniquenessRatio: 1 / 4,
 		},
 	}
 
-	expect(actual.values.colors).toEqual(expected)
+	expect(actual).toEqual(expected)
 })
 
 test('finds color keywords', () => {
-	const actual = analyze(`
+	const actual = run(`
     test {
       outline: 1px solid tomato;
       border-color: Aqua;
       outline-color: whitesmoke;
       background: linear-gradient(90deg, purple 0, purple 100%);
     }
-  `).values.colors
+  `)
 	const expected = {
 		total: 5,
-		totalUnique: 4,
+		total_unique: 4,
 		unique: {
 			tomato: 1,
 			aqua: 1,
 			whitesmoke: 1,
 			purple: 2,
 		},
-		uniquenessRatio: 4 / 5,
-		itemsPerContext: {
+		by_context: {
 			outline: {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					tomato: 1,
 				},
-				uniquenessRatio: 1,
 			},
 			'border-color': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					aqua: 1,
 				},
-				uniquenessRatio: 1,
 			},
 			'outline-color': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					whitesmoke: 1,
 				},
-				uniquenessRatio: 1,
 			},
 			background: {
 				total: 2,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					purple: 2,
 				},
-				uniquenessRatio: 0.5,
 			},
 		},
 		formats: {
 			total: 5,
-			totalUnique: 1,
+			total_unique: 1,
 			unique: {
 				named: 5,
 			},
-			uniquenessRatio: 1 / 5,
 		},
 	}
 	expect(actual).toEqual(expected)
 })
 
 test('does not report false positives for color keywords', () => {
-	const actual = analyze(`
+	const actual = run(`
     test {
       /* Not a blue keyword */
       background: url(icon-blue.png), url(blue-icon.png), url(blue_icon.png), url(icon_blue.png);
@@ -769,18 +731,15 @@ test('does not report false positives for color keywords', () => {
       /* not a color keyword */
       -ms-overflow-style: scrollbar;
     }
-  `).values.colors
+  `)
 	const expected = {
 		total: 0,
-		totalUnique: 0,
+		total_unique: 0,
 		unique: {},
-		uniquenessRatio: 0,
-		itemsPerContext: {},
 		formats: {
 			total: 0,
-			totalUnique: 0,
+			total_unique: 0,
 			unique: {},
-			uniquenessRatio: 0,
 		},
 	}
 
@@ -796,18 +755,15 @@ test.skip('ignores color names that are not actual colors', () => {
       unknown-property: blue; /* don't match value as a color when property is unknown */
     }
   `
-	const actual = analyze(fixture).values.colors
+	const actual = run(fixture)
 	const expected = {
 		total: 0,
-		totalUnique: 0,
+		total_unique: 0,
 		unique: {},
-		uniquenessRatio: 0,
-		itemsPerContext: {},
 		formats: {
 			total: 0,
-			totalUnique: 0,
+			total_unique: 0,
 			unique: {},
-			uniquenessRatio: 0,
 		},
 	}
 
@@ -825,60 +781,54 @@ test('finds colors in var() as fallback values', () => {
       text-shadow: 0 0 var(--main, var(--sec, #000));
     }
   `
-	const result = analyze(fixture)
-	const actual = result.values.colors
+	const result = run(fixture)
+	const actual = result
 	const expected = {
 		total: 4,
-		totalUnique: 4,
+		total_unique: 4,
 		unique: {
 			'#aaa': 1,
 			'#eee': 1,
 			'rgba(27, 31, 35, .2)': 1,
 			'#000': 1,
 		},
-		uniquenessRatio: 4 / 4,
-		itemsPerContext: {
+		by_context: {
 			'--main': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'#aaa': 1,
 				},
-				uniquenessRatio: 1,
 			},
 			color: {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'#eee': 1,
 				},
-				uniquenessRatio: 1,
 			},
 			'box-shadow': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'rgba(27, 31, 35, .2)': 1,
 				},
-				uniquenessRatio: 1,
 			},
 			'text-shadow': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'#000': 1,
 				},
-				uniquenessRatio: 1,
 			},
 		},
 		formats: {
 			total: 4,
-			totalUnique: 2,
+			total_unique: 2,
 			unique: {
 				hex3: 3,
 				rgba: 1,
 			},
-			uniquenessRatio: 2 / 4,
 		},
 	}
 
@@ -903,44 +853,40 @@ test('ignores CSS keywords', () => {
       background: none 0px 0px repeat scroll rgb(0, 0, 0);
     }
   `
-	const actual = analyze(fixture).values.colors
+	const actual = run(fixture)
 	const expected = {
 		total: 4,
-		totalUnique: 3,
+		total_unique: 3,
 		unique: {
 			currentcolor: 2,
 			transparent: 1,
 			'rgb(0, 0, 0)': 1,
 		},
-		uniquenessRatio: 3 / 4,
-		itemsPerContext: {
+		by_context: {
 			color: {
 				total: 3,
-				totalUnique: 2,
+				total_unique: 2,
 				unique: {
 					currentcolor: 2,
 					transparent: 1,
 				},
-				uniquenessRatio: 2 / 3,
 			},
 			background: {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'rgb(0, 0, 0)': 1,
 				},
-				uniquenessRatio: 1,
 			},
 		},
 		formats: {
 			total: 4,
-			totalUnique: 3,
+			total_unique: 3,
 			unique: {
 				currentcolor: 2,
 				transparent: 1,
 				rgb: 1,
 			},
-			uniquenessRatio: 3 / 4,
 		},
 	}
 
@@ -974,11 +920,11 @@ test('finds System Colors', () => {
       color: RandomWord;
     }
   `
-	const result = analyze(fixture)
-	const actual = result.values.colors
+	const result = run(fixture)
+	const actual = result
 	const expected = {
 		total: 17,
-		totalUnique: 17,
+		total_unique: 17,
 		unique: {
 			canvas: 1,
 			canvastext: 1,
@@ -998,11 +944,10 @@ test('finds System Colors', () => {
 			marktext: 1,
 			graytext: 1,
 		},
-		uniquenessRatio: 17 / 17,
-		itemsPerContext: {
+		by_context: {
 			color: {
 				total: 17,
-				totalUnique: 17,
+				total_unique: 17,
 				unique: {
 					canvas: 1,
 					canvastext: 1,
@@ -1022,16 +967,14 @@ test('finds System Colors', () => {
 					marktext: 1,
 					graytext: 1,
 				},
-				uniquenessRatio: 19 / 19,
 			},
 		},
 		formats: {
 			total: 17,
-			totalUnique: 1,
+			total_unique: 1,
 			unique: {
 				system: 17,
 			},
-			uniquenessRatio: 1 / 17,
 		},
 	}
 
@@ -1048,5 +991,5 @@ test('insane color mode', () => {
     }
   `
 
-	expect(() => analyze(fixture)).not.toThrow()
+	expect(() => run(fixture)).not.toThrow()
 })

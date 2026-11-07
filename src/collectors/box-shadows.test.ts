@@ -1,6 +1,11 @@
-import { test } from 'vitest'
-import { expect } from 'vitest'
-import { analyze_compat as analyze } from '../presets/compat.js'
+import { test, expect } from 'vitest'
+import { analyze } from '../engine/analyzer.js'
+import { plain } from '../test-utils.js'
+import { box_shadows } from './box-shadows.js'
+
+function run(css: string) {
+	return plain(analyze(css, { result: box_shadows() }).result)
+}
 
 test('finds simple values', () => {
 	const fixture = `
@@ -8,14 +13,13 @@ test('finds simple values', () => {
       box-shadow: 1px 1px 2px black;
     }
   `
-	const actual = analyze(fixture).values.boxShadows
+	const actual = run(fixture)
 	const expected = {
 		total: 1,
 		unique: {
 			'1px 1px 2px black': 1,
 		},
-		totalUnique: 1,
-		uniquenessRatio: 1,
+		total_unique: 1,
 	}
 
 	expect(actual).toEqual(expected)
@@ -27,14 +31,13 @@ test('finds complex values', () => {
       box-shadow: 1px 1px 1px black,inset 2px 3px 5px rgba(0,0,0,0.3),inset -2px -3px 5px rgba(255,255,255,0.5);
     }
   `
-	const actual = analyze(fixture).values.boxShadows
+	const actual = run(fixture)
 	const expected = {
 		total: 1,
 		unique: {
 			'1px 1px 1px black,inset 2px 3px 5px rgba(0,0,0,0.3),inset -2px -3px 5px rgba(255,255,255,0.5)': 1,
 		},
-		totalUnique: 1,
-		uniquenessRatio: 1,
+		total_unique: 1,
 	}
 
 	expect(actual).toEqual(expected)
@@ -46,14 +49,13 @@ test('finds vendor prefixed values', () => {
       -webkit-box-shadow: 1px 1px 2px black;
     }
   `
-	const actual = analyze(fixture).values.boxShadows
+	const actual = run(fixture)
 	const expected = {
 		total: 1,
 		unique: {
 			'1px 1px 2px black': 1,
 		},
-		totalUnique: 1,
-		uniquenessRatio: 1,
+		total_unique: 1,
 	}
 
 	expect(actual).toEqual(expected)
@@ -64,14 +66,13 @@ test('does not report var() fallback values as separate values', () => {
     with-fallback {
       box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   }`
-	const actual = analyze(fixture).values.boxShadows
+	const actual = run(fixture)
 	const expected = {
 		total: 1,
 		unique: {
 			'var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)': 1,
 		},
-		totalUnique: 1,
-		uniquenessRatio: 1,
+		total_unique: 1,
 	}
 	expect(actual).toEqual(expected)
 })
@@ -89,12 +90,11 @@ test('ignores keywords', () => {
       box-shadow: unset;
     }
   `
-	const actual = analyze(fixture).values.boxShadows
+	const actual = run(fixture)
 	const expected = {
 		total: 0,
 		unique: {},
-		totalUnique: 0,
-		uniquenessRatio: 0,
+		total_unique: 0,
 	}
 
 	expect(actual).toEqual(expected)
