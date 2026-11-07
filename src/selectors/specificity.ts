@@ -43,10 +43,10 @@ function argument_specificity(node: CSSNode): Specificity {
 	let a = 0
 	let b = 0
 	let c = 0
-	const childSelector = node.first_child?.first_child
-	if (childSelector && is_selector(childSelector)) {
+	const child_selector = node.first_child?.first_child
+	if (child_selector && is_selector(child_selector)) {
 		// Only the parts before the first combinator count
-		let part = childSelector.first_child
+		let part = child_selector.first_child
 		while (part && !is_combinator(part)) {
 			const [pa, pb, pc] = selector_specificity({ first_child: part } as Selector)
 			a += pa
@@ -58,7 +58,7 @@ function argument_specificity(node: CSSNode): Specificity {
 	return [a, b, c]
 }
 
-function selector_specificity(selectorAST: Selector): Specificity {
+function selector_specificity(selector_ast: Selector): Specificity {
 	// https://www.w3.org/TR/selectors-4/#specificity-rules
 	let a = 0 /* ID Selectors */
 	let b = 0 /* Class selectors, Attributes selectors, and Pseudo-classes */
@@ -70,7 +70,7 @@ function selector_specificity(selectorAST: Selector): Specificity {
 	}
 
 	// Iterate through all parts of the selector (children of NODE_SELECTOR)
-	let current = selectorAST.first_child
+	let current = selector_ast.first_child
 
 	while (current) {
 		switch (current.type) {
@@ -107,10 +107,10 @@ function selector_specificity(selectorAST: Selector): Specificity {
 					case 'has': {
 						if (current.has_children) {
 							// The first child should be a NODE_SELECTOR_LIST
-							const childSelectorList = current.first_child
-							if (childSelectorList && is_selector_list(childSelectorList)) {
+							const child_selector_list = current.first_child
+							if (child_selector_list && is_selector_list(child_selector_list)) {
 								// Calculate Specificity for all selectors in the list and get max
-								const max1 = max(get_specificity(childSelectorList))
+								const max1 = max(get_specificity(child_selector_list))
 
 								add(max1)
 							}
@@ -125,10 +125,10 @@ function selector_specificity(selectorAST: Selector): Specificity {
 						b += 1
 
 						// Get NODE_SELECTOR_NTH_OF which contains the "of" selector list
-						const nthOf = current.first_child
-						if (nthOf && is_nth_of_selector(nthOf) && nthOf.selector) {
+						const nth_of = current.first_child
+						if (nth_of && is_nth_of_selector(nth_of) && nth_of.selector) {
 							// Use the convenience property to access the selector list directly
-							const max2 = max(get_specificity(nthOf.selector))
+							const max2 = max(get_specificity(nth_of.selector))
 
 							add(max2)
 						}
@@ -206,13 +206,13 @@ function selector_specificity(selectorAST: Selector): Specificity {
 
 			case TYPE_SELECTOR: {
 				// Omit namespace
-				let typeSelector = current.name ?? ''
-				if (typeSelector.includes('|')) {
-					typeSelector = typeSelector.split('|')[1] ?? ''
+				let type_selector = current.name ?? ''
+				if (type_selector.includes('|')) {
+					type_selector = type_selector.split('|')[1] ?? ''
 				}
 
 				// "Ignore the universal selector"
-				if (typeSelector !== '*') {
+				if (type_selector !== '*') {
 					c += 1
 				}
 				break

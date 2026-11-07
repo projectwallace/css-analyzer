@@ -1,6 +1,13 @@
-import { test } from 'vitest'
-import { expect } from 'vitest'
-import { analyze_compat as analyze } from '../presets/compat.js'
+import { test, expect } from 'vitest'
+import { analyze } from '../engine/analyzer.js'
+import { plain } from '../test-utils.js'
+import { border_radiuses } from './border-radiuses.js'
+
+function run(css: string) {
+	return plain(
+		analyze(css, { result: border_radiuses({ contexts: true, property: 'as_written' }) }).result,
+	)
+}
 
 test('finds simple values', () => {
 	const fixture = `
@@ -34,7 +41,7 @@ test('finds simple values', () => {
 			border-radius: 10px 5% / 20px 25em 30px 35em;
     }
   `
-	const actual = analyze(fixture).values.borderRadiuses
+	const actual = run(fixture)
 	const expected = {
 		total: 8,
 		unique: {
@@ -47,12 +54,11 @@ test('finds simple values', () => {
 			'10px 5px 2em / 20px 25px 30%': 1,
 			'10px 5% / 20px 25em 30px 35em': 1,
 		},
-		totalUnique: 8,
-		uniquenessRatio: 1,
-		itemsPerContext: {
+		total_unique: 8,
+		by_context: {
 			'border-radius': {
 				total: 8,
-				totalUnique: 8,
+				total_unique: 8,
 				unique: {
 					'10px': 1,
 					'10px 5%': 1,
@@ -63,7 +69,6 @@ test('finds simple values', () => {
 					'10px 5px 2em / 20px 25px 30%': 1,
 					'10px 5% / 20px 25em 30px 35em': 1,
 				},
-				uniquenessRatio: 1,
 			},
 		},
 	}
@@ -78,33 +83,30 @@ test('finds vendor prefixed values', () => {
 			-webkit-border-top-right-radius: 10px;
     }
   `
-	const actual = analyze(fixture).values.borderRadiuses
+	const actual = run(fixture)
 	const expected = {
 		total: 2,
 		unique: {
 			'10px / 20px': 1,
 			'10px': 1,
 		},
-		totalUnique: 2,
-		itemsPerContext: {
+		total_unique: 2,
+		by_context: {
 			'-moz-border-radius': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'10px / 20px': 1,
 				},
-				uniquenessRatio: 1,
 			},
 			'-webkit-border-top-right-radius': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'10px': 1,
 				},
-				uniquenessRatio: 1,
 			},
 		},
-		uniquenessRatio: 1,
 	}
 
 	expect(actual).toEqual(expected)
@@ -119,48 +121,43 @@ test('finds non-shorthands, logical properties', () => {
 		border-end-start-radius: 1em 5em;
 	}
 	`
-	const actual = analyze(fixture).values.borderRadiuses
+	const actual = run(fixture)
 	const expected = {
 		total: 4,
 		unique: {
 			'1em 5em': 4,
 		},
-		totalUnique: 1,
-		itemsPerContext: {
+		total_unique: 1,
+		by_context: {
 			'border-start-start-radius': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'1em 5em': 1,
 				},
-				uniquenessRatio: 1,
 			},
 			'border-start-end-radius': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'1em 5em': 1,
 				},
-				uniquenessRatio: 1,
 			},
 			'border-end-end-radius': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'1em 5em': 1,
 				},
-				uniquenessRatio: 1,
 			},
 			'border-end-start-radius': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'1em 5em': 1,
 				},
-				uniquenessRatio: 1,
 			},
 		},
-		uniquenessRatio: 1 / 4,
 	}
 
 	expect(actual).toEqual(expected)
@@ -175,48 +172,43 @@ test('finds non-shorthands, non-logical properties', () => {
 		border-bottom-left-radius: 1em 5em;
 	}
 	`
-	const actual = analyze(fixture).values.borderRadiuses
+	const actual = run(fixture)
 	const expected = {
 		total: 4,
 		unique: {
 			'1em 5em': 4,
 		},
-		totalUnique: 1,
-		itemsPerContext: {
+		total_unique: 1,
+		by_context: {
 			'border-top-left-radius': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'1em 5em': 1,
 				},
-				uniquenessRatio: 1,
 			},
 			'border-top-right-radius': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'1em 5em': 1,
 				},
-				uniquenessRatio: 1,
 			},
 			'border-bottom-left-radius': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'1em 5em': 1,
 				},
-				uniquenessRatio: 1,
 			},
 			'border-bottom-right-radius': {
 				total: 1,
-				totalUnique: 1,
+				total_unique: 1,
 				unique: {
 					'1em 5em': 1,
 				},
-				uniquenessRatio: 1,
 			},
 		},
-		uniquenessRatio: 1 / 4,
 	}
 
 	expect(actual).toEqual(expected)
@@ -235,13 +227,11 @@ test('ignores keywords', () => {
       box-shadow: unset;
     }
   `
-	const actual = analyze(fixture).values.borderRadiuses
+	const actual = run(fixture)
 	const expected = {
 		total: 0,
 		unique: {},
-		totalUnique: 0,
-		itemsPerContext: {},
-		uniquenessRatio: 0,
+		total_unique: 0,
 	}
 
 	expect(actual).toEqual(expected)

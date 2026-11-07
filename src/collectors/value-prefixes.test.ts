@@ -1,6 +1,11 @@
-import { test } from 'vitest'
-import { expect } from 'vitest'
-import { analyze_compat as analyze } from '../presets/compat.js'
+import { test, expect } from 'vitest'
+import { analyze } from '../engine/analyzer.js'
+import { plain } from '../test-utils.js'
+import { value_prefixes } from './values.js'
+
+function run(css: string) {
+	return plain(analyze(css, { result: value_prefixes() }).result)
+}
 
 test('finds simple prefixes', () => {
 	const fixture = `
@@ -27,10 +32,10 @@ test('finds simple prefixes', () => {
       }
     }
   `
-	const actual = analyze(fixture).values.prefixes
+	const actual = run(fixture)
 	const expected = {
 		total: 9,
-		totalUnique: 7,
+		total_unique: 7,
 		unique: {
 			'-moz-max-content': 1,
 			'-webkit-max-content': 1,
@@ -40,7 +45,6 @@ test('finds simple prefixes', () => {
 			'-moz-transform': 1,
 			'-o-transform': 2,
 		},
-		uniquenessRatio: 7 / 9,
 	}
 
 	expect(actual).toEqual(expected)
@@ -53,14 +57,13 @@ test('normalizes prefixes', () => {
       WIDTH: -MOZ-MAX-CONTENT;
     }
   `
-	const actual = analyze(fixture).values.prefixes
+	const actual = run(fixture)
 	const expected = {
 		total: 2,
-		totalUnique: 1,
+		total_unique: 1,
 		unique: {
 			'-moz-max-content': 2,
 		},
-		uniquenessRatio: 1 / 2,
 	}
 
 	expect(actual).toEqual(expected)
@@ -79,10 +82,10 @@ test('finds nested prefixes', () => {
       grid-template-columns: repeat(3, max(-webkit-max-content, 100vw));
     }
   `
-	const actual = analyze(fixture).values.prefixes
+	const actual = run(fixture)
 	const expected = {
 		total: 6,
-		totalUnique: 6,
+		total_unique: 6,
 		unique: {
 			'-khtml-linear-gradient': 1,
 			'-webkit-linear-gradient': 1,
@@ -91,7 +94,6 @@ test('finds nested prefixes', () => {
 			'-o-linear-gradient': 1,
 			'-webkit-max-content': 1,
 		},
-		uniquenessRatio: 1,
 	}
 
 	expect(actual).toEqual(expected)
@@ -103,14 +105,13 @@ test('finds DEEPLY nested prefixes', () => {
       width: var(--test, -webkit-max-content);
     }
   `
-	const actual = analyze(fixture).values.prefixes
+	const actual = run(fixture)
 	const expected = {
 		total: 1,
-		totalUnique: 1,
+		total_unique: 1,
 		unique: {
 			'-webkit-max-content': 1,
 		},
-		uniquenessRatio: 1,
 	}
 
 	expect(actual).toEqual(expected)

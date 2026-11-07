@@ -1,6 +1,11 @@
-import { test } from 'vitest'
-import { expect } from 'vitest'
-import { analyze_compat as analyze } from '../presets/compat.js'
+import { test, expect } from 'vitest'
+import { analyze } from '../engine/analyzer.js'
+import { plain } from '../test-utils.js'
+import { gradients } from './gradients.js'
+
+function run(css: string) {
+	return plain(analyze(css, { result: gradients() }).result)
+}
 
 test('finds linear-gradient', () => {
 	const fixture = `
@@ -16,7 +21,7 @@ test('finds linear-gradient', () => {
 			background: -webkit-gradient(linear,left top,right top,color-stop(50%,#ccc),color-stop(50%,#fff));
     }
   `
-	const actual = analyze(fixture).values.gradients
+	const actual = run(fixture)
 	const expected = {
 		total: 9,
 		unique: {
@@ -30,8 +35,7 @@ test('finds linear-gradient', () => {
 			'-webkit-gradient(linear,left top,left bottom,from(#f50),to(#e83c02))': 1,
 			'-webkit-gradient(linear,left top,right top,color-stop(50%,#ccc),color-stop(50%,#fff))': 1,
 		},
-		totalUnique: 9,
-		uniquenessRatio: 1,
+		total_unique: 9,
 	}
 
 	expect(actual).toEqual(expected)
@@ -65,7 +69,7 @@ test('finds repeating-linear-gradient', () => {
 			);
     }
   `
-	const actual = analyze(fixture).values.gradients
+	const actual = run(fixture)
 	const x = `repeating-linear-gradient(
 				-45deg,
 				transparent,
@@ -93,8 +97,7 @@ test('finds repeating-linear-gradient', () => {
 			[y]: 1,
 			[z]: 1,
 		},
-		totalUnique: 5,
-		uniquenessRatio: 1,
+		total_unique: 5,
 	}
 
 	expect(actual).toEqual(expected)
@@ -110,7 +113,7 @@ test('finds radial gradient', () => {
 			background: radial-gradient(85.37% 69.72% at 50% 12.59%, rgba(255, 0, 0, 0.8) 3.14%, rgba(178, 1, 1, 0.8) 62.94%, rgba(47, 3, 3, 0.424) 100%);
     }
   `
-	const actual = analyze(fixture).values.gradients
+	const actual = run(fixture)
 	const expected = {
 		total: 5,
 		unique: {
@@ -120,8 +123,7 @@ test('finds radial gradient', () => {
 			'radial-gradient(0% 100%,circle farthest-corner,rgba(255,255,255,.8) 40%,#e5f4e9 0)': 1,
 			'radial-gradient(85.37% 69.72% at 50% 12.59%, rgba(255, 0, 0, 0.8) 3.14%, rgba(178, 1, 1, 0.8) 62.94%, rgba(47, 3, 3, 0.424) 100%)': 1,
 		},
-		totalUnique: 5,
-		uniquenessRatio: 1,
+		total_unique: 5,
 	}
 
 	expect(actual).toEqual(expected)
@@ -150,7 +152,7 @@ test('finds repeating-radial-gradient', () => {
 			);
     }
   `
-	const actual = analyze(fixture).values.gradients
+	const actual = run(fixture)
 	const x = `repeating-radial-gradient(
 				black,
 				black 5px,
@@ -176,8 +178,7 @@ test('finds repeating-radial-gradient', () => {
 			[y]: 1,
 			[z]: 1,
 		},
-		totalUnique: 3,
-		uniquenessRatio: 1,
+		total_unique: 3,
 	}
 
 	expect(actual).toEqual(expected)
@@ -220,7 +221,7 @@ test('finds conic gradient', () => {
 				hsl(45, 100%, 50%),
 				hsl(0, 100%, 50%)
 			)`
-	const actual = analyze(fixture).values.gradients
+	const actual = run(fixture)
 	const expected = {
 		total: 3,
 		unique: {
@@ -228,8 +229,7 @@ test('finds conic gradient', () => {
 			'conic-gradient(from 90deg at 0 0, blue, red)': 1,
 			[wheel]: 1,
 		},
-		totalUnique: 3,
-		uniquenessRatio: 1,
+		total_unique: 3,
 	}
 
 	expect(actual).toEqual(expected)
@@ -251,7 +251,7 @@ test('finds repeating-conic-gradient', () => {
 			background: repeating-conic-gradient(from -45deg, red 45deg, orange, yellow, green, blue 225deg);
     }
   `
-	const actual = analyze(fixture).values.gradients
+	const actual = run(fixture)
 	const x = `repeating-conic-gradient(
 				from 3deg at 25% 25%,
 				green,
@@ -268,8 +268,7 @@ test('finds repeating-conic-gradient', () => {
 			'repeating-conic-gradient(red, orange, yellow, green, blue 50%)': 1,
 			'repeating-conic-gradient(from -45deg, red 45deg, orange, yellow, green, blue 225deg)': 1,
 		},
-		totalUnique: 4,
-		uniquenessRatio: 1,
+		total_unique: 4,
 	}
 
 	expect(actual).toEqual(expected)
@@ -288,12 +287,11 @@ test('ignores keywords', () => {
       background-image: unset;
     }
   `
-	const actual = analyze(fixture).values.gradients
+	const actual = run(fixture)
 	const expected = {
 		total: 0,
 		unique: {},
-		totalUnique: 0,
-		uniquenessRatio: 0,
+		total_unique: 0,
 	}
 
 	expect(actual).toEqual(expected)

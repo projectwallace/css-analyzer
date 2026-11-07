@@ -6,13 +6,13 @@ export function unquote(str: string): string {
  * Case-insensitive compare two character codes
  * @see https://github.com/csstree/csstree/blob/41f276e8862d8223eeaa01a3d113ab70bb13d2d9/lib/tokenizer/utils.js#L22
  */
-function compare_char(referenceCode: number, testCode: number): boolean {
+function compare_char(reference_code: number, test_code: number): boolean {
 	// if uppercase
-	if (testCode >= 0x0041 && testCode <= 0x005a) {
+	if (test_code >= 0x0041 && test_code <= 0x005a) {
 		// shifting the 6th bit makes a letter lowercase
-		testCode = testCode | 32
+		test_code = test_code | 32
 	}
-	return referenceCode === testCode
+	return reference_code === test_code
 }
 
 /**

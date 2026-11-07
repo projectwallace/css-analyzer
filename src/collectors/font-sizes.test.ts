@@ -1,6 +1,11 @@
-import { describe, test } from 'vitest'
-import { expect } from 'vitest'
-import { analyze_compat as analyze } from '../presets/compat.js'
+import { test, expect, describe } from 'vitest'
+import { analyze } from '../engine/analyzer.js'
+import { plain } from '../test-utils.js'
+import { font_sizes } from './font-sizes.js'
+
+function run(css: string) {
+	return plain(analyze(css, { result: font_sizes() }).result)
+}
 
 test('recognizes a font-size', () => {
 	const fixture = `
@@ -15,17 +20,16 @@ test('recognizes a font-size', () => {
       font-family: serif;
     }
   `
-	const actual = analyze(fixture).values.fontSizes
+	const actual = run(fixture)
 	const expected = {
 		total: 4,
-		totalUnique: 4,
+		total_unique: 4,
 		unique: {
 			'10px': 1,
 			small: 1,
 			'1em': 1,
 			'calc(3vw + 1em)': 1,
 		},
-		uniquenessRatio: 4 / 4,
 	}
 
 	expect(actual).toEqual(expected)
@@ -53,10 +57,10 @@ test('extracts the `font` shorthand', () => {
       font-family: serif;
     }
   `
-	const actual = analyze(fixture).values.fontSizes
+	const actual = run(fixture)
 	const expected = {
 		total: 13,
-		totalUnique: 9,
+		total_unique: 9,
 		unique: {
 			'0': 1,
 			large: 1,
@@ -68,7 +72,6 @@ test('extracts the `font` shorthand', () => {
 			'12px': 1,
 			'13px': 1,
 		},
-		uniquenessRatio: 9 / 13,
 	}
 	expect(actual).toEqual(expected)
 })
@@ -79,7 +82,7 @@ describe('normalize', () => {
 		font-size: 10PX;
 		font-size: 10px;
 	}`
-		const actual = analyze(fixture).values.fontSizes.unique
+		const actual = run(fixture).unique
 		const expected = {
 			'10px': 2,
 		}
@@ -90,7 +93,7 @@ describe('normalize', () => {
 		const fixture = `test {
 		font: 10PX/1 sans-serif;
 	}`
-		const actual = analyze(fixture).values.fontSizes.unique
+		const actual = run(fixture).unique
 		const expected = {
 			'10px': 1,
 		}
@@ -101,7 +104,7 @@ describe('normalize', () => {
 		const fixture = `test {
 		font-size: var(--mySize);
 	}`
-		const actual = analyze(fixture).values.fontSizes.unique
+		const actual = run(fixture).unique
 		const expected = {
 			'var(--mySize)': 1,
 		}
@@ -117,14 +120,13 @@ test('handles system fonts', () => {
       font: large menu;  /* use a font family named "menu" */
     }
   `
-	const actual = analyze(fixture).values.fontSizes
+	const actual = run(fixture)
 	const expected = {
 		total: 1,
-		totalUnique: 1,
+		total_unique: 1,
 		unique: {
 			large: 1,
 		},
-		uniquenessRatio: 1,
 	}
 
 	expect(actual).toEqual(expected)
@@ -147,13 +149,16 @@ test('ignores keywords and global values', () => {
       font: unset;
     }
   `
-	const actual = analyze(fixture).values.fontSizes
+	const actual = run(fixture)
 	const expected = {
 		total: 0,
-		totalUnique: 0,
+		total_unique: 0,
 		unique: {},
-		uniquenessRatio: 0,
 	}
 
 	expect(actual).toEqual(expected)
+})
+
+test('the font shorthand size is found next to the family', () => {
+	expect(run('test { font: 14px "Inter Var", sans-serif, 700 }').unique).toEqual({ '14px': 1 })
 })

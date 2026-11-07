@@ -1,6 +1,11 @@
-import { test } from 'vitest'
-import { expect } from 'vitest'
-import { analyze_compat as analyze } from '../presets/compat.js'
+import { test, expect } from 'vitest'
+import { analyze } from '../engine/analyzer.js'
+import { plain } from '../test-utils.js'
+import { text_shadows } from './values.js'
+
+function run(css: string) {
+	return plain(analyze(css, { result: text_shadows() }).result)
+}
 
 test('finds simple values', () => {
 	const fixture = `
@@ -13,7 +18,7 @@ test('finds simple values', () => {
       text-shadow: red 0 -2px;
     }
   `
-	const actual = analyze(fixture).values.textShadows
+	const actual = run(fixture)
 	const expected = {
 		total: 6,
 		unique: {
@@ -24,8 +29,7 @@ test('finds simple values', () => {
 			'5px 10px': 1,
 			'red 0 -2px': 1,
 		},
-		totalUnique: 6,
-		uniquenessRatio: 1,
+		total_unique: 6,
 	}
 
 	expect(actual).toEqual(expected)
@@ -37,14 +41,13 @@ test('finds complex values', () => {
       text-shadow: 1px 1px 2px black, 0 0 1em blue, 0 0 0.2em blue;
     }
   `
-	const actual = analyze(fixture).values.textShadows
+	const actual = run(fixture)
 	const expected = {
 		total: 1,
 		unique: {
 			'1px 1px 2px black, 0 0 1em blue, 0 0 0.2em blue': 1,
 		},
-		totalUnique: 1,
-		uniquenessRatio: 1,
+		total_unique: 1,
 	}
 
 	expect(actual).toEqual(expected)
@@ -56,14 +59,13 @@ test('finds vendor prefixed values', () => {
       -webkit-text-shadow: 1px 1px 2px black;
     }
   `
-	const actual = analyze(fixture).values.textShadows
+	const actual = run(fixture)
 	const expected = {
 		total: 1,
 		unique: {
 			'1px 1px 2px black': 1,
 		},
-		totalUnique: 1,
-		uniquenessRatio: 1,
+		total_unique: 1,
 	}
 
 	expect(actual).toEqual(expected)
@@ -82,12 +84,11 @@ test('ignores keywords', () => {
       text-shadow: unset;
     }
   `
-	const actual = analyze(fixture).values.textShadows
+	const actual = run(fixture)
 	const expected = {
 		total: 0,
 		unique: {},
-		totalUnique: 0,
-		uniquenessRatio: 0,
+		total_unique: 0,
 	}
 
 	expect(actual).toEqual(expected)

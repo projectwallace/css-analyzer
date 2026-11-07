@@ -1,5 +1,11 @@
-import { describe, test, expect } from 'vitest'
-import { analyze_compat as analyze } from '../presets/compat.js'
+import { test, expect } from 'vitest'
+import { analyze } from '../engine/analyzer.js'
+import { plain } from '../test-utils.js'
+import { displays } from './values.js'
+
+function run(css: string) {
+	return plain(analyze(css, { result: displays() }).result)
+}
 
 test('counts', () => {
 	// Test data from https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#syntax
@@ -21,10 +27,9 @@ test('counts', () => {
 			display: inline-table;
 		}
 	`
-	const actual = analyze(fixture).values.displays
+	const actual = run(fixture)
 	expect(actual.total).toBe(13)
-	expect(actual.totalUnique).toBe(actual.total)
-	expect(actual.uniquenessRatio).toBe(1)
+	expect(actual.total_unique).toBe(actual.total)
 	expect(actual.unique).toEqual({
 		none: 1,
 		contents: 1,
@@ -61,10 +66,9 @@ test('handles two-value', () => {
 			display: inline table;
 		}
 	`
-	const actual = analyze(fixture).values.displays
+	const actual = run(fixture)
 	expect(actual.total).toBe(12)
-	expect(actual.totalUnique).toBe(actual.total)
-	expect(actual.uniquenessRatio).toBe(1)
+	expect(actual.total_unique).toBe(actual.total)
 	expect(actual.unique).toEqual({
 		'block flow': 1,
 		'block flow-root': 1,
@@ -88,7 +92,7 @@ test('normalizes casing', () => {
 			display: Block;
 		}
 	`
-	const actual = analyze(fixture).values.displays
+	const actual = run(fixture)
 	expect(actual.unique).toEqual({
 		block: 2,
 	})
@@ -103,7 +107,7 @@ test('handles value prefixes', () => {
 			display: -MS-flexbox;
 		}
 	`
-	const actual = analyze(fixture).values.displays
+	const actual = run(fixture)
 	expect(actual.unique).toEqual({
 		'-webkit-box': 2,
 		'-ms-flexbox': 2,
@@ -117,7 +121,7 @@ test('handles property prefixes', () => {
 			-O-display: inline;
 		}
 	`
-	const actual = analyze(fixture).values.displays
+	const actual = run(fixture)
 	expect(actual.unique).toEqual({
 		block: 1,
 		inline: 1,
@@ -131,7 +135,7 @@ test('handles property browserhacks', () => {
 			_display: inline;
 		}
 	`
-	const actual = analyze(fixture).values.displays
+	const actual = run(fixture)
 	expect(actual.unique).toEqual({
 		block: 1,
 		inline: 1,
@@ -147,7 +151,7 @@ test('handles value browserhacks', () => {
 			display: block !test;
 		}
 	`
-	const actual = analyze(fixture).values.displays
+	const actual = run(fixture)
 	expect(actual.unique).toEqual({
 		inline: 2,
 		block: 2,
@@ -162,7 +166,7 @@ test('handles var()', () => {
 			display: Var(--inline-dir) flow-root;
 		}
 	`
-	const actual = analyze(fixture).values.displays
+	const actual = run(fixture)
 	expect(actual.unique).toEqual({
 		'var(--myDisplay)': 1,
 		'var(--inline-dir) flow-root': 1,

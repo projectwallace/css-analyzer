@@ -1,6 +1,11 @@
-import { test } from 'vitest'
-import { expect } from 'vitest'
-import { analyze_compat as analyze } from '../presets/compat.js'
+import { test, expect, describe } from 'vitest'
+import { analyze } from '../engine/analyzer.js'
+import { plain } from '../test-utils.js'
+import { keywords } from './values.js'
+
+function run(css: string) {
+	return plain(analyze(css, { result: keywords() }).result)
+}
 
 test('finds global keywords', () => {
 	const fixture = `
@@ -19,10 +24,10 @@ test('finds global keywords', () => {
       font: unset;
 		}
 	`
-	const actual = analyze(fixture).values.keywords
+	const actual = run(fixture)
 	const expected = {
 		total: 10,
-		totalUnique: 5,
+		total_unique: 5,
 		unique: {
 			inherit: 2,
 			initial: 2,
@@ -30,7 +35,6 @@ test('finds global keywords', () => {
 			'revert-layer': 2,
 			unset: 2,
 		},
-		uniquenessRatio: 5 / 10,
 	}
 
 	expect(actual).toEqual(expected)
@@ -45,14 +49,13 @@ test('normalizes keyword casing', () => {
 			font: 10px/12px INHERIT;
 		}
 	`
-	const actual = analyze(fixture).values.keywords
+	const actual = run(fixture)
 	const expected = {
 		total: 3,
-		totalUnique: 1,
+		total_unique: 1,
 		unique: {
 			inherit: 3,
 		},
-		uniquenessRatio: 1 / 3,
 	}
 
 	expect(actual).toEqual(expected)
@@ -66,15 +69,14 @@ test('finds global keywords in shorthands', () => {
 			font: italic bold 16px/1.5 Arial, sans-serif inherit;
 		}
 	`
-	const actual = analyze(fixture).values.keywords
+	const actual = run(fixture)
 	const expected = {
 		total: 3,
-		totalUnique: 2,
+		total_unique: 2,
 		unique: {
 			inherit: 2,
 			auto: 1,
 		},
-		uniquenessRatio: 2 / 3,
 	}
 
 	expect(actual).toEqual(expected)
@@ -87,16 +89,46 @@ test('finds global keywords in multi-values', () => {
 			animation: myAnimation1 2s infinite inherit, myAnimation2 2s infinite inherit;
 		}
 	`
-	const actual = analyze(fixture).values.keywords
+	const actual = run(fixture)
 	const expected = {
 		total: 3,
-		totalUnique: 2,
+		total_unique: 2,
 		unique: {
 			auto: 1,
 			inherit: 2,
 		},
-		uniquenessRatio: 2 / 3,
 	}
 
 	expect(actual).toEqual(expected)
+})
+
+describe('keywords in the font shorthand', () => {
+	test('global keywords inside the shorthand are counted', () => {
+		// "inherit" appears after font-family — unusual but should be recorded
+		expect(
+			run('a { font: italic bold 16px/1.5 Arial, sans-serif inherit; }').unique['inherit'],
+		).toBe(1)
+	})
+
+	test('a global value for the whole font property is counted as keyword', () => {
+		expect(
+			run(`a {
+			font: inherit;
+			font: initial;
+			font: revert;
+			font: revert-layer;
+			font: unset;
+		}`).unique,
+		).toEqual({
+			inherit: 1,
+			initial: 1,
+			revert: 1,
+			'revert-layer': 1,
+			unset: 1,
+		})
+	})
+
+	test('an uppercased keyword is lowercased', () => {
+		expect(run('a { font: 10PX/12PX INHERIT; }').unique).toEqual({ inherit: 1 })
+	})
 })

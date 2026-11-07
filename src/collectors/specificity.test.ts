@@ -1,12 +1,24 @@
-import { test, expect } from 'vitest'
-import { analyze_compat as analyze } from '../presets/compat.js'
+import { describe, test, expect } from 'vitest'
+import { analyze } from '../engine/analyzer.js'
+import { plain } from '../test-utils.js'
+import { specificity, summarize_specificity } from './specificity.js'
+
+/** The specificity result with the shape the old tests were written for */
+function run(css: string) {
+	const { spec } = analyze(css, { spec: specificity({ sequence: true }) })
+	return {
+		...summarize_specificity(spec),
+		items: (spec.sequence ?? []).map((item) => item.split(',').map(Number)),
+		...plain(spec),
+	}
+}
 
 test('handles the universal selector', () => {
 	const fixture = `
     * {}
   test * {}
   `
-	const actual = analyze(fixture).selectors.specificity.items
+	const actual = run(fixture).items
 	const expected = [
 		[0, 0, 0],
 		[0, 0, 1],
@@ -25,7 +37,7 @@ test('handles ID selectors', () => {
     #s12:not(FOO)         /* a=1 b=0 c=1 */
     {}
   `
-	const actual = analyze(fixture).selectors.specificity.items
+	const actual = run(fixture).items
 	const expected = [
 		[1, 0, 0],
 		[5, 4, 2],
@@ -42,7 +54,7 @@ test('handles class selectors', () => {
     .class.class
     {}
   `
-	const actual = analyze(fixture).selectors.specificity.items
+	const actual = run(fixture).items
 	const expected = [
 		[0, 1, 0],
 		[0, 2, 0],
@@ -56,7 +68,7 @@ test('handles element selectors', () => {
     element element
     {}
   `
-	const actual = analyze(fixture).selectors.specificity.items
+	const actual = run(fixture).items
 	const expected = [
 		[0, 0, 1],
 		[0, 0, 2],
@@ -75,7 +87,7 @@ test('handles the :not, :is and :has pseudo classes', () => {
     .foo :is(.bar, #baz) /* a=1 b=1 c=0 */
     {}
   `
-	const actual = analyze(fixture).selectors.specificity.items
+	const actual = run(fixture).items
 	const expected = [
 		[1, 0, 0],
 		[1, 0, 1],
@@ -108,7 +120,7 @@ test('handles attribute selectors', () => {
     [|att]
     {}
   `
-	const actual = analyze(fixture).selectors.specificity.items
+	const actual = run(fixture).items
 	const expected = [
 		[0, 1, 0],
 		[5, 4, 2],
@@ -138,7 +150,7 @@ test('handles the :where pseudo class', () => {
     .qux:where(em, #foo#bar#baz) /* [0,1,0] only the .qux outside the :where() contributes to selector specificity.  */
     {}
   `
-	const actual = analyze(fixture).selectors.specificity.items
+	const actual = run(fixture).items
 	const expected = [[0, 1, 0]]
 	expect(actual).toEqual(expected)
 })
@@ -156,7 +168,7 @@ test('handles pseudo element selectors', () => {
     :nth-child(2n+1)
     {}
   `
-	const actual = analyze(fixture).selectors.specificity.items
+	const actual = run(fixture).items
 	const expected = [
 		[0, 0, 2],
 		[0, 0, 2],
@@ -177,7 +189,7 @@ test('handles the ::part pseudo element', () => {
     ::part(first-ident second-ident)
     {}
   `
-	const actual = analyze(fixture).selectors.specificity.items
+	const actual = run(fixture).items
 	const expected = [
 		[0, 0, 1],
 		[0, 0, 1],
@@ -193,7 +205,7 @@ test('handles the ::highlight pseudo element', () => {
     ::highlight(*)
     {}
   `
-	const actual = analyze(fixture).selectors.specificity.items
+	const actual = run(fixture).items
 	const expected = [
 		[0, 0, 0],
 		[0, 0, 0],
@@ -210,7 +222,7 @@ test('calculates the lowest value', () => {
     now,
     [crazy] ~ .selector > for [no|="good"] {}
   `
-	const actual = analyze(fixture).selectors.specificity.min
+	const actual = run(fixture).min
 	expect(actual).toEqual([0, 0, 1])
 })
 
@@ -221,7 +233,7 @@ test('calculates the highest value', () => {
     now,
     [crazy] ~ .selector > for [no|="good"] {}
   `
-	const actual = analyze(fixture).selectors.specificity.max
+	const actual = run(fixture).max
 	expect(actual).toEqual([1, 0, 0])
 })
 
@@ -232,7 +244,7 @@ test('calculates the mean value', () => {
     now,
     [crazy] ~ .selector > for [no|="good"] {}
   `
-	const actual = analyze(fixture).selectors.specificity.mean
+	const actual = run(fixture).mean
 	expect(actual).toEqual([0.25, 1, 0.5])
 })
 
@@ -243,7 +255,7 @@ test('calculates the mode value', () => {
     now,
     [crazy] ~ .selector > for [no|="good"] {}
   `
-	const actual = analyze(fixture).selectors.specificity.mode
+	const actual = run(fixture).mode
 	expect(actual).toEqual([0, 0, 0.5])
 })
 
@@ -254,7 +266,7 @@ test('calculates total specificity', () => {
     now,
     [crazy] ~ .selector > for [no|="good"] {}
   `
-	const actual = analyze(fixture).selectors.specificity.sum
+	const actual = run(fixture).sum
 	expect(actual).toEqual([1, 4, 2])
 })
 
@@ -273,7 +285,7 @@ test('calculates specificity uniqueness', () => {
     :where(#id, .class),
     main > :is(h1, h2) {}
   `
-	const actual = analyze(fixture).selectors.specificity
+	const actual = run(fixture)
 
 	expect(actual.unique).toEqual({
 		'0,0,0': 3,
@@ -282,8 +294,7 @@ test('calculates specificity uniqueness', () => {
 		'1,0,0': 1,
 		'0,1,0': 3,
 	})
-	expect(actual.totalUnique).toBe(5)
-	expect(actual.uniquenessRatio).toBe(5 / 12)
+	expect(actual.total_unique).toBe(5)
 })
 
 test('does not double count nested pseudo-class functions', () => {
@@ -297,7 +308,7 @@ test('does not double count nested pseudo-class functions', () => {
     :is(.a, :is(.b)),
     :where(:is(.a)) {}
   `
-	const actual = analyze(fixture).selectors.specificity.items
+	const actual = run(fixture).items
 	expect(actual).toEqual([
 		[0, 1, 0],
 		[0, 1, 0],

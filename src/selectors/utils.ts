@@ -105,7 +105,7 @@ function selector_complexity(selector: CSSNode): number {
 	let complexity = 0
 
 	// Helper function to find all Selector nodes recursively
-	function findSelectors(tree: CSSNode, complexities: number[]): void {
+	function find_selectors(tree: CSSNode, complexities: number[]): void {
 		walk(tree, function (node) {
 			if (is_selector(node)) {
 				complexities.push(selector_complexity(node))
@@ -161,22 +161,22 @@ function selector_complexity(selector: CSSNode): number {
 
 			if (PSEUDO_FUNCTIONS.has(name.toLowerCase())) {
 				// Find child selectors and recursively calculate their complexity
-				const childComplexities: number[] = []
+				const child_complexities: number[] = []
 
 				if (node.has_children) {
 					for (const child of node) {
 						if (is_selector(child)) {
-							childComplexities.push(selector_complexity(child))
+							child_complexities.push(selector_complexity(child))
 						} else {
 							// Recurse to find nested selectors
-							findSelectors(child, childComplexities)
+							find_selectors(child, child_complexities)
 						}
 					}
 				}
 
 				// If there are child selectors (like in :where(), :is(), etc.), add their complexity
-				if (childComplexities.length > 0) {
-					for (const c of childComplexities) {
+				if (child_complexities.length > 0) {
+					for (const c of child_complexities) {
 						complexity += c
 					}
 					// Skip further processing of children since we already processed them
