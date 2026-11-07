@@ -18,10 +18,6 @@ describe('Public API', () => {
 				'create_context_counter',
 				'create_counter',
 				'define_collector',
-				'merge',
-				'merge_context_counts',
-				'merge_counts',
-				'merge_defined_used',
 				'summarize',
 				'summarize_frequencies',
 				'summarize_numbers',
@@ -33,14 +29,9 @@ describe('Public API', () => {
 		const factories = Object.entries(collectors).filter(
 			([name]) => name !== 'summarize_specificity',
 		)
-		const definitions = factories.map(([, factory]) =>
-			(factory as () => { create: unknown; merge: unknown })(),
-		)
+		const definitions = factories.map(([, factory]) => (factory as () => { create: unknown })())
 		expect(factories.length).toBeGreaterThan(20)
 		expect(definitions.map((definition) => typeof definition.create)).toEqual(
-			definitions.map(() => 'function'),
-		)
-		expect(definitions.map((definition) => typeof definition.merge)).toEqual(
 			definitions.map(() => 'function'),
 		)
 	})

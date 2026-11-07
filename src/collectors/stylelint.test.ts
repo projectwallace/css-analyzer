@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest'
-import { analyze, create_analyzer, merge } from '../engine/analyzer.js'
+import { analyze, create_analyzer } from '../engine/analyzer.js'
 import { colors } from './colors.js'
 import { specificity, summarize_specificity } from './specificity.js'
 import { z_indexes } from './z-indexes.js'
@@ -88,7 +88,7 @@ describe('max-average-selector-specificity', () => {
 		})
 	})
 
-	test('the average over several files equals the average over their concatenation', () => {
+	test('the average over several added files equals the average over their concatenation', () => {
 		const a = 'a {} a b {} #x {}'
 		const b = '.c {} .d .e {}'
 		const collectors = { s: specificity() }
@@ -96,11 +96,9 @@ describe('max-average-selector-specificity', () => {
 		const incremental = create_analyzer(collectors)
 			.add(a, { source: 'a.css' })
 			.add(b, { source: 'b.css' })
-		const merged = merge(analyze(a, collectors), analyze(b, collectors))
 		const together = analyze(`${a}\n${b}`, collectors)
 
 		expect(summarize_specificity(incremental.result().s)).toEqual(summarize_specificity(together.s))
-		expect(summarize_specificity(merged.s)).toEqual(summarize_specificity(together.s))
 	})
 
 	test('only asks the parser for selectors', () => {

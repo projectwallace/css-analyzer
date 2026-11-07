@@ -1,7 +1,7 @@
 import { test, expect, expectTypeOf } from 'vitest'
-import { analyze, create_analyzer, merge } from './analyzer.js'
+import { analyze, create_analyzer } from './analyzer.js'
 import { define_collector } from './define-collector.js'
-import { create_counter, merge_counts } from './counter.js'
+import { create_counter } from './counter.js'
 import { parse } from '@projectwallace/css-parser'
 import type { CollectorInstance, CountOptions, CountResult } from './types.js'
 
@@ -15,7 +15,7 @@ function declared_properties(options: CountOptions = {}) {
 			},
 			result: () => counter.result(),
 		}
-	}, merge_counts)
+	})
 }
 
 function hash_colors() {
@@ -30,22 +30,19 @@ function hash_colors() {
 			},
 			result: () => counter.result(),
 		}
-	}, merge_counts)
+	})
 }
 
 function rule_count() {
-	return define_collector<number>(
-		function init() {
-			let count = 0
-			return {
-				rule() {
-					count++
-				},
-				result: () => count,
-			}
-		},
-		(a, b) => a + b,
-	)
+	return define_collector<number>(function init() {
+		let count = 0
+		return {
+			rule() {
+				count++
+			},
+			result: () => count,
+		}
+	})
 }
 
 test('result type is inferred from the collectors that were passed', () => {
@@ -65,21 +62,18 @@ test('keys are chosen by the consumer', () => {
 
 test('normalizes the property and exposes declaration facts', () => {
 	const seen: Record<string, unknown>[] = []
-	const facts = define_collector<number>(
-		() => ({
-			declaration(_node, ctx) {
-				seen.push({
-					property: ctx.property,
-					is_custom: ctx.is_custom,
-					is_important: ctx.is_important,
-					is_vendor_prefixed: ctx.is_vendor_prefixed,
-					value_text: ctx.value_text,
-				})
-			},
-			result: () => 0,
-		}),
-		(a) => a,
-	)
+	const facts = define_collector<number>(() => ({
+		declaration(_node, ctx) {
+			seen.push({
+				property: ctx.property,
+				is_custom: ctx.is_custom,
+				is_important: ctx.is_important,
+				is_vendor_prefixed: ctx.is_vendor_prefixed,
+				value_text: ctx.value_text,
+			})
+		},
+		result: () => 0,
+	}))
 	analyze('a { -WEBKIT-Transition: all 1s; --x: 1 !important; COLOR: Red }', { facts })
 	expect(seen).toEqual([
 		{
@@ -108,18 +102,15 @@ test('normalizes the property and exposes declaration facts', () => {
 
 test('declaration handlers can filter on properties before they run', () => {
 	let calls = 0
-	const filtered = define_collector<number>(
-		() => ({
-			declaration: {
-				properties: new Set(['color']),
-				enter() {
-					calls++
-				},
+	const filtered = define_collector<number>(() => ({
+		declaration: {
+			properties: new Set(['color']),
+			enter() {
+				calls++
 			},
-			result: () => calls,
-		}),
-		(a, b) => a + b,
-	)
+		},
+		result: () => calls,
+	}))
 	const result = analyze('a { color: red; margin: 0; background: blue }', { filtered })
 	expect(result.filtered).toBe(1)
 })
@@ -136,21 +127,18 @@ test('one shared value walk feeds every value subscriber', () => {
 
 test('structural context: depth, atrule_stack, parent_rule, in_keyframes', () => {
 	const seen: [string, number, string[], boolean, string | undefined][] = []
-	const structure = define_collector<number>(
-		() => ({
-			declaration(_node, ctx) {
-				seen.push([
-					ctx.property,
-					ctx.depth,
-					[...ctx.atrule_stack],
-					ctx.in_keyframes,
-					ctx.parent_rule?.text.slice(0, 1),
-				])
-			},
-			result: () => 0,
-		}),
-		(a) => a,
-	)
+	const structure = define_collector<number>(() => ({
+		declaration(_node, ctx) {
+			seen.push([
+				ctx.property,
+				ctx.depth,
+				[...ctx.atrule_stack],
+				ctx.in_keyframes,
+				ctx.parent_rule?.text.slice(0, 1),
+			])
+		},
+		result: () => 0,
+	}))
 	analyze(
 		`a { color: red; b { margin: 0 } }
 		@media (x) { c { padding: 0 } }
@@ -169,15 +157,12 @@ test('structural context: depth, atrule_stack, parent_rule, in_keyframes', () =>
 
 test('unsubscribed node kinds are never dispatched', () => {
 	const calls: string[] = []
-	const only_rules = define_collector<number>(
-		() => ({
-			rule() {
-				calls.push('rule')
-			},
-			result: () => 0,
-		}),
-		(a) => a,
-	)
+	const only_rules = define_collector<number>(() => ({
+		rule() {
+			calls.push('rule')
+		},
+		result: () => 0,
+	}))
 	analyze('a { color: red } @media (x) { b { color: blue } }', { only_rules })
 	expect(calls).toEqual(['rule', 'rule'])
 })
@@ -194,30 +179,24 @@ test('parse options follow the subscriptions', () => {
 		atrule_preludes: false,
 	})
 
-	const selectors = define_collector<number>(
-		() => ({ selector() {}, result: () => 0 }),
-		(a) => a,
-	)
+	const selectors = define_collector<number>(() => ({ selector() {}, result: () => 0 }))
 	expect(create_analyzer({ selectors }).parse_options.selectors).toBe(true)
 
-	const preludes = define_collector<number>(
-		() => ({ parse: { atrule_preludes: true }, result: () => 0 }),
-		(a) => a,
-	)
+	const preludes = define_collector<number>(() => ({
+		parse: { atrule_preludes: true },
+		result: () => 0,
+	}))
 	expect(create_analyzer({ preludes }).parse_options.atrule_preludes).toBe(true)
 })
 
 test('values stay unparsed when nobody needs them', () => {
 	let value: unknown = 'untouched'
-	const raw = define_collector<number>(
-		() => ({
-			declaration(_node, ctx) {
-				value = ctx.value
-			},
-			result: () => 0,
-		}),
-		(a) => a,
-	)
+	const raw = define_collector<number>(() => ({
+		declaration(_node, ctx) {
+			value = ctx.value
+		},
+		result: () => 0,
+	}))
 	analyze('a { color: red }', { raw })
 	expect(value).toBeUndefined()
 })
@@ -293,43 +272,20 @@ test('definitions are reusable and never share state between analyzers', () => {
 test('comment and stylesheet subscriptions', () => {
 	const comments: unknown[] = []
 	let css = ''
-	const meta = define_collector<number>(
-		() => ({
-			comment(loc) {
-				comments.push(loc)
-			},
-			stylesheet(_node, ctx) {
-				css = ctx.css
-			},
-			result: () => comments.length,
-		}),
-		(a, b) => a + b,
-	)
+	const meta = define_collector<number>(() => ({
+		comment(loc) {
+			comments.push(loc)
+		},
+		stylesheet(_node, ctx) {
+			css = ctx.css
+		},
+		result: () => comments.length,
+	}))
 	const input = '/* hi */ a { color: red }'
 	const result = analyze(input, { meta }, { source: 'x.css' })
 	expect(result.meta).toBe(1)
 	expect(comments).toEqual([{ line: 1, column: 1, offset: 0, length: 8, source: 'x.css' }])
 	expect(css).toBe(input)
-})
-
-test('merge() combines independent results', () => {
-	const collectors = { props: declared_properties(), rules: rule_count() }
-	const a = analyze('a { color: red }', collectors)
-	const b = analyze('b { color: blue; margin: 0 }', collectors)
-	const merged = merge(a, b)
-
-	expect(merged.rules).toBe(2)
-	expect(merged.props).toEqual(
-		analyze('a { color: red } b { color: blue; margin: 0 }', collectors).props,
-	)
-})
-
-test('merge() works for results that lost their origin when collectors are passed', () => {
-	const collectors = { props: declared_properties() }
-	const a = structuredClone(analyze('a { color: red }', collectors))
-	const b = structuredClone(analyze('a { color: red }', collectors))
-	expect(() => merge(a, b)).toThrow(/collectors/)
-	expect(merge(a, b, collectors).props.total).toBe(2)
 })
 
 test('CollectorInstance can be typed standalone', () => {
@@ -339,18 +295,15 @@ test('CollectorInstance can be typed standalone', () => {
 
 test('value handlers learn the kind of node they got', () => {
 	const kinds: string[] = []
-	const kinds_collector = define_collector<number>(
-		() => ({
-			value: {
-				types: ['hash', 'function', 'dimension', 'identifier'],
-				enter(_node, _ctx, kind) {
-					kinds.push(kind)
-				},
+	const kinds_collector = define_collector<number>(() => ({
+		value: {
+			types: ['hash', 'function', 'dimension', 'identifier'],
+			enter(_node, _ctx, kind) {
+				kinds.push(kind)
 			},
-			result: () => 0,
-		}),
-		(a) => a,
-	)
+		},
+		result: () => 0,
+	}))
 	analyze('a { margin: 1px solid; color: #fff; background: url(a.png), linear-gradient(red) }', {
 		kinds_collector,
 	})
@@ -359,32 +312,26 @@ test('value handlers learn the kind of node they got', () => {
 
 test('clean_value_text drops IE hacks and is undefined for global keywords', () => {
 	const seen: (string | undefined)[] = []
-	const clean = define_collector<number>(
-		() => ({
-			parse: { values: true },
-			declaration(_node, ctx) {
-				seen.push(ctx.clean_value_text)
-			},
-			result: () => 0,
-		}),
-		(a) => a,
-	)
+	const clean = define_collector<number>(() => ({
+		parse: { values: true },
+		declaration(_node, ctx) {
+			seen.push(ctx.clean_value_text)
+		},
+		result: () => 0,
+	}))
 	analyze('a { width: 1px\\9; --x: 1px\\9; color: inherit; margin: 0 }', { clean })
 	expect(seen).toEqual(['1px', '1px\\9', undefined, '0'])
 })
 
 test('font_shorthand is split once and is null for everything else', () => {
 	const seen: unknown[] = []
-	const shorthand = define_collector<number>(
-		() => ({
-			parse: { values: true },
-			declaration(_node, ctx) {
-				seen.push(ctx.font_shorthand, ctx.font_shorthand)
-			},
-			result: () => 0,
-		}),
-		(a) => a,
-	)
+	const shorthand = define_collector<number>(() => ({
+		parse: { values: true },
+		declaration(_node, ctx) {
+			seen.push(ctx.font_shorthand, ctx.font_shorthand)
+		},
+		result: () => 0,
+	}))
 	analyze('a { font: 12px/1.5 Arial; color: red; font: caption }', { shorthand })
 	expect(seen[0]).toBe(seen[1])
 	expect(seen[0]).toEqual({
