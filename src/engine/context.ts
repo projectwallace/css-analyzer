@@ -6,6 +6,7 @@ import {
 	get_declaration_value,
 	get_declaration_value_text,
 	get_location,
+	get_raw_property,
 	is_custom_property,
 } from '../adapter/css-parser.js'
 import {
@@ -88,6 +89,12 @@ export function create_context(): ContextController {
 		},
 		get property() {
 			return get_facts().property
+		},
+		get raw_property() {
+			return get_raw_property(node!)
+		},
+		get property_loc() {
+			return { ...get_location(node!, source), length: get_raw_property(node!).length }
 		},
 		get is_custom() {
 			return is_custom_property(node!)

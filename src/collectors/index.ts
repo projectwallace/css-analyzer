@@ -10,3 +10,20 @@ export { timing_functions, type TimingFunctionsOptions } from './timing-function
 export type { Normalize } from './shared.js'
 export { z_indexes } from './z-indexes.js'
 export { specificity, summarize_specificity, type SpecificitySummary } from './specificity.js'
+export {
+	text_shadows,
+	displays,
+	units,
+	keywords,
+	resets,
+	value_prefixes,
+	value_browserhacks,
+	value_complexity,
+	animation_names,
+} from './values.js'
+export { declarations, type DeclarationsResult } from './declarations.js'
+export { rules, type RulesResult } from './rules.js'
+export { selectors, type SelectorsResult } from './selectors.js'
+export { properties, type PropertiesResult } from './properties.js'
+export { atrules, type AtrulesResult } from './atrules.js'
+export { stylesheet, type StylesheetResult, type EmbeddedType } from './stylesheet.js'
