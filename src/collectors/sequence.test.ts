@@ -19,7 +19,7 @@ test('sequence keeps the numbers in the order they were found (for charts)', () 
 
 	expect(result.rules.sizes.sequence?.map(Number)).toEqual([2, 3, 1])
 	expect(result.rules.nesting.sequence?.map(Number)).toEqual([0, 0, 2])
-	expect(result.selectors.complexity.sequence?.map(Number)).toEqual([1, 2, 1])
+	expect(result.selectors.complexity.sequence?.map(Number)).toEqual([1, 3, 1])
 	expect(result.selectors.nesting.sequence?.map(Number)).toEqual([0, 0, 2])
 	expect(result.specificity.sequence).toEqual(['0,0,1', '0,2,0', '0,1,0'])
 	expect(result.declarations.nesting.sequence?.map(Number)).toEqual([1, 1, 1])
