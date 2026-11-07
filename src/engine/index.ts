@@ -7,6 +7,7 @@ export {
 	merge_context_counts,
 	summarize,
 } from './counter.js'
+export { summarize_frequencies, summarize_numbers, type NumberSummary } from './summary.js'
 export type { Counter, ContextCounter } from './counter.js'
 export type {
 	AddOptions,
