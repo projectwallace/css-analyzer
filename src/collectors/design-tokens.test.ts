@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest'
-import { analyze, create_analyzer } from '../engine/analyzer.js'
+import { analyze, create_analyzer, merge } from '../engine/analyzer.js'
 import { tokens_fixture as fixture } from '../test-fixture.js'
 import { basename } from '../properties/property-utils.js'
 import { analyze_design_tokens, design_tokens_collectors } from '../presets/index.js'
@@ -144,14 +144,12 @@ test('the design token set only asks the parser for values', () => {
 	})
 })
 
-test('several inputs add up to one result', () => {
-	const analyzer = create_analyzer(design_tokens_collectors)
-	analyzer.add('a { color: red; font-size: 12px }')
-	analyzer.add('b { color: red; color: blue; font-size: 14px }')
-	const tokens = analyzer.result()
-
-	expect(counts(tokens.colors)).toEqual({ red: 2, blue: 1 })
-	expect(tokens.colors.by_context.get('color')?.total).toBe(3)
-	expect(counts(tokens.colors.formats)).toEqual({ named: 3 })
-	expect(counts(tokens.font_sizes)).toEqual({ '12px': 1, '14px': 1 })
+test('results from separate runs merge', () => {
+	const a = analyze_design_tokens('a { color: red; font-size: 12px }')
+	const b = analyze_design_tokens('b { color: red; color: blue; font-size: 14px }')
+	const merged = merge(a, b)
+	expect(counts(merged.colors)).toEqual({ red: 2, blue: 1 })
+	expect(merged.colors.by_context.get('color')?.total).toBe(3)
+	expect(counts(merged.colors.formats)).toEqual({ named: 3 })
+	expect(counts(merged.font_sizes)).toEqual({ '12px': 1, '14px': 1 })
 })

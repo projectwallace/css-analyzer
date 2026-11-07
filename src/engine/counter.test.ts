@@ -1,5 +1,11 @@
 import { test, expect } from 'vitest'
-import { create_counter, create_context_counter, summarize } from './counter.js'
+import {
+	create_counter,
+	create_context_counter,
+	merge_counts,
+	merge_context_counts,
+	summarize,
+} from './counter.js'
 
 const at = { loc: { line: 1, column: 2, offset: 3, length: 4 } }
 
@@ -55,6 +61,43 @@ test('context counter counts per context', () => {
 	expect(result.total_unique).toBe(2)
 	expect(result.by_context.get('color')?.total).toBe(2)
 	expect(result.by_context.get('background-color')?.unique.get('red')).toEqual({ count: 1 })
+})
+
+test('merge_counts sums counts and concatenates locations', () => {
+	const a = create_counter({ locations: true })
+	a.add('x', at)
+	const b = create_counter({ locations: true })
+	b.add('x', at)
+	b.add('y', at)
+
+	const merged = merge_counts(a.result(), b.result())
+	expect(merged.total).toBe(3)
+	expect(merged.total_unique).toBe(2)
+	expect(merged.unique.get('x')?.count).toBe(2)
+	expect(merged.unique.get('x')?.locations).toHaveLength(2)
+})
+
+test('merge_counts does not mutate its inputs', () => {
+	const a = create_counter()
+	a.add('x', at)
+	const b = create_counter()
+	b.add('x', at)
+	const a_result = a.result()
+	merge_counts(a_result, b.result())
+	expect(a_result.unique.get('x')?.count).toBe(1)
+})
+
+test('merge_context_counts merges contexts', () => {
+	const a = create_context_counter({ contexts: true })
+	a.add('red', 'color', at)
+	const b = create_context_counter({ contexts: true })
+	b.add('red', 'color', at)
+	b.add('red', 'fill', at)
+
+	const merged = merge_context_counts(a.result(), b.result())
+	expect(merged.total).toBe(3)
+	expect(merged.by_context.get('color')?.total).toBe(2)
+	expect(merged.by_context.get('fill')?.total).toBe(1)
 })
 
 test('summarize derives the uniqueness ratio', () => {

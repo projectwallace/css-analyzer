@@ -25,7 +25,8 @@ const EMPTY: NumberSummary = {
 
 /**
  * Statistics for numbers that were counted as `value -> how often`.
- * Keeping counts (instead of a mean) keeps every statistic derivable afterwards.
+ * Keeping counts (instead of a mean) is what makes these metrics mergeable:
+ * add the counts of two runs together and summarize afterwards.
  */
 export function summarize_frequencies(frequencies: ReadonlyMap<number, number>): NumberSummary {
 	const values = [...frequencies.keys()].sort((a, b) => a - b)

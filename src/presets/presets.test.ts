@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest'
-import { analyze, create_analyzer } from '../engine/analyzer.js'
+import { analyze, create_analyzer, merge } from '../engine/analyzer.js'
 import { stylesheet_fixture, tokens_fixture } from '../test-fixture.js'
 import { all_collectors, analyze_all, analyze_design_tokens } from './index.js'
 
@@ -9,6 +9,14 @@ describe('analyze_all', () => {
 		expect(Object.keys(report)).toEqual(Object.keys(all_collectors))
 		expect(report.colors.total_unique).toBe(1)
 		expect(report.specificity.total).toBe(1)
+	})
+
+	test('results of separate runs merge, and equal the incremental result', () => {
+		const a = 'a { color: red; z-index: 1 } @keyframes k { to { top: 0 } }'
+		const b = 'b { color: blue; z-index: 2; animation: k 1s }'
+		const merged = merge(analyze_all(a), analyze_all(b))
+		const incremental = create_analyzer(all_collectors).add(a).add(b).result()
+		expect(merged).toEqual(incremental)
 	})
 
 	test('parses everything: it is the most expensive set', () => {
