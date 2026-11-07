@@ -18,7 +18,7 @@ import type { DeclarationContext, Location, LocationSource, StylesheetContext } 
 export type ContextController = {
 	/** One shared, mutable object: valid only during the handler call it is passed to */
 	readonly ctx: DeclarationContext & StylesheetContext
-	begin(source: string | undefined, css: string): void
+	begin(css: string): void
 	set_node(node: CSSNode): void
 	enter_rule(node: CSSNode): void
 	leave_rule(): void
@@ -31,7 +31,6 @@ export type ContextController = {
  * whoever asks first pays, everybody else reads the cached value.
  */
 export function create_context(): ContextController {
-	let source: string | undefined
 	let css = ''
 	let node: CSSNode | undefined
 	let property_cache: string | undefined
@@ -55,7 +54,6 @@ export function create_context(): ContextController {
 			column: target.column,
 			offset: target.start,
 			length: target.length,
-			source,
 		}
 	}
 
@@ -66,9 +64,6 @@ export function create_context(): ContextController {
 	}
 
 	const ctx: DeclarationContext & StylesheetContext = {
-		get source() {
-			return source
-		},
 		get css() {
 			return css
 		},
@@ -157,8 +152,7 @@ export function create_context(): ContextController {
 
 	return {
 		ctx,
-		begin(next_source, next_css) {
-			source = next_source
+		begin(next_css) {
 			css = next_css
 			node = undefined
 			depth = 0

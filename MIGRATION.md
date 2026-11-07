@@ -51,7 +51,7 @@ All pure utilities now accept CSS text or a parsed node and return plain data. N
 | `namedColors`, `systemColors`, `colorFunctions`, `colorKeywords` | `named_colors`, `system_colors`, `color_functions`, `color_keywords`                              |
 | `isPropertyHack`                                                 | `is_property_hack`                                                                                |
 
-Removed: `isIe9Hack` (use `get_value_browserhacks`), `hasVendorPrefix`, `cssKeywords` (use `keywords` from `/values`), the `Collection`, `ContextCollection` and `AggregateCollection` classes, and the `Location` / `UniqueWithLocations` types of the old result (`Location` is still exported and gained an optional `source`).
+Removed: `isIe9Hack` (use `get_value_browserhacks`), `hasVendorPrefix`, `cssKeywords` (use `keywords` from `/values`), the `Collection`, `ContextCollection` and `AggregateCollection` classes, and the `Location` / `UniqueWithLocations` types of the old result (`Location` is still exported).
 
 ## New
 

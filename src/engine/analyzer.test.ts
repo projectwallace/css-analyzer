@@ -179,22 +179,16 @@ test('values stay unparsed when nobody needs them', () => {
 	expect(value).toBeUndefined()
 })
 
-test('locations are opt-in per collector and carry the source', () => {
-	const result = analyze(
-		'a { color: red }',
-		{ with: declared_properties({ locations: true }), without: declared_properties() },
-		{ source: 'a.css' },
-	)
+test('locations are opt-in per collector', () => {
+	const result = analyze('a { color: red }', {
+		with: declared_properties({ locations: true }),
+		without: declared_properties(),
+	})
 
 	expect(result.with.unique.get('color')?.locations).toEqual([
-		{ line: 1, column: 5, offset: 4, length: 10, source: 'a.css' },
+		{ line: 1, column: 5, offset: 4, length: 10 },
 	])
 	expect(result.without.unique.get('color')).toEqual({ count: 1 })
-})
-
-test('locations have no `source` when none is given', () => {
-	const { props } = analyze('a { color: red }', { props: declared_properties({ locations: true }) })
-	expect(props.unique.get('color')?.locations?.[0]?.source).toBeUndefined()
 })
 
 test('accepts an already parsed AST', () => {
@@ -227,9 +221,9 @@ test('comment and stylesheet subscriptions', () => {
 		result: () => comments.length,
 	}))
 	const input = '/* hi */ a { color: red }'
-	const result = analyze(input, { meta }, { source: 'x.css' })
+	const result = analyze(input, { meta })
 	expect(result.meta).toBe(1)
-	expect(comments).toEqual([{ line: 1, column: 1, offset: 0, length: 8, source: 'x.css' }])
+	expect(comments).toEqual([{ line: 1, column: 1, offset: 0, length: 8 }])
 	expect(css).toBe(input)
 })
 

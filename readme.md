@@ -89,12 +89,7 @@ r.sizes.sequence // ['2', '3', '1']
 
 Use `summarize_numbers(result.sizes)` for min, max, mean, mode, median, range and sum.
 
-### Source and already parsed input
-
-```js
-// `source` ends up in the locations
-analyze(css, { colors: colors({ locations: true }) }, { source: 'a.css' })
-```
+### Already parsed?
 
 `analyze()` also accepts an AST from `@projectwallace/css-parser`. Parse it with values, selectors and at-rule preludes enabled so every collector has what it needs.
 

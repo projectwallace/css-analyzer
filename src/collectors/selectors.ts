@@ -9,7 +9,7 @@ import {
 import { create_counter } from '../engine/counter.js'
 import { without_sequence } from './shared.js'
 import { define_collector } from '../engine/define-collector.js'
-import type { CollectorDef, CountOptions, CountResult, LocationSource } from '../engine/types.js'
+import type { CollectorDef, CountOptions, CountResult } from '../engine/types.js'
 import {
 	get_accessibility_selectors,
 	get_combinators,
@@ -103,11 +103,7 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 					}
 				})
 				for (const combinator of get_combinators(node)) {
-					const at: LocationSource = {
-						loc:
-							ctx.source === undefined ? combinator.loc : { ...combinator.loc, source: ctx.source },
-					}
-					combinators.add(combinator.name, at)
+					combinators.add(combinator.name, { loc: combinator.loc })
 				}
 				if (get_specificity(node)[0]![0] > 0) {
 					ids.add(text, ctx)
