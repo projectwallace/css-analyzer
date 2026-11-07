@@ -29,7 +29,8 @@ import {
 } from '@projectwallace/css-parser'
 import { create_context } from './context.js'
 import type {
-	AnalyzeOptions,
+	AddOptions,
+	Analyzer,
 	CollectorInstance,
 	CollectorMap,
 	Context,
@@ -108,17 +109,7 @@ type ValueSubscription = {
 	enter: (node: CSSNode, ctx: DeclarationContext, kind: ValueKind) => void
 }
 
-/**
- * Run collectors over one stylesheet.
- * @param input - CSS text, or an already parsed stylesheet node
- * @param collectors - Object map of collectors; the keys become the keys of the result
- * @param options - `source` is stored on every location, to tell stylesheets apart
- */
-export function analyze<C extends CollectorMap>(
-	input: string | CSSNode,
-	collectors: C,
-	options: AnalyzeOptions = {},
-): ResultOf<C> {
+export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer<C> {
 	const keys = Object.keys(collectors) as (keyof C & string)[]
 	const instances: CollectorInstance<unknown>[] = keys.map((key) => collectors[key]!.create())
 
@@ -263,53 +254,73 @@ export function analyze<C extends CollectorMap>(
 		}
 	}
 
-	let ast: CSSNode
-	if (typeof input === 'string') {
-		controller.begin(options.source, input)
-		ast = parse(input, {
-			parse_selectors: parse_options.selectors,
-			parse_values: parse_options.values,
-			parse_atrule_preludes: parse_options.atrule_preludes,
-			on_comment:
-				comment_handlers.length === 0
-					? undefined
-					: function (comment) {
-							const loc = {
-								line: comment.line,
-								column: comment.column,
-								offset: comment.start,
-								length: comment.length,
-								source: options.source,
-							}
-							for (const handler of comment_handlers) {
-								handler(loc)
-							}
-						},
-		})
-	} else {
-		ast = input
-		controller.begin(options.source, ast.text)
+	const analyzer: Analyzer<C> = {
+		parse_options,
+		add(input: string | CSSNode, options: AddOptions = {}): Analyzer<C> {
+			let ast: CSSNode
+			let css: string
+			if (typeof input === 'string') {
+				css = input
+				controller.begin(options.source, css)
+				ast = parse(css, {
+					parse_selectors: parse_options.selectors,
+					parse_values: parse_options.values,
+					parse_atrule_preludes: parse_options.atrule_preludes,
+					on_comment:
+						comment_handlers.length === 0
+							? undefined
+							: function (comment) {
+									const loc = {
+										line: comment.line,
+										column: comment.column,
+										offset: comment.start,
+										length: comment.length,
+										source: options.source,
+									}
+									for (const handler of comment_handlers) {
+										handler(loc)
+									}
+								},
+				})
+			} else {
+				ast = input
+				css = ast.text
+				controller.begin(options.source, css)
+			}
+
+			if (stylesheet_handlers.length > 0) {
+				controller.set_node(ast)
+				for (const handler of stylesheet_handlers) {
+					handler(ast as StyleSheet, ctx as StylesheetContext)
+				}
+			}
+
+			traverse(ast, {
+				enter(node) {
+					return enter(node, get_kind(node)) === true ? SKIP : undefined
+				},
+				leave(node) {
+					leave(node, get_kind(node))
+				},
+			})
+			return analyzer
+		},
+		result(): ResultOf<C> {
+			const result: Record<string, unknown> = {}
+			keys.forEach(function (key, index) {
+				result[key] = instances[index]!.result()
+			})
+			return result as ResultOf<C>
+		},
 	}
 
-	if (stylesheet_handlers.length > 0) {
-		controller.set_node(ast)
-		for (const handler of stylesheet_handlers) {
-			handler(ast as StyleSheet, ctx as StylesheetContext)
-		}
-	}
+	return analyzer
+}
 
-	traverse(ast, {
-		enter(node) {
-			return enter(node, get_kind(node)) === true ? SKIP : undefined
-		},
-		leave(node) {
-			leave(node, get_kind(node))
-		},
-	})
-
-	const result: Record<string, unknown> = {}
-	keys.forEach(function (key, index) {
-		result[key] = instances[index]!.result()
-	})
-	return result as ResultOf<C>
+export function analyze<C extends CollectorMap>(
+	input: string | CSSNode,
+	collectors: C,
+	options?: AddOptions,
+): ResultOf<C> {
+	return create_analyzer(collectors).add(input, options).result()
 }

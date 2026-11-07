@@ -29,6 +29,7 @@ Write unit tests: small, fast and next to the code they test.
 - Test a utility by calling it directly, with text (and with a parsed node when that matters). Prefer `test.each` tables over long fixtures.
 - Use `plain()` and `series()` from `src/test-utils.ts` to compare count results with `toEqual()`.
 - Integration tests are few and live with the presets: `src/presets/presets.test.ts`.
+- Collectors must also work with `create_analyzer().add()`: `src/collectors/all-collectors.test.ts` covers that for every collector, add yours there.
 
 ## Performance
 

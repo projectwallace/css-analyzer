@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
+import { analyze, create_analyzer } from '../engine/analyzer.js'
 import {
 	animation_names,
 	atrules,
@@ -57,6 +57,29 @@ const b = `
 @font-face { font-family: B; src: url(b.woff2) }
 .c > .d { --z: 3px; width: 10px; animation: fade 1s; display: -webkit-box }
 `
+
+test('every collector works across several added inputs', () => {
+	const analyzer = create_analyzer(collectors())
+		.add(a, { source: 'a.css' })
+		.add(b, { source: 'b.css' })
+	const result = analyzer.result()
+
+	expect(result.z_indexes.unique.get('1')?.locations?.[0]?.source).toBe('a.css')
+	expect(result.z_indexes.unique.get('2')?.locations?.[0]?.source).toBe('b.css')
+	expect(result.rules.total).toBe(4)
+})
+
+test('defined and used names are combined across added inputs', () => {
+	const analyzer = create_analyzer(collectors())
+	analyzer.add('@keyframes spin { to { opacity: 1 } }')
+	expect(analyzer.result().atrules.keyframes.unused).toEqual(['spin'])
+
+	analyzer.add('a { animation: spin 1s; animation-name: other }')
+	const { keyframes } = analyzer.result().atrules
+	expect(keyframes.defined).toEqual(['spin'])
+	expect(keyframes.unused).toEqual([])
+	expect(keyframes.unknown).toEqual(['other'])
+})
 
 test('every collector works with locations and a source', () => {
 	const result = analyze(a, collectors(), { source: 'a.css' })

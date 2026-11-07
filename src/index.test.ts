@@ -14,6 +14,7 @@ describe('Public API', () => {
 				'DefinedUsed',
 				'KeywordSet',
 				'analyze',
+				'create_analyzer',
 				'create_context_counter',
 				'create_counter',
 				'define_collector',

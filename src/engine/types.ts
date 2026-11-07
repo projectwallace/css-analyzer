@@ -168,7 +168,13 @@ export type ResultOf<C extends CollectorMap> = {
 	[K in keyof C]: C[K] extends CollectorDef<infer T> ? T : never
 }
 
-export type AnalyzeOptions = {
-	/** Stored on every location, to tell stylesheets apart */
+export type AddOptions = {
 	source?: string
+}
+
+export type Analyzer<C extends CollectorMap> = {
+	/** Parse options the collectors need; use them when you parse the AST yourself */
+	readonly parse_options: ParseOptions
+	add(input: string | CSSNode, options?: AddOptions): Analyzer<C>
+	result(): ResultOf<C>
 }
