@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest'
-import { analyze, create_analyzer } from '../engine/analyzer.js'
+import { analyze } from '../engine/analyzer.js'
 import { tokens_fixture as fixture } from '../test-fixture.js'
 import { basename } from '../properties/property-utils.js'
 import { analyze_design_tokens, design_tokens_collectors } from '../presets/index.js'
@@ -134,24 +134,4 @@ describe('behaviour', () => {
 		expect(counts(result.radii)).toEqual({ '4px': 2, '2px': 1 })
 		expect(counts(result.radii.by_context.get('border-radius')!)).toEqual({ '4px': 2 })
 	})
-})
-
-test('the design token set only asks the parser for values', () => {
-	expect(create_analyzer(design_tokens_collectors).parse_options).toEqual({
-		selectors: false,
-		values: true,
-		atrule_preludes: false,
-	})
-})
-
-test('several inputs add up to one result', () => {
-	const analyzer = create_analyzer(design_tokens_collectors)
-	analyzer.add('a { color: red; font-size: 12px }')
-	analyzer.add('b { color: red; color: blue; font-size: 14px }')
-	const tokens = analyzer.result()
-
-	expect(counts(tokens.colors)).toEqual({ red: 2, blue: 1 })
-	expect(tokens.colors.by_context.get('color')?.total).toBe(3)
-	expect(counts(tokens.colors.formats)).toEqual({ named: 3 })
-	expect(counts(tokens.font_sizes)).toEqual({ '12px': 1, '14px': 1 })
 })

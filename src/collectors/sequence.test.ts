@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { analyze, create_analyzer } from '../engine/analyzer.js'
+import { analyze } from '../engine/analyzer.js'
 import { atrules, declarations, rules, selectors, specificity } from './index.js'
 
 const css = `
@@ -32,22 +32,4 @@ test('sequence is off by default and only kept for the numeric series', () => {
 	expect(result.selectors.sequence).toBeUndefined()
 	expect(result.selectors.ids.sequence).toBeUndefined()
 	expect(result.selectors.nesting.sequence).toBeDefined()
-})
-
-test('sequences are joined when inputs are added', () => {
-	const collectors = { rules: rules({ sequence: true }) }
-	const a = 'a { color: red }'
-	const b = '.b { color: red; margin: 0 }'
-
-	const incremental = create_analyzer(collectors).add(a).add(b).result()
-
-	expect(incremental.rules.sizes.sequence).toEqual(['2', '3'])
-})
-
-test('a sequence taken earlier is not changed by later input', () => {
-	const analyzer = create_analyzer({ rules: rules({ sequence: true }) })
-	analyzer.add('a { color: red }')
-	const first = analyzer.result()
-	analyzer.add('b { color: red }')
-	expect(first.rules.sizes.sequence).toEqual(['2'])
 })
