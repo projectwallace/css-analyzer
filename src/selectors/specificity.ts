@@ -18,14 +18,14 @@ import {
 	is_selector,
 	is_combinator,
 } from '@projectwallace/css-parser'
-import { parse_selector_list } from '@projectwallace/css-parser/parse-selector'
+import { type Input, as_selectors } from '../adapter/css-parser.js'
 
-type Specificity = [number, number, number]
+export type Specificity = [number, number, number]
 
 /**
  * @returns 0 if s1 equals s2, a negative number if s1 is lower than s2, or a positive number if s1 higher than s2
  */
-export function compare(s1: Specificity, s2: Specificity): number {
+export function compare_specificity(s1: Specificity, s2: Specificity): number {
 	if (s1[0] === s2[0]) {
 		if (s1[1] === s2[1]) {
 			return s1[2] - s2[2]
@@ -36,10 +36,10 @@ export function compare(s1: Specificity, s2: Specificity): number {
 }
 
 function max(list: Specificity[]): Specificity {
-	return list.sort(compare).at(-1)!
+	return list.sort(compare_specificity).at(-1)!
 }
 
-export const calculateForAST = (selectorAST: Selector): Specificity => {
+function selector_specificity(selectorAST: Selector): Specificity {
 	// https://www.w3.org/TR/selectors-4/#specificity-rules
 	let a = 0 /* ID Selectors */
 	let b = 0 /* Class selectors, Attributes selectors, and Pseudo-classes */
@@ -86,7 +86,7 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 							const childSelectorList = current.first_child
 							if (childSelectorList && is_selector_list(childSelectorList)) {
 								// Calculate Specificity for all selectors in the list and get max
-								const max1 = max(calculate(childSelectorList))
+								const max1 = max(get_specificity(childSelectorList))
 
 								// Adjust orig specificity
 								a += max1[0]
@@ -107,7 +107,7 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 						const nthOf = current.first_child
 						if (nthOf && is_nth_of_selector(nthOf) && nthOf.selector) {
 							// Use the convenience property to access the selector list directly
-							const max2 = max(calculate(nthOf.selector))
+							const max2 = max(get_specificity(nthOf.selector))
 
 							// Adjust orig specificity
 							a += max2[0]
@@ -133,7 +133,7 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 								}
 
 								// Calculate contribution from this part
-								const partSpecificity = calculateForAST({
+								const partSpecificity = selector_specificity({
 									type_name: 'Selector',
 									first_child: childPart,
 									has_children: true,
@@ -181,7 +181,7 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 								}
 
 								// Calculate contribution from this part
-								const partSpecificity = calculateForAST({
+								const partSpecificity = selector_specificity({
 									type_name: 'Selector',
 									first_child: childPart,
 									has_children: true,
@@ -256,51 +256,16 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 	return [a, b, c]
 }
 
-const convertToAST = (source: string | CSSNode) => {
-	// The passed in argument was a String.
-	// ~> Let's try and parse to an AST
-	if (typeof source === 'string') {
-		try {
-			return parse_selector_list(source)
-		} catch (e) {
-			const message = e instanceof Error ? e.message : String(e)
-			throw new TypeError(
-				`Could not convert passed in source '${source}' to SelectorList: ${message}`,
-			)
-		}
-	}
-
-	// The passed in argument was an Object.
-	// ~> Let's verify if it's a AST of the type NODE_SELECTOR_LIST
-	if (source instanceof Object) {
-		if (is_selector_list(source)) {
-			return source
-		}
-
-		throw new TypeError(`Passed in source is an Object but no AST / AST of the type SelectorList`)
-	}
-
-	throw new TypeError(
-		`Passed in source is not a String nor an Object. I don't know what to do with it.`,
-	)
-}
-
-export const calculate = (selector: string | CSSNode): Specificity[] => {
+/**
+ * Calculate the specificity of a selector (list).
+ * @param input - Selector text, or an already parsed Selector/SelectorList node
+ * @returns One `[a, b, c]` tuple for every selector in the list
+ */
+export function get_specificity(input: Input): Specificity[] {
 	// Quit while you're ahead
-	if (!selector) {
+	if (!input) {
 		return []
 	}
 
-	// Make sure we have a SelectorList AST
-	// If not, an exception will be thrown
-	const selector_list = convertToAST(selector)
-
-	// SelectorList - the ast is always a SelectorList
-	// Its children are NODE_SELECTOR (type 5) nodes
-	// ~> Calculate Specificity for each NODE_SELECTOR
-	const specificities: Specificity[] = []
-	for (const selector_node of selector_list) {
-		specificities.push(calculateForAST(selector_node))
-	}
-	return specificities
+	return as_selectors(input).map((selector) => selector_specificity(selector as Selector))
 }

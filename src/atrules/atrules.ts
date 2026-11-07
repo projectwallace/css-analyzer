@@ -8,15 +8,33 @@ import {
 	is_supports_query,
 	is_dimension,
 	is_number,
-	type CSSNode,
+	type AnyNode,
 } from '@projectwallace/css-parser'
+import { type Input, as_prelude } from '../adapter/css-parser.js'
+
+function find_hacks(
+	name: string,
+	input: Input,
+	check: (node: AnyNode, on_hack: (hack: string) => void) => unknown,
+): string[] {
+	const hacks: string[] = []
+	for (const prelude of as_prelude(name, input)) {
+		walk(prelude, function (node) {
+			const result = check(node, (hack) => hacks.push(hack))
+			if (result === BREAK) return BREAK
+		})
+		if (hacks.length > 0) break
+	}
+	return hacks
+}
 
 /**
- * Check if an @supports atRule is a browserhack (Wallace parser version)
- * @param prelude - The Atrule CSSNode from Wallace parser
+ * Find @supports browserhacks (`-webkit-appearance: none`, `-moz-appearance: meterbar`).
+ * @param input - Prelude text, or an already parsed prelude node
+ * @returns The hacks that were found (at most one)
  */
-export function isSupportsBrowserhack(prelude: CSSNode, on_hack: (hack: string) => void): void {
-	walk(prelude, function (node) {
+export function get_supports_browserhacks(input: Input): string[] {
+	return find_hacks('supports', input, function (node, on_hack) {
 		// Check SupportsQuery nodes for browserhack patterns
 		if (is_supports_query(node)) {
 			const normalizedPrelude = node.value.toString().toLowerCase().replaceAll(/\s+/g, '')
@@ -35,12 +53,12 @@ export function isSupportsBrowserhack(prelude: CSSNode, on_hack: (hack: string) 
 }
 
 /**
- * Check if a @media atRule is a browserhack (Wallace parser version)
- * @param prelude - The Atrule CSSNode from Wallace parser
- * @returns true if the atrule is a browserhack
+ * Find @media browserhacks (`\\0`, `\\9`, `-ms-high-contrast`, `min-resolution: .001dpcm`, ...).
+ * @param input - Prelude text, or an already parsed prelude node
+ * @returns The hacks that were found (at most one)
  */
-export function isMediaBrowserhack(prelude: CSSNode, on_hack: (hack: string) => void): void {
-	walk(prelude, function (node) {
+export function get_media_browserhacks(input: Input): string[] {
+	return find_hacks('media', input, function (node, on_hack) {
 		// Check MediaType nodes for \0 prefix or \9 suffix
 		if (is_media_type(node)) {
 			const text = node.value

@@ -1,6 +1,4 @@
 import {
-	type CSSNode,
-	type Value,
 	is_identifier,
 	is_operator,
 	is_dimension,
@@ -9,6 +7,7 @@ import {
 } from '@projectwallace/css-parser'
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
+import { type Input, as_value } from '../adapter/css-parser.js'
 
 const TIMING_KEYWORDS = new KeywordSet([
 	'linear',
@@ -40,51 +39,48 @@ const ANIMATION_NON_NAME_KEYWORDS = new KeywordSet([
 	'infinite',
 ])
 
-export function analyzeAnimation(
-	value: Value,
-	cb: ({ type, value }: { type: string; value: CSSNode }) => void,
-): void {
-	let durationFound = false
+export type AnimationParts = {
+	/** Durations and delays-as-first-dimension, as written */
+	durations: string[]
+	/** Timing function keywords and functions (`ease-in`, `cubic-bezier(...)`) */
+	timing_functions: string[]
+	/** Animation names, as written (quoted names keep their quotes) */
+	names: string[]
+	/** Global keywords such as `inherit` or `none` */
+	keywords: string[]
+}
 
-	for (let node of value) {
+/**
+ * Split an `animation` or `transition` value into its parts.
+ * @param input - Value text, or an already parsed Value node
+ */
+export function analyze_animation(input: Input): AnimationParts {
+	const parts: AnimationParts = { durations: [], timing_functions: [], names: [], keywords: [] }
+	let duration_found = false
+
+	for (const node of as_value(input)) {
 		// Right after a ',' we start over again
 		if (is_operator(node)) {
-			durationFound = false
-		} else if (is_dimension(node) && durationFound === false) {
+			duration_found = false
+		} else if (is_dimension(node) && duration_found === false) {
 			// The first Dimension is the duration, the second is the delay
-			durationFound = true
-			cb({
-				type: 'duration',
-				value: node,
-			})
+			duration_found = true
+			parts.durations.push(node.text)
 		} else if (is_identifier(node)) {
 			if (TIMING_KEYWORDS.has(node.name)) {
-				cb({
-					type: 'fn',
-					value: node,
-				})
+				parts.timing_functions.push(node.text)
 			} else if (keywords.has(node.name)) {
-				cb({
-					type: 'keyword',
-					value: node,
-				})
+				parts.keywords.push(node.text)
 			} else if (!ANIMATION_NON_NAME_KEYWORDS.has(node.name)) {
-				cb({
-					type: 'name',
-					value: node,
-				})
+				parts.names.push(node.text)
 			}
 		} else if (is_function(node) && TIMING_FUNCTION_VALUES.has(node.name)) {
-			cb({
-				type: 'fn',
-				value: node,
-			})
+			parts.timing_functions.push(node.text)
 		} else if (is_string(node)) {
 			// A quoted string is always a valid animation name, even when it's a reserved keyword (e.g. "none" or "infinite")
-			cb({
-				type: 'name',
-				value: node,
-			})
+			parts.names.push(node.text)
 		}
 	}
+
+	return parts
 }

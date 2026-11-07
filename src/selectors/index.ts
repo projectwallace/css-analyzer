@@ -1,6 +1,8 @@
+export { get_specificity, compare_specificity, type Specificity } from './specificity.js'
 export {
-	calculate as getSpecificity,
-	calculateForAST as getSpecificityForAST,
-	compare as compareSpecificity,
-} from './specificity.js'
-export { getComplexity, isPrefixed, isAccessibility, getCombinators } from './utils.js'
+	get_complexity,
+	get_vendor_prefixes,
+	get_accessibility_selectors,
+	get_combinators,
+	type CombinatorMatch,
+} from './utils.js'

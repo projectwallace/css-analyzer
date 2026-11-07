@@ -29,15 +29,20 @@ import {
 	is_operator,
 	is_string,
 } from '@projectwallace/css-parser'
-import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
-import { getCombinators, getComplexity, isPrefixed, isAccessibility } from './selectors/utils.js'
-import { calculateForAST as calculateSpecificity } from './selectors/specificity.js'
-import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
-import { destructure, SYSTEM_FONTS } from './values/destructure-font-shorthand.js'
-import { keywords, isValueReset } from './values/values.js'
-import { analyzeAnimation } from './values/animations.js'
-import { isValuePrefixed } from './values/vendor-prefix.js'
-import { isValueBrowserhack } from './values/browserhacks.js'
+import { get_supports_browserhacks, get_media_browserhacks } from './atrules/atrules.js'
+import {
+	get_combinators,
+	get_complexity,
+	get_vendor_prefixes,
+	get_accessibility_selectors,
+} from './selectors/utils.js'
+import { get_specificity } from './selectors/specificity.js'
+import { color_functions, color_keywords, named_colors, system_colors } from './values/colors.js'
+import { destructure_font_shorthand, SYSTEM_FONTS } from './values/destructure-font-shorthand.js'
+import { keywords, is_value_reset } from './values/values.js'
+import { analyze_animation } from './values/animations.js'
+import { get_prefixed_values } from './values/vendor-prefix.js'
+import { get_value_browserhacks } from './values/browserhacks.js'
 import { ContextCollection } from './context-collection.js'
 import {
 	Collection,
@@ -899,17 +904,17 @@ function analyzeInternal<T extends boolean>(
 				if (normalized_name === 'media') {
 					medias.p(node.prelude.text, toLoc(node))
 
-					isMediaBrowserhack(node.prelude, (hack) => {
+					for (const hack of get_media_browserhacks(node.prelude)) {
 						mediaBrowserhacks.p(hack, toLoc(node))
 						complexity++
-					})
+					}
 				} else if (normalized_name === 'supports') {
 					supports.p(node.prelude.text, toLoc(node))
 
-					isSupportsBrowserhack(node.prelude, (hack) => {
+					for (const hack of get_supports_browserhacks(node.prelude)) {
 						supportsBrowserhacks.p(hack, toLoc(node))
 						complexity++
-					})
+					}
 				} else if (normalized_name.endsWith('keyframes')) {
 					let prelude = unquote(node.prelude.text)
 					keyframes.p(prelude, toLoc(node))
@@ -1046,18 +1051,18 @@ function analyzeInternal<T extends boolean>(
 			uniqueSelectorNesting.p(depth > 0 ? depth - 1 : 0, loc)
 			uniqueSelectors.add(node.text)
 
-			let complexity = getComplexity(node)
+			let complexity = get_complexity(node)[0]!
 			selectorComplexities.push(complexity)
 			uniqueSelectorComplexities.p(complexity, loc)
 
-			isPrefixed(node, (prefix) => {
+			for (const prefix of get_vendor_prefixes(node)) {
 				prefixedSelectors.p(prefix.toLowerCase(), loc)
-			})
+			}
 
 			// Check for accessibility selectors
-			isAccessibility(node, (a11y_selector) => {
+			for (const a11y_selector of get_accessibility_selectors(node)) {
 				a11y.p(a11y_selector, loc)
-			})
+			}
 
 			walk(node, (child) => {
 				if (is_attribute_selector(child)) {
@@ -1075,12 +1080,11 @@ function analyzeInternal<T extends boolean>(
 				}
 			})
 
-			getCombinators(node, (combinator) => {
-				let name = combinator.name.trim() === '' ? ' ' : combinator.name
-				combinators.p(name, combinator.loc)
-			})
+			for (const combinator of get_combinators(node)) {
+				combinators.p(combinator.name, combinator.loc)
+			}
 
-			let specificity = calculateSpecificity(node)
+			let specificity = get_specificity(node)[0]!
 			let [sa, sb, sc] = specificity
 
 			uniqueSpecificities.p(specificity.toString(), loc)
@@ -1214,20 +1218,20 @@ function analyzeInternal<T extends boolean>(
 
 				//#region VALUE COMPLEXITY
 				// i.e. `background-image: -webkit-linear-gradient()`
-				isValuePrefixed(value, (prefixed) => {
+				for (const prefixed of get_prefixed_values(value)) {
 					vendorPrefixedValues.p(prefixed.toLowerCase(), valueLoc)
 					complexity++
-				})
+				}
 
 				// value browserhacks: progid:, \9, \7, alpha(), expression(), .htc
 				if (!is_custom(property)) {
-					isValueBrowserhack(value, (hack) => {
+					for (const hack of get_value_browserhacks(value)) {
 						valueBrowserhacks.p(hack, valueLoc)
 						complexity++
 						if (hack === '\\9' || hack === '\\7') {
 							text = text.slice(0, -2)
 						}
-					})
+					}
 				}
 				//#endregion VALUE COMPLEXITY
 
@@ -1237,7 +1241,7 @@ function analyzeInternal<T extends boolean>(
 				// Process properties first that don't have colors,
 				// so we can avoid further walking them;
 				if (SPACING_RESET_PROPERTIES.has(normalizedProperty)) {
-					if (isValueReset(value)) {
+					if (is_value_reset(value)) {
 						resets.p(normalizedProperty, valueLoc)
 					}
 				} else if (normalizedProperty === 'display') {
@@ -1251,12 +1255,14 @@ function analyzeInternal<T extends boolean>(
 					return SKIP
 				} else if (normalizedProperty === 'font') {
 					if (!SYSTEM_FONTS.has(text)) {
-						let result = destructure(value, function (keyword) {
-							valueKeywords.p(keyword.toLowerCase(), valueLoc)
-						})
+						let result = destructure_font_shorthand(value)
 
 						if (!result) {
 							return SKIP
+						}
+
+						for (const keyword of result.keywords) {
+							valueKeywords.p(keyword.toLowerCase(), valueLoc)
 						}
 
 						let { font_size, line_height, font_family } = result
@@ -1297,19 +1303,23 @@ function analyzeInternal<T extends boolean>(
 					}
 				} else if (normalizedProperty === 'transition' || normalizedProperty === 'animation') {
 					let isAnimation = normalizedProperty === 'animation'
-					analyzeAnimation(value, function (item) {
-						if (item.type === 'fn') {
-							timingFunctions.p(item.value.text.toLowerCase(), valueLoc)
-						} else if (item.type === 'duration') {
-							durations.p(item.value.text.toLowerCase(), valueLoc)
-						} else if (item.type === 'keyword') {
-							valueKeywords.p(item.value.text.toLowerCase(), valueLoc)
-						} else if (item.type === 'name' && isAnimation) {
-							let name = unquote(item.value.text)
+					let parts = analyze_animation(value)
+					for (const fn of parts.timing_functions) {
+						timingFunctions.p(fn.toLowerCase(), valueLoc)
+					}
+					for (const duration of parts.durations) {
+						durations.p(duration.toLowerCase(), valueLoc)
+					}
+					for (const keyword of parts.keywords) {
+						valueKeywords.p(keyword.toLowerCase(), valueLoc)
+					}
+					if (isAnimation) {
+						for (const animation_name of parts.names) {
+							let name = unquote(animation_name)
 							animationNames.p(name, valueLoc)
 							animationNamesTracking.use(name)
 						}
-					})
+					}
 					return SKIP
 				} else if (
 					normalizedProperty === 'animation-duration' ||
@@ -1436,7 +1446,7 @@ function analyzeInternal<T extends boolean>(
 						}
 
 						// A keyword is most likely to be 'transparent' or 'currentColor'
-						if (colorKeywords.has(identifierText)) {
+						if (color_keywords.has(identifierText)) {
 							let colorKeyword = identifierText.toLowerCase()
 							colors.push(colorKeyword, property, identifierLoc)
 							colorFormats.p(colorKeyword, identifierLoc)
@@ -1444,14 +1454,14 @@ function analyzeInternal<T extends boolean>(
 						}
 
 						// Or it can be a named color
-						if (namedColors.has(identifierText)) {
+						if (named_colors.has(identifierText)) {
 							colors.push(identifierText.toLowerCase(), property, identifierLoc)
 							colorFormats.p('named', identifierLoc)
 							return
 						}
 
 						// Or it can be a system color
-						if (systemColors.has(identifierText)) {
+						if (system_colors.has(identifierText)) {
 							colors.push(identifierText.toLowerCase(), property, identifierLoc)
 							colorFormats.p('system', identifierLoc)
 							return
@@ -1483,7 +1493,7 @@ function analyzeInternal<T extends boolean>(
 						}
 
 						// rgb(a), hsl(a), color(), hwb(), lch(), lab(), oklab(), oklch()
-						if (colorFunctions.has(funcName)) {
+						if (color_functions.has(funcName)) {
 							colors.push(valueNode.text, property, funcLoc)
 							colorFormats.p(funcName.toLowerCase(), funcLoc)
 							return
@@ -1800,23 +1810,23 @@ export function compareSpecificity(a: Specificity, b: Specificity): number {
 	return b[0] - a[0]
 }
 
-export { calculate as calculateSpecificity } from './selectors/specificity.js'
+export { get_specificity } from './selectors/specificity.js'
 
 export {
-	getComplexity as selectorComplexity,
-	isPrefixed as isSelectorPrefixed,
-	isAccessibility as isAccessibilitySelector,
+	get_complexity,
+	get_vendor_prefixes,
+	get_accessibility_selectors,
 } from './selectors/utils.js'
 
-export { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
+export { get_supports_browserhacks, get_media_browserhacks } from './atrules/atrules.js'
 
 export { isHack as isPropertyHack } from './properties/property-utils.js'
 
-export { isValuePrefixed } from './values/vendor-prefix.js'
+export { get_prefixed_values } from './values/vendor-prefix.js'
 
-export { isValueBrowserhack } from './values/browserhacks.js'
+export { get_value_browserhacks } from './values/browserhacks.js'
 
-export { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
+export { color_functions, color_keywords, named_colors, system_colors } from './values/colors.js'
 
 export { keywords as cssKeywords } from './values/values.js'
 
