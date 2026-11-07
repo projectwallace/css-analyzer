@@ -7,6 +7,7 @@ import {
 	type Value,
 } from '@projectwallace/css-parser'
 import { KeywordSet } from '../keyword-set.js'
+import { type Input, as_value } from '../adapter/css-parser.js'
 import { keywords } from './values.js'
 
 export const SYSTEM_FONTS: KeywordSet = new KeywordSet([
@@ -76,10 +77,17 @@ const SLASH = 47 // '/'.charCodeAt(0)
  * @param value - The VALUE CSSNode for a `font` declaration
  * @param cb    - Called for every global CSS keyword found in the value (e.g. inherit)
  */
-export function destructure(
-	value: Value,
-	cb: (keyword: string) => void,
-): { font_size?: string; line_height?: string; font_family?: string | null } | null {
+export type FontShorthand = {
+	font_size?: string
+	line_height?: string
+	font_family?: string | null
+	/** Global keywords (inherit, initial, ...) found anywhere in the value */
+	keywords: string[]
+}
+
+export function destructure_font_shorthand(input: Input): FontShorthand | null {
+	const value = as_value(input) as Value
+	const found_keywords: string[] = []
 	if (!value.has_children) {
 		return null
 	}
@@ -92,7 +100,7 @@ export function destructure(
 	// Report global keywords (inherit, initial, …) that appear anywhere in the value.
 	for (const child of value) {
 		if (is_identifier(child) && keywords.has(child.name)) {
-			cb(child.name!)
+			found_keywords.push(child.name!)
 		}
 	}
 
@@ -198,5 +206,5 @@ export function destructure(
 		}
 	}
 
-	return { font_size, line_height, font_family }
+	return { font_size, line_height, font_family, keywords: found_keywords }
 }

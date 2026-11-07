@@ -2,22 +2,22 @@ import { test, expect, describe } from 'vitest'
 import {
 	analyze,
 	compareSpecificity,
-	selectorComplexity,
-	isAccessibilitySelector,
-	isSelectorPrefixed,
-	isMediaBrowserhack,
-	isSupportsBrowserhack,
+	get_complexity,
+	get_accessibility_selectors,
+	get_vendor_prefixes,
+	get_media_browserhacks,
+	get_supports_browserhacks,
 	isPropertyHack,
-	isValuePrefixed,
-	isValueBrowserhack,
+	get_prefixed_values,
+	get_value_browserhacks,
 	hasVendorPrefix,
 	cssKeywords,
 	KeywordSet,
 	// Color exports
-	namedColors,
-	systemColors,
-	colorFunctions,
-	colorKeywords,
+	named_colors,
+	system_colors,
+	color_functions,
+	color_keywords,
 	type UniqueWithLocations,
 	type Location,
 	type Specificity,
@@ -32,36 +32,36 @@ describe('Public API', () => {
 		expect(typeof compareSpecificity).toBe('function')
 	})
 
-	test('exposes the "selectorComplexity" method', () => {
-		expect(typeof selectorComplexity).toBe('function')
+	test('exposes the "get_complexity" method', () => {
+		expect(typeof get_complexity).toBe('function')
 	})
 
-	test('exposes the "isSelectorPrefixed" method', () => {
-		expect(typeof isSelectorPrefixed).toBe('function')
+	test('exposes the "get_vendor_prefixes" method', () => {
+		expect(typeof get_vendor_prefixes).toBe('function')
 	})
 
-	test('exposes the "isAccessibilitySelector" method', () => {
-		expect(typeof isAccessibilitySelector).toBe('function')
+	test('exposes the "get_accessibility_selectors" method', () => {
+		expect(typeof get_accessibility_selectors).toBe('function')
 	})
 
-	test('exposes the "isMediaBrowserhack" method', () => {
-		expect(typeof isMediaBrowserhack).toBe('function')
+	test('exposes the "get_media_browserhacks" method', () => {
+		expect(typeof get_media_browserhacks).toBe('function')
 	})
 
-	test('exposes the "isSupportsBrowserhack" method', () => {
-		expect(typeof isSupportsBrowserhack).toBe('function')
+	test('exposes the "get_supports_browserhacks" method', () => {
+		expect(typeof get_supports_browserhacks).toBe('function')
 	})
 
 	test('exposes the "isPropertyHack" method', () => {
 		expect(typeof isPropertyHack).toBe('function')
 	})
 
-	test('exposes the "isValuePrefixed" method', () => {
-		expect(typeof isValuePrefixed).toBe('function')
+	test('exposes the "get_prefixed_values" method', () => {
+		expect(typeof get_prefixed_values).toBe('function')
 	})
 
-	test('exposes the "isValueBrowserhack" method', () => {
-		expect(typeof isValueBrowserhack).toBe('function')
+	test('exposes the "get_value_browserhacks" method', () => {
+		expect(typeof get_value_browserhacks).toBe('function')
 	})
 
 	test('exposes the "hasVendorPrefix" method', () => {
@@ -72,20 +72,20 @@ describe('Public API', () => {
 		expect(typeof compareSpecificity).toBe('function')
 	})
 
-	test('exposes the namedColors KeywordSet', () => {
-		expect(namedColors.has('Red')).toBeTruthy()
+	test('exposes the named_colors KeywordSet', () => {
+		expect(named_colors.has('Red')).toBeTruthy()
 	})
 
-	test('exposes the systemColors KeywordSet', () => {
-		expect(systemColors.has('LinkText')).toBeTruthy()
+	test('exposes the system_colors KeywordSet', () => {
+		expect(system_colors.has('LinkText')).toBeTruthy()
 	})
 
-	test('exposes the colorFunctions KeywordSet', () => {
-		expect(colorFunctions.has('okLAB')).toBeTruthy()
+	test('exposes the color_functions KeywordSet', () => {
+		expect(color_functions.has('okLAB')).toBeTruthy()
 	})
 
-	test('exposes the colorKeywords KeywordSet', () => {
-		expect(colorKeywords.has('TRANSPARENT')).toBeTruthy()
+	test('exposes the color_keywords KeywordSet', () => {
+		expect(color_keywords.has('TRANSPARENT')).toBeTruthy()
 	})
 
 	test('exposes CSS keywords KeywordSet', () => {
