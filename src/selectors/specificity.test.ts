@@ -285,3 +285,27 @@ test('calculates specificity uniqueness', () => {
 	expect(actual.totalUnique).toBe(5)
 	expect(actual.uniquenessRatio).toBe(5 / 12)
 })
+
+test('does not double count nested pseudo-class functions', () => {
+	const fixture = `
+    :is(.a),
+    :is(:is(.a)),
+    :is(:is(:is(#a))),
+    :not(:is(.a, .b)),
+    .x:has(:is(.a, .b)),
+    :is(.a :is(.b)),
+    :is(.a, :is(.b)),
+    :where(:is(.a)) {}
+  `
+	const actual = analyze(fixture).selectors.specificity.items
+	expect(actual).toEqual([
+		[0, 1, 0],
+		[0, 1, 0],
+		[1, 0, 0],
+		[0, 1, 0],
+		[0, 2, 0],
+		[0, 2, 0],
+		[0, 1, 0],
+		[0, 0, 0],
+	])
+})
