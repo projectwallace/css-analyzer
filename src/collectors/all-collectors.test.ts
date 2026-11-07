@@ -58,9 +58,9 @@ const b = `
 .c > .d { --z: 3px; width: 10px; animation: fade 1s; display: -webkit-box }
 `
 
-test('every collector works with locations and a source', () => {
-	const result = analyze(a, collectors(), { source: 'a.css' })
-	expect(result.z_indexes.unique.get('1')?.locations?.[0]?.source).toBe('a.css')
+test('every collector works with locations', () => {
+	const result = analyze(a, collectors())
+	expect(result.z_indexes.unique.get('1')?.locations?.[0]?.line).toBeGreaterThan(0)
 	expect(result.rules.sizes.unique.size).toBeGreaterThan(0)
 })
 

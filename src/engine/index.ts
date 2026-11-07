@@ -4,7 +4,6 @@ export { create_counter, create_context_counter, summarize } from './counter.js'
 export { summarize_frequencies, summarize_numbers, type NumberSummary } from './summary.js'
 export type { Counter, ContextCounter } from './counter.js'
 export type {
-	AnalyzeOptions,
 	CSSNode,
 	CollectorDef,
 	CollectorInstance,

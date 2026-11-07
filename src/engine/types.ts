@@ -16,8 +16,6 @@ export type Location = {
 	column: number
 	offset: number
 	length: number
-	/** File name, `undefined` unless the input was added with `{ source }` */
-	source?: string
 }
 
 /** What the parser has to parse: the engine asks only for what the collectors need */
@@ -82,8 +80,6 @@ export type ContextCountOptions = CountOptions & {
 
 /** Facts and structure about the node that is currently visited */
 export type Context = {
-	/** File name passed to `add(css, { source })` */
-	readonly source: string | undefined
 	/** Number of enclosing rules/at-rules */
 	readonly depth: number
 	/** Lowercased, unprefixed names of the enclosing at-rules, outermost first */
@@ -166,9 +162,4 @@ export type CollectorMap = Record<string, AnyCollectorDef>
 
 export type ResultOf<C extends CollectorMap> = {
 	[K in keyof C]: C[K] extends CollectorDef<infer T> ? T : never
-}
-
-export type AnalyzeOptions = {
-	/** Stored on every location, to tell stylesheets apart */
-	source?: string
 }

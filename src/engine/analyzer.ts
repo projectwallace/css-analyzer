@@ -29,7 +29,6 @@ import {
 } from '@projectwallace/css-parser'
 import { create_context } from './context.js'
 import type {
-	AnalyzeOptions,
 	CollectorInstance,
 	CollectorMap,
 	Context,
@@ -112,12 +111,10 @@ type ValueSubscription = {
  * Run collectors over one stylesheet.
  * @param input - CSS text, or an already parsed stylesheet node
  * @param collectors - Object map of collectors; the keys become the keys of the result
- * @param options - `source` is stored on every location, to tell stylesheets apart
  */
 export function analyze<C extends CollectorMap>(
 	input: string | CSSNode,
 	collectors: C,
-	options: AnalyzeOptions = {},
 ): ResultOf<C> {
 	const keys = Object.keys(collectors) as (keyof C & string)[]
 	const instances: CollectorInstance<unknown>[] = keys.map((key) => collectors[key]!.create())
@@ -265,7 +262,7 @@ export function analyze<C extends CollectorMap>(
 
 	let ast: CSSNode
 	if (typeof input === 'string') {
-		controller.begin(options.source, input)
+		controller.begin(input)
 		ast = parse(input, {
 			parse_selectors: parse_options.selectors,
 			parse_values: parse_options.values,
@@ -279,7 +276,6 @@ export function analyze<C extends CollectorMap>(
 								column: comment.column,
 								offset: comment.start,
 								length: comment.length,
-								source: options.source,
 							}
 							for (const handler of comment_handlers) {
 								handler(loc)
@@ -288,7 +284,7 @@ export function analyze<C extends CollectorMap>(
 		})
 	} else {
 		ast = input
-		controller.begin(options.source, ast.text)
+		controller.begin(ast.text)
 	}
 
 	if (stylesheet_handlers.length > 0) {
