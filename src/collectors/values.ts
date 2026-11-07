@@ -1,4 +1,4 @@
-import type { Dimension } from '@projectwallace/css-parser'
+import { type Dimension, str_index_of } from '@projectwallace/css-parser'
 import { create_context_counter } from '../engine/counter.js'
 import { define_collector } from '../engine/define-collector.js'
 import type {
@@ -176,7 +176,7 @@ export function value_browserhacks(options: CountOptions = {}): CollectorDef<Cou
 				if (!ctx.value) {
 					return
 				}
-				if (ctx.is_important && !node.text.toLowerCase().includes('!important')) {
+				if (ctx.is_important && str_index_of('!important', node.text) === -1) {
 					counter.add('!ie', ctx.at(ctx.value))
 				}
 				if (ctx.clean_value_text === undefined || ctx.is_custom) {

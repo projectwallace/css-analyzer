@@ -4,6 +4,7 @@ import {
 	is_identifier,
 	is_operator,
 	is_string,
+	str_index_of,
 } from '@projectwallace/css-parser'
 import { analyze_animation } from '../values/animations.js'
 import { keywords } from '../values/values.js'
@@ -31,8 +32,7 @@ export const NO_VALUE_WALK: ReadonlySet<string> = new Set([
 
 /** Lowercase, except for values with var(): their fallbacks can hold case-sensitive names */
 export function lowercase_unless_var(text: string): string {
-	const lower = text.toLowerCase()
-	return lower.includes('var(') ? text : lower
+	return str_index_of('var(', text) !== -1 ? text : text.toLowerCase()
 }
 
 /**

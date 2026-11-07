@@ -48,178 +48,78 @@ test('reports no false positives', () => {
 	expect(actual).toEqual(expected)
 })
 
-test('detects progid: DXImageTransform filter hack', () => {
-	const fixture = `
-    a {
-      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF0000', endColorstr='#00FF00');
-    }
-  `
-	const actual = run(fixture)
+test.each([
+	[
+		'progid: DXImageTransform filter',
+		`a { filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF0000', endColorstr='#00FF00'); }`,
+		'progid:',
+	],
+	[
+		'progid: within a quoted value',
+		`a { filter: 'progid:DXImageTransform.Microsoft.gradient(startColorstr="#FF0000", endColorstr="#00FF00")'; }`,
+		'progid:',
+	],
+	[
+		'progid: case-insensitively',
+		`a { filter: PROGID:DXImageTransform.Microsoft.gradient(); }`,
+		'progid:',
+	],
+	['trailing \\9 (IE9)', `a { color: red\\9; }`, '\\9'],
+	['trailing \\7 (IE7)', `a { height: 100px\\7; }`, '\\7'],
+	['alpha(opacity=)', `a { filter: alpha(opacity=50); }`, 'alpha()'],
+	['alpha() case-insensitively', `a { filter: Alpha(opacity=50); }`, 'alpha()'],
+	['behavior .htc', `a { behavior: url(/assets/pie.htc); }`, '.htc'],
+	['behavior .htc in a quoted URL', `a { behavior: url('/assets/pie.htc'); }`, '.htc'],
+	['behavior .htc case-insensitively', `a { behavior: url(/assets/pie.HTC); }`, '.htc'],
+	[
+		'expression()',
+		`a { width: expression(document.body.clientWidth - 20 + 'px'); }`,
+		'expression()',
+	],
+	[
+		'expression() case-insensitively',
+		`a { width: Expression(document.body.clientWidth); }`,
+		'expression()',
+	],
+])('detects %s', (_name, css, hack) => {
+	const actual = run(css)
 	expect(actual.total).toBe(1)
-	expect(actual.unique).toMatchObject({ 'progid:': 1 })
-})
-
-test('detects progid: hack within quoted value', () => {
-	const fixture = `
-    a {
-      filter: 'progid:DXImageTransform.Microsoft.gradient(startColorstr="#FF0000", endColorstr="#00FF00")';
-    }
-  `
-	const actual = run(fixture)
-	expect(actual.total).toBe(1)
-	expect(actual.unique).toMatchObject({ 'progid:': 1 })
-})
-
-test('detects progid: hack case-insensitively', () => {
-	const fixture = `a { filter: PROGID:DXImageTransform.Microsoft.gradient(); }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(1)
-	expect(actual.unique).toMatchObject({ 'progid:': 1 })
-})
-
-test('detects trailing \\9 hack (IE9)', () => {
-	const fixture = `a { color: red\\9; }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(1)
-	expect(actual.unique).toMatchObject({ '\\9': 1 })
-})
-
-test('detects trailing \\7 hack (IE7)', () => {
-	const fixture = `a { height: 100px\\7; }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(1)
-	expect(actual.unique).toMatchObject({ '\\7': 1 })
-})
-
-test('detects alpha(opacity=) IE opacity hack', () => {
-	const fixture = `a { filter: alpha(opacity=50); }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(1)
-	expect(actual.unique).toMatchObject({ 'alpha()': 1 })
-})
-
-test('detects alpha() hack case-insensitively', () => {
-	const fixture = `a { filter: Alpha(opacity=50); }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(1)
-	expect(actual.unique).toMatchObject({ 'alpha()': 1 })
-})
-
-test('detects behavior .htc hack', () => {
-	const fixture = `a { behavior: url(/assets/pie.htc); }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(1)
-	expect(actual.unique).toMatchObject({ '.htc': 1 })
-})
-
-test('detects behavior .htc hack in quoted URL', () => {
-	const fixture = `a { behavior: url('/assets/pie.htc'); }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(1)
-	expect(actual.unique).toMatchObject({ '.htc': 1 })
-})
-
-test('detects behavior .htc hack case-insensitively', () => {
-	const fixture = `a { behavior: url(/assets/pie.HTC); }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(1)
-	expect(actual.unique).toMatchObject({ '.htc': 1 })
-})
-
-test('detects expression() IE hack', () => {
-	const fixture = `a { width: expression(document.body.clientWidth - 20 + 'px'); }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(1)
-	expect(actual.unique).toMatchObject({ 'expression()': 1 })
-})
-
-test('detects expression() hack case-insensitively', () => {
-	const fixture = `a { width: Expression(document.body.clientWidth); }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(1)
-	expect(actual.unique).toMatchObject({ 'expression()': 1 })
+	expect(actual.unique).toEqual({ [hack]: 1 })
 })
 
 test('counts multiple declarations with the same hack', () => {
-	const fixture = `
+	const actual = run(`
     a {
       filter: alpha(opacity=50);
       behavior: url(/assets/pie.htc);
       filter: alpha(opacity=80);
     }
-  `
-	const actual = run(fixture)
+  `)
 	expect(actual.total).toBe(3)
 	expect(actual.total_unique).toBe(2)
-	expect(actual.unique).toMatchObject({ 'alpha()': 2, '.htc': 1 })
+	expect(actual.unique).toEqual({ 'alpha()': 2, '.htc': 1 })
 })
 
-test('no false positive: url() without .htc extension', () => {
-	const fixture = `
-    a {
-      background: url(/assets/image.png);
-      content: url('/fonts/icon.woff2');
-    }
-  `
-	const actual = run(fixture)
-	expect(actual.total).toBe(0)
-})
-
-test('no false positive: gradient() without progid', () => {
-	const fixture = `
-    a {
-      background: linear-gradient(red, blue);
-      background: radial-gradient(circle, #fff, #000);
-    }
-  `
-	const actual = run(fixture)
-	expect(actual.total).toBe(0)
-})
-
-test('no false positive: custom properties are not flagged for \\9 hack', () => {
-	const fixture = `a { --my-color: red\\9; }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(0)
-})
-
-test('no false positive: custom properties are not flagged for \\7 hack', () => {
-	const fixture = `a { --my-size: 100px\\7; }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(0)
-})
-
-test('no false positive: custom properties are not flagged for progid:', () => {
-	const fixture = `a { --filter: progid:DXImageTransform.Microsoft.gradient(); }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(0)
-})
-
-test('no false positive: custom properties are not flagged for alpha()', () => {
-	const fixture = `a { --opacity: alpha(opacity=50); }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(0)
-})
-
-test('no false positive: custom properties are not flagged for expression()', () => {
-	const fixture = `a { --width: expression(document.body.clientWidth); }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(0)
-})
-
-test('no false positive: custom properties are not flagged for .htc url', () => {
-	const fixture = `a { --behavior: url(/assets/pie.htc); }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(0)
-})
-
-test('no false positive: aspect-ratio with slash is not a \\7 hack', () => {
-	const fixture = `a { aspect-ratio: 16/7; }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(0)
-})
-
-test('no false positive: regular identifier ending in 7 is not a hack', () => {
-	const fixture = `a { grid-area: col7; }`
-	const actual = run(fixture)
-	expect(actual.total).toBe(0)
+test.each([
+	[
+		'url() without .htc extension',
+		`a { background: url(/assets/image.png); content: url('/fonts/icon.woff2'); }`,
+	],
+	[
+		'gradients without progid',
+		`a { background: linear-gradient(red, blue); background: radial-gradient(circle, #fff, #000); }`,
+	],
+	['custom properties with \\9', `a { --my-color: red\\9; }`],
+	['custom properties with \\7', `a { --my-size: 100px\\7; }`],
+	[
+		'custom properties with progid:',
+		`a { --filter: progid:DXImageTransform.Microsoft.gradient(); }`,
+	],
+	['custom properties with alpha()', `a { --opacity: alpha(opacity=50); }`],
+	['custom properties with expression()', `a { --width: expression(document.body.clientWidth); }`],
+	['custom properties with a .htc url', `a { --behavior: url(/assets/pie.htc); }`],
+	['aspect-ratio with a slash', `a { aspect-ratio: 16/7; }`],
+	['an identifier ending in 7', `a { grid-area: col7; }`],
+])('no false positive: %s', (_name, css) => {
+	expect(run(css).total).toBe(0)
 })
