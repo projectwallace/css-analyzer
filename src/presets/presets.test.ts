@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
+import { analyze, create_analyzer } from '../engine/analyzer.js'
 import { stylesheet_fixture, tokens_fixture } from '../test-fixture.js'
 import { all_collectors, analyze_all, analyze_design_tokens } from './index.js'
 
@@ -9,6 +9,14 @@ describe('analyze_all', () => {
 		expect(Object.keys(report)).toEqual(Object.keys(all_collectors))
 		expect(report.colors.total_unique).toBe(1)
 		expect(report.specificity.total).toBe(1)
+	})
+
+	test('parses everything: it is the most expensive set', () => {
+		expect(create_analyzer(all_collectors).parse_options).toEqual({
+			selectors: true,
+			values: true,
+			atrule_preludes: true,
+		})
 	})
 
 	test('can be extended and narrowed like any collector map', () => {

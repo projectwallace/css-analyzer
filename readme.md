@@ -89,14 +89,21 @@ r.sizes.sequence // ['2', '3', '1']
 
 Use `summarize_numbers(result.sizes)` for min, max, mean, mode, median, range and sum.
 
-### Source and already parsed input
+### Many stylesheets
 
 ```js
-// `source` ends up in the locations
-analyze(css, { colors: colors({ locations: true }) }, { source: 'a.css' })
+import { create_analyzer } from '@projectwallace/css-analyzer'
+
+// One analyzer, many inputs. `source` ends up in the locations.
+const analyzer = create_analyzer({ colors: colors({ locations: true }) })
+analyzer.add(css_a, { source: 'a.css' })
+analyzer.add(css_b, { source: 'b.css' })
+analyzer.result()
 ```
 
-`analyze()` also accepts an AST from `@projectwallace/css-parser`. Parse it with values, selectors and at-rule preludes enabled so every collector has what it needs.
+### Already parsed?
+
+`analyze()` and `analyzer.add()` accept an AST from `@projectwallace/css-parser`. Parse it with the options your collectors need: `analyzer.parse_options`.
 
 ### Presets
 

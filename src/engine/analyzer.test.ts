@@ -1,5 +1,5 @@
 import { test, expect, expectTypeOf } from 'vitest'
-import { analyze } from './analyzer.js'
+import { analyze, create_analyzer } from './analyzer.js'
 import { define_collector } from './define-collector.js'
 import { create_counter } from './counter.js'
 import { parse } from '@projectwallace/css-parser'
@@ -167,6 +167,28 @@ test('unsubscribed node kinds are never dispatched', () => {
 	expect(calls).toEqual(['rule', 'rule'])
 })
 
+test('parse options follow the subscriptions', () => {
+	expect(create_analyzer({ rules: rule_count() }).parse_options).toEqual({
+		selectors: false,
+		values: false,
+		atrule_preludes: false,
+	})
+	expect(create_analyzer({ colors: hash_colors() }).parse_options).toEqual({
+		selectors: false,
+		values: true,
+		atrule_preludes: false,
+	})
+
+	const selectors = define_collector<number>(() => ({ selector() {}, result: () => 0 }))
+	expect(create_analyzer({ selectors }).parse_options.selectors).toBe(true)
+
+	const preludes = define_collector<number>(() => ({
+		parse: { atrule_preludes: true },
+		result: () => 0,
+	}))
+	expect(create_analyzer({ preludes }).parse_options.atrule_preludes).toBe(true)
+})
+
 test('values stay unparsed when nobody needs them', () => {
 	let value: unknown = 'untouched'
 	const raw = define_collector<number>(() => ({
@@ -180,11 +202,12 @@ test('values stay unparsed when nobody needs them', () => {
 })
 
 test('locations are opt-in per collector and carry the source', () => {
-	const result = analyze(
-		'a { color: red }',
-		{ with: declared_properties({ locations: true }), without: declared_properties() },
-		{ source: 'a.css' },
-	)
+	const analyzer = create_analyzer({
+		with: declared_properties({ locations: true }),
+		without: declared_properties(),
+	})
+	analyzer.add('a { color: red }', { source: 'a.css' })
+	const result = analyzer.result()
 
 	expect(result.with.unique.get('color')?.locations).toEqual([
 		{ line: 1, column: 5, offset: 4, length: 10, source: 'a.css' },
@@ -197,9 +220,41 @@ test('locations have no `source` when none is given', () => {
 	expect(props.unique.get('color')?.locations?.[0]?.source).toBeUndefined()
 })
 
+test('add() aggregates multiple inputs', () => {
+	const analyzer = create_analyzer({ props: declared_properties({ locations: true }) })
+	analyzer.add('a { color: red }', { source: 'a.css' })
+	analyzer.add('b { color: blue; margin: 0 }', { source: 'b.css' })
+	const { props } = analyzer.result()
+
+	expect(props.total).toBe(3)
+	expect(props.unique.get('color')?.locations?.map((loc) => loc.source)).toEqual(['a.css', 'b.css'])
+})
+
+test('add(a).add(b) equals analyzing both', () => {
+	const a = 'a { color: red }'
+	const b = 'b { color: blue; margin: 0 }'
+	const incremental = create_analyzer({ props: declared_properties() }).add(a).add(b).result()
+	const together = analyze(`${a}\n${b}`, { props: declared_properties() })
+	expect(incremental).toEqual(together)
+})
+
+test('result() can be taken at any time and stays stable', () => {
+	const analyzer = create_analyzer({ props: declared_properties() })
+	analyzer.add('a { color: red }')
+	const first = analyzer.result()
+	analyzer.add('b { color: red }')
+	expect(first.props.total).toBe(1)
+	expect(analyzer.result().props.total).toBe(2)
+})
+
 test('accepts an already parsed AST', () => {
 	const collectors = { colors: hash_colors(), rules: rule_count() }
-	const ast = parse('a { color: #fff }')
+	const { selectors, values, atrule_preludes } = create_analyzer(collectors).parse_options
+	const ast = parse('a { color: #fff }', {
+		parse_selectors: selectors,
+		parse_values: values,
+		parse_atrule_preludes: atrule_preludes,
+	})
 	const result = analyze(ast, collectors)
 	expect(result.colors.total).toBe(1)
 	expect(result.rules).toBe(1)

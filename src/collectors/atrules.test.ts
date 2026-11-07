@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
+import { analyze, create_analyzer } from '../engine/analyzer.js'
 import { plain, series } from '../test-utils.js'
 import { summarize_numbers } from '../engine/summary.js'
 import { atrules } from './atrules.js'
@@ -1128,4 +1128,15 @@ test('tracks registered custom properties as defined (@property) and used (var()
 	expect(result.properties.used).toEqual(['--a', '--c', '--d'])
 	expect(result.properties.unused).toEqual(['--b'])
 	expect(result.properties.unknown).toEqual(['--c', '--d'])
+})
+
+test('registered custom property tracking works across added inputs', () => {
+	const analyzer = create_analyzer({ result: atrules() })
+	analyzer.add('@property --a { syntax: "*"; inherits: false }')
+	analyzer.add('.x { color: var(--a) }')
+	const { result } = analyzer.result()
+
+	expect(result.properties.defined).toEqual(['--a'])
+	expect(result.properties.unused).toEqual([])
+	expect(result.properties.unknown).toEqual([])
 })
