@@ -128,7 +128,8 @@ export function create_analyzer<C extends CollectorMap>(collectors: C): Analyzer
 					controller.set_node(node)
 					for (const handler of selector_handlers) handler(node, ctx as Context)
 				}
-				break
+				// Selectors nested in :is(), :not(), ... belong to the selector that holds them
+				return true
 			default:
 				break
 		}
