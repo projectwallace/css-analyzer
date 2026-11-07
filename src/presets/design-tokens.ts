@@ -1,6 +1,6 @@
 import { analyze } from '../engine/analyzer.js'
 import type {
-	AddOptions,
+	AnalyzeOptions,
 	CSSNode,
 	CollectorDef,
 	ContextCountResult,
@@ -47,6 +47,9 @@ export const design_tokens_collectors: DesignTokensCollectors = {
 	easings: timing_functions(),
 }
 
-export function analyze_design_tokens(input: string | CSSNode, options?: AddOptions): DesignTokens {
+export function analyze_design_tokens(
+	input: string | CSSNode,
+	options?: AnalyzeOptions,
+): DesignTokens {
 	return analyze(input, design_tokens_collectors, options)
 }
