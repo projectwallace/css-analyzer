@@ -26,4 +26,5 @@ jobs:
           node-version: 24
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
-      - run: pnpm dlx pkg-pr-new publish --pnpm --compact
+      # pkg.pr.new publishes previews to its own registry, not to npm: trusted publishing does not apply
+      - run: pnpm dlx pkg-pr-new publish --pnpm --compact # zizmor: ignore[use-trusted-publishing]
