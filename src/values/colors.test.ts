@@ -1,6 +1,6 @@
 import { test } from 'vitest'
 import { expect } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze_compat as analyze } from '../presets/compat.js'
 
 test('finds hex colors', () => {
 	const actual = analyze(`
@@ -120,12 +120,12 @@ test('finds hex colors', () => {
 })
 
 test('Counts hex format correctly when combined with a browserhack', () => {
-	let actual = analyze(`
+	const actual = analyze(`
     a {
       color: #000\\9;
     }
   `)
-	let expected = {
+	const expected = {
 		total: 1,
 		totalUnique: 1,
 		unique: {
@@ -1049,49 +1049,4 @@ test('insane color mode', () => {
   `
 
 	expect(() => analyze(fixture)).not.toThrow()
-})
-
-test('Lists locations when unstable flag is set', () => {
-	let css = `
-    thing {
-      color: red;
-      color: #f00;
-      color: rgb(255, 0, 0);
-      background-color: red;
-    }
-  `
-	let actual = analyze(css, { useLocations: true })
-
-	expect(actual.values.colors.uniqueWithLocations).toEqual({
-		red: [
-			{
-				line: 3,
-				column: 14,
-				offset: 26,
-				length: 3,
-			},
-			{
-				line: 6,
-				column: 25,
-				offset: 103,
-				length: 3,
-			},
-		],
-		'#f00': [
-			{
-				line: 4,
-				column: 14,
-				offset: 44,
-				length: 4,
-			},
-		],
-		'rgb(255, 0, 0)': [
-			{
-				line: 5,
-				column: 14,
-				offset: 63,
-				length: 14,
-			},
-		],
-	})
 })

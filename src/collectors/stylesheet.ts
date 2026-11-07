@@ -1,7 +1,7 @@
 import { get_data_uri } from '../adapter/css-parser.js'
 import { define_collector } from '../engine/define-collector.js'
 import type { CollectorDef, Location } from '../engine/types.js'
-import { getEmbedType } from '../stylesheet/stylesheet.js'
+import { get_embed_type } from '../stylesheet/stylesheet.js'
 
 export type EmbeddedType = { count: number; size: number; locations?: Location[] }
 
@@ -58,7 +58,7 @@ export function stylesheet(options: StylesheetOptions = {}): CollectorDef<Styles
 						if (embed === undefined) return
 						embedded_total++
 						embedded_size += embed.length
-						const type = getEmbedType(embed)
+						const type = get_embed_type(embed)
 						const entry = types.get(type) ?? { count: 0, size: 0 }
 						entry.count++
 						entry.size += embed.length

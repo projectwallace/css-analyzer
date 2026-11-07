@@ -1,5 +1,5 @@
 import { is_identifier, is_function, is_url, str_equals, walk } from '@projectwallace/css-parser'
-import { endsWith, unquote } from '../string-utils.js'
+import { ends_with, unquote } from '../string-utils.js'
 import { type Input, as_value } from '../adapter/css-parser.js'
 
 /**
@@ -36,7 +36,7 @@ export function get_value_browserhacks(input: Input): string[] {
 				hacks.push('expression()')
 			}
 		}
-		if (is_url(child) && endsWith('.htc', unquote(child.value ?? ''))) {
+		if (is_url(child) && ends_with('.htc', unquote(child.value ?? ''))) {
 			hacks.push('.htc')
 		}
 	})

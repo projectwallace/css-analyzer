@@ -1,8 +1,8 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze_compat as analyze } from '../presets/compat.js'
 
 test('should count rules', () => {
-	let actual = analyze(`
+	const actual = analyze(`
     html {
       color: black;
     }
@@ -104,7 +104,7 @@ test('counts sizes of rules', () => {
     }
   `).rules.sizes
 
-	let expected = {
+	const expected = {
 		min: 2,
 		max: 6,
 		mean: 3.75,

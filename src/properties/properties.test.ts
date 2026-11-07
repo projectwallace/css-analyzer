@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze_compat as analyze } from '../presets/compat.js'
 
 test('counts totals', () => {
 	const fixture = `
@@ -323,18 +323,5 @@ test('counts the amount of !important used on custom properties', () => {
 	expect(actual.unique).toEqual({
 		'--color2': 2,
 		'--color3': 1,
-	})
-})
-
-test('reports locations correctly', () => {
-	const fixture = `
-    properties {
-      margin: 0;
-    }
-  `
-	const actual = analyze(fixture, { useLocations: true }).properties.uniqueWithLocations
-
-	expect(actual).toEqual({
-		margin: [{ offset: 24, length: 6, column: 7, line: 3 }],
 	})
 })

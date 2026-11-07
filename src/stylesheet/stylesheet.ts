@@ -1,8 +1,8 @@
-export function getEmbedType(embed: string): string {
+export function get_embed_type(embed: string): string {
 	// data:image/gif;base64,R0lG
-	let start = 5 // `data:`.length
-	let semicolon = embed.indexOf(';')
-	let comma = embed.indexOf(',')
+	const start = 5 // `data:`.length
+	const semicolon = embed.indexOf(';')
+	const comma = embed.indexOf(',')
 
 	if (semicolon === -1) {
 		return embed.substring(start, comma)

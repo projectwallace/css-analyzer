@@ -39,10 +39,6 @@
 			"types": "./dist/index.d.ts",
 			"default": "./dist/index.js"
 		},
-		"./next": {
-			"types": "./dist/engine/index.d.ts",
-			"default": "./dist/engine/index.js"
-		},
 		"./collectors": {
 			"types": "./dist/collectors/index.d.ts",
 			"default": "./dist/collectors/index.js"
@@ -75,7 +71,6 @@
 	"scripts": {
 		"lint": "oxlint --config .oxlintrc.json; oxfmt --check",
 		"test": "vitest --coverage",
-		"test:compat": "vitest run --config vitest.compat.config.ts",
 		"check": "tsc --noEmit",
 		"build": "tsdown",
 		"knip": "knip"

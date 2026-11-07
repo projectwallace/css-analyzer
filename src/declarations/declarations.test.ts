@@ -1,8 +1,8 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze_compat as analyze } from '../presets/compat.js'
 
 test('handles empty values', () => {
-	let css = `
+	const css = `
     thing {
       height:;
       width: ;

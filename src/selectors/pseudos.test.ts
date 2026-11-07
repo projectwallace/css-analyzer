@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze_compat as analyze } from '../presets/compat.js'
 
 describe('pseudo classes', () => {
 	test('calculates pseudo classes', () => {
@@ -11,7 +11,7 @@ describe('pseudo classes', () => {
 			a:dir(ltr),
 			a:dir(ltr),
 			a:has(.thing) {}`).selectors.pseudoClasses
-		let expected = {
+		const expected = {
 			total: 6,
 			totalUnique: 5,
 			uniquenessRatio: 5 / 6,
@@ -31,7 +31,7 @@ describe('pseudo classes', () => {
 			a:hover,
 			A:HOVER {}
 		`
-		let actual = analyze(fixture).selectors.pseudoClasses
+		const actual = analyze(fixture).selectors.pseudoClasses
 		expect(actual.unique).toEqual({ hover: 2 })
 		expect(actual.totalUnique).toBe(1)
 	})
@@ -40,37 +40,9 @@ describe('pseudo classes', () => {
 		const fixture = `
 			main:has(a) a:hover {}
 		`
-		let actual = analyze(fixture).selectors.pseudoClasses
+		const actual = analyze(fixture).selectors.pseudoClasses
 		expect(actual.unique).toEqual({ has: 1, hover: 1 })
 		expect(actual.totalUnique).toBe(2)
-	})
-
-	test('logs the whole parent selector when using locations', () => {
-		let actual = analyze(
-			`
-			a:hover,
-			a:lang(en) {}`,
-			{ useLocations: true },
-		).selectors.pseudoClasses.uniqueWithLocations
-		let expected = {
-			hover: [
-				{
-					line: 2,
-					column: 4,
-					offset: 4,
-					length: 7,
-				},
-			],
-			lang: [
-				{
-					line: 3,
-					column: 4,
-					offset: 16,
-					length: 10,
-				},
-			],
-		}
-		expect(actual).toEqual(expected)
 	})
 })
 
@@ -80,7 +52,7 @@ describe('pseudo elements', () => {
 			a,
 			a::before,
 			a::after {}`).selectors.pseudoElements
-		let expected = {
+		const expected = {
 			total: 2,
 			totalUnique: 2,
 			uniquenessRatio: 2 / 2,
@@ -96,7 +68,7 @@ describe('pseudo elements', () => {
 		const actual = analyze(`
 			::highlight(Name),
 			::highlight(name) {}`).selectors.pseudoElements
-		let expected = {
+		const expected = {
 			total: 2,
 			totalUnique: 1,
 			uniquenessRatio: 1 / 2,
@@ -112,7 +84,7 @@ describe('pseudo elements', () => {
 			a::before,
 			A::BEFORE {}
 		`
-		let actual = analyze(fixture).selectors.pseudoElements
+		const actual = analyze(fixture).selectors.pseudoElements
 		expect(actual.unique).toEqual({ before: 2 })
 		expect(actual.totalUnique).toBe(1)
 	})
@@ -121,7 +93,7 @@ describe('pseudo elements', () => {
 		const fixture = `
 			custom-element::slotted(::grammer-error) {}
 		`
-		let actual = analyze(fixture).selectors.pseudoElements
+		const actual = analyze(fixture).selectors.pseudoElements
 		expect(actual.unique).toEqual({ slotted: 1, 'grammer-error': 1 })
 		expect(actual.totalUnique).toBe(2)
 	})

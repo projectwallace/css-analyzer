@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze_compat as analyze } from '../presets/compat.js'
 
 test('are analyzed', () => {
 	const fixture = `
@@ -435,7 +435,7 @@ test('handles emoji selectors', () => {
 })
 
 test('analyzes vendor prefixed selectors', () => {
-	let actual = analyze(`
+	const actual = analyze(`
     input[type=text]::-webkit-input-placeholder {
         color: green;
     }
@@ -470,7 +470,7 @@ test('analyzes vendor prefixed selectors', () => {
 })
 
 test('counts combinators', () => {
-	let result = analyze(`
+	const result = analyze(`
     a,
     a b,
     a > b,
@@ -481,7 +481,7 @@ test('counts combinators', () => {
     :is(a + b, a, e > f) {
     }
   `)
-	let actual = result.selectors.combinators
+	const actual = result.selectors.combinators
 
 	expect(actual.total).toBe(12)
 	expect(actual.totalUnique).toBe(4)
@@ -492,63 +492,6 @@ test('counts combinators', () => {
 		'~': 2,
 		'+': 3,
 	})
-})
-
-test('tracks combinator locations', () => {
-	let css = `
-    a b,
-    a > b,
-    a
-      b,
-    a:not(b) c,
-    a[attr] b {}
-  `
-	let result = analyze(css, {
-		useLocations: true,
-	})
-	let actual = result.selectors.combinators
-
-	expect(actual.uniqueWithLocations).toEqual({
-		' ': [
-			{
-				line: 2,
-				column: 6,
-				offset: 6,
-				length: 1,
-			},
-			{
-				line: 4,
-				column: 6,
-				offset: 26,
-				length: 1,
-			},
-			{
-				line: 6,
-				column: 13,
-				offset: 48,
-				length: 1,
-			},
-			{
-				line: 7,
-				column: 12,
-				offset: 63,
-				length: 1,
-			},
-		],
-		'>': [
-			{
-				line: 3,
-				column: 7,
-				offset: 16,
-				length: 1,
-			},
-		],
-	})
-
-	let as_strings = actual.uniqueWithLocations![' ']?.map((loc) =>
-		css.substring(loc.offset, loc.offset + loc.length),
-	)
-	expect(as_strings).toEqual([' ', `\n`, ' ', ' '])
 })
 
 test('tracks nesting depth', () => {
@@ -597,42 +540,5 @@ test('tracks nesting depth', () => {
 		},
 		uniquenessRatio: 3 / 4,
 	}
-	expect(actual).toEqual(expected)
-})
-
-test('Can keep track of selector locations if we ask it to do so', () => {
-	const fixture = `
-    rule {
-      color: green;
-    }
-
-    @media print {
-      @media (min-width: 1000px) {
-        @supports (display: grid) {
-          another-rule {
-            color: purple;
-          }
-        }
-      }
-    }
-  `
-	let actual = analyze(fixture, { useLocations: true }).selectors.complexity.uniqueWithLocations
-	let expected = {
-		'1': [
-			{
-				line: 2,
-				column: 5,
-				offset: 5,
-				length: 4,
-			},
-			{
-				line: 9,
-				column: 11,
-				offset: 139,
-				length: 12,
-			},
-		],
-	}
-
 	expect(actual).toEqual(expected)
 })

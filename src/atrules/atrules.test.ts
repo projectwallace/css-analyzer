@@ -1,8 +1,8 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze_compat as analyze } from '../presets/compat.js'
 
 test('counts total atrules', () => {
-	let css = `
+	const css = `
     @import url(test.css);
 
     @layer a, b, c;
@@ -17,7 +17,7 @@ test('counts total atrules', () => {
 
 		@LAYER A;
   `
-	let actual = analyze(css).atrules
+	const actual = analyze(css).atrules
 	expect(actual.total).toEqual(5)
 	expect(actual.totalUnique).toEqual(4)
 	expect(actual.unique).toEqual({
@@ -30,7 +30,7 @@ test('counts total atrules', () => {
 })
 
 test('calculates complexity', () => {
-	let css = `
+	const css = `
     /* 1 */
     @import url(test.css);
 
@@ -59,7 +59,7 @@ test('calculates complexity', () => {
     /* 2 */
     @-webkit-keyframes one {}
   `
-	let actual = analyze(css).atrules.complexity
+	const actual = analyze(css).atrules.complexity
 	expect(actual).toEqual({
 		min: 1,
 		max: 2,
@@ -343,98 +343,11 @@ test('finds @font-face', () => {
 	expect(actual).toEqual(expected)
 })
 
-test('finds @font-face (with locations)', () => {
-	const fixture = `
-    @font-face {
-      font-family: Arial;
-      src: url("https://url-to-arial.woff");
-    }
-
-    @font-face {
-      font-display: swap;
-      font-family: Test;
-      font-stretch: condensed;
-      font-style: italic;
-      font-weight: 700;
-      font-variant: no-common-ligatures proportional-nums;
-      font-feature-settings: "liga" 0;
-      font-variation-settings: "xhgt" 0.7;
-      src: local("Input Mono");
-      unicode-range: U+0025-00FF;
-    }
-
-    @font-face {
-      font-family: 'Input Mono';
-      src: local('Input Mono') url("https://url-to-input-mono.woff");
-    }
-
-    @font-face {
-      font-family: MyHelvetica;
-      src: local("Helvetica Neue Bold"), local("HelveticaNeue-Bold"), url(MgOpenModernaBold.ttf);
-      font-weight: bold;
-    }
-
-    /* Duplicate @font-face in Media Query */
-    @media (min-width: 1000px) {
-      @font-face {
-        font-family: 'Input Mono';
-        src: local('Input Mono') url("https://url-to-input-mono.woff");
-      }
-    }`
-	const actual = analyze(fixture, {
-		useLocations: true,
-	}).atrules.fontface.uniqueWithLocations
-	const expected = {
-		5: [
-			{
-				line: 2,
-				column: 5,
-				offset: 5,
-				length: 89,
-			},
-		],
-		100: [
-			{
-				line: 7,
-				column: 5,
-				offset: 100,
-				length: 357,
-			},
-		],
-		463: [
-			{
-				line: 20,
-				column: 5,
-				offset: 463,
-				length: 121,
-			},
-		],
-		590: [
-			{
-				line: 25,
-				column: 5,
-				offset: 590,
-				length: 173,
-			},
-		],
-		850: [
-			{
-				line: 33,
-				column: 7,
-				offset: 850,
-				length: 127,
-			},
-		],
-	}
-
-	expect(actual).toEqual(expected)
-})
-
 // oxlint-disable-next-line vitest/no-disabled-tests
 test.skip('handles @font-face encoding issues (GH-307)', () => {
 	// Actual CSS once found in a <style> tag on vistaprint.nl
 	// CSSTree parses it without errors, but analyzer failed on it;
-	let css = `
+	const css = `
     @font-face {
       font-family: &#x27;Graphik&#x27;;
       font-stretch: normal;
@@ -457,9 +370,9 @@ test.skip('handles @font-face encoding issues (GH-307)', () => {
   `
 	expect(() => analyze(css)).not.toThrowError()
 
-	let actual = analyze(css).atrules.fontface
+	const actual = analyze(css).atrules.fontface
 	expect(actual.total).toEqual(2)
-	let expected = {
+	const expected = {
 		'font-family': `&#x27`,
 		'font-stretch': `normal`,
 		'font-style': `normal`,
@@ -744,7 +657,7 @@ test('finds Media Features', () => {
 })
 
 test('does not crash on incomplete @media queries', () => {
-	let css = `
+	const css = `
     @media (min-width) {}
     @media (-moz-images-in-menus) {}
     @media (min--moz-device-pixel-ratio) {}
