@@ -39,11 +39,35 @@ function max(list: Specificity[]): Specificity {
 	return list.sort(compare).at(-1)!
 }
 
+function argument_specificity(node: CSSNode): Specificity {
+	let a = 0
+	let b = 0
+	let c = 0
+	const childSelector = node.first_child?.first_child
+	if (childSelector && is_selector(childSelector)) {
+		// Only the parts before the first combinator count
+		let part = childSelector.first_child
+		while (part && !is_combinator(part)) {
+			const [pa, pb, pc] = calculateForAST({ first_child: part } as Selector)
+			a += pa
+			b += pb
+			c += pc
+			part = part.next_sibling as SelectorNode
+		}
+	}
+	return [a, b, c]
+}
+
 export const calculateForAST = (selectorAST: Selector): Specificity => {
 	// https://www.w3.org/TR/selectors-4/#specificity-rules
 	let a = 0 /* ID Selectors */
 	let b = 0 /* Class selectors, Attributes selectors, and Pseudo-classes */
 	let c = 0 /* Type selectors and Pseudo-elements */
+	const add = ([x, y, z]: Specificity) => {
+		a += x
+		b += y
+		c += z
+	}
 
 	// Iterate through all parts of the selector (children of NODE_SELECTOR)
 	let current = selectorAST.first_child
@@ -88,10 +112,7 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 								// Calculate Specificity for all selectors in the list and get max
 								const max1 = max(calculate(childSelectorList))
 
-								// Adjust orig specificity
-								a += max1[0]
-								b += max1[1]
-								c += max1[2]
+								add(max1)
 							}
 						}
 
@@ -109,10 +130,7 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 							// Use the convenience property to access the selector list directly
 							const max2 = max(calculate(nthOf.selector))
 
-							// Adjust orig specificity
-							a += max2[0]
-							b += max2[1]
-							c += max2[2]
+							add(max2)
 						}
 						break
 					}
@@ -122,29 +140,7 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 					case 'host': {
 						b += 1
 
-						const selector_list = current.first_child
-						const childSelector = selector_list?.first_child
-						if (childSelector && is_selector(childSelector)) {
-							// Calculate specificity for parts before the first combinator
-							let childPart = childSelector.first_child
-							while (childPart) {
-								if (is_combinator(childPart)) {
-									break
-								}
-
-								// Calculate contribution from this part
-								const partSpecificity = calculateForAST({
-									type_name: 'Selector',
-									first_child: childPart,
-									has_children: true,
-								} as Selector)
-								a += partSpecificity[0] ?? 0
-								b += partSpecificity[1] ?? 0
-								c += partSpecificity[2] ?? 0
-
-								childPart = childPart.next_sibling as SelectorNode
-							}
-						}
+						add(argument_specificity(current))
 						break
 					}
 					// Improper use of Pseudo-Class Selectors instead of a Pseudo-Element
@@ -170,29 +166,7 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 					case 'slotted': {
 						c += 1
 
-						const selector_list = current.first_child
-						const childSelector = selector_list?.first_child
-						if (childSelector && is_selector(childSelector)) {
-							// Calculate specificity for parts before the first combinator
-							let childPart = childSelector.first_child
-							while (childPart) {
-								if (is_combinator(childPart)) {
-									break
-								}
-
-								// Calculate contribution from this part
-								const partSpecificity = calculateForAST({
-									type_name: 'Selector',
-									first_child: childPart,
-									has_children: true,
-								} as Selector)
-								a += partSpecificity[0] ?? 0
-								b += partSpecificity[1] ?? 0
-								c += partSpecificity[2] ?? 0
-
-								childPart = childPart.next_sibling as SelectorNode
-							}
-						}
+						add(argument_specificity(current))
 						break
 					}
 
@@ -256,51 +230,26 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 	return [a, b, c]
 }
 
-const convertToAST = (source: string | CSSNode) => {
-	// The passed in argument was a String.
-	// ~> Let's try and parse to an AST
-	if (typeof source === 'string') {
-		try {
-			return parse_selector_list(source)
-		} catch (e) {
-			const message = e instanceof Error ? e.message : String(e)
-			throw new TypeError(
-				`Could not convert passed in source '${source}' to SelectorList: ${message}`,
-			)
-		}
-	}
-
-	// The passed in argument was an Object.
-	// ~> Let's verify if it's a AST of the type NODE_SELECTOR_LIST
-	if (source instanceof Object) {
-		if (is_selector_list(source)) {
-			return source
-		}
-
-		throw new TypeError(`Passed in source is an Object but no AST / AST of the type SelectorList`)
-	}
-
-	throw new TypeError(
-		`Passed in source is not a String nor an Object. I don't know what to do with it.`,
-	)
-}
-
 export const calculate = (selector: string | CSSNode): Specificity[] => {
-	// Quit while you're ahead
 	if (!selector) {
 		return []
 	}
 
-	// Make sure we have a SelectorList AST
-	// If not, an exception will be thrown
-	const selector_list = convertToAST(selector)
-
-	// SelectorList - the ast is always a SelectorList
-	// Its children are NODE_SELECTOR (type 5) nodes
-	// ~> Calculate Specificity for each NODE_SELECTOR
-	const specificities: Specificity[] = []
-	for (const selector_node of selector_list) {
-		specificities.push(calculateForAST(selector_node))
+	let selector_list: CSSNode
+	if (typeof selector === 'string') {
+		try {
+			selector_list = parse_selector_list(selector)
+		} catch (event) {
+			const message = event instanceof Error ? event.message : String(event)
+			throw new TypeError(
+				`Could not convert passed in source '${selector}' to SelectorList: ${message}`,
+			)
+		}
+	} else if (is_selector_list(selector)) {
+		selector_list = selector
+	} else {
+		throw new TypeError('Passed in source is not a string or a SelectorList AST')
 	}
-	return specificities
+
+	return Array.from(selector_list, (node) => calculateForAST(node as Selector))
 }
