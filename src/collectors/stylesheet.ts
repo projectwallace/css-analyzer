@@ -1,4 +1,5 @@
-import { is_url, str_starts_with } from '@projectwallace/css-parser'
+import { is_url, str_starts_with, URL } from '@projectwallace/css-parser'
+import { to_location } from '../engine/counter.ts'
 import { define_collector } from '../engine/define-collector.ts'
 import type { CollectorDef, Location } from '../engine/types.ts'
 import { unquote } from '../string-utils.ts'
@@ -52,8 +53,8 @@ export function stylesheet(options: StylesheetOptions = {}): CollectorDef<Styles
 				comments_size += loc.length
 			},
 			value: {
-				types: ['url'],
-				enter(node, ctx) {
+				types: [URL],
+				enter(node) {
 					if (!is_url(node)) {
 						return
 					}
@@ -69,7 +70,7 @@ export function stylesheet(options: StylesheetOptions = {}): CollectorDef<Styles
 					entry.size += embed.length
 					if (locations) {
 						entry.locations ??= []
-						entry.locations.push(ctx.at(node).loc)
+						entry.locations.push(to_location(node))
 					}
 					types.set(type, entry)
 				},

@@ -1,14 +1,8 @@
-import { is_function, is_identifier } from '@projectwallace/css-parser'
+import { is_function, is_identifier, FUNCTION } from '@projectwallace/css-parser'
 import { DefinedUsed, type DefinedUsedResult } from '../defined-used.ts'
 import { create_counter } from '../engine/counter.ts'
 import { define_collector } from '../engine/define-collector.ts'
-import type {
-	CollectorDef,
-	CountOptions,
-	CountResult,
-	DeclarationContext,
-	LocationSource,
-} from '../engine/types.ts'
+import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 import { basename, shorthand_properties } from '../properties/property-utils.ts'
 import { get_first_identifier, get_list_items } from './shared.ts'
 
@@ -51,14 +45,6 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 		const custom_tracking = new DefinedUsed()
 		const anchor_tracking = new DefinedUsed()
 
-		// The location of the property name, not the whole declaration
-		let current: DeclarationContext | undefined
-		const property_at: LocationSource = {
-			get loc() {
-				return current!.property_loc
-			},
-		}
-
 		return {
 			parse: { values: true, atrule_preludes: true },
 			atrule(node) {
@@ -67,33 +53,34 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 					custom_tracking.define(prelude.text)
 				}
 			},
-			declaration(_node, ctx) {
+			declaration(node, ctx) {
 				const raw = ctx.raw_property
 				if (!raw) {
 					return
 				}
-				current = ctx
-				names.add(ctx.property, property_at)
+				// The location of the property name, not the whole declaration
+				const length = raw.length
+				names.add(ctx.property, node, length)
 
 				if (ctx.is_vendor_prefixed) {
-					complexity.add(2, property_at)
-					prefixed.add(raw, property_at)
+					complexity.add(2, node, length)
+					prefixed.add(raw, node, length)
 				} else if (ctx.is_custom) {
-					custom.add(raw, property_at)
+					custom.add(raw, node, length)
 					custom_tracking.define(raw)
-					complexity.add(ctx.is_important ? 3 : 2, property_at)
+					complexity.add(ctx.is_important ? 3 : 2, node, length)
 					if (ctx.is_important) {
-						custom_importants.add(raw, property_at)
+						custom_importants.add(raw, node, length)
 					}
 				} else if (ctx.is_browserhack) {
-					browserhacks.add(raw.charAt(0), property_at)
-					complexity.add(2, property_at)
+					browserhacks.add(raw.charAt(0), node, length)
+					complexity.add(2, node, length)
 				} else {
-					complexity.add(1, property_at)
+					complexity.add(1, node, length)
 				}
 
 				if (shorthand_properties.has(ctx.property)) {
-					shorthands.add(raw, property_at)
+					shorthands.add(raw, node, length)
 				}
 
 				// Anchor names live in values
@@ -115,7 +102,7 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 				}
 			},
 			value: {
-				types: ['function'],
+				types: [FUNCTION],
 				enter(node) {
 					const name = is_function(node) ? node.name.toLowerCase() : ''
 					if (name !== 'var' && name !== 'anchor' && name !== 'anchor-size') {

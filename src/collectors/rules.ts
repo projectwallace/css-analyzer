@@ -55,10 +55,10 @@ export function rules(options: CountOptions = {}): CollectorDef<RulesResult> {
 					}
 				}
 
-				sizes.add(selector_count + declaration_count, ctx)
-				nesting.add(ctx.depth, ctx)
-				selectors.add(selector_count, ctx)
-				declarations.add(declaration_count, ctx)
+				sizes.add(selector_count + declaration_count, node)
+				nesting.add(ctx.depth, node)
+				selectors.add(selector_count, node)
+				declarations.add(declaration_count, node)
 			},
 			result: () => ({
 				total,

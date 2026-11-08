@@ -7,22 +7,10 @@ import {
 	type StyleSheet,
 	AT_RULE,
 	DECLARATION,
-	DIMENSION,
-	FUNCTION,
-	HASH,
-	IDENTIFIER,
-	NUMBER,
-	OPERATOR,
-	PARENTHESIS,
-	RATIO,
 	SELECTOR,
 	SKIP,
-	STRING,
 	STYLE_RULE,
-	STYLESHEET,
 	SUPPORTS_DECLARATION,
-	UNICODE_RANGE,
-	URL,
 	parse,
 	traverse,
 	walk,
@@ -37,65 +25,7 @@ import type {
 	ResultOf,
 	StylesheetContext,
 	ParseOptions,
-	ValueKind,
 } from './types.ts'
-
-type NodeKind =
-	| 'stylesheet'
-	| 'rule'
-	| 'atrule'
-	| 'selector'
-	| 'declaration'
-	| 'supports_declaration'
-	| 'other'
-
-function get_kind(node: CSSNode): NodeKind {
-	switch (node.type) {
-		case STYLE_RULE:
-			return 'rule'
-		case AT_RULE:
-			return 'atrule'
-		case DECLARATION:
-			return 'declaration'
-		case SUPPORTS_DECLARATION:
-			return 'supports_declaration'
-		case SELECTOR:
-			return 'selector'
-		case STYLESHEET:
-			return 'stylesheet'
-		default:
-			return 'other'
-	}
-}
-
-function get_value_kind(node: CSSNode): ValueKind {
-	switch (node.type) {
-		case HASH:
-			return 'hash'
-		case FUNCTION:
-			return 'function'
-		case IDENTIFIER:
-			return 'identifier'
-		case DIMENSION:
-			return 'dimension'
-		case NUMBER:
-			return 'number'
-		case STRING:
-			return 'string'
-		case URL:
-			return 'url'
-		case OPERATOR:
-			return 'operator'
-		case PARENTHESIS:
-			return 'parenthesis'
-		case UNICODE_RANGE:
-			return 'unicode_range'
-		case RATIO:
-			return 'ratio'
-		default:
-			return 'other'
-	}
-}
 
 type DeclarationSubscription = {
 	properties: ReadonlySet<string> | undefined
@@ -104,7 +34,7 @@ type DeclarationSubscription = {
 
 type ValueSubscription = {
 	properties: ReadonlySet<string> | undefined
-	enter: (node: CSSNode, ctx: DeclarationContext, kind: ValueKind) => void
+	enter: (node: CSSNode, ctx: DeclarationContext) => void
 }
 
 /**
@@ -126,7 +56,7 @@ export function analyze<C extends CollectorMap>(
 	const selector_handlers: NonNullable<CollectorInstance<unknown>['selector']>[] = []
 	const comment_handlers: NonNullable<CollectorInstance<unknown>['comment']>[] = []
 	const declaration_handlers: DeclarationSubscription[] = []
-	const value_handlers = new Map<ValueKind, ValueSubscription[]>()
+	const value_handlers = new Map<number, ValueSubscription[]>()
 	const parse_options: ParseOptions = { selectors: false, values: false, atrule_preludes: false }
 
 	for (const instance of instances) {
@@ -200,45 +130,44 @@ export function analyze<C extends CollectorMap>(
 			if (value_node.type === value.type && value_node.start === value.start) {
 				return
 			}
-			const kind = get_value_kind(value_node)
-			const handlers = value_handlers.get(kind)
+			const handlers = value_handlers.get(value_node.type)
 			if (!handlers) {
 				return
 			}
 			for (const handler of handlers) {
 				if (!handler.properties || handler.properties.has(ctx.property)) {
-					handler.enter(value_node, ctx, kind)
+					handler.enter(value_node, ctx)
 				}
 			}
 		})
 	}
 
-	function enter(node: CSSNode, kind: NodeKind): boolean | void {
-		switch (kind) {
-			case 'declaration':
+	function enter(node: CSSNode): boolean | void {
+		switch (node.type) {
+			case DECLARATION:
 				if (needs_declarations) {
 					visit_declaration(node as Declaration)
 				}
 				// Value nodes are handled by the single value walk above
 				return true
-			case 'supports_declaration':
+			case SUPPORTS_DECLARATION:
 				// `@supports (display: grid)`: a condition, not a declaration
 				return true
-			case 'rule':
+			case STYLE_RULE:
 				controller.set_node(node)
 				for (const handler of rule_handlers) {
 					handler(node as Rule, ctx as Context)
 				}
 				controller.enter_rule(node)
 				break
-			case 'atrule':
+			case AT_RULE:
 				controller.set_node(node)
 				for (const handler of atrule_handlers) {
 					handler(node as Atrule, ctx as Context)
 				}
 				controller.enter_atrule(node)
 				break
-			case 'selector':
+			case SELECTOR:
 				if (selector_handlers.length > 0) {
 					controller.set_node(node)
 					for (const handler of selector_handlers) {
@@ -252,10 +181,10 @@ export function analyze<C extends CollectorMap>(
 		}
 	}
 
-	function leave(_node: CSSNode, kind: NodeKind): void {
-		if (kind === 'rule') {
+	function leave(node: CSSNode): void {
+		if (node.type === STYLE_RULE) {
 			controller.leave_rule()
-		} else if (kind === 'atrule') {
+		} else if (node.type === AT_RULE) {
 			controller.leave_atrule()
 		}
 	}
@@ -296,11 +225,9 @@ export function analyze<C extends CollectorMap>(
 
 	traverse(ast, {
 		enter(node) {
-			return enter(node, get_kind(node)) === true ? SKIP : undefined
+			return enter(node) === true ? SKIP : undefined
 		},
-		leave(node) {
-			leave(node, get_kind(node))
-		},
+		leave,
 	})
 
 	const result: Record<string, unknown> = Object.create(null)

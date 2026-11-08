@@ -29,7 +29,7 @@ export function font_families(options: FontFamiliesOptions = {}): CollectorDef<C
 					if (options.skip_var && str_index_of('var(', text) !== -1) {
 						return
 					}
-					counter.add(text, ctx.at(ctx.value!))
+					counter.add(text, ctx.value!)
 				},
 			},
 		}

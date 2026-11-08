@@ -32,7 +32,7 @@ export function font_sizes(options: FontSizesOptions = {}): CollectorDef<CountRe
 					if (ctx.property === 'font-size' && SYSTEM_FONTS.has(text)) {
 						return
 					}
-					counter.add(lowercase ? lowercase_unless_var(text) : text, ctx.at(ctx.value!))
+					counter.add(lowercase ? lowercase_unless_var(text) : text, ctx.value!)
 				},
 			},
 		}

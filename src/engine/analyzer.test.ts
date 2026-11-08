@@ -2,7 +2,7 @@ import { test, expect, expectTypeOf } from 'vitest'
 import { analyze } from './analyzer.ts'
 import { define_collector } from './define-collector.ts'
 import { create_counter } from './counter.ts'
-import { parse } from '@projectwallace/css-parser'
+import { DIMENSION, FUNCTION, HASH, IDENTIFIER, parse } from '@projectwallace/css-parser'
 import type { CollectorInstance, CountOptions, CountResult } from './types.ts'
 
 // Toy collectors: they exercise the contract the same way built-ins will
@@ -10,8 +10,8 @@ function declared_properties(options: CountOptions = {}) {
 	return define_collector<CountResult>(function init() {
 		const counter = create_counter(options)
 		return {
-			declaration(_node, ctx) {
-				counter.add(ctx.property, ctx)
+			declaration(node, ctx) {
+				counter.add(ctx.property, node)
 			},
 			result: () => counter.result(),
 		}
@@ -23,9 +23,9 @@ function hash_colors() {
 		const counter = create_counter()
 		return {
 			value: {
-				types: ['hash'],
-				enter(node, ctx) {
-					counter.add(node.text, ctx.at(node))
+				types: [HASH],
+				enter(node) {
+					counter.add(node.text, node)
 				},
 			},
 			result: () => counter.result(),
@@ -226,13 +226,13 @@ test('CollectorInstance can be typed standalone', () => {
 	expect(instance.result()).toBe(1)
 })
 
-test('value handlers learn the kind of node they got', () => {
-	const kinds: string[] = []
+test('value handlers only get the node types they subscribed to', () => {
+	const kinds: number[] = []
 	const kinds_collector = define_collector<number>(() => ({
 		value: {
-			types: ['hash', 'function', 'dimension', 'identifier'],
-			enter(_node, _ctx, kind) {
-				kinds.push(kind)
+			types: [HASH, FUNCTION, DIMENSION, IDENTIFIER],
+			enter(node) {
+				kinds.push(node.type)
 			},
 		},
 		result: () => 0,
@@ -240,7 +240,7 @@ test('value handlers learn the kind of node they got', () => {
 	analyze('a { margin: 1px solid; color: #fff; background: url(a.png), linear-gradient(red) }', {
 		kinds_collector,
 	})
-	expect(kinds).toEqual(['dimension', 'identifier', 'hash', 'function', 'identifier'])
+	expect(kinds).toEqual([DIMENSION, IDENTIFIER, HASH, FUNCTION, IDENTIFIER])
 })
 
 test('clean_value_text drops IE hacks and is undefined for global keywords', () => {

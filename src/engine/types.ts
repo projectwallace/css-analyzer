@@ -25,24 +25,6 @@ export type ParseOptions = {
 	atrule_preludes: boolean
 }
 
-/** The kind of node inside a declaration value */
-export type ValueKind =
-	| 'hash'
-	| 'function'
-	| 'identifier'
-	| 'dimension'
-	| 'number'
-	| 'string'
-	| 'url'
-	| 'operator'
-	| 'parenthesis'
-	| 'unicode_range'
-	| 'ratio'
-	| 'other'
-
-/** Anything that can tell the location of the node that is being processed */
-export type LocationSource = { readonly loc: Location }
-
 export type CountEntry = {
 	count: number
 	/** Only present if the collector was created with `{ locations: true }` */
@@ -91,10 +73,6 @@ export type Context = {
 	/** Lowercased, unprefixed names of the enclosing at-rules, outermost first */
 	readonly atrule_stack: readonly string[]
 	readonly parent_rule: CSSNode | undefined
-	/** Location of the current node */
-	readonly loc: Location
-	/** Location view for any other node; the returned object is reused, read `.loc` right away */
-	at(node: CSSNode): LocationSource
 }
 
 export type StylesheetContext = Context & {
@@ -107,8 +85,6 @@ export type DeclarationContext = Context & {
 	readonly property: string
 	/** Property as written (`-WEBKIT-Transition`) */
 	readonly raw_property: string
-	/** Location of the property name only */
-	readonly property_loc: Location
 	readonly is_custom: boolean
 	readonly is_important: boolean
 	readonly is_browserhack: boolean
@@ -147,9 +123,10 @@ export type CollectorInstance<T> = {
 		  }
 	/** Subscribe to nodes inside declaration values; the engine walks each value once for all collectors */
 	value?: {
-		types: readonly ValueKind[]
+		/** Parser node types, e.g. `[HASH, FUNCTION]` */
+		types: readonly number[]
 		properties?: ReadonlySet<string>
-		enter: (node: CSSNode, ctx: DeclarationContext, kind: ValueKind) => void
+		enter: (node: CSSNode, ctx: DeclarationContext) => void
 	}
 	/** Called for every comment. Only works when the engine parses the input itself. */
 	comment?: (loc: Location) => void

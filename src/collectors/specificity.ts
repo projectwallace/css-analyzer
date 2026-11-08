@@ -24,7 +24,7 @@ export function specificity(options: CountOptions = {}): CollectorDef<CountResul
 				if (ctx.atrule_stack.includes('keyframes')) {
 					return
 				}
-				counter.add(get_specificity(node)[0]!.join(','), ctx)
+				counter.add(get_specificity(node)[0]!.join(','), node)
 			},
 		}
 	})

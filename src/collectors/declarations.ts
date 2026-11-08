@@ -25,8 +25,8 @@ export function declarations(options: CountOptions = {}): CollectorDef<Declarati
 
 		return {
 			declaration(node, ctx) {
-				texts.add(node.text, ctx)
-				nesting.add(Math.max(ctx.depth - 1, 0), ctx)
+				texts.add(node.text, node)
+				nesting.add(Math.max(ctx.depth - 1, 0), node)
 
 				let weight = 1
 				if (ctx.is_important) {
@@ -37,7 +37,7 @@ export function declarations(options: CountOptions = {}): CollectorDef<Declarati
 						weight++
 					}
 				}
-				complexity.add(weight, ctx)
+				complexity.add(weight, node)
 			},
 			result: () => ({
 				...texts.result(),

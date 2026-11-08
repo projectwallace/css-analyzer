@@ -1,3 +1,4 @@
+import type { CSSNode } from '@projectwallace/css-parser'
 import type {
 	ContextCountOptions,
 	ContextCountResult,
@@ -5,35 +6,44 @@ import type {
 	CountMap,
 	CountOptions,
 	CountResult,
-	LocationSource,
+	Location,
 } from './types.ts'
 
+/** Where `node` is in the source. `length` overrides the node's length (e.g. only the property name). */
+export function to_location(node: CSSNode, length: number = node.length): Location {
+	return { line: node.line, column: node.column, offset: node.start, length }
+}
+
 export type Counter<T extends CountItem = string> = {
-	/** Count `item`. Pass the context (or `ctx.at(node)`); its location is only read if locations are enabled. */
-	add(item: T, at: LocationSource): void
+	/**
+	 * Count `item`, found at `node`. The location is only read if locations are enabled;
+	 * `length` overrides the node's length.
+	 */
+	add(item: T, node: CSSNode, length?: number): void
 	result(): CountResult<T>
 }
 
 export type ContextCounter<T extends CountItem = string> = {
-	add(item: T, context: string, at: LocationSource): void
+	add(item: T, context: string, node: CSSNode, length?: number): void
 	result(): ContextCountResult<T>
 }
 
 function add_to<T extends CountItem>(
 	map: CountMap<T>,
 	item: T,
-	at: LocationSource,
+	node: CSSNode,
+	length: number | undefined,
 	locations: boolean,
 ): void {
 	const entry = map.get(item)
 	if (entry) {
 		entry.count++
 		if (locations) {
-			entry.locations!.push(at.loc)
+			entry.locations!.push(to_location(node, length))
 		}
 		return
 	}
-	map.set(item, locations ? { count: 1, locations: [at.loc] } : { count: 1 })
+	map.set(item, locations ? { count: 1, locations: [to_location(node, length)] } : { count: 1 })
 }
 
 function to_result<T extends CountItem>(map: CountMap<T>, total: number): CountResult<T> {
@@ -59,10 +69,10 @@ export function create_counter<T extends CountItem = string>(
 	const map: CountMap<T> = new Map()
 	let total = 0
 
-	function add(item: T, at: LocationSource): void {
+	function add(item: T, node: CSSNode, length?: number): void {
 		total++
 		sequence?.push(item)
-		add_to(map, item, at, locations)
+		add_to(map, item, node, length, locations)
 	}
 
 	function result(): CountResult<T> {
@@ -85,9 +95,9 @@ export function create_context_counter<T extends CountItem = string>(
 	const contexts = new Map<string, { map: CountMap<T>; total: number }>()
 	let total = 0
 
-	function add(item: T, context: string, at: LocationSource): void {
+	function add(item: T, context: string, node: CSSNode, length?: number): void {
 		total++
-		add_to(map, item, at, locations)
+		add_to(map, item, node, length, locations)
 		if (!track_contexts) {
 			return
 		}
@@ -97,7 +107,7 @@ export function create_context_counter<T extends CountItem = string>(
 			contexts.set(context, scoped)
 		}
 		scoped.total++
-		add_to(scoped.map, item, at, locations)
+		add_to(scoped.map, item, node, length, locations)
 	}
 
 	function result(): ContextCountResult<T> {

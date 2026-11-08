@@ -1,6 +1,7 @@
 import { KeywordSet } from '../keyword-set.ts'
 import {
 	type CSSNode,
+	type Combinator,
 	SKIP,
 	walk,
 	str_equals,
@@ -191,6 +192,11 @@ function selector_complexity(selector: CSSNode): number {
 	return complexity
 }
 
+/** A combinator's name; `' '` for the descendant combinator */
+export function combinator_name(node: Combinator): string {
+	return node.name.trim() === '' ? ' ' : node.name
+}
+
 export type CombinatorMatch = { name: string; loc: Location }
 
 /**
@@ -203,7 +209,7 @@ export function get_combinators(input: SelectorInput): CombinatorMatch[] {
 		walk(selector, function (node) {
 			if (is_combinator(node)) {
 				found.push({
-					name: node.name.trim() === '' ? ' ' : node.name,
+					name: combinator_name(node),
 					loc: {
 						offset: node.start,
 						line: node.line,

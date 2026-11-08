@@ -1,4 +1,4 @@
-import { type Dimension, str_index_of } from '@projectwallace/css-parser'
+import { type Dimension, str_index_of, DIMENSION, IDENTIFIER } from '@projectwallace/css-parser'
 import { create_context_counter } from '../engine/counter.ts'
 import { define_collector } from '../engine/define-collector.ts'
 import type {
@@ -34,7 +34,7 @@ export function text_shadows(options: CountOptions = {}): CollectorDef<CountResu
 				enter(_node, ctx) {
 					const text = ctx.clean_value_text
 					if (text !== undefined) {
-						counter.add(text, ctx.at(ctx.value!))
+						counter.add(text, ctx.value!)
 					}
 				},
 			},
@@ -55,7 +55,7 @@ export function displays(options: CountOptions = {}): CollectorDef<CountResult> 
 					}
 					const raw = ctx.value_text
 					const text = global_keywords.has(raw) ? raw.toLowerCase() : ctx.clean_value_text
-					counter.add(lowercase_unless_var(text!), ctx.at(ctx.value))
+					counter.add(lowercase_unless_var(text!), ctx.value)
 				},
 			},
 		}
@@ -69,7 +69,7 @@ export function units(options: ContextCountOptions = {}): CollectorDef<ContextCo
 		return {
 			parse: { values: true },
 			value: {
-				types: ['dimension'],
+				types: [DIMENSION],
 				enter(node, ctx) {
 					if (NO_VALUE_WALK.has(ctx.property)) {
 						return
@@ -77,7 +77,7 @@ export function units(options: ContextCountOptions = {}): CollectorDef<ContextCo
 					counter.add(
 						(node as Dimension).unit.toLowerCase(),
 						get_context_property(ctx, options.property),
-						ctx.at(node),
+						node,
 					)
 				},
 			},
@@ -96,22 +96,21 @@ export function keywords(options: CountOptions = {}): CollectorDef<CountResult> 
 					return
 				}
 				const text = ctx.value_text
-				const at = ctx.at(ctx.value)
 
 				if (global_keywords.has(text)) {
-					counter.add(text.toLowerCase(), at)
+					counter.add(text.toLowerCase(), ctx.value)
 				} else if (ctx.property === 'font') {
 					for (const keyword of ctx.font_shorthand?.keywords ?? []) {
-						counter.add(keyword.toLowerCase(), at)
+						counter.add(keyword.toLowerCase(), ctx.value)
 					}
 				} else if (ctx.property === 'transition' || ctx.property === 'animation') {
 					for (const keyword of analyze_animation(ctx.value).keywords) {
-						counter.add(keyword.toLowerCase(), at)
+						counter.add(keyword.toLowerCase(), ctx.value)
 					}
 				}
 			},
 			value: {
-				types: ['identifier'],
+				types: [IDENTIFIER],
 				enter(node, ctx) {
 					// Whole-value keywords and shorthands were handled above
 					if (NO_VALUE_WALK.has(ctx.property) || ctx.property === 'font') {
@@ -122,7 +121,7 @@ export function keywords(options: CountOptions = {}): CollectorDef<CountResult> 
 					}
 					const text = node.text
 					if (global_keywords.has(text)) {
-						counter.add(text.toLowerCase(), ctx.at(node))
+						counter.add(text.toLowerCase(), node)
 					}
 				},
 			},
@@ -142,7 +141,7 @@ export function resets(options: CountOptions = {}): CollectorDef<CountResult> {
 						return
 					}
 					if (is_value_reset(ctx.value!)) {
-						counter.add(ctx.property, ctx.at(ctx.value!))
+						counter.add(ctx.property, ctx.value!)
 					}
 				},
 			},
@@ -160,7 +159,7 @@ export function value_prefixes(options: CountOptions = {}): CollectorDef<CountRe
 					return
 				}
 				for (const prefixed of get_prefixed_values(ctx.value!)) {
-					counter.add(prefixed.toLowerCase(), ctx.at(ctx.value!))
+					counter.add(prefixed.toLowerCase(), ctx.value!)
 				}
 			},
 		}
@@ -177,13 +176,13 @@ export function value_browserhacks(options: CountOptions = {}): CollectorDef<Cou
 					return
 				}
 				if (ctx.is_important && str_index_of('!important', node.text) === -1) {
-					counter.add('!ie', ctx.at(ctx.value))
+					counter.add('!ie', ctx.value)
 				}
 				if (ctx.clean_value_text === undefined || ctx.is_custom) {
 					return
 				}
 				for (const hack of get_value_browserhacks(ctx.value)) {
-					counter.add(hack, ctx.at(ctx.value))
+					counter.add(hack, ctx.value)
 				}
 			},
 		}
@@ -209,7 +208,7 @@ export function value_complexity(options: CountOptions = {}): CollectorDef<Count
 						complexity += get_value_browserhacks(ctx.value).length
 					}
 				}
-				counter.add(complexity, ctx.at(ctx.value))
+				counter.add(complexity, ctx.value)
 			},
 		}
 	})
@@ -224,7 +223,7 @@ export function animation_names(options: CountOptions = {}): CollectorDef<CountR
 				properties: new Set(['animation', 'animation-name']),
 				enter(_node, ctx) {
 					for (const name of get_animation_names(ctx)) {
-						counter.add(name, ctx.at(ctx.value!))
+						counter.add(name, ctx.value!)
 					}
 				},
 			},

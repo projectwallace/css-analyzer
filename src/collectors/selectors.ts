@@ -4,6 +4,7 @@ import {
 	is_pseudo_element_selector,
 	is_selector_list,
 	is_type_selector,
+	is_combinator,
 	walk,
 } from '@projectwallace/css-parser'
 import { create_counter } from '../engine/counter.ts'
@@ -12,7 +13,7 @@ import { define_collector } from '../engine/define-collector.ts'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 import {
 	get_accessibility_selectors,
-	get_combinators,
+	combinator_name,
 	get_complexity,
 	get_vendor_prefixes,
 } from '../selectors/utils.ts'
@@ -69,7 +70,7 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 					return
 				}
 				for (const item of prelude) {
-					keyframes.add(item.text, ctx.at(item))
+					keyframes.add(item.text, item)
 				}
 			},
 			selector(node, ctx) {
@@ -78,35 +79,34 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 				}
 				const text = node.text
 
-				texts.add(text, ctx)
-				complexity.add(get_complexity(node)[0]!, ctx)
-				nesting.add(Math.max(ctx.depth - 1, 0), ctx)
+				texts.add(text, node)
+				complexity.add(get_complexity(node)[0]!, node)
+				nesting.add(Math.max(ctx.depth - 1, 0), node)
 
 				for (const prefix of get_vendor_prefixes(node)) {
-					prefixed.add(prefix.toLowerCase(), ctx)
+					prefixed.add(prefix.toLowerCase(), node)
 				}
 				for (const item of get_accessibility_selectors(node)) {
-					accessibility.add(item, ctx)
+					accessibility.add(item, node)
 				}
 				walk(node, function (part) {
 					if (is_attribute_selector(part)) {
-						attributes.add(part.name.toLowerCase(), ctx)
+						attributes.add(part.name.toLowerCase(), node)
 					} else if (is_type_selector(part)) {
 						const name = part.name
 						if (!name.startsWith('--') && name.includes('-')) {
-							custom_elements.add(name.toLowerCase(), ctx)
+							custom_elements.add(name.toLowerCase(), node)
 						}
 					} else if (is_pseudo_class_selector(part)) {
-						pseudo_classes.add(part.name.toLowerCase(), ctx)
+						pseudo_classes.add(part.name.toLowerCase(), node)
 					} else if (is_pseudo_element_selector(part)) {
-						pseudo_elements.add(part.name.toLowerCase(), ctx)
+						pseudo_elements.add(part.name.toLowerCase(), node)
+					} else if (is_combinator(part)) {
+						combinators.add(combinator_name(part), part, 1)
 					}
 				})
-				for (const combinator of get_combinators(node)) {
-					combinators.add(combinator.name, { loc: combinator.loc })
-				}
 				if (get_specificity(node)[0]![0] > 0) {
-					ids.add(text, ctx)
+					ids.add(text, node)
 				}
 			},
 			result: () => ({

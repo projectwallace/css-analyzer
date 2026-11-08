@@ -15,7 +15,7 @@ export function box_shadows(options: CountOptions = {}): CollectorDef<CountResul
 					if (text === undefined) {
 						return
 					}
-					counter.add(text, ctx.at(ctx.value!))
+					counter.add(text, ctx.value!)
 				},
 			},
 		}

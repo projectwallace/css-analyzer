@@ -1,4 +1,4 @@
-import { is_function } from '@projectwallace/css-parser'
+import { is_function, FUNCTION, HASH, IDENTIFIER } from '@projectwallace/css-parser'
 import { create_context_counter, create_counter } from '../engine/counter.ts'
 import { define_collector } from '../engine/define-collector.ts'
 import type {
@@ -33,25 +33,24 @@ export function colors(options: ColorsOptions = {}): CollectorDef<ColorsResult> 
 		return {
 			parse: { values: true },
 			value: {
-				types: ['hash', 'identifier', 'function'],
-				enter(node, ctx, kind) {
+				types: [HASH, IDENTIFIER, FUNCTION],
+				enter(node, ctx) {
 					const property = ctx.property
 					if (NO_VALUE_WALK.has(property)) {
 						return
 					}
-					const at = ctx.at(node)
 					const context = get_context_property(ctx, options.property)
 					const text = node.text
 
-					if (kind === 'hash') {
+					if (node.type === HASH) {
 						if (!text.startsWith('#')) {
 							return
 						}
 						// Exclude the # and any IE hack (\9, \7) from the hex length
 						const hex_length = text.length - (text.endsWith('\\9') || text.endsWith('\\7') ? 3 : 1)
-						counter.add(normalize(text), context, at)
-						formats.add('hex' + hex_length, at)
-					} else if (kind === 'identifier') {
+						counter.add(normalize(text), context, node)
+						formats.add('hex' + hex_length, node)
+					} else if (node.type === IDENTIFIER) {
 						// Font names like "Black" are not colors
 						if (property === 'font') {
 							return
@@ -62,20 +61,20 @@ export function colors(options: ColorsOptions = {}): CollectorDef<ColorsResult> 
 						}
 
 						if (color_keywords.has(text)) {
-							counter.add(normalize(text), context, at)
-							formats.add(text.toLowerCase(), at)
+							counter.add(normalize(text), context, node)
+							formats.add(text.toLowerCase(), node)
 						} else if (named_colors.has(text)) {
-							counter.add(normalize(text), context, at)
-							formats.add('named', at)
+							counter.add(normalize(text), context, node)
+							formats.add('named', node)
 						} else if (system_colors.has(text)) {
-							counter.add(normalize(text), context, at)
-							formats.add('system', at)
+							counter.add(normalize(text), context, node)
+							formats.add('system', node)
 						}
 					} else {
 						const name = is_function(node) ? node.name : ''
 						if (color_functions.has(name)) {
-							counter.add(text, context, at)
-							formats.add(name.toLowerCase(), at)
+							counter.add(text, context, node)
+							formats.add(name.toLowerCase(), node)
 						}
 					}
 				},

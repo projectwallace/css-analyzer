@@ -13,7 +13,7 @@ import {
 	type FontShorthand,
 } from '../values/destructure-font-shorthand.ts'
 import { keywords } from '../values/values.ts'
-import type { DeclarationContext, Location, LocationSource, StylesheetContext } from './types.ts'
+import type { DeclarationContext, StylesheetContext } from './types.ts'
 
 export type ContextController = {
 	/** One shared, mutable object: valid only during the handler call it is passed to */
@@ -42,25 +42,9 @@ export function create_context(): ContextController {
 	let clean_text: string | undefined
 	let font_loaded = false
 	let font_result: FontShorthand | null = null
-	let view_node: CSSNode | undefined
 	const atrule_stack: string[] = []
 	const rule_stack: CSSNode[] = []
 	let depth = 0
-
-	function get_location(target: CSSNode): Location {
-		return {
-			line: target.line,
-			column: target.column,
-			offset: target.start,
-			length: target.length,
-		}
-	}
-
-	const view: LocationSource = {
-		get loc(): Location {
-			return get_location(view_node!)
-		},
-	}
 
 	const ctx: DeclarationContext & StylesheetContext = {
 		get css() {
@@ -75,13 +59,6 @@ export function create_context(): ContextController {
 		get parent_rule() {
 			return rule_stack.at(-1)
 		},
-		get loc() {
-			return get_location(node!)
-		},
-		at(other) {
-			view_node = other
-			return view
-		},
 		get property() {
 			property_cache ??= basename(ctx.raw_property)
 			return property_cache
@@ -89,9 +66,6 @@ export function create_context(): ContextController {
 		get raw_property() {
 			raw_property_cache ??= (node as Declaration).property ?? ''
 			return raw_property_cache
-		},
-		get property_loc() {
-			return { ...get_location(node!), length: ctx.raw_property.length }
 		},
 		get is_custom() {
 			return is_custom(ctx.raw_property)

@@ -15,7 +15,7 @@ export function z_indexes(options: CountOptions = {}): CollectorDef<CountResult>
 					if (text === undefined) {
 						return
 					}
-					counter.add(text, ctx.at(ctx.value!))
+					counter.add(text, ctx.value!)
 				},
 			},
 		}

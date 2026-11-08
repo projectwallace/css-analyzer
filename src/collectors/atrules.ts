@@ -12,9 +12,10 @@ import {
 	is_media_feature,
 	str_equals,
 	walk,
+	FUNCTION,
 } from '@projectwallace/css-parser'
 import { DefinedUsed, type DefinedUsedResult } from '../defined-used.ts'
-import { create_counter } from '../engine/counter.ts'
+import { create_counter, to_location } from '../engine/counter.ts'
 import { define_collector } from '../engine/define-collector.ts'
 import type { CollectorDef, CountOptions, CountResult, Location } from '../engine/types.ts'
 import { unquote } from '../string-utils.ts'
@@ -159,53 +160,53 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 				const prelude = node.has_prelude ? node.prelude : undefined
 				const prelude_text = prelude?.text
 				const block = node.block
-				names.add(name, ctx)
-				nesting.add(ctx.depth, ctx)
+				names.add(name, node)
+				nesting.add(ctx.depth, node)
 
 				for (const feature of find_media_features(prelude)) {
-					media_features.add(feature.property.toLowerCase(), ctx.at(feature))
+					media_features.add(feature.property.toLowerCase(), feature)
 				}
 
 				if (name === 'font-face') {
 					font_faces.total++
 					font_faces.items.push({ ...get_descriptors(block) })
-					font_faces.locations?.push(ctx.loc)
-					complexity.add(1, ctx)
+					font_faces.locations?.push(to_location(node))
+					complexity.add(1, node)
 				}
 
 				if (prelude_text === undefined) {
 					if (name === 'layer') {
 						// @layer without a prelude is anonymous
-						layers.add('<anonymous>', ctx)
-						complexity.add(2, ctx)
+						layers.add('<anonymous>', node)
+						complexity.add(2, node)
 					}
 					return
 				}
 
 				let weight = 1
 				if (name === 'media') {
-					medias.add(prelude_text, ctx)
+					medias.add(prelude_text, node)
 					for (const hack of get_media_browserhacks(prelude!)) {
-						media_browserhacks.add(hack, ctx)
+						media_browserhacks.add(hack, node)
 						weight++
 					}
 				} else if (name === 'supports') {
-					supports.add(prelude_text, ctx)
+					supports.add(prelude_text, node)
 					for (const hack of get_supports_browserhacks(prelude!)) {
-						supports_browserhacks.add(hack, ctx)
+						supports_browserhacks.add(hack, node)
 						weight++
 					}
 				} else if (name.endsWith('keyframes')) {
 					const keyframes_name = unquote(prelude_text)
-					keyframes.add(keyframes_name, ctx)
+					keyframes.add(keyframes_name, node)
 					keyframes_tracking.define(keyframes_name)
 					if (node.is_vendor_prefixed) {
-						prefixed_keyframes.add(`@${raw_name.toLowerCase()} ${prelude_text}`, ctx)
+						prefixed_keyframes.add(`@${raw_name.toLowerCase()} ${prelude_text}`, node)
 						weight++
 					}
 				} else if (name === 'layer') {
 					for (const layer of prelude_text.split(',').map((part) => part.trim())) {
-						layers.add(layer, ctx)
+						layers.add(layer, node)
 						// `@layer name { }` places CSS into a layer (use); `@layer a, b;` orders layers (define)
 						if (block) {
 							layer_tracking.use(layer)
@@ -214,36 +215,36 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 						}
 					}
 				} else if (name === 'import') {
-					imports.add(prelude_text, ctx)
+					imports.add(prelude_text, node)
 					for (const item of get_import_functions(prelude)) {
 						if (item.name === 'supports') {
-							supports.add(item.value, ctx.at(item.node))
+							supports.add(item.value, item.node)
 						} else {
 							// layer() can be empty
-							layers.add(item.value, ctx.at(item.node))
+							layers.add(item.value, item.node)
 							layer_tracking.use(item.value)
 						}
 					}
 				} else if (name === 'container') {
-					containers.add(prelude_text, ctx)
+					containers.add(prelude_text, node)
 					const container_name = get_container_name(prelude)
 					if (container_name !== undefined) {
-						container_names.add(container_name, ctx)
+						container_names.add(container_name, node)
 						container_tracking.use(container_name)
 					}
 				} else if (name === 'property') {
-					registered.add(prelude_text, ctx)
+					registered.add(prelude_text, node)
 					property_tracking.define(prelude_text)
 				} else if (name === 'function') {
 					const end = prelude_text.indexOf('(')
-					functions.add((end === -1 ? prelude_text : prelude_text.slice(0, end)).trim(), ctx)
+					functions.add((end === -1 ? prelude_text : prelude_text.slice(0, end)).trim(), node)
 				} else if (name === 'charset') {
-					charsets.add(prelude_text.toLowerCase(), ctx)
+					charsets.add(prelude_text.toLowerCase(), node)
 				} else if (name === 'scope') {
-					scopes.add(prelude_text, ctx)
+					scopes.add(prelude_text, node)
 				}
 
-				complexity.add(weight, ctx)
+				complexity.add(weight, node)
 			},
 			declaration: {
 				properties: new Set([...CONTAINER_PROPERTIES, ...ANIMATION_PROPERTIES]),
@@ -260,7 +261,7 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 							}
 							const text = item.text
 							if (!keywords.has(text)) {
-								container_names.add(text, ctx.at(item))
+								container_names.add(text, item)
 								container_tracking.define(text)
 							}
 						}
@@ -269,7 +270,7 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 						// Example: container: my-layout / inline-size;
 						const first = get_first_identifier(value)
 						if (first !== undefined) {
-							container_names.add(first, ctx.at(value))
+							container_names.add(first, value)
 							if (!keywords.has(first)) {
 								container_tracking.define(first)
 							}
@@ -282,7 +283,7 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 				},
 			},
 			value: {
-				types: ['function'],
+				types: [FUNCTION],
 				enter(node) {
 					// var(--x) is a use of a registered custom property
 					if (!is_function(node) || !str_equals('var', node.name)) {

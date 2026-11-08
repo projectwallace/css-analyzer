@@ -1,8 +1,9 @@
 import { test, expect } from 'vitest'
+import { parse } from '@projectwallace/css-parser'
 import { create_counter } from './counter.ts'
 import { summarize_frequencies, summarize_numbers } from './summary.ts'
 
-const at = { loc: { line: 1, column: 1, offset: 0, length: 1 } }
+const at = parse('a{}')
 
 function count(values: number[]) {
 	const counter = create_counter<number>()

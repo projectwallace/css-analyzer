@@ -31,13 +31,12 @@ export function timing_functions(options: TimingFunctionsOptions = {}): Collecto
 					if (ctx.clean_value_text === undefined) {
 						return
 					}
-					const at = ctx.at(ctx.value!)
 					const items =
 						ctx.property === 'transition' || ctx.property === 'animation'
 							? analyze_animation(ctx.value!).timing_functions
 							: get_list_items(ctx.value!).map((item) => item.text)
 					for (const item of items) {
-						counter.add(lowercase ? lowercase_unless_var(item) : item, at)
+						counter.add(lowercase ? lowercase_unless_var(item) : item, ctx.value!)
 					}
 				},
 			},

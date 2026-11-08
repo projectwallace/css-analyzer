@@ -19,7 +19,7 @@ export function border_radiuses(
 					if (text === undefined) {
 						return
 					}
-					counter.add(text, get_context_property(ctx, options.property), ctx.at(ctx.value!))
+					counter.add(text, get_context_property(ctx, options.property), ctx.value!)
 				},
 			},
 			result: () => counter.result(),

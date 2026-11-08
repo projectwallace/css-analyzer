@@ -1,7 +1,10 @@
 import { test, expect } from 'vitest'
-import { create_counter, create_context_counter, summarize } from './counter.ts'
+import { type CSSNode, parse } from '@projectwallace/css-parser'
+import { create_counter, create_context_counter, summarize, to_location } from './counter.ts'
 
-const at = { loc: { line: 1, column: 2, offset: 3, length: 4 } }
+// The rule `a{}` on line 2, column 3
+const at = parse('\n  a{}').first_child!
+const loc = { line: 2, column: 3, offset: 3, length: 3 }
 
 test('counts totals and uniques in one shape', () => {
 	const counter = create_counter()
@@ -19,18 +22,26 @@ test('counts totals and uniques in one shape', () => {
 	})
 })
 
+test('length overrides the location length', () => {
+	const counter = create_counter({ locations: true })
+	counter.add('a', at, 1)
+	expect(counter.result().unique.get('a')!.locations).toEqual([{ ...loc, length: 1 }])
+	expect(to_location(at)).toEqual(loc)
+})
+
 test('locations are opt-in and do not change the shape', () => {
 	const with_locations = create_counter({ locations: true })
 	with_locations.add('a', at)
 	const result = with_locations.result()
-	expect(result.unique.get('a')).toEqual({ count: 1, locations: [at.loc] })
+	expect(result.unique.get('a')).toEqual({ count: 1, locations: [loc] })
 
 	const without = create_counter()
-	without.add('a', {
-		get loc(): never {
-			throw new Error('loc must not be read')
+	const unreadable = new Proxy({} as CSSNode, {
+		get(): never {
+			throw new Error('the node must not be read')
 		},
 	})
+	without.add('a', unreadable)
 	expect(without.result().unique.get('a')).toEqual({ count: 1 })
 })
 
