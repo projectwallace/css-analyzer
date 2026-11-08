@@ -26,6 +26,9 @@ export type ContextController = {
 	leave_atrule(): void
 }
 
+/** Cache marker for facts whose computed value can itself be `undefined` or `null` */
+const NOT_COMPUTED = Symbol('not-computed-yet')
+
 /**
  * Builds the shared context object. Facts are lazy and memoized per node:
  * whoever asks first pays, everybody else reads the cached value.
@@ -36,12 +39,9 @@ export function create_context(): ContextController {
 	let property_cache: string | undefined
 	let raw_property_cache: string | undefined
 	let value_text_cache: string | undefined
-	let value_node: Value | undefined
-	let value_loaded = false
-	let clean_loaded = false
-	let clean_text: string | undefined
-	let font_loaded = false
-	let font_result: FontShorthand | null = null
+	let value_cache: Value | undefined | typeof NOT_COMPUTED = NOT_COMPUTED
+	let clean_text_cache: string | undefined | typeof NOT_COMPUTED = NOT_COMPUTED
+	let font_cache: FontShorthand | null | typeof NOT_COMPUTED = NOT_COMPUTED
 	const atrule_stack: string[] = []
 	let depth = 0
 
@@ -80,36 +80,34 @@ export function create_context(): ContextController {
 			return value_text_cache
 		},
 		get clean_value_text() {
-			if (!clean_loaded) {
-				clean_loaded = true
+			if (clean_text_cache === NOT_COMPUTED) {
 				const text = ctx.value_text
-				if (ctx.value && !keywords.has(text)) {
-					clean_text = ctx.is_custom ? text : strip_value_hack(text)
-				} else {
-					clean_text = undefined
-				}
+				clean_text_cache =
+					ctx.value && !keywords.has(text)
+						? ctx.is_custom
+							? text
+							: strip_value_hack(text)
+						: undefined
 			}
-			return clean_text
+			return clean_text_cache
 		},
 		get font_shorthand() {
-			if (!font_loaded) {
-				font_loaded = true
+			if (font_cache === NOT_COMPUTED) {
 				const text = ctx.clean_value_text
-				font_result =
+				font_cache =
 					ctx.property === 'font' && text !== undefined && !SYSTEM_FONTS.has(text)
 						? destructure_font_shorthand(ctx.value!)
 						: null
 			}
-			return font_result
+			return font_cache
 		},
 		get value() {
-			if (!value_loaded) {
+			if (value_cache === NOT_COMPUTED) {
 				// Values that were not parsed (see `parse.values`) are RAW nodes
 				const value = (node as Declaration).value
-				value_node = value && !is_raw(value) ? (value as Value) : undefined
-				value_loaded = true
+				value_cache = value && !is_raw(value) ? (value as Value) : undefined
 			}
-			return value_node
+			return value_cache
 		},
 	}
 
@@ -127,10 +125,9 @@ export function create_context(): ContextController {
 			property_cache = undefined
 			raw_property_cache = undefined
 			value_text_cache = undefined
-			value_node = undefined
-			value_loaded = false
-			clean_loaded = false
-			font_loaded = false
+			value_cache = NOT_COMPUTED
+			clean_text_cache = NOT_COMPUTED
+			font_cache = NOT_COMPUTED
 		},
 		enter_atrule(atrule) {
 			atrule_stack.push(property_basename((atrule as Atrule).name ?? ''))
