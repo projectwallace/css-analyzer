@@ -1,5 +1,6 @@
 import {
 	type CSSNode,
+	type Selector,
 	type SelectorList,
 	type Value,
 	is_selector,
@@ -17,7 +18,7 @@ export function as_value(input: Input): Value {
 }
 
 /** A selector list, or a single selector, as nodes. Throws a TypeError for anything else. */
-export function as_selectors(input: Input): CSSNode[] {
+export function as_selectors(input: Input): Selector[] {
 	if (typeof input === 'string') {
 		let list: SelectorList
 		try {
@@ -28,13 +29,13 @@ export function as_selectors(input: Input): CSSNode[] {
 				`Could not convert passed in source '${input}' to SelectorList: ${message}`,
 			)
 		}
-		return Array.from(list)
+		return Array.from(list) as Selector[]
 	}
 	if (is_selector(input)) {
 		return [input]
 	}
 	if (is_selector_list(input)) {
-		return Array.from(input)
+		return Array.from(input) as Selector[]
 	}
 	throw new TypeError('Passed in source is an Object but no AST / AST of the type SelectorList')
 }

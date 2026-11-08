@@ -242,5 +242,5 @@ export function get_specificity(input: Input): Specificity[] {
 		return []
 	}
 
-	return as_selectors(input).map((selector) => selector_specificity(selector as Selector))
+	return as_selectors(input).map((selector) => selector_specificity(selector))
 }
