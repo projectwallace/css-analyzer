@@ -73,10 +73,11 @@
 		"test": "vitest --coverage",
 		"check": "tsc --noEmit",
 		"build": "tsdown",
-		"knip": "knip"
+		"knip": "knip",
+		"precommit": "pnpm run test --run && pnpm run check && pnpm run lint && pnpm run knip"
 	},
 	"dependencies": {
-		"@projectwallace/css-parser": "https://pkg.pr.new/@projectwallace/css-parser@a45a82b"
+		"@projectwallace/css-parser": "~0.19.5"
 	},
 	"devDependencies": {
 		"@projectwallace/preset-oxlint": "^0.0.12",
