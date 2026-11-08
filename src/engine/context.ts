@@ -20,9 +20,8 @@ export type ContextController = {
 	/** One shared, mutable object: valid only during the handler call it is passed to */
 	readonly ctx: DeclarationContext & StylesheetContext
 	begin(css: string): void
-	set_node(node: CSSNode): void
-	enter_rule(node: CSSNode): void
-	leave_rule(): void
+	/** `depth`: the number of enclosing rules and at-rules, as reported by `traverse()` */
+	set_node(node: CSSNode, depth: number): void
 	enter_atrule(node: CSSNode): void
 	leave_atrule(): void
 }
@@ -44,7 +43,6 @@ export function create_context(): ContextController {
 	let font_loaded = false
 	let font_result: FontShorthand | null = null
 	const atrule_stack: string[] = []
-	const rule_stack: CSSNode[] = []
 	let depth = 0
 
 	const ctx: DeclarationContext & StylesheetContext = {
@@ -56,9 +54,6 @@ export function create_context(): ContextController {
 		},
 		get atrule_stack() {
 			return atrule_stack
-		},
-		get parent_rule() {
-			return rule_stack.at(-1)
 		},
 		get property() {
 			property_cache ??= property_basename(ctx.raw_property)
@@ -125,10 +120,10 @@ export function create_context(): ContextController {
 			node = undefined
 			depth = 0
 			atrule_stack.length = 0
-			rule_stack.length = 0
 		},
-		set_node(next) {
+		set_node(next, next_depth) {
 			node = next
+			depth = next_depth
 			property_cache = undefined
 			raw_property_cache = undefined
 			value_text_cache = undefined
@@ -137,21 +132,11 @@ export function create_context(): ContextController {
 			clean_loaded = false
 			font_loaded = false
 		},
-		enter_rule(rule) {
-			rule_stack.push(rule)
-			depth++
-		},
-		leave_rule() {
-			rule_stack.pop()
-			depth--
-		},
 		enter_atrule(atrule) {
 			atrule_stack.push(property_basename((atrule as Atrule).name ?? ''))
-			depth++
 		},
 		leave_atrule() {
 			atrule_stack.pop()
-			depth--
 		},
 	}
 }

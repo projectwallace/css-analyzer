@@ -1,4 +1,4 @@
-import { is_function, is_url, str_equals, walk } from '@projectwallace/css-parser'
+import { is_function, is_url, str_equals, walk_values } from '@projectwallace/css-parser'
 import { ends_with, unquote } from '../string-utils.ts'
 import { type ValueInput, as_value } from '../input.ts'
 
@@ -28,7 +28,7 @@ export function get_value_browserhacks(input: ValueInput): string[] {
 	}
 
 	// alpha(), expression(), and behavior .htc hacks
-	walk(node, function (child) {
+	walk_values(node, function (child) {
 		if (is_function(child)) {
 			const name = child.name
 			if (str_equals('alpha', name)) {

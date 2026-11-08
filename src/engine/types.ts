@@ -72,7 +72,6 @@ export type Context = {
 	readonly depth: number
 	/** Lowercased, unprefixed names of the enclosing at-rules, outermost first */
 	readonly atrule_stack: readonly string[]
-	readonly parent_rule: CSSNode | undefined
 }
 
 export type StylesheetContext = Context & {

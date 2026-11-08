@@ -2,7 +2,14 @@ import { test, expect, expectTypeOf } from 'vitest'
 import { analyze } from './analyzer.ts'
 import { define_collector } from './define-collector.ts'
 import { create_counter } from './counter.ts'
-import { DIMENSION, FUNCTION, HASH, IDENTIFIER, parse } from '@projectwallace/css-parser'
+import {
+	DIMENSION,
+	FUNCTION,
+	HASH,
+	IDENTIFIER,
+	STYLE_RULE,
+	parse,
+} from '@projectwallace/css-parser'
 import type { CollectorInstance, CountOptions, CountResult } from './types.ts'
 
 // Toy collectors: they exercise the contract the same way built-ins will
@@ -129,16 +136,16 @@ test('one shared value walk feeds every value subscriber', () => {
 	expect(result.other_colors.total).toBe(3)
 })
 
-test('structural context: depth, atrule_stack, parent_rule', () => {
+test('structural context: depth, atrule_stack, and the parent rule via node.closest()', () => {
 	const seen: [string, number, string[], string | undefined][] = []
 	const structure = define_collector<number>(() => ({
 		declaration: {
-			enter(_node, ctx) {
+			enter(node, ctx) {
 				seen.push([
 					ctx.property,
 					ctx.depth,
 					[...ctx.atrule_stack],
-					ctx.parent_rule?.text.slice(0, 1),
+					node.closest(STYLE_RULE)?.text.slice(0, 1),
 				])
 			},
 		},

@@ -1,4 +1,4 @@
-import { is_function, is_identifier, walk } from '@projectwallace/css-parser'
+import { is_function, is_identifier, walk_values } from '@projectwallace/css-parser'
 import { type ValueInput, as_value } from '../input.ts'
 
 /**
@@ -7,7 +7,7 @@ import { type ValueInput, as_value } from '../input.ts'
  */
 export function get_prefixed_values(input: ValueInput): string[] {
 	const found: string[] = []
-	walk(as_value(input), function (node) {
+	walk_values(as_value(input), function (node) {
 		if (node.is_vendor_prefixed) {
 			// .name in case of Identifier or Function, .text as fallback
 			if (is_identifier(node) || is_function(node)) {

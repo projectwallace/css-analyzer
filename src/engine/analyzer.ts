@@ -13,7 +13,7 @@ import {
 	SUPPORTS_DECLARATION,
 	parse,
 	traverse,
-	walk,
+	walk_values,
 } from '@projectwallace/css-parser'
 import { create_context } from './context.ts'
 import type {
@@ -94,8 +94,8 @@ export function analyze<C extends CollectorMap>(
 	const controller = create_context()
 	const ctx = controller.ctx
 
-	function visit_declaration(node: Declaration): void {
-		controller.set_node(node)
+	function visit_declaration(node: Declaration, depth: number): void {
+		controller.set_node(node, depth)
 
 		for (const handler of declaration_handlers) {
 			if (!handler.properties || handler.properties.has(ctx.property)) {
@@ -106,16 +106,8 @@ export function analyze<C extends CollectorMap>(
 		if (value_handlers.size === 0) {
 			return
 		}
-		const value = ctx.value
-		if (!value) {
-			return
-		}
-
-		walk(value, function (value_node) {
-			// The callback also receives the VALUE node itself
-			if (value_node.type === value.type && value_node.start === value.start) {
-				return
-			}
+		// Visits nothing when values are not parsed
+		walk_values(node, function (value_node) {
 			const handlers = value_handlers.get(value_node.type)
 			if (!handlers) {
 				return
@@ -128,11 +120,11 @@ export function analyze<C extends CollectorMap>(
 		})
 	}
 
-	function enter(node: CSSNode): boolean | void {
+	function enter(node: CSSNode, depth: number): boolean | void {
 		switch (node.type) {
 			case DECLARATION:
 				if (needs_declarations) {
-					visit_declaration(node as Declaration)
+					visit_declaration(node as Declaration, depth)
 				}
 				// Value nodes are handled by the single value walk above
 				return true
@@ -140,14 +132,13 @@ export function analyze<C extends CollectorMap>(
 				// `@supports (display: grid)`: a condition, not a declaration
 				return true
 			case STYLE_RULE:
-				controller.set_node(node)
+				controller.set_node(node, depth)
 				for (const handler of rule_handlers) {
 					handler(node as Rule, ctx as Context)
 				}
-				controller.enter_rule(node)
 				break
 			case AT_RULE:
-				controller.set_node(node)
+				controller.set_node(node, depth)
 				for (const handler of atrule_handlers) {
 					handler(node as Atrule, ctx as Context)
 				}
@@ -155,7 +146,7 @@ export function analyze<C extends CollectorMap>(
 				break
 			case SELECTOR:
 				if (selector_handlers.length > 0) {
-					controller.set_node(node)
+					controller.set_node(node, depth)
 					for (const handler of selector_handlers) {
 						handler(node as Selector, ctx as Context)
 					}
@@ -168,9 +159,7 @@ export function analyze<C extends CollectorMap>(
 	}
 
 	function leave(node: CSSNode): void {
-		if (node.type === STYLE_RULE) {
-			controller.leave_rule()
-		} else if (node.type === AT_RULE) {
+		if (node.type === AT_RULE) {
 			controller.leave_atrule()
 		}
 	}
@@ -203,15 +192,15 @@ export function analyze<C extends CollectorMap>(
 	}
 
 	if (stylesheet_handlers.length > 0) {
-		controller.set_node(ast)
+		controller.set_node(ast, 0)
 		for (const handler of stylesheet_handlers) {
 			handler(ast as StyleSheet, ctx as StylesheetContext)
 		}
 	}
 
 	traverse(ast, {
-		enter(node) {
-			return enter(node) === true ? SKIP : undefined
+		enter(node, depth) {
+			return enter(node, depth) === true ? SKIP : undefined
 		},
 		leave,
 	})
