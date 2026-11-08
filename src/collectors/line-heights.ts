@@ -1,6 +1,6 @@
 import { str_index_of } from '@projectwallace/css-parser'
-import type { CollectorDef, CountOptions, CountResult } from '../engine/types.js'
-import { define_counting_collector, lowercase_unless_var, type Normalize } from './shared.js'
+import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
+import { define_counting_collector, lowercase_unless_var, type Normalize } from './shared.ts'
 
 export type LineHeightsOptions = CountOptions & {
 	normalize?: Normalize

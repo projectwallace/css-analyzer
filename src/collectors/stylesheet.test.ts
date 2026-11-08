@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import { stylesheet } from '../collectors/stylesheet.js'
+import { analyze } from '../engine/analyzer.ts'
+import { stylesheet } from '../collectors/stylesheet.ts'
 
 /** Stylesheet results with the shape the old tests were written for */
 function run(css: string) {

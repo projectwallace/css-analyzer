@@ -1,5 +1,5 @@
-import { summarize_numbers } from './engine/summary.js'
-import type { CountItem, CountResult } from './engine/types.js'
+import { summarize_numbers } from './engine/summary.ts'
+import type { CountItem, CountResult } from './engine/types.ts'
 
 export type PlainCount = {
 	total: number

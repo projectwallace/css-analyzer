@@ -1,5 +1,5 @@
-import type { CollectorDef, CountOptions, CountResult } from '../engine/types.js'
-import { define_counting_collector } from './shared.js'
+import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
+import { define_counting_collector } from './shared.ts'
 
 const PROPERTIES = new Set(['z-index'])
 

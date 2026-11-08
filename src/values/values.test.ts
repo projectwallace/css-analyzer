@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
 import { parse_value } from '@projectwallace/css-parser/parse-value'
-import { is_value_reset, keywords } from './values.js'
+import { is_value_reset, keywords } from './values.ts'
 
 test.each(['0', '0px', '-0', '+0', '-0.0e0', '0 0px 0em 0pc 0vw', '0px 0dvh 0rem 0in'])(
 	'"%s" is a reset',

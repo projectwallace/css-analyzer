@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
 import { type Atrule, parse } from '@projectwallace/css-parser'
-import { as_prelude, as_selectors, as_value } from './input.js'
+import { as_prelude, as_selectors, as_value } from './input.ts'
 
 test('as_value parses text and passes nodes through', () => {
 	const value = as_value('1px solid red')

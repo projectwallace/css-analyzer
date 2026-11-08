@@ -1,6 +1,6 @@
 import { is_function, is_url, str_equals, walk } from '@projectwallace/css-parser'
-import { ends_with, unquote } from '../string-utils.js'
-import { type ValueInput, as_value } from '../input.js'
+import { ends_with, unquote } from '../string-utils.ts'
+import { type ValueInput, as_value } from '../input.ts'
 
 /**
  * Find the browserhacks in a CSS value: `progid:`, `\9`, `\7`, `alpha()`, `expression()`, `.htc`

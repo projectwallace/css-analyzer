@@ -7,6 +7,19 @@
 		"prefer-const": "error",
 		"no-var": "error",
 		"no-unused-vars": "error",
-		"func-style": ["error", "declaration", { "allowArrowFunctions": false }]
+		"func-style": ["error", "declaration", { "allowArrowFunctions": false }],
+		// Relative imports must use `.ts` so the source runs as-is in Node (type stripping)
+		"import/extensions": [
+			"error",
+			"always",
+			{
+				"ignorePackages": true,
+				"pattern": {
+					"js": "never",
+					"mjs": "never",
+					"cjs": "never"
+				}
+			}
+		]
 	}
 }

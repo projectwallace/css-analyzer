@@ -1,11 +1,11 @@
-import { analyze } from '../engine/analyzer.js'
+import { analyze } from '../engine/analyzer.ts'
 import type {
 	CSSNode,
 	CollectorDef,
 	ContextCountResult,
 	CountResult,
 	ResultOf,
-} from '../engine/types.js'
+} from '../engine/types.ts'
 import {
 	border_radiuses,
 	box_shadows,
@@ -16,8 +16,8 @@ import {
 	gradients,
 	line_heights,
 	timing_functions,
-} from '../collectors/index.js'
-import type { ColorsResult } from '../collectors/colors.js'
+} from '../collectors/index.ts'
+import type { ColorsResult } from '../collectors/colors.ts'
 
 export type DesignTokensCollectors = {
 	colors: CollectorDef<ColorsResult>

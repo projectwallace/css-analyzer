@@ -13,20 +13,20 @@ import {
 	str_equals,
 	walk,
 } from '@projectwallace/css-parser'
-import { DefinedUsed, type DefinedUsedResult } from '../defined-used.js'
-import { create_counter } from '../engine/counter.js'
-import { define_collector } from '../engine/define-collector.js'
-import type { CollectorDef, CountOptions, CountResult, Location } from '../engine/types.js'
-import { unquote } from '../string-utils.js'
-import { get_media_browserhacks, get_supports_browserhacks } from '../atrules/atrules.js'
-import { keywords } from '../values/values.js'
-import { basename } from '../properties/property-utils.js'
+import { DefinedUsed, type DefinedUsedResult } from '../defined-used.ts'
+import { create_counter } from '../engine/counter.ts'
+import { define_collector } from '../engine/define-collector.ts'
+import type { CollectorDef, CountOptions, CountResult, Location } from '../engine/types.ts'
+import { unquote } from '../string-utils.ts'
+import { get_media_browserhacks, get_supports_browserhacks } from '../atrules/atrules.ts'
+import { keywords } from '../values/values.ts'
+import { basename } from '../properties/property-utils.ts'
 import {
 	get_animation_names,
 	get_first_identifier,
 	get_list_items,
 	without_sequence,
-} from './shared.js'
+} from './shared.ts'
 
 /** Media features (`(min-width: 40em)`) anywhere in an at-rule prelude */
 function find_media_features(prelude: CSSNode | null | undefined): MediaFeature[] {

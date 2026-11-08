@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import { plain } from '../test-utils.js'
-import { gradients } from './gradients.js'
+import { analyze } from '../engine/analyzer.ts'
+import { plain } from '../test-utils.ts'
+import { gradients } from './gradients.ts'
 
 function run(css: string) {
 	return plain(analyze(css, { result: gradients() }).result)

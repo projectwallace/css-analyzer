@@ -1,8 +1,8 @@
 import { describe, test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import { plain, series } from '../test-utils.js'
-import { selectors } from './selectors.js'
-import { specificity, summarize_specificity } from './specificity.js'
+import { analyze } from '../engine/analyzer.ts'
+import { plain, series } from '../test-utils.ts'
+import { selectors } from './selectors.ts'
+import { specificity, summarize_specificity } from './specificity.ts'
 
 /** Selector results with the shape the old tests were written for */
 function run(css: string) {

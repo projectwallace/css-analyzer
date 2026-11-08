@@ -6,14 +6,14 @@ import {
 	is_custom,
 	is_raw,
 } from '@projectwallace/css-parser'
-import { basename } from '../properties/property-utils.js'
+import { basename } from '../properties/property-utils.ts'
 import {
 	SYSTEM_FONTS,
 	destructure_font_shorthand,
 	type FontShorthand,
-} from '../values/destructure-font-shorthand.js'
-import { keywords } from '../values/values.js'
-import type { DeclarationContext, Location, LocationSource, StylesheetContext } from './types.js'
+} from '../values/destructure-font-shorthand.ts'
+import { keywords } from '../values/values.ts'
+import type { DeclarationContext, Location, LocationSource, StylesheetContext } from './types.ts'
 
 export type ContextController = {
 	/** One shared, mutable object: valid only during the handler call it is passed to */

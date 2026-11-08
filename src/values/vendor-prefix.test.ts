@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { get_prefixed_values } from './vendor-prefix.js'
+import { get_prefixed_values } from './vendor-prefix.ts'
 
 test.each([
 	['-webkit-box', ['-webkit-box']],

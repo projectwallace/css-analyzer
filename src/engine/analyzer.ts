@@ -27,7 +27,7 @@ import {
 	traverse,
 	walk,
 } from '@projectwallace/css-parser'
-import { create_context } from './context.js'
+import { create_context } from './context.ts'
 import type {
 	CollectorInstance,
 	CollectorMap,
@@ -38,7 +38,7 @@ import type {
 	StylesheetContext,
 	ParseOptions,
 	ValueKind,
-} from './types.js'
+} from './types.ts'
 
 type NodeKind =
 	| 'stylesheet'

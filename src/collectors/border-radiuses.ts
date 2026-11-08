@@ -1,8 +1,8 @@
-import { define_collector } from '../engine/define-collector.js'
-import { create_context_counter } from '../engine/counter.js'
-import type { CollectorDef, ContextCountOptions, ContextCountResult } from '../engine/types.js'
-import { get_context_property } from './shared.js'
-import { border_radius_properties } from '../properties/property-utils.js'
+import { define_collector } from '../engine/define-collector.ts'
+import { create_context_counter } from '../engine/counter.ts'
+import type { CollectorDef, ContextCountOptions, ContextCountResult } from '../engine/types.ts'
+import { get_context_property } from './shared.ts'
+import { border_radius_properties } from '../properties/property-utils.ts'
 
 /** Values of `border-radius` and its longhands; with `contexts` also counted per property */
 export function border_radiuses(

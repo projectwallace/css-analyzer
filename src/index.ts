@@ -1,3 +1,3 @@
-export * from './engine/index.js'
-export { DefinedUsed, type DefinedUsedResult } from './defined-used.js'
-export { KeywordSet } from './keyword-set.js'
+export * from './engine/index.ts'
+export { DefinedUsed, type DefinedUsedResult } from './defined-used.ts'
+export { KeywordSet } from './keyword-set.ts'

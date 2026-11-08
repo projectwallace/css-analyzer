@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
 import { parse_value } from '@projectwallace/css-parser/parse-value'
-import { destructure_font_shorthand } from './destructure-font-shorthand.js'
+import { destructure_font_shorthand } from './destructure-font-shorthand.ts'
 
 type Parts = { font_size?: string; line_height?: string; font_family?: string | null }
 

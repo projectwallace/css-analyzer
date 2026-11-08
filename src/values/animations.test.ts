@@ -2,7 +2,7 @@
 import { test } from 'vitest'
 import { expect } from 'vitest'
 import { parse_value } from '@projectwallace/css-parser/parse-value'
-import { analyze_animation } from './animations.js'
+import { analyze_animation } from './animations.ts'
 
 test('emits name for custom animation name identifier', () => {
 	const names = analyze_animation('slide-in 300ms ease-out forwards').names

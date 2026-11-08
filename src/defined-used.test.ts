@@ -1,9 +1,9 @@
 import { test, expect, describe } from 'vitest'
-import { DefinedUsed } from './defined-used.js'
-import { analyze } from './engine/analyzer.js'
-import { plain } from './test-utils.js'
-import { atrules } from './collectors/atrules.js'
-import { properties } from './collectors/properties.js'
+import { DefinedUsed } from './defined-used.ts'
+import { analyze } from './engine/analyzer.ts'
+import { plain } from './test-utils.ts'
+import { atrules } from './collectors/atrules.ts'
+import { properties } from './collectors/properties.ts'
 
 function run_properties(css: string) {
 	return analyze(css, { result: properties() }).result

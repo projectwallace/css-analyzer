@@ -1,5 +1,5 @@
-import { analyze } from '../engine/analyzer.js'
-import type { CSSNode, ResultOf } from '../engine/types.js'
+import { analyze } from '../engine/analyzer.ts'
+import type { CSSNode, ResultOf } from '../engine/types.ts'
 import {
 	animation_names,
 	atrules,
@@ -27,7 +27,7 @@ import {
 	value_complexity,
 	value_prefixes,
 	z_indexes,
-} from '../collectors/index.js'
+} from '../collectors/index.ts'
 
 export type AllCollectors = {
 	stylesheet: ReturnType<typeof stylesheet>

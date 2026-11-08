@@ -1,4 +1,4 @@
-import { KeywordSet } from '../keyword-set.js'
+import { KeywordSet } from '../keyword-set.ts'
 
 export const named_colors: KeywordSet = new KeywordSet([
 	// CSS Named Colors

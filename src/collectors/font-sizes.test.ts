@@ -1,7 +1,7 @@
 import { test, expect, describe } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import { plain } from '../test-utils.js'
-import { font_sizes } from './font-sizes.js'
+import { analyze } from '../engine/analyzer.ts'
+import { plain } from '../test-utils.ts'
+import { font_sizes } from './font-sizes.ts'
 
 function run(css: string) {
 	return plain(analyze(css, { result: font_sizes() }).result)

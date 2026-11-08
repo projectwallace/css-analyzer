@@ -1,8 +1,8 @@
-export { analyze } from './analyzer.js'
-export { define_collector } from './define-collector.js'
-export { create_counter, create_context_counter, summarize } from './counter.js'
-export { summarize_frequencies, summarize_numbers, type NumberSummary } from './summary.js'
-export type { Counter, ContextCounter } from './counter.js'
+export { analyze } from './analyzer.ts'
+export { define_collector } from './define-collector.ts'
+export { create_counter, create_context_counter, summarize } from './counter.ts'
+export { summarize_frequencies, summarize_numbers, type NumberSummary } from './summary.ts'
+export type { Counter, ContextCounter } from './counter.ts'
 export type {
 	CSSNode,
 	CollectorDef,
@@ -23,4 +23,4 @@ export type {
 	ResultOf,
 	StylesheetContext,
 	ValueKind,
-} from './types.js'
+} from './types.ts'

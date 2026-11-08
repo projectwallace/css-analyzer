@@ -1,9 +1,9 @@
 import { test, expect, expectTypeOf } from 'vitest'
-import { analyze } from './analyzer.js'
-import { define_collector } from './define-collector.js'
-import { create_counter } from './counter.js'
+import { analyze } from './analyzer.ts'
+import { define_collector } from './define-collector.ts'
+import { create_counter } from './counter.ts'
 import { parse } from '@projectwallace/css-parser'
-import type { CollectorInstance, CountOptions, CountResult } from './types.js'
+import type { CollectorInstance, CountOptions, CountResult } from './types.ts'
 
 // Toy collectors: they exercise the contract the same way built-ins will
 function declared_properties(options: CountOptions = {}) {

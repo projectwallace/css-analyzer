@@ -5,8 +5,8 @@ import {
 	get_vendor_prefixes,
 	get_accessibility_selectors,
 	get_combinators,
-} from './index.js'
-import { get_specificity } from './specificity.js'
+} from './index.ts'
+import { get_specificity } from './specificity.ts'
 
 const selector = 'a.b > #c:not(.d)::-webkit-scrollbar [aria-hidden="true"]'
 

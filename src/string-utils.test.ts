@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { ends_with } from './string-utils.js'
+import { ends_with } from './string-utils.ts'
 
 test('endsWith', () => {
 	expect(ends_with('keyframes', 'keyframes')).toEqual(true)

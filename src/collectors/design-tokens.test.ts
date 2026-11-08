@@ -1,6 +1,6 @@
 import { test, expect, describe } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import type { CountResult } from '../engine/types.js'
+import { analyze } from '../engine/analyzer.ts'
+import type { CountResult } from '../engine/types.ts'
 import {
 	border_radiuses,
 	box_shadows,
@@ -11,7 +11,7 @@ import {
 	gradients,
 	line_heights,
 	timing_functions,
-} from './index.js'
+} from './index.ts'
 
 /** Compare on counts only: the legacy shape has `unique` as a plain record */
 function counts(result: CountResult): Record<string, number> {

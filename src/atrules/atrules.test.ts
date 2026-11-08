@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
 import { type Atrule, parse } from '@projectwallace/css-parser'
-import { get_media_browserhacks, get_supports_browserhacks } from './index.js'
+import { get_media_browserhacks, get_supports_browserhacks } from './index.ts'
 
 function prelude_of(css: string) {
 	const atrule = parse(css, { parse_atrule_preludes: true }).first_child as Atrule

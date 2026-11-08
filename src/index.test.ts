@@ -1,11 +1,11 @@
 import { test, expect, describe } from 'vitest'
-import * as api from './index.js'
-import * as collectors from './collectors/index.js'
-import * as presets from './presets/index.js'
-import * as selectors from './selectors/index.js'
-import * as values from './values/index.js'
-import * as atrules from './atrules/index.js'
-import * as properties from './properties/index.js'
+import * as api from './index.ts'
+import * as collectors from './collectors/index.ts'
+import * as presets from './presets/index.ts'
+import * as selectors from './selectors/index.ts'
+import * as values from './values/index.ts'
+import * as atrules from './atrules/index.ts'
+import * as properties from './properties/index.ts'
 
 describe('Public API', () => {
 	test('main entry exports the engine', () => {

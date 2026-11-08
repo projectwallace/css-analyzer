@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import { plain } from '../test-utils.js'
-import { value_browserhacks } from './values.js'
+import { analyze } from '../engine/analyzer.ts'
+import { plain } from '../test-utils.ts'
+import { value_browserhacks } from './values.ts'
 
 function run(css: string) {
 	return plain(analyze(css, { result: value_browserhacks() }).result)

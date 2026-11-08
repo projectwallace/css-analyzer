@@ -5,9 +5,9 @@ import {
 	is_operator,
 	is_string,
 } from '@projectwallace/css-parser'
-import { KeywordSet } from '../keyword-set.js'
-import { type ValueInput, as_value } from '../input.js'
-import { keywords } from './values.js'
+import { KeywordSet } from '../keyword-set.ts'
+import { type ValueInput, as_value } from '../input.ts'
+import { keywords } from './values.ts'
 
 export const SYSTEM_FONTS: KeywordSet = new KeywordSet([
 	'caption',

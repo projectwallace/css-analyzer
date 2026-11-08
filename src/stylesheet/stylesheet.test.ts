@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { get_embed_type } from './stylesheet.js'
+import { get_embed_type } from './stylesheet.ts'
 
 test('correctly extracts embed types', () => {
 	;[

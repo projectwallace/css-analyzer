@@ -1,4 +1,4 @@
-import type { CountResult } from './types.js'
+import type { CountResult } from './types.ts'
 
 export type NumberSummary = {
 	total: number

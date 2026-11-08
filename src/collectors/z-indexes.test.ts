@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import { plain } from '../test-utils.js'
-import { z_indexes } from './z-indexes.js'
+import { analyze } from '../engine/analyzer.ts'
+import { plain } from '../test-utils.ts'
+import { z_indexes } from './z-indexes.ts'
 
 function run(css: string) {
 	return plain(analyze(css, { result: z_indexes() }).result)

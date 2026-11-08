@@ -1,14 +1,14 @@
 import { is_function } from '@projectwallace/css-parser'
-import { create_context_counter, create_counter } from '../engine/counter.js'
-import { define_collector } from '../engine/define-collector.js'
+import { create_context_counter, create_counter } from '../engine/counter.ts'
+import { define_collector } from '../engine/define-collector.ts'
 import type {
 	CollectorDef,
 	ContextCountOptions,
 	ContextCountResult,
 	CountResult,
-} from '../engine/types.js'
-import { color_functions, color_keywords, named_colors, system_colors } from '../values/colors.js'
-import { NO_VALUE_WALK, get_context_property, type Normalize } from './shared.js'
+} from '../engine/types.ts'
+import { color_functions, color_keywords, named_colors, system_colors } from '../values/colors.ts'
+import { NO_VALUE_WALK, get_context_property, type Normalize } from './shared.ts'
 
 export type ColorsOptions = ContextCountOptions & {
 	/** `lowercase` (default) lowercases hex colors and color names. Color functions are always kept as written. */

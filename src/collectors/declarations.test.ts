@@ -1,8 +1,8 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import { series } from '../test-utils.js'
-import { summarize_numbers } from '../engine/summary.js'
-import { declarations } from './declarations.js'
+import { analyze } from '../engine/analyzer.ts'
+import { series } from '../test-utils.ts'
+import { summarize_numbers } from '../engine/summary.ts'
+import { declarations } from './declarations.ts'
 
 /** Declaration results with the shape the old tests were written for */
 function run(css: string) {

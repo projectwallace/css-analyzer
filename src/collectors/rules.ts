@@ -1,7 +1,7 @@
 import { is_declaration, is_selector, is_selector_list } from '@projectwallace/css-parser'
-import { create_counter } from '../engine/counter.js'
-import { define_collector } from '../engine/define-collector.js'
-import type { CollectorDef, CountOptions, CountResult } from '../engine/types.js'
+import { create_counter } from '../engine/counter.ts'
+import { define_collector } from '../engine/define-collector.ts'
+import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 
 export type RulesResult = {
 	total: number

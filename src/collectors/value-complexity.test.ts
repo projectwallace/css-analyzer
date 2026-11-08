@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import { summarize_numbers } from '../engine/summary.js'
-import { value_complexity } from './values.js'
+import { analyze } from '../engine/analyzer.ts'
+import { summarize_numbers } from '../engine/summary.ts'
+import { value_complexity } from './values.ts'
 
 test('calculates value complexity', () => {
 	const { complexity } = analyze(

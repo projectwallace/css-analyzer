@@ -1,7 +1,7 @@
 import { test, expect, describe } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import { plain } from '../test-utils.js'
-import { line_heights } from './line-heights.js'
+import { analyze } from '../engine/analyzer.ts'
+import { plain } from '../test-utils.ts'
+import { line_heights } from './line-heights.ts'
 
 function run(css: string) {
 	return plain(analyze(css, { result: line_heights() }).result)

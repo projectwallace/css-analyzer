@@ -1,7 +1,7 @@
 import { str_index_of } from '@projectwallace/css-parser'
-import type { CollectorDef, CountOptions, CountResult } from '../engine/types.js'
-import { SYSTEM_FONTS } from '../values/destructure-font-shorthand.js'
-import { define_counting_collector } from './shared.js'
+import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
+import { SYSTEM_FONTS } from '../values/destructure-font-shorthand.ts'
+import { define_counting_collector } from './shared.ts'
 
 export type FontFamiliesOptions = CountOptions & {
 	/** Leave out values that use `var()` */

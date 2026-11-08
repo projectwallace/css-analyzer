@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
 import { parse_selector_list } from '@projectwallace/css-parser/parse-selector'
-import { get_specificity, compare_specificity } from './specificity.js'
+import { get_specificity, compare_specificity } from './specificity.ts'
 
 test('get_specificity returns one tuple per selector in the list', () => {
 	expect(get_specificity('a, .b, #c')).toEqual([

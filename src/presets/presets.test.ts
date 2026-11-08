@@ -1,7 +1,7 @@
 import { test, expect, describe } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import { tokens_fixture } from '../test-fixture.js'
-import { all_collectors, analyze_all, analyze_design_tokens } from './index.js'
+import { analyze } from '../engine/analyzer.ts'
+import { tokens_fixture } from '../test-fixture.ts'
+import { all_collectors, analyze_all, analyze_design_tokens } from './index.ts'
 
 describe('analyze_all', () => {
 	test('has one snake_case key per collector', () => {

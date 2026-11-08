@@ -6,17 +6,17 @@ import {
 	is_type_selector,
 	walk,
 } from '@projectwallace/css-parser'
-import { create_counter } from '../engine/counter.js'
-import { without_sequence } from './shared.js'
-import { define_collector } from '../engine/define-collector.js'
-import type { CollectorDef, CountOptions, CountResult } from '../engine/types.js'
+import { create_counter } from '../engine/counter.ts'
+import { without_sequence } from './shared.ts'
+import { define_collector } from '../engine/define-collector.ts'
+import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 import {
 	get_accessibility_selectors,
 	get_combinators,
 	get_complexity,
 	get_vendor_prefixes,
-} from '../selectors/utils.js'
-import { get_specificity } from '../selectors/specificity.js'
+} from '../selectors/utils.ts'
+import { get_specificity } from '../selectors/specificity.ts'
 
 export type SelectorsResult = CountResult & {
 	/** Items are numbers */

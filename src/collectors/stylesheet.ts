@@ -1,8 +1,8 @@
 import { is_url, str_starts_with } from '@projectwallace/css-parser'
-import { define_collector } from '../engine/define-collector.js'
-import type { CollectorDef, Location } from '../engine/types.js'
-import { unquote } from '../string-utils.js'
-import { get_embed_type } from '../stylesheet/stylesheet.js'
+import { define_collector } from '../engine/define-collector.ts'
+import type { CollectorDef, Location } from '../engine/types.ts'
+import { unquote } from '../string-utils.ts'
+import { get_embed_type } from '../stylesheet/stylesheet.ts'
 
 export type EmbeddedType = { count: number; size: number; locations?: Location[] }
 

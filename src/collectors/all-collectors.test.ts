@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
+import { analyze } from '../engine/analyzer.ts'
 import {
 	animation_names,
 	atrules,
@@ -18,7 +18,7 @@ import {
 	value_complexity,
 	value_prefixes,
 	z_indexes,
-} from './index.js'
+} from './index.ts'
 
 function collectors() {
 	const options = { locations: true }

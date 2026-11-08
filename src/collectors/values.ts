@@ -1,25 +1,25 @@
 import { type Dimension, str_index_of } from '@projectwallace/css-parser'
-import { create_context_counter } from '../engine/counter.js'
-import { define_collector } from '../engine/define-collector.js'
+import { create_context_counter } from '../engine/counter.ts'
+import { define_collector } from '../engine/define-collector.ts'
 import type {
 	CollectorDef,
 	ContextCountOptions,
 	ContextCountResult,
 	CountOptions,
 	CountResult,
-} from '../engine/types.js'
-import { SPACING_RESET_PROPERTIES } from '../properties/property-utils.js'
-import { analyze_animation } from '../values/animations.js'
-import { get_value_browserhacks } from '../values/browserhacks.js'
-import { is_value_reset, keywords as global_keywords } from '../values/values.js'
-import { get_prefixed_values } from '../values/vendor-prefix.js'
+} from '../engine/types.ts'
+import { SPACING_RESET_PROPERTIES } from '../properties/property-utils.ts'
+import { analyze_animation } from '../values/animations.ts'
+import { get_value_browserhacks } from '../values/browserhacks.ts'
+import { is_value_reset, keywords as global_keywords } from '../values/values.ts'
+import { get_prefixed_values } from '../values/vendor-prefix.ts'
 import {
 	NO_VALUE_WALK,
 	define_counting_collector,
 	get_animation_names,
 	get_context_property,
 	lowercase_unless_var,
-} from './shared.js'
+} from './shared.ts'
 
 const TEXT_SHADOW = new Set(['text-shadow'])
 const DISPLAY = new Set(['display'])

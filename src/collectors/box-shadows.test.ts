@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import { plain } from '../test-utils.js'
-import { box_shadows } from './box-shadows.js'
+import { analyze } from '../engine/analyzer.ts'
+import { plain } from '../test-utils.ts'
+import { box_shadows } from './box-shadows.ts'
 
 function run(css: string) {
 	return plain(analyze(css, { result: box_shadows() }).result)

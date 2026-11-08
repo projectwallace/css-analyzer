@@ -1,7 +1,7 @@
-import { create_counter } from '../engine/counter.js'
-import { without_sequence } from './shared.js'
-import { define_collector } from '../engine/define-collector.js'
-import type { CollectorDef, CountOptions, CountResult } from '../engine/types.js'
+import { create_counter } from '../engine/counter.ts'
+import { without_sequence } from './shared.ts'
+import { define_collector } from '../engine/define-collector.ts'
+import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 
 export type DeclarationsResult = CountResult & {
 	importants: { total: number; in_keyframes: number }

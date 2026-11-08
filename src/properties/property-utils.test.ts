@@ -5,7 +5,7 @@ import {
 	is_hack,
 	shorthand_properties,
 	SPACING_RESET_PROPERTIES,
-} from './property-utils.js'
+} from './property-utils.ts'
 
 test.each([
 	['color', 'color'],

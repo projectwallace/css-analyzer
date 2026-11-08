@@ -1,8 +1,8 @@
 import { describe, test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import { plain } from '../test-utils.js'
-import { summarize_numbers } from '../engine/summary.js'
-import { properties } from './properties.js'
+import { analyze } from '../engine/analyzer.ts'
+import { plain } from '../test-utils.ts'
+import { summarize_numbers } from '../engine/summary.ts'
+import { properties } from './properties.ts'
 
 /** Property results with the shape the old tests were written for */
 function run(css: string) {

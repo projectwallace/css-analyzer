@@ -1,7 +1,7 @@
-import { summarize_frequencies } from '../engine/summary.js'
-import type { CollectorDef, CountOptions, CountResult } from '../engine/types.js'
-import { compare_specificity, get_specificity, type Specificity } from '../selectors/specificity.js'
-import { define_counting_collector } from './shared.js'
+import { summarize_frequencies } from '../engine/summary.ts'
+import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
+import { compare_specificity, get_specificity, type Specificity } from '../selectors/specificity.ts'
+import { define_counting_collector } from './shared.ts'
 
 export type SpecificitySummary = {
 	/** Number of selectors */

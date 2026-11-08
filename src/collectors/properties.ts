@@ -1,16 +1,16 @@
 import { is_function, is_identifier } from '@projectwallace/css-parser'
-import { DefinedUsed, type DefinedUsedResult } from '../defined-used.js'
-import { create_counter } from '../engine/counter.js'
-import { define_collector } from '../engine/define-collector.js'
+import { DefinedUsed, type DefinedUsedResult } from '../defined-used.ts'
+import { create_counter } from '../engine/counter.ts'
+import { define_collector } from '../engine/define-collector.ts'
 import type {
 	CollectorDef,
 	CountOptions,
 	CountResult,
 	DeclarationContext,
 	LocationSource,
-} from '../engine/types.js'
-import { basename, shorthand_properties } from '../properties/property-utils.js'
-import { get_first_identifier, get_list_items } from './shared.js'
+} from '../engine/types.ts'
+import { basename, shorthand_properties } from '../properties/property-utils.ts'
+import { get_first_identifier, get_list_items } from './shared.ts'
 
 export type PropertiesResult = CountResult & {
 	/** Vendor prefixed properties, as written */

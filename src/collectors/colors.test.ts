@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import { plain } from '../test-utils.js'
-import { colors } from './colors.js'
+import { analyze } from '../engine/analyzer.ts'
+import { plain } from '../test-utils.ts'
+import { colors } from './colors.ts'
 
 function run(css: string) {
 	return plain(analyze(css, { result: colors({ contexts: true, property: 'as_written' }) }).result)

@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
-import { create_counter } from './counter.js'
-import { summarize_frequencies, summarize_numbers } from './summary.js'
+import { create_counter } from './counter.ts'
+import { summarize_frequencies, summarize_numbers } from './summary.ts'
 
 const at = { loc: { line: 1, column: 1, offset: 0, length: 1 } }
 

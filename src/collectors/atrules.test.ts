@@ -1,8 +1,8 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import { plain, series } from '../test-utils.js'
-import { summarize_numbers } from '../engine/summary.js'
-import { atrules } from './atrules.js'
+import { analyze } from '../engine/analyzer.ts'
+import { plain, series } from '../test-utils.ts'
+import { summarize_numbers } from '../engine/summary.ts'
+import { atrules } from './atrules.ts'
 
 function defined_used(r: {
 	defined: string[]

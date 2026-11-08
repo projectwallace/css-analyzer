@@ -1,6 +1,6 @@
 import { is_number, is_dimension } from '@projectwallace/css-parser'
-import { type ValueInput, as_value } from '../input.js'
-import { KeywordSet } from '../keyword-set.js'
+import { type ValueInput, as_value } from '../input.ts'
+import { KeywordSet } from '../keyword-set.ts'
 
 export const keywords: KeywordSet = new KeywordSet([
 	'auto',

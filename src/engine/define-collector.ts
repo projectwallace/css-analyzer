@@ -1,4 +1,4 @@
-import type { CollectorDef, CollectorInstance } from './types.js'
+import type { CollectorDef, CollectorInstance } from './types.ts'
 
 /**
  * Define a collector. `init` runs once per analyzer and creates a fresh instance with its own

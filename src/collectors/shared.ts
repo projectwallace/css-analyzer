@@ -6,12 +6,12 @@ import {
 	is_string,
 	str_index_of,
 } from '@projectwallace/css-parser'
-import { analyze_animation } from '../values/animations.js'
-import { keywords } from '../values/values.js'
-import { unquote } from '../string-utils.js'
-import { create_counter } from '../engine/counter.js'
-import { define_collector } from '../engine/define-collector.js'
-import type { Counter } from '../engine/counter.js'
+import { analyze_animation } from '../values/animations.ts'
+import { keywords } from '../values/values.ts'
+import { unquote } from '../string-utils.ts'
+import { create_counter } from '../engine/counter.ts'
+import { define_collector } from '../engine/define-collector.ts'
+import type { Counter } from '../engine/counter.ts'
 import type {
 	CollectorDef,
 	CollectorInstance,
@@ -19,7 +19,7 @@ import type {
 	CountItem,
 	CountResult,
 	DeclarationContext,
-} from '../engine/types.js'
+} from '../engine/types.ts'
 
 export type Normalize = 'lowercase' | 'none'
 

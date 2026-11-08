@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import { plain } from '../test-utils.js'
-import { border_radiuses } from './border-radiuses.js'
+import { analyze } from '../engine/analyzer.ts'
+import { plain } from '../test-utils.ts'
+import { border_radiuses } from './border-radiuses.ts'
 
 function run(css: string) {
 	return plain(

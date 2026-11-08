@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import { atrules, declarations, rules, selectors, specificity } from './index.js'
+import { analyze } from '../engine/analyzer.ts'
+import { atrules, declarations, rules, selectors, specificity } from './index.ts'
 
 const css = `
 a { color: red }

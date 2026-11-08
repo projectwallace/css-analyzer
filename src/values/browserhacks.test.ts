@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { get_value_browserhacks } from './browserhacks.js'
+import { get_value_browserhacks } from './browserhacks.ts'
 
 test.each([
 	['value\\9', ['\\9']],

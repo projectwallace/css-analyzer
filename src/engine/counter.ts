@@ -6,7 +6,7 @@ import type {
 	CountOptions,
 	CountResult,
 	LocationSource,
-} from './types.js'
+} from './types.ts'
 
 export type Counter<T extends CountItem = string> = {
 	/** Count `item`. Pass the context (or `ctx.at(node)`); its location is only read if locations are enabled. */

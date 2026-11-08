@@ -7,7 +7,7 @@ import type {
 	StyleSheet,
 	Value,
 } from '@projectwallace/css-parser'
-import type { FontShorthand } from '../values/destructure-font-shorthand.js'
+import type { FontShorthand } from '../values/destructure-font-shorthand.ts'
 
 export type { CSSNode }
 

@@ -1,11 +1,11 @@
-import type { CollectorDef, CountOptions, CountResult } from '../engine/types.js'
-import { analyze_animation } from '../values/animations.js'
+import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
+import { analyze_animation } from '../values/animations.ts'
 import {
 	define_counting_collector,
 	get_list_items,
 	lowercase_unless_var,
 	type Normalize,
-} from './shared.js'
+} from './shared.ts'
 
 export type TimingFunctionsOptions = CountOptions & {
 	normalize?: Normalize

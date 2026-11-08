@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.js'
-import { plain } from '../test-utils.js'
-import { timing_functions } from './timing-functions.js'
+import { analyze } from '../engine/analyzer.ts'
+import { plain } from '../test-utils.ts'
+import { timing_functions } from './timing-functions.ts'
 
 function run(css: string) {
 	return plain(analyze(css, { result: timing_functions() }).result)

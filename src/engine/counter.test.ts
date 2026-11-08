@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { create_counter, create_context_counter, summarize } from './counter.js'
+import { create_counter, create_context_counter, summarize } from './counter.ts'
 
 const at = { loc: { line: 1, column: 2, offset: 3, length: 4 } }
 
