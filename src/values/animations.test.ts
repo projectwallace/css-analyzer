@@ -1,9 +1,9 @@
 // oxlint-disable vitest/no-conditional-in-test
 import { test } from 'vitest'
 import { expect } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze } from '../index.ts'
 import { parse_value } from '@projectwallace/css-parser/parse-value'
-import { analyzeAnimation } from './animations.js'
+import { analyzeAnimation } from './animations.ts'
 
 test('finds simple durations', () => {
 	const fixture = `

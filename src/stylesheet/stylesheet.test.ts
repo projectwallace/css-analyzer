@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../index.js'
-import { getEmbedType } from './stylesheet.js'
+import { analyze } from '../index.ts'
+import { getEmbedType } from './stylesheet.ts'
 
 test('counts Lines of Code', () => {
 	const fixture = `

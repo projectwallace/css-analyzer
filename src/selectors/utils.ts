@@ -1,5 +1,5 @@
-import type { Location } from '../collection.js'
-import { KeywordSet } from '../keyword-set.js'
+import type { Location } from '../collection.ts'
+import { KeywordSet } from '../keyword-set.ts'
 import {
 	type CSSNode,
 	SKIP,
@@ -14,7 +14,7 @@ import {
 	is_nth_selector,
 	is_combinator,
 } from '@projectwallace/css-parser'
-import { unquote } from '../string-utils.js'
+import { unquote } from '../string-utils.ts'
 
 const PSEUDO_FUNCTIONS = new KeywordSet([
 	'nth-child',
