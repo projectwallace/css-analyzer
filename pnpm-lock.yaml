@@ -13,8 +13,8 @@ importers:
         version: 0.19.5
     devDependencies:
       '@projectwallace/preset-oxlint':
-        specifier: ^0.0.12
-        version: 0.0.12(oxlint@1.89.0)
+        specifier: ^0.0.13
+        version: 0.0.13(oxlint@1.89.0)
       '@vitest/coverage-v8':
         specifier: ^5.0.5
         version: 5.0.5(vitest@5.0.5)
@@ -571,8 +571,8 @@ packages:
     resolution: {integrity: sha512-+T87+IbeJjLv1XZmKraFGRkAMZmd+nIabQRDjvsTsMxwceX+kFMPJq0eVqtcgmtUgQxAZraRouVIvYTVakslyg==}
     engines: {pnpm: '>=11.0.0'}
 
-  '@projectwallace/preset-oxlint@0.0.12':
-    resolution: {integrity: sha512-Amy4yCmGM2ZbPfWauhMRQ+s32w9LEZV4FTdccxGrL/2zr15+giWv27dlhWnfRhtKVYrRhWkEFYQ5tWvdl/DbxA==}
+  '@projectwallace/preset-oxlint@0.0.13':
+    resolution: {integrity: sha512-aVyVp2j1qjZEtKKyok2a5WYnArG+Hw1yjL/W0k2Q4sMzUMyt7z9iEg6aR9Nc0gVpknRsZfFRQrKQrZyq5n4pbQ==}
     peerDependencies:
       oxlint: ^1.0.0
 
@@ -1687,7 +1687,7 @@ snapshots:
 
   '@projectwallace/css-parser@0.19.5': {}
 
-  '@projectwallace/preset-oxlint@0.0.12(oxlint@1.89.0)':
+  '@projectwallace/preset-oxlint@0.0.13(oxlint@1.89.0)':
     dependencies:
       oxlint: 1.89.0
 
