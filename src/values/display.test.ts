@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import { analyze } from '../index'
+import { analyze } from '../index.ts'
 
 test('counts', () => {
 	// Test data from https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#syntax

@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze } from '../index.ts'
 
 test('counts totals', () => {
 	const fixture = `
