@@ -30,6 +30,16 @@ type ValueSubscription = Omit<NonNullable<CollectorInstance<unknown>['value']>, 
 
 /**
  * Run collectors over one stylesheet.
+ *
+ * This is a single-pass, multiplexed visitor (the same pattern as ESLint rule listeners or
+ * PostCSS 8 plugin visitors): every collector subscribes to the node types it cares about,
+ * the subscriptions are merged into one dispatch table, and the AST is traversed once for all
+ * collectors. Each declaration value is walked once as well, for every value subscriber.
+ *
+ * Handlers receive a shared context object (see `create_context()`): a flyweight whose facts
+ * (normalized property, parsed value, font shorthand, ...) are computed lazily and memoized per
+ * node, so the first collector that asks pays and the others read the cached result. The
+ * context is only valid during the handler call it is passed to.
  * @param input - CSS text, or an already parsed stylesheet node
  * @param collectors - Object map of collectors; the keys become the keys of the result
  */
