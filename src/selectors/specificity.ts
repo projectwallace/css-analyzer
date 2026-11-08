@@ -10,6 +10,7 @@ import {
 	PSEUDO_CLASS_SELECTOR,
 	PSEUDO_ELEMENT_SELECTOR,
 	TYPE_SELECTOR,
+	type CSSNode,
 	type Selector,
 	type SelectorNode,
 	is_selector_list,
@@ -62,7 +63,7 @@ function selector_specificity(selector_ast: Selector): Specificity {
 	let a = 0 /* ID Selectors */
 	let b = 0 /* Class selectors, Attributes selectors, and Pseudo-classes */
 	let c = 0 /* Type selectors and Pseudo-elements */
-	const add = ([x, y, z]: Specificity) => {
+	function add([x, y, z]: Specificity) {
 		a += x
 		b += y
 		c += z
