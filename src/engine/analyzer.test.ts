@@ -275,10 +275,10 @@ test('clean_value_text drops IE hacks and is undefined for global keywords', () 
 		result: () => 0,
 	}))
 	analyze(
-		'a { width: 1px\\9; height: 2px \\0/; top: 3px\\9\\0; --x: 1px\\9; color: inherit; margin: 0 }',
+		'a { width: 1px\\9; height: 2px \\0/; top: 3px\\9\\0; left: 4px\\7; --x: 1px\\9; color: inherit; margin: 0 }',
 		{ clean },
 	)
-	expect(seen).toEqual(['1px', '2px', '3px', '1px\\9', undefined, '0'])
+	expect(seen).toEqual(['1px', '2px', '3px', '4px', '1px\\9', undefined, '0'])
 })
 
 test('font_shorthand is split once and is null for everything else', () => {
