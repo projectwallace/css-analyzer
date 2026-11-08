@@ -99,7 +99,7 @@ describe('Public API', () => {
 	})
 
 	test('exposes Location type', () => {
-		let location: Location = {
+		const location: Location = {
 			offset: 0,
 			line: 0,
 			length: 0,
@@ -109,20 +109,20 @@ describe('Public API', () => {
 	})
 
 	test('exposes UniqueWithLocations type', () => {
-		let location: Location = {
+		const location: Location = {
 			offset: 0,
 			line: 0,
 			length: 0,
 			column: 0,
 		}
-		let uniqueWithLocations: UniqueWithLocations = {
+		const uniqueWithLocations: UniqueWithLocations = {
 			'my-item': [location],
 		}
 		expect(uniqueWithLocations).toHaveProperty('my-item')
 	})
 
 	test('exposes Specificity type', () => {
-		let specificity: Specificity = [1, 1, 1]
+		const specificity: Specificity = [1, 1, 1]
 		expect(specificity).toHaveLength(3)
 	})
 })
@@ -684,7 +684,7 @@ test('handles empty input gracefully', () => {
 test('has metadata', () => {
 	const fixture = Array.from({ length: 100 })
 		.map(
-			(_) => `
+			() => `
     html {
       font: 1em/1 sans-serif;
       color: rgb(0 0 0 / 0.5);

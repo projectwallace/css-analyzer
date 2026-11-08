@@ -46,7 +46,7 @@ export function analyzeAnimation(
 ): void {
 	let durationFound = false
 
-	for (let node of value) {
+	for (const node of value) {
 		// Right after a ',' we start over again
 		if (is_operator(node)) {
 			durationFound = false

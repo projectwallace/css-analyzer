@@ -2,7 +2,7 @@ import { test, expect } from 'vitest'
 import { analyze } from '../index.ts'
 
 test('handles empty values', () => {
-	let css = `
+	const css = `
     thing {
       height:;
       width: ;

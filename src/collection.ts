@@ -34,10 +34,10 @@ export class Collection<UseLocations extends boolean = false> {
 	}
 
 	p(item: string | number, node_location: Location): void {
-		let index = this.#total
+		const index = this.#total
 
 		if (this.#useLocations) {
-			let position = index * 4
+			const position = index * 4
 
 			this.#nodes[position] = node_location.line
 			this.#nodes[position + 1] = node_location.column
@@ -46,7 +46,7 @@ export class Collection<UseLocations extends boolean = false> {
 		}
 
 		if (this.#items.has(item)) {
-			let list = this.#items.get(item)!
+			const list = this.#items.get(item)!
 			list.push(index)
 			this.#total++
 			return
@@ -61,17 +61,17 @@ export class Collection<UseLocations extends boolean = false> {
 	}
 
 	c(): CollectionCount<UseLocations> {
-		let uniqueWithLocations: Map<string | number, Location[]> = new Map()
-		let unique: Record<string, number> = {}
-		let useLocations = this.#useLocations
-		let items = this.#items
-		let _nodes = this.#nodes
-		let size = items.size
+		const uniqueWithLocations: Map<string | number, Location[]> = new Map()
+		const unique: Record<string, number> = {}
+		const useLocations = this.#useLocations
+		const items = this.#items
+		const _nodes = this.#nodes
+		const size = items.size
 
 		items.forEach((list, key) => {
 			if (useLocations) {
-				let nodes = list.map(function (index) {
-					let position = index * 4
+				const nodes = list.map(function (index) {
+					const position = index * 4
 					return {
 						line: _nodes[position]!,
 						column: _nodes[position + 1]!,
@@ -85,7 +85,7 @@ export class Collection<UseLocations extends boolean = false> {
 			}
 		})
 
-		let total = this.#total
+		const total = this.#total
 
 		if (useLocations) {
 			return {

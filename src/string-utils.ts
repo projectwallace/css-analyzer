@@ -31,8 +31,8 @@ export function endsWith(base: string, maybe: string): boolean {
 		return true
 	}
 
-	let len = maybe.length
-	let offset = len - base.length
+	const len = maybe.length
+	const offset = len - base.length
 
 	if (offset < 0) {
 		return false

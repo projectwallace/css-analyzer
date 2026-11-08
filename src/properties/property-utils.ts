@@ -96,7 +96,7 @@ export function isHack(property: string): boolean {
 		return false
 	}
 
-	let code = property.charCodeAt(0)
+	const code = property.charCodeAt(0)
 
 	return (
 		code === 47 || // /

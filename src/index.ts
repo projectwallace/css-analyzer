@@ -705,14 +705,14 @@ function analyzeInternal<T extends boolean>(
 		total: number
 	}
 } {
-	let start = Date.now()
+	const start = Date.now()
 
 	// Stylesheet
-	let linesOfCode = (css.match(/\n/g) || []).length + 1
+	const linesOfCode = (css.match(/\n/g) || []).length + 1
 	let totalComments = 0
 	let commentsSize = 0
 	let embedSize = 0
-	let embedTypes = {
+	const embedTypes = {
 		total: 0,
 		unique: new Map() as Map<
 			string,
@@ -724,8 +724,8 @@ function analyzeInternal<T extends boolean>(
 		>,
 	}
 
-	let startParse = Date.now()
-	let ast = parse(css, {
+	const startParse = Date.now()
+	const ast = parse(css, {
 		on_comment({ length }) {
 			totalComments++
 			// includes /* and */ in the size calculation
@@ -733,112 +733,112 @@ function analyzeInternal<T extends boolean>(
 		},
 	})
 
-	let startAnalysis = Date.now()
+	const startAnalysis = Date.now()
 
 	// Atrules
-	let atrules = new Collection(useLocations)
-	let atRuleComplexities = new AggregateCollection()
+	const atrules = new Collection(useLocations)
+	const atRuleComplexities = new AggregateCollection()
 	/** @type {Record<string, string>[]} */
-	let fontfaces: Record<string, string>[] = []
-	let fontfaces_with_loc = new Collection(useLocations)
-	let layers = new Collection(useLocations)
-	let imports = new Collection(useLocations)
-	let medias = new Collection(useLocations)
-	let mediaBrowserhacks = new Collection(useLocations)
-	let mediaFeatures = new Collection(useLocations)
-	let charsets = new Collection(useLocations)
-	let supports = new Collection(useLocations)
-	let supportsBrowserhacks = new Collection(useLocations)
-	let keyframes = new Collection(useLocations)
-	let prefixedKeyframes = new Collection(useLocations)
-	let containers = new Collection(useLocations)
-	let containerNames = new Collection(useLocations)
-	let registeredProperties = new Collection(useLocations)
-	let functions = new Collection(useLocations)
-	let scopes = new Collection(useLocations)
-	let atruleNesting = new AggregateCollection()
-	let uniqueAtruleNesting = new Collection(useLocations)
+	const fontfaces: Record<string, string>[] = []
+	const fontfaces_with_loc = new Collection(useLocations)
+	const layers = new Collection(useLocations)
+	const imports = new Collection(useLocations)
+	const medias = new Collection(useLocations)
+	const mediaBrowserhacks = new Collection(useLocations)
+	const mediaFeatures = new Collection(useLocations)
+	const charsets = new Collection(useLocations)
+	const supports = new Collection(useLocations)
+	const supportsBrowserhacks = new Collection(useLocations)
+	const keyframes = new Collection(useLocations)
+	const prefixedKeyframes = new Collection(useLocations)
+	const containers = new Collection(useLocations)
+	const containerNames = new Collection(useLocations)
+	const registeredProperties = new Collection(useLocations)
+	const functions = new Collection(useLocations)
+	const scopes = new Collection(useLocations)
+	const atruleNesting = new AggregateCollection()
+	const uniqueAtruleNesting = new Collection(useLocations)
 
 	// Rules
 	let totalRules = 0
 	let emptyRules = 0
-	let ruleSizes = new AggregateCollection()
-	let selectorsPerRule = new AggregateCollection()
-	let declarationsPerRule = new AggregateCollection()
-	let uniqueRuleSize = new Collection(useLocations)
-	let uniqueSelectorsPerRule = new Collection(useLocations)
-	let uniqueDeclarationsPerRule = new Collection(useLocations)
-	let ruleNesting = new AggregateCollection()
-	let uniqueRuleNesting = new Collection(useLocations)
+	const ruleSizes = new AggregateCollection()
+	const selectorsPerRule = new AggregateCollection()
+	const declarationsPerRule = new AggregateCollection()
+	const uniqueRuleSize = new Collection(useLocations)
+	const uniqueSelectorsPerRule = new Collection(useLocations)
+	const uniqueDeclarationsPerRule = new Collection(useLocations)
+	const ruleNesting = new AggregateCollection()
+	const uniqueRuleNesting = new Collection(useLocations)
 
 	// Selectors
-	let keyframeSelectors = new Collection(useLocations)
-	let uniqueSelectors = new Set()
-	let prefixedSelectors = new Collection(useLocations)
+	const keyframeSelectors = new Collection(useLocations)
+	const uniqueSelectors = new Set()
+	const prefixedSelectors = new Collection(useLocations)
 	let maxSpecificity: Specificity | undefined
 	let minSpecificity: Specificity | undefined
-	let specificityA = new AggregateCollection()
-	let specificityB = new AggregateCollection()
-	let specificityC = new AggregateCollection()
-	let uniqueSpecificities = new Collection(useLocations)
-	let selectorComplexities = new AggregateCollection()
-	let uniqueSelectorComplexities = new Collection(useLocations)
-	let specificities: Specificity[] = []
-	let ids = new Collection(useLocations)
-	let a11y = new Collection(useLocations)
-	let pseudoClasses = new Collection(useLocations)
-	let pseudoElements = new Collection(useLocations)
-	let attributeSelectors = new Collection(useLocations)
-	let customElementSelectors = new Collection(useLocations)
-	let combinators = new Collection(useLocations)
-	let selectorNesting = new AggregateCollection()
-	let uniqueSelectorNesting = new Collection(useLocations)
+	const specificityA = new AggregateCollection()
+	const specificityB = new AggregateCollection()
+	const specificityC = new AggregateCollection()
+	const uniqueSpecificities = new Collection(useLocations)
+	const selectorComplexities = new AggregateCollection()
+	const uniqueSelectorComplexities = new Collection(useLocations)
+	const specificities: Specificity[] = []
+	const ids = new Collection(useLocations)
+	const a11y = new Collection(useLocations)
+	const pseudoClasses = new Collection(useLocations)
+	const pseudoElements = new Collection(useLocations)
+	const attributeSelectors = new Collection(useLocations)
+	const customElementSelectors = new Collection(useLocations)
+	const combinators = new Collection(useLocations)
+	const selectorNesting = new AggregateCollection()
+	const uniqueSelectorNesting = new Collection(useLocations)
 
 	// Declarations
-	let uniqueDeclarations = new Set()
+	const uniqueDeclarations = new Set()
 	let totalDeclarations = 0
-	let declarationComplexities = new AggregateCollection()
+	const declarationComplexities = new AggregateCollection()
 	let importantDeclarations = 0
 	let importantsInKeyframes = 0
-	let importantCustomProperties = new Collection(useLocations)
-	let declarationNesting = new AggregateCollection()
-	let uniqueDeclarationNesting = new Collection(useLocations)
+	const importantCustomProperties = new Collection(useLocations)
+	const declarationNesting = new AggregateCollection()
+	const uniqueDeclarationNesting = new Collection(useLocations)
 
 	// Properties
-	let properties = new Collection(useLocations)
-	let propertyHacks = new Collection(useLocations)
-	let propertyVendorPrefixes = new Collection(useLocations)
-	let customProperties = new Collection(useLocations)
-	let shorthands = new Collection(useLocations)
-	let propertyComplexities = new AggregateCollection()
+	const properties = new Collection(useLocations)
+	const propertyHacks = new Collection(useLocations)
+	const propertyVendorPrefixes = new Collection(useLocations)
+	const customProperties = new Collection(useLocations)
+	const shorthands = new Collection(useLocations)
+	const propertyComplexities = new AggregateCollection()
 
 	// Values
-	let valueComplexities = new AggregateCollection()
-	let vendorPrefixedValues = new Collection(useLocations)
-	let valueBrowserhacks = new Collection(useLocations)
-	let displays = new Collection(useLocations)
-	let zindex = new Collection(useLocations)
-	let textShadows = new Collection(useLocations)
-	let boxShadows = new Collection(useLocations)
-	let fontFamilies = new Collection(useLocations)
-	let fontSizes = new Collection(useLocations)
-	let lineHeights = new Collection(useLocations)
-	let timingFunctions = new Collection(useLocations)
-	let durations = new Collection(useLocations)
-	let animationNames = new Collection(useLocations)
-	let colors = new ContextCollection(useLocations)
-	let colorFormats = new Collection(useLocations)
-	let units = new ContextCollection(useLocations)
-	let gradients = new Collection(useLocations)
-	let valueKeywords = new Collection(useLocations)
-	let borderRadiuses = new ContextCollection(useLocations)
-	let resets = new Collection(useLocations)
+	const valueComplexities = new AggregateCollection()
+	const vendorPrefixedValues = new Collection(useLocations)
+	const valueBrowserhacks = new Collection(useLocations)
+	const displays = new Collection(useLocations)
+	const zindex = new Collection(useLocations)
+	const textShadows = new Collection(useLocations)
+	const boxShadows = new Collection(useLocations)
+	const fontFamilies = new Collection(useLocations)
+	const fontSizes = new Collection(useLocations)
+	const lineHeights = new Collection(useLocations)
+	const timingFunctions = new Collection(useLocations)
+	const durations = new Collection(useLocations)
+	const animationNames = new Collection(useLocations)
+	const colors = new ContextCollection(useLocations)
+	const colorFormats = new Collection(useLocations)
+	const units = new ContextCollection(useLocations)
+	const gradients = new Collection(useLocations)
+	const valueKeywords = new Collection(useLocations)
+	const borderRadiuses = new ContextCollection(useLocations)
+	const resets = new Collection(useLocations)
 
-	let customPropsTracking = new DefinedUsed()
-	let animationNamesTracking = new DefinedUsed()
-	let containerNamesTracking = new DefinedUsed()
-	let layerNamesTracking = new DefinedUsed()
-	let anchorNamesTracking = new DefinedUsed()
+	const customPropsTracking = new DefinedUsed()
+	const animationNamesTracking = new DefinedUsed()
+	const containerNamesTracking = new DefinedUsed()
+	const layerNamesTracking = new DefinedUsed()
+	const anchorNamesTracking = new DefinedUsed()
 
 	function toLoc(node: CSSNode): Location {
 		return {
@@ -859,24 +859,24 @@ function analyzeInternal<T extends boolean>(
 		}
 
 		// Check if we're inside a keyframes block
-		let inKeyframes = keyframesDepth >= 0 && depth > keyframesDepth
+		const inKeyframes = keyframesDepth >= 0 && depth > keyframesDepth
 
 		// Count nodes and track nesting
 		if (is_atrule(node)) {
-			let atruleLoc = toLoc(node)
+			const atruleLoc = toLoc(node)
 			atruleNesting.push(depth)
 			uniqueAtruleNesting.p(depth, atruleLoc)
-			let normalized_name = property_basename(node.name ?? '')
+			const normalized_name = property_basename(node.name ?? '')
 			atrules.p(normalized_name, atruleLoc)
 
 			//#region @FONT-FACE
 			if (normalized_name === 'font-face') {
-				let descriptors = Object.create(null)
+				const descriptors = Object.create(null)
 				if (useLocations) {
 					fontfaces_with_loc.p(node.start, toLoc(node))
 				}
-				let block = node.block
-				for (let descriptor of block?.children || []) {
+				const block = node.block
+				for (const descriptor of block?.children || []) {
 					if (is_declaration(descriptor) && descriptor.value) {
 						descriptors[descriptor.property] = descriptor.value.text
 					}
@@ -912,7 +912,7 @@ function analyzeInternal<T extends boolean>(
 						complexity++
 					})
 				} else if (normalized_name.endsWith('keyframes')) {
-					let prelude = unquote(node.prelude.text)
+					const prelude = unquote(node.prelude.text)
 					keyframes.p(prelude, toLoc(node))
 					animationNamesTracking.define(prelude)
 
@@ -924,7 +924,7 @@ function analyzeInternal<T extends boolean>(
 					// Mark the depth at which we enter a keyframes atrule
 					keyframesDepth = depth
 				} else if (normalized_name === 'layer') {
-					for (let layer of node.prelude.text.split(',').map((s: string) => s.trim())) {
+					for (const layer of node.prelude.text.split(',').map((s: string) => s.trim())) {
 						layers.p(layer, toLoc(node))
 						// @layer name { } places CSS into a layer (use); @layer a, b; orders layers (define)
 						if (node.block) {
@@ -937,7 +937,7 @@ function analyzeInternal<T extends boolean>(
 					imports.p(node.prelude.text, toLoc(node))
 
 					if (is_atrule_prelude(node.prelude) && node.prelude.has_children) {
-						for (let child of node.prelude) {
+						for (const child of node.prelude) {
 							if (!is_function(child)) {
 								continue
 							}
@@ -952,11 +952,11 @@ function analyzeInternal<T extends boolean>(
 						}
 					}
 				} else if (normalized_name === 'container') {
-					let { prelude } = node
+					const { prelude } = node
 					containers.p(prelude.text, toLoc(node))
 					if (is_atrule_prelude(prelude) && is_container_query(prelude.first_child)) {
-						let container_query = prelude.first_child
-						let container_name = container_query.first_child
+						const container_query = prelude.first_child
+						const container_name = container_query.first_child
 						if (container_name && is_identifier(container_name)) {
 							containerNames.p(container_name.text, toLoc(node))
 							containerNamesTracking.use(container_name.text)
@@ -966,8 +966,8 @@ function analyzeInternal<T extends boolean>(
 					registeredProperties.p(node.prelude.text, toLoc(node))
 					customPropsTracking.define(node.prelude.text)
 				} else if (normalized_name === 'function') {
-					let prelude = node.prelude.text
-					let name = prelude.includes('(')
+					const prelude = node.prelude.text
+					const name = prelude.includes('(')
 						? prelude.slice(0, prelude.indexOf('(')).trim()
 						: prelude.trim()
 					functions.p(name, toLoc(node))
@@ -983,7 +983,7 @@ function analyzeInternal<T extends boolean>(
 			// Handle keyframe rules specially
 			if (inKeyframes && node.has_prelude) {
 				if (is_selector_list(node.prelude) && node.prelude.child_count > 0) {
-					for (let keyframe_selector of node.prelude) {
+					for (const keyframe_selector of node.prelude) {
 						keyframeSelectors.p(keyframe_selector.text, toLoc(keyframe_selector))
 					}
 				}
@@ -1002,7 +1002,7 @@ function analyzeInternal<T extends boolean>(
 				// Count selectors and declarations in this rule
 				let numSelectors = 0
 				let numDeclarations = 0
-				let loc = toLoc(node)
+				const loc = toLoc(node)
 
 				// Find the SelectorList child and count Selector nodes inside it
 				if (node.has_prelude && is_selector_list(node.prelude)) {
@@ -1041,13 +1041,13 @@ function analyzeInternal<T extends boolean>(
 				return SKIP
 			}
 
-			let loc = toLoc(node)
+			const loc = toLoc(node)
 
 			selectorNesting.push(depth > 0 ? depth - 1 : 0)
 			uniqueSelectorNesting.p(depth > 0 ? depth - 1 : 0, loc)
 			uniqueSelectors.add(node.text)
 
-			let complexity = getComplexity(node)
+			const complexity = getComplexity(node)
 			selectorComplexities.push(complexity)
 			uniqueSelectorComplexities.p(complexity, loc)
 
@@ -1077,12 +1077,12 @@ function analyzeInternal<T extends boolean>(
 			})
 
 			getCombinators(node, (combinator) => {
-				let name = combinator.name.trim() === '' ? ' ' : combinator.name
+				const name = combinator.name.trim() === '' ? ' ' : combinator.name
 				combinators.p(name, combinator.loc)
 			})
 
-			let specificity = calculateSpecificity(node)
-			let [sa, sb, sc] = specificity
+			const specificity = calculateSpecificity(node)
+			const [sa, sb, sc] = specificity
 
 			uniqueSpecificities.p(specificity.toString(), loc)
 
@@ -1122,11 +1122,11 @@ function analyzeInternal<T extends boolean>(
 			return SKIP
 		} else if (is_declaration(node)) {
 			totalDeclarations++
-			let declaration = node.text
+			const declaration = node.text
 			uniqueDeclarations.add(declaration)
 
-			let loc = toLoc(node)
-			let declarationDepth = depth > 0 ? depth - 1 : 0
+			const loc = toLoc(node)
+			const declarationDepth = depth > 0 ? depth - 1 : 0
 			declarationNesting.push(declarationDepth)
 			uniqueDeclarationNesting.p(declarationDepth, loc)
 
@@ -1146,15 +1146,15 @@ function analyzeInternal<T extends boolean>(
 			declarationComplexities.push(complexity)
 
 			//#region PROPERTIES
-			let { is_important, property, is_browserhack, is_vendor_prefixed } = node
+			const { is_important, property, is_browserhack, is_vendor_prefixed } = node
 
 			if (!property) {
 				return
 			}
 
-			let propertyLoc = toLoc(node)
+			const propertyLoc = toLoc(node)
 			propertyLoc.length = property.length
-			let normalizedProperty = property_basename(property)
+			const normalizedProperty = property_basename(property)
 
 			properties.p(normalizedProperty, propertyLoc)
 
@@ -1189,7 +1189,7 @@ function analyzeInternal<T extends boolean>(
 			//#region VALUES
 			// Values are analyzed inside declaration because we need context, like which property is used
 			{
-				let value = node.value
+				const value = node.value
 				if (!value) {
 					return
 				}
@@ -1198,7 +1198,7 @@ function analyzeInternal<T extends boolean>(
 				}
 
 				let { text } = value
-				let valueLoc = toLoc(value)
+				const valueLoc = toLoc(value)
 				let complexity = 1
 
 				// auto, inherit, initial, none, etc.
@@ -1232,7 +1232,7 @@ function analyzeInternal<T extends boolean>(
 				}
 				//#endregion VALUE COMPLEXITY
 
-				// TODO: should shorthands be counted towards complexity?
+				// Open question: should shorthands be counted towards complexity?
 				valueComplexities.push(complexity)
 
 				// Process properties first that don't have colors,
@@ -1252,7 +1252,7 @@ function analyzeInternal<T extends boolean>(
 					return SKIP
 				} else if (normalizedProperty === 'font') {
 					if (!SYSTEM_FONTS.has(text)) {
-						let result = destructure(value, function (keyword) {
+						const result = destructure(value, function (keyword) {
 							valueKeywords.p(keyword.toLowerCase(), valueLoc)
 						})
 
@@ -1260,7 +1260,7 @@ function analyzeInternal<T extends boolean>(
 							return SKIP
 						}
 
-						let { font_size, line_height, font_family } = result
+						const { font_size, line_height, font_family } = result
 						if (font_family) {
 							fontFamilies.p(font_family, valueLoc)
 						}
@@ -1295,7 +1295,7 @@ function analyzeInternal<T extends boolean>(
 						lineHeights.p(text, valueLoc)
 					}
 				} else if (normalizedProperty === 'transition' || normalizedProperty === 'animation') {
-					let isAnimation = normalizedProperty === 'animation'
+					const isAnimation = normalizedProperty === 'animation'
 					analyzeAnimation(value, function (item) {
 						if (item.type === 'fn') {
 							timingFunctions.p(item.value.text.toLowerCase(), valueLoc)
@@ -1304,7 +1304,7 @@ function analyzeInternal<T extends boolean>(
 						} else if (item.type === 'keyword') {
 							valueKeywords.p(item.value.text.toLowerCase(), valueLoc)
 						} else if (item.type === 'name' && isAnimation) {
-							let name = unquote(item.value.text)
+							const name = unquote(item.value.text)
 							animationNames.p(name, valueLoc)
 							animationNamesTracking.use(name)
 						}
@@ -1314,9 +1314,9 @@ function analyzeInternal<T extends boolean>(
 					normalizedProperty === 'animation-duration' ||
 					normalizedProperty === 'transition-duration'
 				) {
-					for (let child of value.children) {
+					for (const child of value.children) {
 						if (!is_operator(child)) {
-							let text = child.text
+							const text = child.text
 							if (/var\(/i.test(text)) {
 								durations.p(text, valueLoc)
 							} else {
@@ -1328,24 +1328,24 @@ function analyzeInternal<T extends boolean>(
 					normalizedProperty === 'transition-timing-function' ||
 					normalizedProperty === 'animation-timing-function'
 				) {
-					for (let child of value.children) {
+					for (const child of value.children) {
 						if (!is_operator(child)) {
 							timingFunctions.p(child.text, valueLoc)
 						}
 					}
 				} else if (normalizedProperty === 'animation-name') {
-					for (let child of value.children) {
+					for (const child of value.children) {
 						if (is_identifier(child) && !keywords.has(child.name)) {
 							animationNames.p(child.text, valueLoc)
 							animationNamesTracking.use(child.text)
 						} else if (is_string(child)) {
-							let name = unquote(child.text)
+							const name = unquote(child.text)
 							animationNames.p(name, valueLoc)
 							animationNamesTracking.use(name)
 						}
 					}
 				} else if (normalizedProperty === 'container-name') {
-					for (let child of value.children) {
+					for (const child of value.children) {
 						if (is_identifier(child) && !keywords.has(child.name)) {
 							containerNames.p(child.text, toLoc(child))
 							containerNamesTracking.define(child.text)
@@ -1361,7 +1361,7 @@ function analyzeInternal<T extends boolean>(
 						}
 					}
 				} else if (normalizedProperty === 'anchor-name') {
-					for (let child of value.children) {
+					for (const child of value.children) {
 						if (is_identifier(child) && is_custom(child.text)) {
 							anchorNamesTracking.define(child.text)
 						}
@@ -1384,19 +1384,19 @@ function analyzeInternal<T extends boolean>(
 
 				walk(value, (valueNode) => {
 					if (is_dimension(valueNode)) {
-						let unit = valueNode.unit.toLowerCase()
-						let loc = toLoc(valueNode)
+						const unit = valueNode.unit.toLowerCase()
+						const loc = toLoc(valueNode)
 						units.push(unit, property, loc)
 						return SKIP
 					}
 
 					if (is_hash(valueNode)) {
 						// Use text property for the hash value
-						let hashText = valueNode.text
+						const hashText = valueNode.text
 						if (!hashText || !hashText.startsWith('#')) {
 							return SKIP
 						}
-						let hashValue = hashText.toLowerCase()
+						const hashValue = hashText.toLowerCase()
 
 						// Calculate hex length (excluding the # and any IE9 browserhack \9)
 						let hexLength = hashValue.length - 1 // Remove the # from length
@@ -1404,7 +1404,7 @@ function analyzeInternal<T extends boolean>(
 							hexLength = hexLength - 2 // Remove the \9 or \7 from length
 						}
 
-						let hashLoc = toLoc(valueNode)
+						const hashLoc = toLoc(valueNode)
 						colors.push(hashValue, property, hashLoc)
 						colorFormats.p(`hex` + hexLength, hashLoc)
 
@@ -1412,8 +1412,8 @@ function analyzeInternal<T extends boolean>(
 					}
 
 					if (is_identifier(valueNode)) {
-						let identifierText = valueNode.text
-						let identifierLoc = toLoc(valueNode)
+						const identifierText = valueNode.text
+						const identifierLoc = toLoc(valueNode)
 
 						// Skip all identifier processing for font properties to avoid:
 						// 1. False positives for colors (e.g., "Black" as a font family vs. "black" the color)
@@ -1429,14 +1429,14 @@ function analyzeInternal<T extends boolean>(
 						// Bail out if it can't be a color name
 						// 20 === 'lightgoldenrodyellow'.length
 						// 3 === 'red'.length
-						let nodeLen = identifierText.length
+						const nodeLen = identifierText.length
 						if (nodeLen > 20 || nodeLen < 3) {
 							return SKIP
 						}
 
 						// A keyword is most likely to be 'transparent' or 'currentColor'
 						if (colorKeywords.has(identifierText)) {
-							let colorKeyword = identifierText.toLowerCase()
+							const colorKeyword = identifierText.toLowerCase()
 							colors.push(colorKeyword, property, identifierLoc)
 							colorFormats.p(colorKeyword, identifierLoc)
 							return
@@ -1459,13 +1459,13 @@ function analyzeInternal<T extends boolean>(
 					}
 
 					if (is_function(valueNode)) {
-						let funcName = valueNode.name
-						let funcLoc = toLoc(valueNode)
-						let firstFuncChild = valueNode.first_child
+						const funcName = valueNode.name
+						const funcLoc = toLoc(valueNode)
+						const firstFuncChild = valueNode.first_child
 
 						// Track var(--custom-property) usage
 						if (str_equals('var', funcName) && firstFuncChild && is_identifier(firstFuncChild)) {
-							let name = firstFuncChild.text
+							const name = firstFuncChild.text
 							if (is_custom(name)) {
 								customPropsTracking.use(name)
 							}
@@ -1498,16 +1498,16 @@ function analyzeInternal<T extends boolean>(
 			}
 			//#endregion VALUES
 		} else if (is_url(node)) {
-			let { value } = node
-			let embed = unquote(value ?? '')
+			const { value } = node
+			const embed = unquote(value ?? '')
 			if (str_starts_with('data:', embed)) {
-				let size = embed.length
-				let type = getEmbedType(embed)
+				const size = embed.length
+				const type = getEmbedType(embed)
 
 				embedTypes.total++
 				embedSize += size
 
-				let loc = {
+				const loc = {
 					line: node.line,
 					column: node.column,
 					offset: node.start,
@@ -1515,7 +1515,7 @@ function analyzeInternal<T extends boolean>(
 				}
 
 				if (embedTypes.unique.has(type)) {
-					let item = embedTypes.unique.get(type)!
+					const item = embedTypes.unique.get(type)!
 					item.count++
 					item.size += size
 					embedTypes.unique.set(type, item)
@@ -1523,7 +1523,7 @@ function analyzeInternal<T extends boolean>(
 						item.uniqueWithLocations.push(loc)
 					}
 				} else {
-					let item = {
+					const item = {
 						count: 1,
 						size,
 						uniqueWithLocations: useLocations ? [loc] : undefined,
@@ -1537,22 +1537,22 @@ function analyzeInternal<T extends boolean>(
 		}
 	})
 
-	let totalUniqueDeclarations = uniqueDeclarations.size
+	const totalUniqueDeclarations = uniqueDeclarations.size
 
-	let totalSelectors = selectorComplexities.size()
-	let specificitiesA = specificityA.aggregate()
-	let specificitiesB = specificityB.aggregate()
-	let specificitiesC = specificityC.aggregate()
-	let totalUniqueSelectors = uniqueSelectors.size
-	let assign = Object.assign
-	let cssLen = css.length
-	let fontFacesCount = fontfaces.length
-	let atRuleComplexity = atRuleComplexities.aggregate()
-	let selectorComplexity = selectorComplexities.aggregate()
-	let declarationComplexity = declarationComplexities.aggregate()
-	let propertyComplexity = propertyComplexities.aggregate()
-	let valueComplexity = valueComplexities.aggregate()
-	let atruleCount = atrules.c()
+	const totalSelectors = selectorComplexities.size()
+	const specificitiesA = specificityA.aggregate()
+	const specificitiesB = specificityB.aggregate()
+	const specificitiesC = specificityC.aggregate()
+	const totalUniqueSelectors = uniqueSelectors.size
+	const assign = Object.assign
+	const cssLen = css.length
+	const fontFacesCount = fontfaces.length
+	const atRuleComplexity = atRuleComplexities.aggregate()
+	const selectorComplexity = selectorComplexities.aggregate()
+	const declarationComplexity = declarationComplexities.aggregate()
+	const propertyComplexity = propertyComplexities.aggregate()
+	const valueComplexity = valueComplexities.aggregate()
+	const atruleCount = atrules.c()
 
 	return {
 		stylesheet: {

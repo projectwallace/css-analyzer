@@ -96,7 +96,7 @@ export function destructure(
 		}
 	}
 
-	let children = value.children
+	const children = value.children
 	let font_size: string | undefined
 	let line_height: string | undefined
 	// Index of the first child node that belongs to font-family (-1 = none found)

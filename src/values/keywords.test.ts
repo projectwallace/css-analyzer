@@ -59,15 +59,15 @@ test('normalizes keyword casing', () => {
 })
 
 test('finds global keywords in shorthands', () => {
-	let fixture = `
+	const fixture = `
 		a {
 			animation: myAnimation 2s infinite inherit;
 			margin: 0 auto;
 			font: italic bold 16px/1.5 Arial, sans-serif inherit;
 		}
 	`
-	let actual = analyze(fixture).values.keywords
-	let expected = {
+	const actual = analyze(fixture).values.keywords
+	const expected = {
 		total: 3,
 		totalUnique: 2,
 		unique: {
@@ -81,14 +81,14 @@ test('finds global keywords in shorthands', () => {
 })
 
 test('finds global keywords in multi-values', () => {
-	let fixture = `
+	const fixture = `
 		a {
 			background-size: auto, 50%;
 			animation: myAnimation1 2s infinite inherit, myAnimation2 2s infinite inherit;
 		}
 	`
-	let actual = analyze(fixture).values.keywords
-	let expected = {
+	const actual = analyze(fixture).values.keywords
+	const expected = {
 		total: 3,
 		totalUnique: 2,
 		unique: {
