@@ -28,33 +28,33 @@ import {
 	is_function,
 	is_operator,
 	is_string,
+	property_basename,
 } from '@projectwallace/css-parser'
-import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
-import { getCombinators, getComplexity, isPrefixed, isAccessibility } from './selectors/utils.js'
-import { calculateForAST as calculateSpecificity } from './selectors/specificity.js'
-import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
-import { destructure, SYSTEM_FONTS } from './values/destructure-font-shorthand.js'
-import { keywords, isValueReset } from './values/values.js'
-import { analyzeAnimation } from './values/animations.js'
-import { isValuePrefixed } from './values/vendor-prefix.js'
-import { isValueBrowserhack } from './values/browserhacks.js'
-import { ContextCollection } from './context-collection.js'
+import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.ts'
+import { getCombinators, getComplexity, isPrefixed, isAccessibility } from './selectors/utils.ts'
+import { calculateForAST as calculateSpecificity } from './selectors/specificity.ts'
+import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.ts'
+import { destructure, SYSTEM_FONTS } from './values/destructure-font-shorthand.ts'
+import { keywords, isValueReset } from './values/values.ts'
+import { analyzeAnimation } from './values/animations.ts'
+import { isValuePrefixed } from './values/vendor-prefix.ts'
+import { isValueBrowserhack } from './values/browserhacks.ts'
+import { ContextCollection } from './context-collection.ts'
 import {
 	Collection,
 	type CollectionCount,
 	type Location,
 	type UniqueWithLocations,
-} from './collection.js'
-import { AggregateCollection } from './aggregate-collection.js'
-import { DefinedUsed, type DefinedUsedResult } from './defined-used.js'
-import { endsWith, unquote } from './string-utils.js'
-import { getEmbedType } from './stylesheet/stylesheet.js'
+} from './collection.ts'
+import { AggregateCollection } from './aggregate-collection.ts'
+import { DefinedUsed, type DefinedUsedResult } from './defined-used.ts'
+import { endsWith, unquote } from './string-utils.ts'
+import { getEmbedType } from './stylesheet/stylesheet.ts'
 import {
-	basename,
 	SPACING_RESET_PROPERTIES,
 	border_radius_properties,
 	shorthand_properties,
-} from './properties/property-utils.js'
+} from './properties/property-utils.ts'
 
 export type Specificity = [number, number, number]
 
@@ -865,7 +865,7 @@ function analyzeInternal<T extends boolean>(
 			let atruleLoc = toLoc(node)
 			atruleNesting.push(depth)
 			uniqueAtruleNesting.p(depth, atruleLoc)
-			let normalized_name = basename(node.name ?? '')
+			let normalized_name = property_basename(node.name ?? '')
 			atrules.p(normalized_name, atruleLoc)
 
 			//#region @FONT-FACE
@@ -1153,7 +1153,7 @@ function analyzeInternal<T extends boolean>(
 
 			let propertyLoc = toLoc(node)
 			propertyLoc.length = property.length
-			let normalizedProperty = basename(property)
+			let normalizedProperty = property_basename(property)
 
 			properties.p(normalizedProperty, propertyLoc)
 
@@ -1800,30 +1800,30 @@ export function compareSpecificity(a: Specificity, b: Specificity): number {
 	return b[0] - a[0]
 }
 
-export { calculate as calculateSpecificity } from './selectors/specificity.js'
+export { calculate as calculateSpecificity } from './selectors/specificity.ts'
 
 export {
 	getComplexity as selectorComplexity,
 	isPrefixed as isSelectorPrefixed,
 	isAccessibility as isAccessibilitySelector,
-} from './selectors/utils.js'
+} from './selectors/utils.ts'
 
-export { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
+export { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.ts'
 
-export { isHack as isPropertyHack } from './properties/property-utils.js'
+export { isHack as isPropertyHack } from './properties/property-utils.ts'
 
-export { isValuePrefixed } from './values/vendor-prefix.js'
+export { isValuePrefixed } from './values/vendor-prefix.ts'
 
-export { isValueBrowserhack } from './values/browserhacks.js'
+export { isValueBrowserhack } from './values/browserhacks.ts'
 
-export { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
+export { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.ts'
 
-export { keywords as cssKeywords } from './values/values.js'
+export { keywords as cssKeywords } from './values/values.ts'
 
-export { hasVendorPrefix } from './vendor-prefix.js'
+export { hasVendorPrefix } from './vendor-prefix.ts'
 
-export { KeywordSet } from './keyword-set.js'
+export { KeywordSet } from './keyword-set.ts'
 
-export { DefinedUsed, type DefinedUsedResult } from './defined-used.js'
+export { DefinedUsed, type DefinedUsedResult } from './defined-used.ts'
 
-export type { Location, UniqueWithLocations } from './collection.js'
+export type { Location, UniqueWithLocations } from './collection.ts'
