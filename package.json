@@ -31,6 +31,7 @@
 		"dist"
 	],
 	"type": "module",
+	"sideEffects": false,
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"exports": {
@@ -64,7 +65,8 @@
 		"test": "vitest --coverage",
 		"check": "tsc --noEmit",
 		"build": "tsdown",
-		"knip": "knip"
+		"knip": "knip",
+		"precommit": "pnpm run test --run && pnpm run check && pnpm run lint && pnpm run knip"
 	},
 	"dependencies": {
 		"@projectwallace/css-parser": "~0.19.0"
