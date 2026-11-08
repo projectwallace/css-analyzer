@@ -1,5 +1,5 @@
 import { KeywordSet } from '../keyword-set.ts'
-import { is_custom, is_vendor_prefixed } from '@projectwallace/css-parser'
+import { is_custom, is_vendor_prefixed, property_basename } from '@projectwallace/css-parser'
 
 export const shorthand_properties: Set<string> = new Set([
 	'all',
@@ -110,21 +110,7 @@ export function is_hack(property: string): boolean {
 }
 
 /**
- * Get the normalized basename for a property with a vendor prefix
- * @returns The property name without vendor prefix
+ * Normalized property name: lowercased, without vendor prefix or hack character.
+ * Custom properties are returned as written. Alias of css-parser's `property_basename()`.
  */
-export function basename(property: string): string {
-	if (is_custom(property)) {
-		return property
-	}
-
-	if (is_vendor_prefixed(property)) {
-		return property.slice(property.indexOf('-', 2) + 1).toLowerCase()
-	}
-
-	if (is_hack(property)) {
-		return property.slice(1).toLowerCase()
-	}
-
-	return property.toLowerCase()
-}
+export const basename: (property: string) => string = property_basename

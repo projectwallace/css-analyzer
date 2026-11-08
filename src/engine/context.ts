@@ -5,8 +5,9 @@ import {
 	type Value,
 	is_custom,
 	is_raw,
+	property_basename,
+	strip_value_hack,
 } from '@projectwallace/css-parser'
-import { basename } from '../properties/property-utils.ts'
 import {
 	SYSTEM_FONTS,
 	destructure_font_shorthand,
@@ -60,7 +61,7 @@ export function create_context(): ContextController {
 			return rule_stack.at(-1)
 		},
 		get property() {
-			property_cache ??= basename(ctx.raw_property)
+			property_cache ??= property_basename(ctx.raw_property)
 			return property_cache
 		},
 		get raw_property() {
@@ -88,10 +89,7 @@ export function create_context(): ContextController {
 				clean_loaded = true
 				const text = ctx.value_text
 				if (ctx.value && !keywords.has(text)) {
-					clean_text =
-						!ctx.is_custom && (text.endsWith('\\9') || text.endsWith('\\7'))
-							? text.slice(0, -2)
-							: text
+					clean_text = ctx.is_custom ? text : strip_value_hack(text)
 				} else {
 					clean_text = undefined
 				}
@@ -148,7 +146,7 @@ export function create_context(): ContextController {
 			depth--
 		},
 		enter_atrule(atrule) {
-			atrule_stack.push(basename((atrule as Atrule).name ?? ''))
+			atrule_stack.push(property_basename((atrule as Atrule).name ?? ''))
 			depth++
 		},
 		leave_atrule() {

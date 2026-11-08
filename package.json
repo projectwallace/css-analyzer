@@ -76,7 +76,7 @@
 		"knip": "knip"
 	},
 	"dependencies": {
-		"@projectwallace/css-parser": "~0.19.0"
+		"@projectwallace/css-parser": "https://pkg.pr.new/@projectwallace/css-parser@44d813e"
 	},
 	"devDependencies": {
 		"@projectwallace/preset-oxlint": "^0.0.12",
