@@ -1,6 +1,6 @@
 import { test, expect, describe } from 'vitest'
-import { DefinedUsed } from './defined-used.js'
-import { analyze } from './index.js'
+import { DefinedUsed } from './defined-used.ts'
+import { analyze } from './index.ts'
 
 describe('DefinedUsed class', () => {
 	test('starts empty', () => {

@@ -12,9 +12,15 @@
 		"noUncheckedIndexedAccess": true,
 		"noImplicitAny": true,
 
+		// Node-compatible module resolution: relative imports must include a file
+		// extension, and we use `.ts` so source runs as-is with Node's type stripping
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
+		"allowImportingTsExtensions": true,
+		"rewriteRelativeImportExtensions": true,
+		"erasableSyntaxOnly": true,
+
 		// Type checking, not transpiling
-		"module": "ESNext",
-		"moduleResolution": "bundler",
 		"allowSyntheticDefaultImports": true,
 		"noEmit": true,
 		"declaration": true,

@@ -1,4 +1,4 @@
-import { Collection, type CollectionCount, type Location } from './collection.js'
+import { Collection, type CollectionCount, type Location } from './collection.ts'
 
 export class ContextCollection<UseLocations extends boolean = false> {
 	#list: Collection<UseLocations>

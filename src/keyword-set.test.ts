@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { KeywordSet } from './keyword-set.js'
+import { KeywordSet } from './keyword-set.ts'
 
 test('happy path', () => {
 	expect(new KeywordSet([]).has('a')).toEqual(false)

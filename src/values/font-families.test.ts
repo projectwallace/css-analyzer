@@ -1,7 +1,7 @@
 // oxlint-disable no-unused-expressions
 import { test } from 'vitest'
 import { expect } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze } from '../index.ts'
 
 test('recognizes a font-family', () => {
 	const fixture = `

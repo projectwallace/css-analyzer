@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze } from '../index.ts'
 
 test('counts Accessibility selectors', () => {
 	const fixture = `

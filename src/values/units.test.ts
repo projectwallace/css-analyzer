@@ -1,6 +1,6 @@
 import { test } from 'vitest'
 import { expect } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze } from '../index.ts'
 
 test('analyzes length units', () => {
 	const fixture = `
