@@ -303,7 +303,7 @@ export function analyze<C extends CollectorMap>(
 		},
 	})
 
-	const result: Record<string, unknown> = {}
+	const result: Record<string, unknown> = Object.create(null)
 	keys.forEach(function (key, index) {
 		result[key] = instances[index]!.result()
 	})
