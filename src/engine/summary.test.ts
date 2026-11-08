@@ -5,9 +5,9 @@ import { summarize_frequencies, summarize_numbers } from './summary.js'
 const at = { loc: { line: 1, column: 1, offset: 0, length: 1 } }
 
 function count(values: number[]) {
-	const counter = create_counter()
+	const counter = create_counter<number>()
 	for (const value of values) {
-		counter.add(String(value), at)
+		counter.add(value, at)
 	}
 	return counter.result()
 }

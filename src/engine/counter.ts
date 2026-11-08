@@ -1,26 +1,27 @@
 import type {
 	ContextCountOptions,
 	ContextCountResult,
-	CountEntry,
+	CountItem,
+	CountMap,
 	CountOptions,
 	CountResult,
 	LocationSource,
 } from './types.js'
 
-export type Counter = {
+export type Counter<T extends CountItem = string> = {
 	/** Count `item`. Pass the context (or `ctx.at(node)`); its location is only read if locations are enabled. */
-	add(item: string, at: LocationSource): void
-	result(): CountResult
+	add(item: T, at: LocationSource): void
+	result(): CountResult<T>
 }
 
-export type ContextCounter = {
-	add(item: string, context: string, at: LocationSource): void
-	result(): ContextCountResult
+export type ContextCounter<T extends CountItem = string> = {
+	add(item: T, context: string, at: LocationSource): void
+	result(): ContextCountResult<T>
 }
 
-function add_to(
-	map: Map<string, CountEntry>,
-	item: string,
+function add_to<T extends CountItem>(
+	map: CountMap<T>,
+	item: T,
 	at: LocationSource,
 	locations: boolean,
 ): void {
@@ -35,9 +36,9 @@ function add_to(
 	map.set(item, locations ? { count: 1, locations: [at.loc] } : { count: 1 })
 }
 
-function to_result(map: Map<string, CountEntry>, total: number): CountResult {
+function to_result<T extends CountItem>(map: CountMap<T>, total: number): CountResult<T> {
 	// Copy so that results stay stable if more input is added afterwards
-	const unique = new Map<string, CountEntry>()
+	const unique: CountMap<T> = new Map()
 	for (const [item, entry] of map) {
 		unique.set(
 			item,
@@ -49,19 +50,22 @@ function to_result(map: Map<string, CountEntry>, total: number): CountResult {
 	return { total, total_unique: unique.size, unique }
 }
 
-export function create_counter(options: CountOptions = {}): Counter {
+/** Count strings (the default) or numbers: `create_counter<number>()` */
+export function create_counter<T extends CountItem = string>(
+	options: CountOptions = {},
+): Counter<T> {
 	const locations = options.locations === true
-	const sequence: string[] | undefined = options.sequence === true ? [] : undefined
-	const map = new Map<string, CountEntry>()
+	const sequence: T[] | undefined = options.sequence === true ? [] : undefined
+	const map: CountMap<T> = new Map()
 	let total = 0
 
-	function add(item: string, at: LocationSource): void {
+	function add(item: T, at: LocationSource): void {
 		total++
 		sequence?.push(item)
 		add_to(map, item, at, locations)
 	}
 
-	function result(): CountResult {
+	function result(): CountResult<T> {
 		const counted = to_result(map, total)
 		if (sequence) {
 			counted.sequence = sequence.slice()
@@ -72,14 +76,16 @@ export function create_counter(options: CountOptions = {}): Counter {
 	return { add, result }
 }
 
-export function create_context_counter(options: ContextCountOptions = {}): ContextCounter {
+export function create_context_counter<T extends CountItem = string>(
+	options: ContextCountOptions = {},
+): ContextCounter<T> {
 	const locations = options.locations === true
 	const track_contexts = options.contexts === true
-	const map = new Map<string, CountEntry>()
-	const contexts = new Map<string, { map: Map<string, CountEntry>; total: number }>()
+	const map: CountMap<T> = new Map()
+	const contexts = new Map<string, { map: CountMap<T>; total: number }>()
 	let total = 0
 
-	function add(item: string, context: string, at: LocationSource): void {
+	function add(item: T, context: string, at: LocationSource): void {
 		total++
 		add_to(map, item, at, locations)
 		if (!track_contexts) {
@@ -94,8 +100,8 @@ export function create_context_counter(options: ContextCountOptions = {}): Conte
 		add_to(scoped.map, item, at, locations)
 	}
 
-	function result(): ContextCountResult {
-		const by_context = new Map<string, CountResult>()
+	function result(): ContextCountResult<T> {
+		const by_context = new Map<string, CountResult<T>>()
 		for (const [context, scoped] of contexts) {
 			by_context.set(context, to_result(scoped.map, scoped.total))
 		}
@@ -106,7 +112,7 @@ export function create_context_counter(options: ContextCountOptions = {}): Conte
 }
 
 /** Derived numbers for a count result. Kept out of the core so unused stats cost nothing. */
-export function summarize(counts: CountResult): { uniqueness_ratio: number } {
+export function summarize(counts: CountResult<CountItem>): { uniqueness_ratio: number } {
 	return {
 		uniqueness_ratio: counts.total === 0 ? 0 : counts.total_unique / counts.total,
 	}

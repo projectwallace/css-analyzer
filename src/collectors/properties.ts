@@ -25,7 +25,7 @@ export type PropertiesResult = CountResult & {
 	/** The hack character (`*`, `_`, ...) of property hacks */
 	browserhacks: CountResult
 	/** 1, 2 for prefixed/hacked/custom, 3 for important custom properties. Items are numbers. */
-	complexity: CountResult
+	complexity: CountResult<number>
 	/** `anchor-name` / `position-anchor` names, defined and used */
 	anchor_names: DefinedUsedResult
 }
@@ -47,7 +47,7 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 		const custom_importants = create_counter(options)
 		const shorthands = create_counter(options)
 		const browserhacks = create_counter(options)
-		const complexity = create_counter(options)
+		const complexity = create_counter<number>(options)
 		const custom_tracking = new DefinedUsed()
 		const anchor_tracking = new DefinedUsed()
 
@@ -76,20 +76,20 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 				names.add(ctx.property, property_at)
 
 				if (ctx.is_vendor_prefixed) {
-					complexity.add('2', property_at)
+					complexity.add(2, property_at)
 					prefixed.add(raw, property_at)
 				} else if (ctx.is_custom) {
 					custom.add(raw, property_at)
 					custom_tracking.define(raw)
-					complexity.add(ctx.is_important ? '3' : '2', property_at)
+					complexity.add(ctx.is_important ? 3 : 2, property_at)
 					if (ctx.is_important) {
 						custom_importants.add(raw, property_at)
 					}
 				} else if (ctx.is_browserhack) {
 					browserhacks.add(raw.charAt(0), property_at)
-					complexity.add('2', property_at)
+					complexity.add(2, property_at)
 				} else {
-					complexity.add('1', property_at)
+					complexity.add(1, property_at)
 				}
 
 				if (shorthand_properties.has(ctx.property)) {

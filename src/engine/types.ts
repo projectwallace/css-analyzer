@@ -49,17 +49,23 @@ export type CountEntry = {
 	locations?: Location[]
 }
 
+/** Unique items with how often (and where) each was found */
+export type CountMap<T extends CountItem = string> = Map<T, CountEntry>
+
+/** What can be counted: text (properties, selectors, values) or numbers (complexity, nesting). Never both. */
+export type CountItem = string | number
+
 /** The one and only way counted things are reported */
-export type CountResult = {
+export type CountResult<T extends CountItem = string> = {
 	total: number
 	total_unique: number
-	unique: Map<string, CountEntry>
+	unique: CountMap<T>
 	/** Every counted item in the order it was found. Only present with `{ sequence: true }`. */
-	sequence?: string[]
+	sequence?: T[]
 }
 
-export type ContextCountResult = CountResult & {
-	by_context: Map<string, CountResult>
+export type ContextCountResult<T extends CountItem = string> = CountResult<T> & {
+	by_context: Map<string, CountResult<T>>
 }
 
 export type CountOptions = {

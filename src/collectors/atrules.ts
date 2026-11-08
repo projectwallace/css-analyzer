@@ -109,9 +109,9 @@ export type AtrulesResult = CountResult & {
 	functions: CountResult
 	scopes: CountResult
 	/** 1 per at-rule, plus 1 for hacks and prefixed keyframes. Items are numbers. */
-	complexity: CountResult
+	complexity: CountResult<number>
 	/** Items are numbers */
-	nesting: CountResult
+	nesting: CountResult<number>
 }
 
 const CONTAINER_PROPERTIES = new Set(['container-name', 'container'])
@@ -140,8 +140,8 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 		const registered = create_counter(without_sequence(options))
 		const functions = create_counter(without_sequence(options))
 		const scopes = create_counter(without_sequence(options))
-		const complexity = create_counter(without_sequence(options))
-		const nesting = create_counter(options)
+		const complexity = create_counter<number>(without_sequence(options))
+		const nesting = create_counter<number>(options)
 		const keyframes_tracking = new DefinedUsed()
 		const container_tracking = new DefinedUsed()
 		const layer_tracking = new DefinedUsed()
@@ -160,7 +160,7 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 				const prelude_text = prelude?.text
 				const block = node.block
 				names.add(name, ctx)
-				nesting.add(String(ctx.depth), ctx)
+				nesting.add(ctx.depth, ctx)
 
 				for (const feature of find_media_features(prelude)) {
 					media_features.add(feature.property.toLowerCase(), ctx.at(feature))
@@ -170,14 +170,14 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 					font_faces.total++
 					font_faces.items.push({ ...get_descriptors(block) })
 					font_faces.locations?.push(ctx.loc)
-					complexity.add('1', ctx)
+					complexity.add(1, ctx)
 				}
 
 				if (prelude_text === undefined) {
 					if (name === 'layer') {
 						// @layer without a prelude is anonymous
 						layers.add('<anonymous>', ctx)
-						complexity.add('2', ctx)
+						complexity.add(2, ctx)
 					}
 					return
 				}
@@ -243,7 +243,7 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 					scopes.add(prelude_text, ctx)
 				}
 
-				complexity.add(String(weight), ctx)
+				complexity.add(weight, ctx)
 			},
 			declaration: {
 				properties: new Set([...CONTAINER_PROPERTIES, ...ANIMATION_PROPERTIES]),

@@ -84,11 +84,10 @@ export function summarize_frequencies(frequencies: ReadonlyMap<number, number>):
 }
 
 /** Statistics for a count result whose items are numbers (e.g. nesting depths, complexities) */
-export function summarize_numbers(counts: CountResult): NumberSummary {
+export function summarize_numbers(counts: CountResult<number>): NumberSummary {
 	const frequencies = new Map<number, number>()
 	for (const [item, { count }] of counts.unique) {
-		const value = Number(item)
-		frequencies.set(value, (frequencies.get(value) ?? 0) + count)
+		frequencies.set(item, count)
 	}
 	return summarize_frequencies(frequencies)
 }

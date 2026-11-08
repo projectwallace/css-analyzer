@@ -7,10 +7,10 @@ export type RulesResult = {
 	total: number
 	empty: number
 	/** Selectors + declarations per rule. Items are numbers. */
-	sizes: CountResult
-	nesting: CountResult
-	selectors: CountResult
-	declarations: CountResult
+	sizes: CountResult<number>
+	nesting: CountResult<number>
+	selectors: CountResult<number>
+	declarations: CountResult<number>
 }
 
 /**
@@ -19,10 +19,10 @@ export type RulesResult = {
  */
 export function rules(options: CountOptions = {}): CollectorDef<RulesResult> {
 	return define_collector<RulesResult>(function init() {
-		const sizes = create_counter(options)
-		const nesting = create_counter(options)
-		const selectors = create_counter(options)
-		const declarations = create_counter(options)
+		const sizes = create_counter<number>(options)
+		const nesting = create_counter<number>(options)
+		const selectors = create_counter<number>(options)
+		const declarations = create_counter<number>(options)
 		let total = 0
 		let empty = 0
 
@@ -55,10 +55,10 @@ export function rules(options: CountOptions = {}): CollectorDef<RulesResult> {
 					}
 				}
 
-				sizes.add(String(selector_count + declaration_count), ctx)
-				nesting.add(String(ctx.depth), ctx)
-				selectors.add(String(selector_count), ctx)
-				declarations.add(String(declaration_count), ctx)
+				sizes.add(selector_count + declaration_count, ctx)
+				nesting.add(ctx.depth, ctx)
+				selectors.add(selector_count, ctx)
+				declarations.add(declaration_count, ctx)
 			},
 			result: () => ({
 				total,

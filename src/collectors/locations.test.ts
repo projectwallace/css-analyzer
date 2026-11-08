@@ -135,7 +135,7 @@ test('selector complexity lists the selectors per value, however deep they are n
     }
   `
 	const { selectors: result } = analyze(css, { selectors: selectors({ locations: true }) })
-	expect(result.complexity.unique.get('1')?.locations).toEqual([
+	expect(result.complexity.unique.get(1)?.locations).toEqual([
 		{ line: 2, column: 5, offset: 5, length: 4 },
 		{ line: 9, column: 11, offset: 139, length: 12 },
 	])

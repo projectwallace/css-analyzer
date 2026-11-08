@@ -194,8 +194,8 @@ export function value_browserhacks(options: CountOptions = {}): CollectorDef<Cou
  * Complexity of every value: 1, plus 1 for every vendor prefixed value and browserhack.
  * Items are numbers; use `summarize_numbers()` for min, max, mean, ...
  */
-export function value_complexity(options: CountOptions = {}): CollectorDef<CountResult> {
-	return define_counting_collector(options, function setup(counter) {
+export function value_complexity(options: CountOptions = {}): CollectorDef<CountResult<number>> {
+	return define_counting_collector<number>(options, function setup(counter) {
 		return {
 			parse: { values: true },
 			declaration(_node, ctx) {
@@ -209,7 +209,7 @@ export function value_complexity(options: CountOptions = {}): CollectorDef<Count
 						complexity += get_value_browserhacks(ctx.value).length
 					}
 				}
-				counter.add(String(complexity), ctx.at(ctx.value))
+				counter.add(complexity, ctx.at(ctx.value))
 			},
 		}
 	})

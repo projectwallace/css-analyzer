@@ -1,5 +1,5 @@
 import { summarize_numbers } from './engine/summary.js'
-import type { CountResult } from './engine/types.js'
+import type { CountItem, CountResult } from './engine/types.js'
 
 export type PlainCount = {
 	total: number
@@ -14,12 +14,17 @@ export type PlainCount = {
  * `unique` is a record of counts, and per-property counts and formats are plain too.
  */
 export function plain(
-	result: CountResult & { by_context?: Map<string, CountResult>; formats?: CountResult },
+	result: CountResult<CountItem> & {
+		by_context?: Map<string, CountResult<CountItem>>
+		formats?: CountResult
+	},
 ): PlainCount {
 	const counted: PlainCount = {
 		total: result.total,
 		total_unique: result.total_unique,
-		unique: Object.fromEntries([...result.unique].map(([item, { count }]) => [item, count])),
+		unique: Object.fromEntries(
+			[...result.unique].map(([item, { count }]) => [String(item), count]),
+		),
 	}
 	if (result.by_context && result.by_context.size > 0) {
 		counted.by_context = Object.fromEntries(
@@ -44,7 +49,7 @@ export type Series = PlainCount & {
 }
 
 /** A series of counted numbers with its statistics, like 9.x reported them */
-export function series(result: CountResult): Series {
+export function series(result: CountResult<number>): Series {
 	const { min, max, mean, mode, range, sum } = summarize_numbers(result)
 	return {
 		min,
@@ -53,7 +58,7 @@ export function series(result: CountResult): Series {
 		mode,
 		range,
 		sum,
-		items: (result.sequence ?? []).map(Number),
+		items: result.sequence ?? [],
 		...plain(result),
 	}
 }

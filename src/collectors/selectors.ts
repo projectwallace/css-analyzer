@@ -20,9 +20,9 @@ import { get_specificity } from '../selectors/specificity.js'
 
 export type SelectorsResult = CountResult & {
 	/** Items are numbers */
-	complexity: CountResult
+	complexity: CountResult<number>
 	/** Items are numbers */
-	nesting: CountResult
+	nesting: CountResult<number>
 	/** Selectors that contain an ID, counted by selector text */
 	ids: CountResult
 	pseudo_classes: CountResult
@@ -47,8 +47,8 @@ export type SelectorsResult = CountResult & {
 export function selectors(options: CountOptions = {}): CollectorDef<SelectorsResult> {
 	return define_collector<SelectorsResult>(function init() {
 		const texts = create_counter(without_sequence(options))
-		const complexity = create_counter(options)
-		const nesting = create_counter(options)
+		const complexity = create_counter<number>(options)
+		const nesting = create_counter<number>(options)
 		const ids = create_counter(without_sequence(options))
 		const pseudo_classes = create_counter(without_sequence(options))
 		const pseudo_elements = create_counter(without_sequence(options))
@@ -79,8 +79,8 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 				const text = node.text
 
 				texts.add(text, ctx)
-				complexity.add(String(get_complexity(node)[0]), ctx)
-				nesting.add(String(Math.max(ctx.depth - 1, 0)), ctx)
+				complexity.add(get_complexity(node)[0]!, ctx)
+				nesting.add(Math.max(ctx.depth - 1, 0), ctx)
 
 				for (const prefix of get_vendor_prefixes(node)) {
 					prefixed.add(prefix.toLowerCase(), ctx)

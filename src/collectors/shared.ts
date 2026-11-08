@@ -16,6 +16,7 @@ import type {
 	CollectorDef,
 	CollectorInstance,
 	CountOptions,
+	CountItem,
 	CountResult,
 	DeclarationContext,
 } from '../engine/types.js'
@@ -39,12 +40,12 @@ export function lowercase_unless_var(text: string): string {
  * Most collectors just count strings: this wires a counter to a handler set
  * and returns the standard count result.
  */
-export function define_counting_collector(
+export function define_counting_collector<T extends CountItem = string>(
 	options: CountOptions,
-	setup: (counter: Counter) => Omit<CollectorInstance<CountResult>, 'result'>,
-): CollectorDef<CountResult> {
-	return define_collector<CountResult>(function init() {
-		const counter = create_counter(options)
+	setup: (counter: Counter<T>) => Omit<CollectorInstance<CountResult<T>>, 'result'>,
+): CollectorDef<CountResult<T>> {
+	return define_collector<CountResult<T>>(function init() {
+		const counter = create_counter<T>(options)
 		return { ...setup(counter), result: () => counter.result() }
 	})
 }

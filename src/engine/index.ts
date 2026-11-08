@@ -12,6 +12,8 @@ export type {
 	ContextCountOptions,
 	ContextCountResult,
 	CountEntry,
+	CountItem,
+	CountMap,
 	CountOptions,
 	CountResult,
 	DeclarationContext,

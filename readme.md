@@ -84,7 +84,7 @@ Numeric series (nesting, sizes, complexity, specificity) are counted as values. 
 ```js
 import { rules } from '@projectwallace/css-analyzer/collectors'
 const { r } = analyze(css, { r: rules({ sequence: true }) })
-r.sizes.sequence // ['2', '3', '1']
+r.sizes.sequence // [2, 3, 1]
 ```
 
 Use `summarize_numbers(result.sizes)` for min, max, mean, mode, median, range and sum.
