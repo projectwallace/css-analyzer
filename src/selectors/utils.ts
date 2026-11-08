@@ -56,7 +56,7 @@ export function isAccessibility(
 	on_selector: (a11y_selector: string) => void,
 ): void {
 	function normalize(node: CSSNode) {
-		let clone = node.clone()
+		const clone = node.clone()
 		// We're intentionally not adding attr_flags here because they don't matter for normalization
 		// Also not lowercasing node.value because that DOES matter for CSS
 		if (clone.value) {
@@ -103,8 +103,6 @@ export function getComplexity(selector: CSSNode): number {
 	}
 
 	walk(selector, function (node) {
-		const type = node.type
-
 		// Skip Selector nodes (don't count the selector container itself)
 		if (is_selector(node)) {
 			return

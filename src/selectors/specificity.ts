@@ -58,12 +58,12 @@ function argument_specificity(node: CSSNode): Specificity {
 	return [a, b, c]
 }
 
-export const calculateForAST = (selectorAST: Selector): Specificity => {
+export function calculateForAST(selectorAST: Selector): Specificity {
 	// https://www.w3.org/TR/selectors-4/#specificity-rules
 	let a = 0 /* ID Selectors */
 	let b = 0 /* Class selectors, Attributes selectors, and Pseudo-classes */
 	let c = 0 /* Type selectors and Pseudo-elements */
-	const add = ([x, y, z]: Specificity) => {
+	function add([x, y, z]: Specificity) {
 		a += x
 		b += y
 		c += z
@@ -230,7 +230,7 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 	return [a, b, c]
 }
 
-export const calculate = (selector: string | CSSNode): Specificity[] => {
+export function calculate(selector: string | CSSNode): Specificity[] {
 	if (!selector) {
 		return []
 	}

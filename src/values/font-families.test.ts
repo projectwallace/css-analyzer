@@ -97,7 +97,7 @@ test('does not crash on 14px "Inter Var", sans-serif, 700', () => {
 	expect(() => {
 		analyze(fixture).values.fontFamilies
 	}).not.toThrow()
-	let { fontFamilies, fontSizes } = analyze(fixture).values
+	const { fontFamilies, fontSizes } = analyze(fixture).values
 	expect(fontFamilies.unique).toEqual({
 		'"Inter Var", sans-serif, 700': 1,
 	})

@@ -31,7 +31,7 @@ export function isIe9Hack(node: Value): boolean {
  * - https://www.alwaystwisted.com/relicss/old-css
  */
 export function isValueBrowserhack(node: Value, on_hack: (hack: string) => void): void {
-	let text = node.text
+	const text = node.text
 
 	// filter: progid:DXImageTransform.Microsoft.gradient(...) — plain or within quotes
 	if (/progid:/i.test(node.text)) {

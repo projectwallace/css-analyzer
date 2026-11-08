@@ -30,9 +30,9 @@ export class ContextCollection<UseLocations extends boolean = false> {
 	count(): CollectionCount<UseLocations> & {
 		itemsPerContext: { [k: string]: CollectionCount<UseLocations> }
 	} {
-		let itemsPerContext: Map<string, CollectionCount<UseLocations>> = new Map()
+		const itemsPerContext: Map<string, CollectionCount<UseLocations>> = new Map()
 
-		for (let [context, value] of this.#contexts.entries()) {
+		for (const [context, value] of this.#contexts.entries()) {
 			itemsPerContext.set(context, value.c())
 		}
 
