@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'vitest'
+import { test, expect } from 'vitest'
 import { analyze } from '../engine/analyzer.js'
 import { plain } from '../test-utils.js'
 import { specificity, summarize_specificity } from './specificity.js'

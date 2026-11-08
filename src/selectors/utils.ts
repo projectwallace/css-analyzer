@@ -117,8 +117,6 @@ function selector_complexity(selector: CSSNode): number {
 	}
 
 	walk(selector, function (node) {
-		const type = node.type
-
 		// Skip Selector nodes (don't count the selector container itself)
 		if (is_selector(node)) {
 			return

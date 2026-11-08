@@ -33,7 +33,7 @@ export const NO_VALUE_WALK: ReadonlySet<string> = new Set([
 
 /** Lowercase, except for values with var(): their fallbacks can hold case-sensitive names */
 export function lowercase_unless_var(text: string): string {
-	return str_index_of('var(', text) !== -1 ? text : text.toLowerCase()
+	return str_index_of('var(', text) === -1 ? text.toLowerCase() : text
 }
 
 /**

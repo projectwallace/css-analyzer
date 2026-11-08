@@ -51,12 +51,6 @@ const a = `
 :root { --x: 1px }
 a { z-index: 1; margin: 0; color: var(--x); animation: spin 1s; display: flex !important }
 `
-const b = `
-@layer base { b { z-index: 2; text-shadow: 0 0 1px red } }
-@keyframes fade { to { opacity: 1 } }
-@font-face { font-family: B; src: url(b.woff2) }
-.c > .d { width: 10px; animation: fade 1s; display: -webkit-box }
-`
 
 test('every collector works with locations', () => {
 	const result = analyze(a, collectors())

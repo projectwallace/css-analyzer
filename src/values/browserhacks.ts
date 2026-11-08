@@ -1,4 +1,4 @@
-import { is_identifier, is_function, is_url, str_equals, walk } from '@projectwallace/css-parser'
+import { is_function, is_url, str_equals, walk } from '@projectwallace/css-parser'
 import { ends_with, unquote } from '../string-utils.js'
 import { type ValueInput, as_value } from '../input.js'
 

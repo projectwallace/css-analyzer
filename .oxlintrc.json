@@ -6,6 +6,7 @@
 		"max-depth": ["warn", 6],
 		"prefer-const": "error",
 		"no-var": "error",
+		"no-unused-vars": "error",
 		"func-style": ["error", "declaration", { "allowArrowFunctions": false }]
 	}
 }

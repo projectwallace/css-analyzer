@@ -10,7 +10,6 @@ import {
 	PSEUDO_CLASS_SELECTOR,
 	PSEUDO_ELEMENT_SELECTOR,
 	TYPE_SELECTOR,
-	type CSSNode,
 	type Selector,
 	type SelectorNode,
 	is_selector_list,

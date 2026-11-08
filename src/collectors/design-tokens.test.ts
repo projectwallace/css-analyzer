@@ -1,8 +1,5 @@
 import { test, expect, describe } from 'vitest'
 import { analyze } from '../engine/analyzer.js'
-import { tokens_fixture as fixture } from '../test-fixture.js'
-import { basename } from '../properties/property-utils.js'
-import { analyze_design_tokens, design_tokens_collectors } from '../presets/index.js'
 import type { CountResult } from '../engine/types.js'
 import {
 	border_radiuses,

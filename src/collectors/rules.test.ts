@@ -1,6 +1,6 @@
-import { describe, test, expect } from 'vitest'
+import { test, expect } from 'vitest'
 import { analyze } from '../engine/analyzer.js'
-import { plain, series } from '../test-utils.js'
+import { series } from '../test-utils.js'
 import { rules } from './rules.js'
 
 /** Rule results with the shape the old tests were written for */

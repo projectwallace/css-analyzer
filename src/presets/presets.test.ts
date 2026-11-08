@@ -1,6 +1,6 @@
 import { test, expect, describe } from 'vitest'
 import { analyze } from '../engine/analyzer.js'
-import { stylesheet_fixture, tokens_fixture } from '../test-fixture.js'
+import { tokens_fixture } from '../test-fixture.js'
 import { all_collectors, analyze_all, analyze_design_tokens } from './index.js'
 
 describe('analyze_all', () => {
