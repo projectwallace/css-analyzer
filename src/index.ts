@@ -28,6 +28,7 @@ import {
 	is_function,
 	is_operator,
 	is_string,
+	property_basename,
 } from '@projectwallace/css-parser'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.ts'
 import { getCombinators, getComplexity, isPrefixed, isAccessibility } from './selectors/utils.ts'
@@ -50,7 +51,6 @@ import { DefinedUsed, type DefinedUsedResult } from './defined-used.ts'
 import { endsWith, unquote } from './string-utils.ts'
 import { getEmbedType } from './stylesheet/stylesheet.ts'
 import {
-	basename,
 	SPACING_RESET_PROPERTIES,
 	border_radius_properties,
 	shorthand_properties,
@@ -865,7 +865,7 @@ function analyzeInternal<T extends boolean>(
 			let atruleLoc = toLoc(node)
 			atruleNesting.push(depth)
 			uniqueAtruleNesting.p(depth, atruleLoc)
-			let normalized_name = basename(node.name ?? '')
+			let normalized_name = property_basename(node.name ?? '')
 			atrules.p(normalized_name, atruleLoc)
 
 			//#region @FONT-FACE
@@ -1153,7 +1153,7 @@ function analyzeInternal<T extends boolean>(
 
 			let propertyLoc = toLoc(node)
 			propertyLoc.length = property.length
-			let normalizedProperty = basename(property)
+			let normalizedProperty = property_basename(property)
 
 			properties.p(normalizedProperty, propertyLoc)
 
