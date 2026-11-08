@@ -8,7 +8,7 @@ pnpm test        # vitest, with coverage
 pnpm check       # types
 pnpm lint        # oxlint + oxfmt
 pnpm knip        # unused code
-pnpm build
+pnpm build       # build + publint
 ```
 
 ## Code style
