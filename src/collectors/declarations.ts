@@ -32,7 +32,7 @@ export function declarations(options: CountOptions = {}): CollectorDef<Declarati
 				if (ctx.is_important) {
 					importants++
 					weight++
-					if (ctx.in_keyframes) {
+					if (ctx.atrule_stack.includes('keyframes')) {
 						importants_in_keyframes++
 						weight++
 					}

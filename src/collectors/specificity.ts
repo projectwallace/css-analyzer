@@ -21,7 +21,7 @@ export function specificity(options: CountOptions = {}): CollectorDef<CountResul
 	return define_counting_collector(options, function setup(counter) {
 		return {
 			selector(node, ctx) {
-				if (ctx.in_keyframes) {
+				if (ctx.atrule_stack.includes('keyframes')) {
 					return
 				}
 				counter.add(get_specificity(node)[0]!.join(','), ctx)

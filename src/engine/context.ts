@@ -43,7 +43,6 @@ export function create_context(): ContextController {
 	let font_loaded = false
 	let font_result: FontShorthand | null = null
 	let view_node: CSSNode | undefined
-	let keyframes_count = 0
 	const atrule_stack: string[] = []
 	const rule_stack: CSSNode[] = []
 	let depth = 0
@@ -75,9 +74,6 @@ export function create_context(): ContextController {
 		},
 		get parent_rule() {
 			return rule_stack.at(-1)
-		},
-		get in_keyframes() {
-			return keyframes_count > 0
 		},
 		get loc() {
 			return get_location(node!)
@@ -156,7 +152,6 @@ export function create_context(): ContextController {
 			css = next_css
 			node = undefined
 			depth = 0
-			keyframes_count = 0
 			atrule_stack.length = 0
 			rule_stack.length = 0
 		},
@@ -179,18 +174,11 @@ export function create_context(): ContextController {
 			depth--
 		},
 		enter_atrule(atrule) {
-			const name = basename((atrule as Atrule).name ?? '')
-			atrule_stack.push(name)
-			if (name === 'keyframes') {
-				keyframes_count++
-			}
+			atrule_stack.push(basename((atrule as Atrule).name ?? ''))
 			depth++
 		},
 		leave_atrule() {
-			const name = atrule_stack.pop()
-			if (name === 'keyframes') {
-				keyframes_count--
-			}
+			atrule_stack.pop()
 			depth--
 		},
 	}

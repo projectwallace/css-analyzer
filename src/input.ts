@@ -37,13 +37,13 @@ export function as_selectors(input: SelectorInput): Selector[] {
 				`Could not convert passed in source '${input}' to SelectorList: ${message}`,
 			)
 		}
-		return Array.from(list) as Selector[]
+		return Array.from(list)
 	}
 	if (is_selector(input)) {
 		return [input]
 	}
 	if (is_selector_list(input)) {
-		return Array.from(input) as Selector[]
+		return Array.from(input)
 	}
 	throw new TypeError('Passed in source is an Object but no AST / AST of the type SelectorList')
 }

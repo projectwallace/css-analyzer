@@ -91,7 +91,6 @@ export type Context = {
 	/** Lowercased, unprefixed names of the enclosing at-rules, outermost first */
 	readonly atrule_stack: readonly string[]
 	readonly parent_rule: CSSNode | undefined
-	readonly in_keyframes: boolean
 	/** Location of the current node */
 	readonly loc: Location
 	/** Location view for any other node; the returned object is reused, read `.loc` right away */

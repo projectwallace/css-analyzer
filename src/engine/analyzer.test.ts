@@ -125,17 +125,11 @@ test('one shared value walk feeds every value subscriber', () => {
 	expect(result.other_colors.total).toBe(3)
 })
 
-test('structural context: depth, atrule_stack, parent_rule, in_keyframes', () => {
-	const seen: [string, number, string[], boolean, string | undefined][] = []
+test('structural context: depth, atrule_stack, parent_rule', () => {
+	const seen: [string, number, string[], string | undefined][] = []
 	const structure = define_collector<number>(() => ({
 		declaration(_node, ctx) {
-			seen.push([
-				ctx.property,
-				ctx.depth,
-				[...ctx.atrule_stack],
-				ctx.in_keyframes,
-				ctx.parent_rule?.text.slice(0, 1),
-			])
+			seen.push([ctx.property, ctx.depth, [...ctx.atrule_stack], ctx.parent_rule?.text.slice(0, 1)])
 		},
 		result: () => 0,
 	}))
@@ -147,11 +141,11 @@ test('structural context: depth, atrule_stack, parent_rule, in_keyframes', () =>
 		{ structure },
 	)
 	expect(seen).toEqual([
-		['color', 1, [], false, 'a'],
-		['margin', 2, [], false, 'b'],
-		['padding', 2, ['media'], false, 'c'],
-		['top', 2, ['keyframes'], true, 'f'],
-		['left', 1, [], false, 'd'],
+		['color', 1, [], 'a'],
+		['margin', 2, [], 'b'],
+		['padding', 2, ['media'], 'c'],
+		['top', 2, ['keyframes'], 'f'],
+		['left', 1, [], 'd'],
 	])
 })
 

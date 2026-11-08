@@ -29,7 +29,7 @@ export function rules(options: CountOptions = {}): CollectorDef<RulesResult> {
 		return {
 			parse: { selectors: true },
 			rule(node, ctx) {
-				if (ctx.in_keyframes) {
+				if (ctx.atrule_stack.includes('keyframes')) {
 					return
 				}
 				total++

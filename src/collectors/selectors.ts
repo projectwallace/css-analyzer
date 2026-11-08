@@ -61,7 +61,7 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 
 		return {
 			rule(node, ctx) {
-				if (!ctx.in_keyframes) {
+				if (!ctx.atrule_stack.includes('keyframes')) {
 					return
 				}
 				const prelude = node.prelude
@@ -73,7 +73,7 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 				}
 			},
 			selector(node, ctx) {
-				if (ctx.in_keyframes) {
+				if (ctx.atrule_stack.includes('keyframes')) {
 					return
 				}
 				const text = node.text

@@ -22,7 +22,7 @@ function compare_char(reference_code: number, test_code: number): boolean {
  * ends_with('test', 'my-test') // true
  * ends_with('test', 'est') // false
  *
- * @param base e.g. '-webkit-transform'
+ * @param base e.g. '-webkit-transform'; MUST be lowercase
  * @param maybe e.g. 'transform'
  * @returns true if `test` ends with `base`, false otherwise
  */
