@@ -7,7 +7,7 @@ import {
 	str_equals,
 	walk,
 } from '@projectwallace/css-parser'
-import { endsWith, unquote } from '../string-utils.js'
+import { endsWith, unquote } from '../string-utils.ts'
 
 /**
  * @deprecated Will be removed in next major version. Use `isValueBrowserhack()` instead.

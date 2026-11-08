@@ -1,5 +1,5 @@
-import { KeywordSet } from '../keyword-set.js'
 import { is_custom, is_vendor_prefixed, property_basename } from '@projectwallace/css-parser'
+import { KeywordSet } from '../keyword-set.ts'
 
 export const shorthand_properties: Set<string> = new Set([
 	'all',

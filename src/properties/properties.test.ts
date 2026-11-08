@@ -1,6 +1,6 @@
 import { test, expect, describe } from 'vitest'
-import { analyze } from '../index.js'
-import { basename } from './property-utils.js'
+import { basename } from './property-utils.ts'
+import { analyze } from '../index.ts'
 
 test('counts totals', () => {
 	const fixture = `

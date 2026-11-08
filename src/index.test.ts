@@ -21,7 +21,7 @@ import {
 	type UniqueWithLocations,
 	type Location,
 	type Specificity,
-} from './index.js'
+} from './index.ts'
 
 describe('Public API', () => {
 	test("exposes the 'analyze' method", () => {

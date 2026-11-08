@@ -4,4 +4,4 @@ export {
 	border_radius_properties,
 	basename,
 	isHack as is_property_hack,
-} from './property-utils'
+} from './property-utils.ts'
