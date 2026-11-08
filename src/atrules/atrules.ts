@@ -10,11 +10,11 @@ import {
 	is_number,
 	type AnyNode,
 } from '@projectwallace/css-parser'
-import { type Input, as_prelude } from '../input.js'
+import { type PreludeInput, as_prelude } from '../input.js'
 
 function find_hacks(
 	name: string,
-	input: Input,
+	input: PreludeInput,
 	check: (node: AnyNode, on_hack: (hack: string) => void) => unknown,
 ): string[] {
 	const hacks: string[] = []
@@ -37,7 +37,7 @@ function find_hacks(
  * @param input - Prelude text, or an already parsed prelude node
  * @returns The hacks that were found (at most one)
  */
-export function get_supports_browserhacks(input: Input): string[] {
+export function get_supports_browserhacks(input: PreludeInput): string[] {
 	return find_hacks('supports', input, function (node, on_hack) {
 		// Check SupportsQuery nodes for browserhack patterns
 		if (is_supports_query(node)) {
@@ -61,7 +61,7 @@ export function get_supports_browserhacks(input: Input): string[] {
  * @param input - Prelude text, or an already parsed prelude node
  * @returns The hacks that were found (at most one)
  */
-export function get_media_browserhacks(input: Input): string[] {
+export function get_media_browserhacks(input: PreludeInput): string[] {
 	return find_hacks('media', input, function (node, on_hack) {
 		// Check MediaType nodes for \0 prefix or \9 suffix
 		if (is_media_type(node)) {

@@ -7,7 +7,7 @@ import {
 } from '@projectwallace/css-parser'
 import { KeywordSet } from '../keyword-set.js'
 import { keywords } from './values.js'
-import { type Input, as_value } from '../input.js'
+import { type ValueInput, as_value } from '../input.js'
 
 const TIMING_KEYWORDS = new KeywordSet([
 	'linear',
@@ -54,7 +54,7 @@ export type AnimationParts = {
  * Split an `animation` or `transition` value into its parts.
  * @param input - Value text, or an already parsed Value node
  */
-export function analyze_animation(input: Input): AnimationParts {
+export function analyze_animation(input: ValueInput): AnimationParts {
 	const parts: AnimationParts = { durations: [], timing_functions: [], names: [], keywords: [] }
 	let duration_found = false
 

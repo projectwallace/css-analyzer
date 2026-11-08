@@ -14,7 +14,7 @@ import {
 	is_combinator,
 } from '@projectwallace/css-parser'
 import { unquote } from '../string-utils.js'
-import { type Input, as_selectors } from '../input.js'
+import { type SelectorInput, as_selectors } from '../input.js'
 import type { Location } from '../engine/types.js'
 
 const PSEUDO_FUNCTIONS = new KeywordSet([
@@ -33,7 +33,7 @@ const PSEUDO_FUNCTIONS = new KeywordSet([
  * Find vendor prefixed pseudo-classes, pseudo-elements and type selectors.
  * @returns The prefixed names, including their colons (`:-moz-focusring`, `::-webkit-scrollbar`)
  */
-export function get_vendor_prefixes(input: Input): string[] {
+export function get_vendor_prefixes(input: SelectorInput): string[] {
 	const found: string[] = []
 	for (const selector of as_selectors(input)) {
 		walk(selector, function (node) {
@@ -61,7 +61,7 @@ export function get_vendor_prefixes(input: Input): string[] {
  * Find accessibility selectors: attribute selectors for `role` and `aria-*`.
  * @returns The normalized attribute selectors, e.g. `[aria-hidden="true"]`
  */
-export function get_accessibility_selectors(input: Input): string[] {
+export function get_accessibility_selectors(input: SelectorInput): string[] {
 	const found: string[] = []
 	function normalize(node: CSSNode) {
 		const clone = node.clone()
@@ -98,7 +98,7 @@ export function get_accessibility_selectors(input: Input): string[] {
  * Get the complexity of every selector in a selector (list).
  * @param input - Selector text, or an already parsed Selector/SelectorList node
  */
-export function get_complexity(input: Input): number[] {
+export function get_complexity(input: SelectorInput): number[] {
 	return as_selectors(input).map((selector) => selector_complexity(selector))
 }
 
@@ -199,7 +199,7 @@ export type CombinatorMatch = { name: string; loc: Location }
  * Find all combinators in a selector (list).
  * @returns The combinator (`' '` for the descendant combinator) and where it was found
  */
-export function get_combinators(input: Input): CombinatorMatch[] {
+export function get_combinators(input: SelectorInput): CombinatorMatch[] {
 	const found: CombinatorMatch[] = []
 	for (const selector of as_selectors(input)) {
 		walk(selector, function (node) {

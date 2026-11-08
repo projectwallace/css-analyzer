@@ -1,11 +1,11 @@
 import { is_function, is_identifier, walk } from '@projectwallace/css-parser'
-import { type Input, as_value } from '../input.js'
+import { type ValueInput, as_value } from '../input.js'
 
 /**
  * Find vendor prefixed identifiers and functions in a CSS value.
  * @returns The prefixed names, as written
  */
-export function get_prefixed_values(input: Input): string[] {
+export function get_prefixed_values(input: ValueInput): string[] {
 	const found: string[] = []
 	walk(as_value(input), function (node) {
 		if (node.is_vendor_prefixed) {

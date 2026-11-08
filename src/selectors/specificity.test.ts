@@ -17,9 +17,9 @@ test('get_specificity accepts a single parsed Selector node', () => {
 })
 
 test('get_specificity throws a TypeError for input that is not a selector', () => {
-	expect(() => get_specificity(parse_selector_list('a').first_child!.first_child!)).toThrow(
-		TypeError,
-	)
+	expect(() =>
+		get_specificity(parse_selector_list('a').first_child!.first_child! as never),
+	).toThrow(TypeError)
 })
 
 test('compare_specificity sorts ascending', () => {

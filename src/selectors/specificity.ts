@@ -18,7 +18,7 @@ import {
 	is_selector,
 	is_combinator,
 } from '@projectwallace/css-parser'
-import { type Input, as_selectors } from '../input.js'
+import { type SelectorInput, as_selectors } from '../input.js'
 
 export type Specificity = [number, number, number]
 
@@ -236,7 +236,7 @@ function selector_specificity(selector_ast: Selector): Specificity {
  * @param input - Selector text, or an already parsed Selector/SelectorList node
  * @returns One `[a, b, c]` tuple for every selector in the list
  */
-export function get_specificity(input: Input): Specificity[] {
+export function get_specificity(input: SelectorInput): Specificity[] {
 	// Quit while you're ahead
 	if (!input) {
 		return []

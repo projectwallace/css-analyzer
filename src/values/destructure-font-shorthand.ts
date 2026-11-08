@@ -4,10 +4,9 @@ import {
 	is_identifier,
 	is_operator,
 	is_string,
-	type Value,
 } from '@projectwallace/css-parser'
 import { KeywordSet } from '../keyword-set.js'
-import { type Input, as_value } from '../input.js'
+import { type ValueInput, as_value } from '../input.js'
 import { keywords } from './values.js'
 
 export const SYSTEM_FONTS: KeywordSet = new KeywordSet([
@@ -85,8 +84,8 @@ export type FontShorthand = {
 	keywords: string[]
 }
 
-export function destructure_font_shorthand(input: Input): FontShorthand | null {
-	const value = as_value(input) as Value
+export function destructure_font_shorthand(input: ValueInput): FontShorthand | null {
+	const value = as_value(input)
 	const found_keywords: string[] = []
 	if (!value.has_children) {
 		return null

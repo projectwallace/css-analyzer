@@ -1,5 +1,5 @@
 import { is_number, is_dimension } from '@projectwallace/css-parser'
-import { type Input, as_value } from '../input.js'
+import { type ValueInput, as_value } from '../input.js'
 import { KeywordSet } from '../keyword-set.js'
 
 export const keywords: KeywordSet = new KeywordSet([
@@ -15,7 +15,7 @@ export const keywords: KeywordSet = new KeywordSet([
 /**
  * Test whether a value is a reset (0, 0px, -0.0e0 etc.)
  */
-export function is_value_reset(input: Input): boolean {
+export function is_value_reset(input: ValueInput): boolean {
 	for (const node of as_value(input)) {
 		if (is_number(node) && node.value === 0) {
 			continue

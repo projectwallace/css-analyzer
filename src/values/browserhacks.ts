@@ -1,6 +1,6 @@
 import { is_identifier, is_function, is_url, str_equals, walk } from '@projectwallace/css-parser'
 import { ends_with, unquote } from '../string-utils.js'
-import { type Input, as_value } from '../input.js'
+import { type ValueInput, as_value } from '../input.js'
 
 /**
  * Find the browserhacks in a CSS value: `progid:`, `\9`, `\7`, `alpha()`, `expression()`, `.htc`
@@ -9,7 +9,7 @@ import { type Input, as_value } from '../input.js'
  * - https://browserhacks.com/
  * - https://www.alwaystwisted.com/relicss/old-css
  */
-export function get_value_browserhacks(input: Input): string[] {
+export function get_value_browserhacks(input: ValueInput): string[] {
 	const node = as_value(input)
 	const hacks: string[] = []
 	const text = node.text
