@@ -28,6 +28,7 @@ import {
 	is_function,
 	is_operator,
 	is_string,
+	str_index_of,
 } from '@projectwallace/css-parser'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
 import { getCombinators, getComplexity, isPrefixed, isAccessibility } from './selectors/utils.js'
@@ -1133,7 +1134,7 @@ function analyzeInternal<T extends boolean>(
 			if (node.is_important) {
 				complexity++
 
-				if (!declaration.toLowerCase().includes('!important')) {
+				if (str_index_of('!important', declaration) === -1) {
 					valueBrowserhacks.p('!ie', toLoc(node.value as CSSNode))
 				}
 
@@ -1276,11 +1277,10 @@ function analyzeInternal<T extends boolean>(
 					// units, colors, and font families in var() fallbacks
 				} else if (normalizedProperty === 'font-size') {
 					if (!SYSTEM_FONTS.has(text)) {
-						let normalized = text.toLowerCase()
-						if (normalized.includes('var(')) {
-							fontSizes.p(text, valueLoc)
+						if (str_index_of('var(', text) === -1) {
+							fontSizes.p(text.toLowerCase(), valueLoc)
 						} else {
-							fontSizes.p(normalized, valueLoc)
+							fontSizes.p(text, valueLoc)
 						}
 					}
 				} else if (normalizedProperty === 'font-family') {
@@ -1289,11 +1289,10 @@ function analyzeInternal<T extends boolean>(
 					}
 					return SKIP // to prevent finding color false positives (Black as font family name is not a color)
 				} else if (normalizedProperty === 'line-height') {
-					let normalized = text.toLowerCase()
-					if (normalized.includes('var(')) {
-						lineHeights.p(text, valueLoc)
+					if (str_index_of('var(', text) === -1) {
+						lineHeights.p(text.toLowerCase(), valueLoc)
 					} else {
-						lineHeights.p(normalized, valueLoc)
+						lineHeights.p(text, valueLoc)
 					}
 				} else if (normalizedProperty === 'transition' || normalizedProperty === 'animation') {
 					let isAnimation = normalizedProperty === 'animation'
