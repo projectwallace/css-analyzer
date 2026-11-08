@@ -7,8 +7,8 @@ import {
 	is_function,
 	is_string,
 } from '@projectwallace/css-parser'
-import { KeywordSet } from '../keyword-set.js'
-import { keywords } from './values.js'
+import { KeywordSet } from '../keyword-set.ts'
+import { keywords } from './values.ts'
 
 const TIMING_KEYWORDS = new KeywordSet([
 	'linear',

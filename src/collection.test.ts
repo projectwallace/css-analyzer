@@ -1,5 +1,5 @@
 import { test, expect, expectTypeOf } from 'vitest'
-import { Collection, type UniqueWithLocations } from './collection'
+import { Collection, type UniqueWithLocations } from './collection.ts'
 
 let loc = { line: 1, column: 1, offset: 1, length: 1 }
 

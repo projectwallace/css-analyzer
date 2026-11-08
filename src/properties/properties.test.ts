@@ -1,5 +1,6 @@
 import { test, expect, describe } from 'vitest'
-import { analyze } from '../index.js'
+import { basename } from './property-utils.ts'
+import { analyze } from '../index.ts'
 
 test('counts totals', () => {
 	const fixture = `
@@ -336,5 +337,20 @@ test('reports locations correctly', () => {
 
 	expect(actual).toEqual({
 		margin: [{ offset: 24, length: 6, column: 7, line: 3 }],
+	})
+})
+
+describe('basename', () => {
+	test.each([
+		['color', 'color'],
+		['COLOR', 'color'],
+		['-webkit-transition', 'transition'],
+		['-MOZ-Appearance', 'appearance'],
+		['*zoom', 'zoom'],
+		['_margin', 'margin'],
+		['_-webkit-box-shadow', 'box-shadow'],
+		['--My-Custom', '--My-Custom'],
+	])('%s → %s', (property, expected) => {
+		expect(basename(property)).toBe(expected)
 	})
 })

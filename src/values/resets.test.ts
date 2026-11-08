@@ -1,4 +1,4 @@
-import { analyze } from '../index.js'
+import { analyze } from '../index.ts'
 import { test } from 'vitest'
 import { expect } from 'vitest'
 
