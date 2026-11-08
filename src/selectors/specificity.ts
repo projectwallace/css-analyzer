@@ -239,8 +239,8 @@ export const calculate = (selector: string | CSSNode): Specificity[] => {
 	if (typeof selector === 'string') {
 		try {
 			selector_list = parse_selector_list(selector)
-		} catch (e) {
-			const message = e instanceof Error ? e.message : String(e)
+		} catch (event) {
+			const message = event instanceof Error ? event.message : String(event)
 			throw new TypeError(`Could not convert passed in source '${selector}' to SelectorList: ${message}`)
 		}
 	} else if (is_selector_list(selector)) {
