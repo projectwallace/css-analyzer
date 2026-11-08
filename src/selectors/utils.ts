@@ -1,5 +1,5 @@
-import type { Location } from '../collection.js'
-import { KeywordSet } from '../keyword-set.js'
+import type { Location } from '../collection.ts'
+import { KeywordSet } from '../keyword-set.ts'
 import {
 	type CSSNode,
 	SKIP,
@@ -14,7 +14,7 @@ import {
 	is_nth_selector,
 	is_combinator,
 } from '@projectwallace/css-parser'
-import { unquote } from '../string-utils.js'
+import { unquote } from '../string-utils.ts'
 
 const PSEUDO_FUNCTIONS = new KeywordSet([
 	'nth-child',
@@ -56,7 +56,7 @@ export function isAccessibility(
 	on_selector: (a11y_selector: string) => void,
 ): void {
 	function normalize(node: CSSNode) {
-		let clone = node.clone()
+		const clone = node.clone()
 		// We're intentionally not adding attr_flags here because they don't matter for normalization
 		// Also not lowercasing node.value because that DOES matter for CSS
 		if (clone.value) {
@@ -76,7 +76,7 @@ export function isAccessibility(
 	walk(selector, function (node) {
 		if (is_attribute_selector(node)) {
 			const name = node.name || ''
-			if (str_equals('role', name) || str_starts_with(name, 'aria-')) {
+			if (str_equals('role', name) || str_starts_with('aria-', name)) {
 				on_selector(normalize(node))
 			}
 		}
@@ -96,13 +96,13 @@ export function getComplexity(selector: CSSNode): number {
 		walk(tree, function (node) {
 			if (is_selector(node)) {
 				complexities.push(getComplexity(node))
+				// getComplexity already counted everything nested inside this selector
+				return SKIP
 			}
 		})
 	}
 
 	walk(selector, function (node) {
-		const type = node.type
-
 		// Skip Selector nodes (don't count the selector container itself)
 		if (is_selector(node)) {
 			return
@@ -183,7 +183,7 @@ export function getComplexity(selector: CSSNode): number {
 export function getCombinators(
 	selector: CSSNode,
 	onMatch: ({ name, loc }: { name: string; loc: Location }) => void,
-) {
+): void {
 	walk(selector, function (node) {
 		if (is_combinator(node)) {
 			onMatch({

@@ -1,21 +1,21 @@
 import { test, expect, expectTypeOf } from 'vitest'
-import { Collection, type UniqueWithLocations } from './collection'
+import { Collection, type UniqueWithLocations } from './collection.ts'
 
-let loc = { line: 1, column: 1, offset: 1, length: 1 }
+const loc = { line: 1, column: 1, offset: 1, length: 1 }
 
 test('basic collection - size()', () => {
-	let collection = new Collection()
+	const collection = new Collection()
 	collection.p('a', loc)
 	collection.p('a', loc)
 	expect(collection.size()).toEqual(2)
 })
 
 test('count with useLocations=undefined', () => {
-	let collection = new Collection()
+	const collection = new Collection()
 	collection.p('a', loc)
 	collection.p('a', loc)
 
-	let count = collection.c()
+	const count = collection.c()
 	expect(count).toEqual({
 		total: 2,
 		totalUnique: 1,
@@ -28,11 +28,11 @@ test('count with useLocations=undefined', () => {
 })
 
 test('count with useLocations=false', () => {
-	let collection = new Collection(false)
+	const collection = new Collection(false)
 	collection.p('a', loc)
 	collection.p('a', loc)
 
-	let count = collection.c()
+	const count = collection.c()
 	expect(count).toEqual({
 		total: 2,
 		totalUnique: 1,
@@ -45,12 +45,12 @@ test('count with useLocations=false', () => {
 })
 
 test('count with useLocations=true', () => {
-	let collection = new Collection(true)
+	const collection = new Collection(true)
 	collection.p('a', loc)
 	collection.p('a', loc)
 
-	let pos = { offset: 1, length: 1, line: 1, column: 1 }
-	let count = collection.c()
+	const pos = { offset: 1, length: 1, line: 1, column: 1 }
+	const count = collection.c()
 	expect(count).toEqual({
 		total: 2,
 		totalUnique: 1,

@@ -6,10 +6,10 @@ import {
 	is_string,
 	type Value,
 } from '@projectwallace/css-parser'
-import { KeywordSet } from '../keyword-set.js'
-import { keywords } from './values.js'
+import { KeywordSet } from '../keyword-set.ts'
+import { keywords } from './values.ts'
 
-export const SYSTEM_FONTS = new KeywordSet([
+export const SYSTEM_FONTS: KeywordSet = new KeywordSet([
 	'caption',
 	'icon',
 	'menu',
@@ -96,7 +96,7 @@ export function destructure(
 		}
 	}
 
-	let children = value.children
+	const children = value.children
 	let font_size: string | undefined
 	let line_height: string | undefined
 	// Index of the first child node that belongs to font-family (-1 = none found)
@@ -133,7 +133,9 @@ export function destructure(
 		// -----------------------------------------------------------------
 		for (let i = 0; i < children.length; i++) {
 			const child = children[i]
-			if (!child) continue
+			if (!child) {
+				continue
+			}
 
 			if (is_dimension(child)) {
 				font_size = child.text

@@ -1,6 +1,6 @@
 import { test } from 'vitest'
 import { expect } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze } from '../index.ts'
 
 test('finds hex colors', () => {
 	const actual = analyze(`
@@ -120,12 +120,12 @@ test('finds hex colors', () => {
 })
 
 test('Counts hex format correctly when combined with a browserhack', () => {
-	let actual = analyze(`
+	const actual = analyze(`
     a {
       color: #000\\9;
     }
   `)
-	let expected = {
+	const expected = {
 		total: 1,
 		totalUnique: 1,
 		unique: {
@@ -1052,7 +1052,7 @@ test('insane color mode', () => {
 })
 
 test('Lists locations when unstable flag is set', () => {
-	let css = `
+	const css = `
     thing {
       color: red;
       color: #f00;
@@ -1060,7 +1060,7 @@ test('Lists locations when unstable flag is set', () => {
       background-color: red;
     }
   `
-	let actual = analyze(css, { useLocations: true })
+	const actual = analyze(css, { useLocations: true })
 
 	expect(actual.values.colors.uniqueWithLocations).toEqual({
 		red: [

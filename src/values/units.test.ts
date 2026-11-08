@@ -1,6 +1,6 @@
 import { test } from 'vitest'
 import { expect } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze } from '../index.ts'
 
 test('analyzes length units', () => {
 	const fixture = `
@@ -68,7 +68,7 @@ test('analyzes length units', () => {
 })
 
 test('normalizes units', () => {
-	let actual = analyze(`
+	const actual = analyze(`
     a {
       font-size: 10px;
       width: 24PX;
@@ -83,7 +83,7 @@ test('normalizes units', () => {
 })
 
 test('should not include browserhacks', () => {
-	let actual = analyze(`
+	const actual = analyze(`
     a {
       font-size: 10px\\9;
       color: 1em!ie;

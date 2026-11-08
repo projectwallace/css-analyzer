@@ -5,9 +5,10 @@ import {
 	is_operator,
 	is_dimension,
 	is_function,
+	is_string,
 } from '@projectwallace/css-parser'
-import { KeywordSet } from '../keyword-set.js'
-import { keywords } from './values.js'
+import { KeywordSet } from '../keyword-set.ts'
+import { keywords } from './values.ts'
 
 const TIMING_KEYWORDS = new KeywordSet([
 	'linear',
@@ -42,10 +43,10 @@ const ANIMATION_NON_NAME_KEYWORDS = new KeywordSet([
 export function analyzeAnimation(
 	value: Value,
 	cb: ({ type, value }: { type: string; value: CSSNode }) => void,
-) {
+): void {
 	let durationFound = false
 
-	for (let node of value) {
+	for (const node of value) {
 		// Right after a ',' we start over again
 		if (is_operator(node)) {
 			durationFound = false
@@ -76,6 +77,12 @@ export function analyzeAnimation(
 		} else if (is_function(node) && TIMING_FUNCTION_VALUES.has(node.name)) {
 			cb({
 				type: 'fn',
+				value: node,
+			})
+		} else if (is_string(node)) {
+			// A quoted string is always a valid animation name, even when it's a reserved keyword (e.g. "none" or "infinite")
+			cb({
+				type: 'name',
 				value: node,
 			})
 		}

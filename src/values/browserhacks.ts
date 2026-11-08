@@ -4,9 +4,10 @@ import {
 	is_identifier,
 	is_function,
 	is_url,
+	str_equals,
 	walk,
 } from '@projectwallace/css-parser'
-import { endsWith, unquote } from '../string-utils.js'
+import { endsWith, unquote } from '../string-utils.ts'
 
 /**
  * @deprecated Will be removed in next major version. Use `isValueBrowserhack()` instead.
@@ -30,7 +31,7 @@ export function isIe9Hack(node: Value): boolean {
  * - https://www.alwaystwisted.com/relicss/old-css
  */
 export function isValueBrowserhack(node: Value, on_hack: (hack: string) => void): void {
-	let text = node.text
+	const text = node.text
 
 	// filter: progid:DXImageTransform.Microsoft.gradient(...) — plain or within quotes
 	if (/progid:/i.test(node.text)) {
@@ -48,10 +49,9 @@ export function isValueBrowserhack(node: Value, on_hack: (hack: string) => void)
 	// alpha(), expression(), and behavior .htc hacks
 	walk(node, function (child) {
 		if (is_function(child)) {
-			const name = child.name.toLowerCase()
-			if (name === 'alpha') {
+			if (str_equals('alpha', child.name)) {
 				on_hack('alpha()')
-			} else if (name === 'expression') {
+			} else if (str_equals('expression', child.name)) {
 				on_hack('expression()')
 			}
 		}

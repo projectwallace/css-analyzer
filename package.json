@@ -1,6 +1,6 @@
 {
 	"name": "@projectwallace/css-analyzer",
-	"version": "9.9.3",
+	"version": "9.9.7",
 	"description": "The best CSS analyzer out there. Check design tokens, complexity, specificity, performance and more.",
 	"keywords": [
 		"analytics",
@@ -31,6 +31,7 @@
 		"dist"
 	],
 	"type": "module",
+	"sideEffects": false,
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"exports": {
@@ -64,26 +65,28 @@
 		"test": "vitest --coverage",
 		"check": "tsc --noEmit",
 		"build": "tsdown",
-		"knip": "knip"
+		"knip": "knip",
+		"precommit": "pnpm run test --run && pnpm run check && pnpm run lint && pnpm run knip"
 	},
 	"dependencies": {
-		"@projectwallace/css-parser": "~0.18.1"
+		"@projectwallace/css-parser": "~0.19.5"
 	},
 	"devDependencies": {
-		"@projectwallace/preset-oxlint": "^0.0.11",
-		"@vitest/coverage-v8": "^4.1.10",
-		"knip": "^6.31.0",
-		"oxfmt": "^0.61.0",
-		"oxlint": "^1.75.0",
-		"publint": "^0.3.22",
-		"tsdown": "^0.22.14",
+		"@projectwallace/preset-oxlint": "^0.0.13",
+		"@vitest/coverage-v8": "^5.0.5",
+		"knip": "^6.42.1",
+		"oxfmt": "^0.74.0",
+		"oxlint": "^1.89.0",
+		"pkg-pr-new": "^0.0.93",
+		"publint": "^0.3.25",
+		"tsdown": "^0.23.1",
 		"typescript": "^7.0.2",
-		"vite": "^8.2.0",
-		"vitest": "^4.1.10"
+		"vite": "^8.3.4",
+		"vitest": "^5.0.5"
 	},
 	"engines": {
 		"node": ">=18.0.0",
 		"pnpm": ">=11.0.0"
 	},
-	"packageManager": "pnpm@11.1.1"
+	"packageManager": "pnpm@11.16.0"
 }

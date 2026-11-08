@@ -1,7 +1,7 @@
-import { KeywordSet } from '../keyword-set.js'
-import { is_custom, is_vendor_prefixed } from '@projectwallace/css-parser'
+import { is_custom, is_vendor_prefixed, property_basename } from '@projectwallace/css-parser'
+import { KeywordSet } from '../keyword-set.ts'
 
-export const shorthand_properties = new Set([
+export const shorthand_properties: Set<string> = new Set([
 	'all',
 	'animation',
 	'background',
@@ -51,7 +51,7 @@ export const shorthand_properties = new Set([
 	'vertical-align',
 ])
 
-export const SPACING_RESET_PROPERTIES = new Set([
+export const SPACING_RESET_PROPERTIES: Set<string> = new Set([
 	'margin',
 	'margin-block',
 	'margin-inline',
@@ -76,7 +76,7 @@ export const SPACING_RESET_PROPERTIES = new Set([
 	'padding-inline-end',
 ])
 
-export const border_radius_properties = new KeywordSet([
+export const border_radius_properties: KeywordSet = new KeywordSet([
 	'border-radius',
 	'border-top-left-radius',
 	'border-top-right-radius',
@@ -92,9 +92,11 @@ export const border_radius_properties = new KeywordSet([
  * @see https://github.com/csstree/csstree/blob/master/lib/utils/names.js#L69
  */
 export function isHack(property: string): boolean {
-	if (is_custom(property) || is_vendor_prefixed(property)) return false
+	if (is_custom(property) || is_vendor_prefixed(property)) {
+		return false
+	}
 
-	let code = property.charCodeAt(0)
+	const code = property.charCodeAt(0)
 
 	return (
 		code === 47 || // /
@@ -108,21 +110,7 @@ export function isHack(property: string): boolean {
 }
 
 /**
- * Get the normalized basename for a property with a vendor prefix
- * @returns The property name without vendor prefix
+ * Normalized property name: lowercased, without vendor prefix or hack characters.
+ * Custom properties are returned as written. Alias of css-parser's `property_basename()`.
  */
-export function basename(property: string): string {
-	if (is_custom(property)) {
-		return property
-	}
-
-	if (is_vendor_prefixed(property)) {
-		return property.slice(property.indexOf('-', 2) + 1).toLowerCase()
-	}
-
-	if (isHack(property)) {
-		return property.slice(1).toLowerCase()
-	}
-
-	return property.toLowerCase()
-}
+export const basename: (property: string) => string = property_basename

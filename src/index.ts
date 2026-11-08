@@ -3,6 +3,7 @@ import {
 	type CSSNode,
 	is_custom,
 	SKIP,
+	str_equals,
 	str_starts_with,
 	walk,
 	parse,
@@ -13,9 +14,7 @@ import {
 	is_atrule,
 	is_selector,
 	is_declaration,
-	is_supports_query,
 	is_supports_declaration,
-	is_layer_name,
 	is_identifier,
 	is_attribute_selector,
 	is_type_selector,
@@ -28,33 +27,42 @@ import {
 	is_hash,
 	is_function,
 	is_operator,
+	is_string,
+	str_index_of,
+	property_basename,
 } from '@projectwallace/css-parser'
-import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
-import { getCombinators, getComplexity, isPrefixed, isAccessibility } from './selectors/utils.js'
-import { calculateForAST as calculateSpecificity } from './selectors/specificity.js'
-import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
-import { destructure, SYSTEM_FONTS } from './values/destructure-font-shorthand.js'
-import { keywords, isValueReset } from './values/values.js'
-import { analyzeAnimation } from './values/animations.js'
-import { isValuePrefixed } from './values/vendor-prefix.js'
-import { isValueBrowserhack } from './values/browserhacks.js'
-import { ContextCollection } from './context-collection.js'
-import { Collection, type Location } from './collection.js'
-import { AggregateCollection } from './aggregate-collection.js'
-import { DefinedUsed } from './defined-used.js'
-import { endsWith, unquote } from './string-utils.js'
-import { getEmbedType } from './stylesheet/stylesheet.js'
+import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.ts'
+import { getCombinators, getComplexity, isPrefixed, isAccessibility } from './selectors/utils.ts'
+import { calculateForAST as calculateSpecificity } from './selectors/specificity.ts'
+import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.ts'
+import { destructure, SYSTEM_FONTS } from './values/destructure-font-shorthand.ts'
+import { keywords, isValueReset } from './values/values.ts'
+import { analyzeAnimation } from './values/animations.ts'
+import { isValuePrefixed } from './values/vendor-prefix.ts'
+import { isValueBrowserhack } from './values/browserhacks.ts'
+import { ContextCollection } from './context-collection.ts'
 import {
-	basename,
+	Collection,
+	type CollectionCount,
+	type Location,
+	type UniqueWithLocations,
+} from './collection.ts'
+import { AggregateCollection } from './aggregate-collection.ts'
+import { DefinedUsed, type DefinedUsedResult } from './defined-used.ts'
+import { endsWith, unquote } from './string-utils.ts'
+import { getEmbedType } from './stylesheet/stylesheet.ts'
+import {
 	SPACING_RESET_PROPERTIES,
 	border_radius_properties,
 	shorthand_properties,
-} from './properties/property-utils.js'
+} from './properties/property-utils.ts'
 
 export type Specificity = [number, number, number]
 
 function ratio(part: number, total: number): number {
-	if (total === 0) return 0
+	if (total === 0) {
+		return 0
+	}
 	return part / total
 }
 
@@ -79,15 +87,632 @@ export function analyze(css: string, options: Options = {}): any {
 	return analyzeInternal(css, options, false)
 }
 
-function analyzeInternal<T extends boolean>(css: string, options: Options, useLocations: T) {
-	let start = Date.now()
+function analyzeInternal<T extends boolean>(
+	css: string,
+	options: Options,
+	useLocations: T,
+): {
+	stylesheet: {
+		sourceLinesOfCode: number
+		linesOfCode: number
+		size: number
+		complexity: number
+		comments: {
+			total: number
+			size: number
+		}
+		embeddedContent: {
+			size: {
+				total: number
+				ratio: number
+			}
+			types: {
+				total: number
+				totalUnique: number
+				uniquenessRatio: number
+				unique: {
+					[k: string]: {
+						size: number
+						count: number
+						uniqueWithLocations?: Location[]
+					}
+				}
+			}
+		}
+	}
+	atrules: {
+		total: number
+		totalUnique: number
+		unique: Record<string, number>
+		uniquenessRatio: number
+	} & (T extends true
+		? {
+				uniqueWithLocations: UniqueWithLocations
+			}
+		: {
+				uniqueWithLocations?: undefined
+			}) & {
+			fontface: {
+				total: number
+				totalUnique: number
+				unique: Record<string, string>[]
+				uniquenessRatio: number
+			} & (
+				| {
+						uniqueWithLocations: UniqueWithLocations | undefined
+				  }
+				| {
+						uniqueWithLocations?: undefined
+				  }
+			)
+			import: CollectionCount<T>
+			media: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) & {
+					browserhacks: CollectionCount<T>
+					features: CollectionCount<T>
+				}
+			charset: CollectionCount<T>
+			supports: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) & {
+					browserhacks: CollectionCount<T>
+				}
+			keyframes: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) &
+				DefinedUsedResult & {
+					prefixed: {
+						total: number
+						totalUnique: number
+						unique: Record<string, number>
+						uniquenessRatio: number
+					} & (T extends true
+						? {
+								uniqueWithLocations: UniqueWithLocations
+							}
+						: {
+								uniqueWithLocations?: undefined
+							}) & {
+							ratio: number
+						}
+				}
+			container: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) & {
+					names: {
+						total: number
+						totalUnique: number
+						unique: Record<string, number>
+						uniquenessRatio: number
+					} & (T extends true
+						? {
+								uniqueWithLocations: UniqueWithLocations
+							}
+						: {
+								uniqueWithLocations?: undefined
+							}) &
+						DefinedUsedResult
+				}
+			layer: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) &
+				DefinedUsedResult
+			property: CollectionCount<T>
+			function: CollectionCount<T>
+			scope: CollectionCount<T>
+			complexity: {
+				min: number
+				max: number
+				mean: number
+				mode: number
+				range: number
+				sum: number
+			}
+			nesting: {
+				min: number
+				max: number
+				mean: number
+				mode: number
+				range: number
+				sum: number
+			} & {
+				items: number[]
+			} & {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+					? {
+							uniqueWithLocations: UniqueWithLocations
+						}
+					: {
+							uniqueWithLocations?: undefined
+						})
+		}
+	rules: {
+		total: number
+		empty: {
+			total: number
+			ratio: number
+		}
+		sizes: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		} & {
+			items: number[]
+		} & {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					})
+		nesting: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		} & {
+			items: number[]
+		} & {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					})
+		selectors: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		} & {
+			items: number[]
+		} & {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					})
+		declarations: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		} & {
+			items: number[]
+		} & {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					})
+	}
+	selectors: {
+		total: number
+		totalUnique: number
+		uniquenessRatio: number
+		specificity: {
+			/** @type Specificity */
+			min: number[]
+			/** @type Specificity */
+			max: number[]
+			/** @type Specificity */
+			sum: number[]
+			/** @type Specificity */
+			mean: number[]
+			/** @type Specificity */
+			mode: number[]
+			/** @type Specificity */
+			items: Specificity[]
+		} & {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					})
+		complexity: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		} & {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) & {
+				items: number[]
+			}
+		nesting: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		} & {
+			items: number[]
+		} & {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					})
+		id: {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+			? {
+					uniqueWithLocations: UniqueWithLocations
+				}
+			: {
+					uniqueWithLocations?: undefined
+				}) & {
+				ratio: number
+			}
+		pseudoClasses: CollectionCount<T>
+		pseudoElements: CollectionCount<T>
+		accessibility: {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+			? {
+					uniqueWithLocations: UniqueWithLocations
+				}
+			: {
+					uniqueWithLocations?: undefined
+				}) & {
+				ratio: number
+			}
+		attributes: CollectionCount<T>
+		customElements: CollectionCount<T>
+		keyframes: CollectionCount<T>
+		prefixed: {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+			? {
+					uniqueWithLocations: UniqueWithLocations
+				}
+			: {
+					uniqueWithLocations?: undefined
+				}) & {
+				ratio: number
+			}
+		combinators: CollectionCount<T>
+	}
+	declarations: {
+		total: number
+		totalUnique: number
+		uniquenessRatio: number
+		importants: {
+			total: number
+			ratio: number
+			inKeyframes: {
+				total: number
+				ratio: number
+			}
+		}
+		complexity: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		}
+		nesting: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		} & {
+			items: number[]
+		} & {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					})
+	}
+	properties: {
+		total: number
+		totalUnique: number
+		unique: Record<string, number>
+		uniquenessRatio: number
+	} & (T extends true
+		? {
+				uniqueWithLocations: UniqueWithLocations
+			}
+		: {
+				uniqueWithLocations?: undefined
+			}) & {
+			prefixed: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) & {
+					ratio: number
+				}
+			custom: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) &
+				DefinedUsedResult & {
+					ratio: number
+					importants: {
+						total: number
+						totalUnique: number
+						unique: Record<string, number>
+						uniquenessRatio: number
+					} & (T extends true
+						? {
+								uniqueWithLocations: UniqueWithLocations
+							}
+						: {
+								uniqueWithLocations?: undefined
+							}) & {
+							ratio: number
+						}
+				}
+			shorthands: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) & {
+					ratio: number
+				}
+			browserhacks: {
+				total: number
+				totalUnique: number
+				unique: Record<string, number>
+				uniquenessRatio: number
+			} & (T extends true
+				? {
+						uniqueWithLocations: UniqueWithLocations
+					}
+				: {
+						uniqueWithLocations?: undefined
+					}) & {
+					ratio: number
+				}
+			complexity: {
+				min: number
+				max: number
+				mean: number
+				mode: number
+				range: number
+				sum: number
+			}
+			anchorNames: DefinedUsedResult
+		}
+	values: {
+		colors: {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+			? {
+					uniqueWithLocations: UniqueWithLocations
+				}
+			: {
+					uniqueWithLocations?: undefined
+				}) & {
+				itemsPerContext: {
+					[k: string]: CollectionCount<T>
+				}
+			} & {
+				formats: CollectionCount<T>
+			}
+		gradients: CollectionCount<T>
+		fontFamilies: CollectionCount<T>
+		fontSizes: CollectionCount<T>
+		lineHeights: CollectionCount<T>
+		zindexes: CollectionCount<T>
+		textShadows: CollectionCount<T>
+		boxShadows: CollectionCount<T>
+		borderRadiuses: {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+			? {
+					uniqueWithLocations: UniqueWithLocations
+				}
+			: {
+					uniqueWithLocations?: undefined
+				}) & {
+				itemsPerContext: {
+					[k: string]: CollectionCount<T>
+				}
+			}
+		animations: {
+			durations: CollectionCount<T>
+			timingFunctions: CollectionCount<T>
+			names: CollectionCount<T>
+		}
+		prefixes: CollectionCount<T>
+		browserhacks: CollectionCount<T>
+		units: {
+			total: number
+			totalUnique: number
+			unique: Record<string, number>
+			uniquenessRatio: number
+		} & (T extends true
+			? {
+					uniqueWithLocations: UniqueWithLocations
+				}
+			: {
+					uniqueWithLocations?: undefined
+				}) & {
+				itemsPerContext: {
+					[k: string]: CollectionCount<T>
+				}
+			}
+		complexity: {
+			min: number
+			max: number
+			mean: number
+			mode: number
+			range: number
+			sum: number
+		}
+		keywords: CollectionCount<T>
+		resets: CollectionCount<T>
+		displays: CollectionCount<T>
+	}
+	__meta__: {
+		parseTime: number
+		analyzeTime: number
+		total: number
+	}
+} {
+	const start = Date.now()
 
 	// Stylesheet
-	let linesOfCode = (css.match(/\n/g) || []).length + 1
+	const linesOfCode = (css.match(/\n/g) || []).length + 1
 	let totalComments = 0
 	let commentsSize = 0
 	let embedSize = 0
-	let embedTypes = {
+	const embedTypes = {
 		total: 0,
 		unique: new Map() as Map<
 			string,
@@ -99,8 +724,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 		>,
 	}
 
-	let startParse = Date.now()
-	let ast = parse(css, {
+	const startParse = Date.now()
+	const ast = parse(css, {
 		on_comment({ length }) {
 			totalComments++
 			// includes /* and */ in the size calculation
@@ -108,112 +733,112 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 		},
 	})
 
-	let startAnalysis = Date.now()
+	const startAnalysis = Date.now()
 
 	// Atrules
-	let atrules = new Collection(useLocations)
-	let atRuleComplexities = new AggregateCollection()
+	const atrules = new Collection(useLocations)
+	const atRuleComplexities = new AggregateCollection()
 	/** @type {Record<string, string>[]} */
-	let fontfaces: Record<string, string>[] = []
-	let fontfaces_with_loc = new Collection(useLocations)
-	let layers = new Collection(useLocations)
-	let imports = new Collection(useLocations)
-	let medias = new Collection(useLocations)
-	let mediaBrowserhacks = new Collection(useLocations)
-	let mediaFeatures = new Collection(useLocations)
-	let charsets = new Collection(useLocations)
-	let supports = new Collection(useLocations)
-	let supportsBrowserhacks = new Collection(useLocations)
-	let keyframes = new Collection(useLocations)
-	let prefixedKeyframes = new Collection(useLocations)
-	let containers = new Collection(useLocations)
-	let containerNames = new Collection(useLocations)
-	let registeredProperties = new Collection(useLocations)
-	let functions = new Collection(useLocations)
-	let scopes = new Collection(useLocations)
-	let atruleNesting = new AggregateCollection()
-	let uniqueAtruleNesting = new Collection(useLocations)
+	const fontfaces: Record<string, string>[] = []
+	const fontfaces_with_loc = new Collection(useLocations)
+	const layers = new Collection(useLocations)
+	const imports = new Collection(useLocations)
+	const medias = new Collection(useLocations)
+	const mediaBrowserhacks = new Collection(useLocations)
+	const mediaFeatures = new Collection(useLocations)
+	const charsets = new Collection(useLocations)
+	const supports = new Collection(useLocations)
+	const supportsBrowserhacks = new Collection(useLocations)
+	const keyframes = new Collection(useLocations)
+	const prefixedKeyframes = new Collection(useLocations)
+	const containers = new Collection(useLocations)
+	const containerNames = new Collection(useLocations)
+	const registeredProperties = new Collection(useLocations)
+	const functions = new Collection(useLocations)
+	const scopes = new Collection(useLocations)
+	const atruleNesting = new AggregateCollection()
+	const uniqueAtruleNesting = new Collection(useLocations)
 
 	// Rules
 	let totalRules = 0
 	let emptyRules = 0
-	let ruleSizes = new AggregateCollection()
-	let selectorsPerRule = new AggregateCollection()
-	let declarationsPerRule = new AggregateCollection()
-	let uniqueRuleSize = new Collection(useLocations)
-	let uniqueSelectorsPerRule = new Collection(useLocations)
-	let uniqueDeclarationsPerRule = new Collection(useLocations)
-	let ruleNesting = new AggregateCollection()
-	let uniqueRuleNesting = new Collection(useLocations)
+	const ruleSizes = new AggregateCollection()
+	const selectorsPerRule = new AggregateCollection()
+	const declarationsPerRule = new AggregateCollection()
+	const uniqueRuleSize = new Collection(useLocations)
+	const uniqueSelectorsPerRule = new Collection(useLocations)
+	const uniqueDeclarationsPerRule = new Collection(useLocations)
+	const ruleNesting = new AggregateCollection()
+	const uniqueRuleNesting = new Collection(useLocations)
 
 	// Selectors
-	let keyframeSelectors = new Collection(useLocations)
-	let uniqueSelectors = new Set()
-	let prefixedSelectors = new Collection(useLocations)
+	const keyframeSelectors = new Collection(useLocations)
+	const uniqueSelectors = new Set()
+	const prefixedSelectors = new Collection(useLocations)
 	let maxSpecificity: Specificity | undefined
 	let minSpecificity: Specificity | undefined
-	let specificityA = new AggregateCollection()
-	let specificityB = new AggregateCollection()
-	let specificityC = new AggregateCollection()
-	let uniqueSpecificities = new Collection(useLocations)
-	let selectorComplexities = new AggregateCollection()
-	let uniqueSelectorComplexities = new Collection(useLocations)
-	let specificities: Specificity[] = []
-	let ids = new Collection(useLocations)
-	let a11y = new Collection(useLocations)
-	let pseudoClasses = new Collection(useLocations)
-	let pseudoElements = new Collection(useLocations)
-	let attributeSelectors = new Collection(useLocations)
-	let customElementSelectors = new Collection(useLocations)
-	let combinators = new Collection(useLocations)
-	let selectorNesting = new AggregateCollection()
-	let uniqueSelectorNesting = new Collection(useLocations)
+	const specificityA = new AggregateCollection()
+	const specificityB = new AggregateCollection()
+	const specificityC = new AggregateCollection()
+	const uniqueSpecificities = new Collection(useLocations)
+	const selectorComplexities = new AggregateCollection()
+	const uniqueSelectorComplexities = new Collection(useLocations)
+	const specificities: Specificity[] = []
+	const ids = new Collection(useLocations)
+	const a11y = new Collection(useLocations)
+	const pseudoClasses = new Collection(useLocations)
+	const pseudoElements = new Collection(useLocations)
+	const attributeSelectors = new Collection(useLocations)
+	const customElementSelectors = new Collection(useLocations)
+	const combinators = new Collection(useLocations)
+	const selectorNesting = new AggregateCollection()
+	const uniqueSelectorNesting = new Collection(useLocations)
 
 	// Declarations
-	let uniqueDeclarations = new Set()
+	const uniqueDeclarations = new Set()
 	let totalDeclarations = 0
-	let declarationComplexities = new AggregateCollection()
+	const declarationComplexities = new AggregateCollection()
 	let importantDeclarations = 0
 	let importantsInKeyframes = 0
-	let importantCustomProperties = new Collection(useLocations)
-	let declarationNesting = new AggregateCollection()
-	let uniqueDeclarationNesting = new Collection(useLocations)
+	const importantCustomProperties = new Collection(useLocations)
+	const declarationNesting = new AggregateCollection()
+	const uniqueDeclarationNesting = new Collection(useLocations)
 
 	// Properties
-	let properties = new Collection(useLocations)
-	let propertyHacks = new Collection(useLocations)
-	let propertyVendorPrefixes = new Collection(useLocations)
-	let customProperties = new Collection(useLocations)
-	let shorthands = new Collection(useLocations)
-	let propertyComplexities = new AggregateCollection()
+	const properties = new Collection(useLocations)
+	const propertyHacks = new Collection(useLocations)
+	const propertyVendorPrefixes = new Collection(useLocations)
+	const customProperties = new Collection(useLocations)
+	const shorthands = new Collection(useLocations)
+	const propertyComplexities = new AggregateCollection()
 
 	// Values
-	let valueComplexities = new AggregateCollection()
-	let vendorPrefixedValues = new Collection(useLocations)
-	let valueBrowserhacks = new Collection(useLocations)
-	let displays = new Collection(useLocations)
-	let zindex = new Collection(useLocations)
-	let textShadows = new Collection(useLocations)
-	let boxShadows = new Collection(useLocations)
-	let fontFamilies = new Collection(useLocations)
-	let fontSizes = new Collection(useLocations)
-	let lineHeights = new Collection(useLocations)
-	let timingFunctions = new Collection(useLocations)
-	let durations = new Collection(useLocations)
-	let animationNames = new Collection(useLocations)
-	let colors = new ContextCollection(useLocations)
-	let colorFormats = new Collection(useLocations)
-	let units = new ContextCollection(useLocations)
-	let gradients = new Collection(useLocations)
-	let valueKeywords = new Collection(useLocations)
-	let borderRadiuses = new ContextCollection(useLocations)
-	let resets = new Collection(useLocations)
+	const valueComplexities = new AggregateCollection()
+	const vendorPrefixedValues = new Collection(useLocations)
+	const valueBrowserhacks = new Collection(useLocations)
+	const displays = new Collection(useLocations)
+	const zindex = new Collection(useLocations)
+	const textShadows = new Collection(useLocations)
+	const boxShadows = new Collection(useLocations)
+	const fontFamilies = new Collection(useLocations)
+	const fontSizes = new Collection(useLocations)
+	const lineHeights = new Collection(useLocations)
+	const timingFunctions = new Collection(useLocations)
+	const durations = new Collection(useLocations)
+	const animationNames = new Collection(useLocations)
+	const colors = new ContextCollection(useLocations)
+	const colorFormats = new Collection(useLocations)
+	const units = new ContextCollection(useLocations)
+	const gradients = new Collection(useLocations)
+	const valueKeywords = new Collection(useLocations)
+	const borderRadiuses = new ContextCollection(useLocations)
+	const resets = new Collection(useLocations)
 
-	let customPropsTracking = new DefinedUsed()
-	let animationNamesTracking = new DefinedUsed()
-	let containerNamesTracking = new DefinedUsed()
-	let layerNamesTracking = new DefinedUsed()
-	let anchorNamesTracking = new DefinedUsed()
+	const customPropsTracking = new DefinedUsed()
+	const animationNamesTracking = new DefinedUsed()
+	const containerNamesTracking = new DefinedUsed()
+	const layerNamesTracking = new DefinedUsed()
+	const anchorNamesTracking = new DefinedUsed()
 
 	function toLoc(node: CSSNode): Location {
 		return {
@@ -234,24 +859,24 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 		}
 
 		// Check if we're inside a keyframes block
-		let inKeyframes = keyframesDepth >= 0 && depth > keyframesDepth
+		const inKeyframes = keyframesDepth >= 0 && depth > keyframesDepth
 
 		// Count nodes and track nesting
 		if (is_atrule(node)) {
-			let atruleLoc = toLoc(node)
+			const atruleLoc = toLoc(node)
 			atruleNesting.push(depth)
 			uniqueAtruleNesting.p(depth, atruleLoc)
-			let normalized_name = basename(node.name ?? '')
+			const normalized_name = property_basename(node.name ?? '')
 			atrules.p(normalized_name, atruleLoc)
 
 			//#region @FONT-FACE
 			if (normalized_name === 'font-face') {
-				let descriptors = Object.create(null)
+				const descriptors = Object.create(null)
 				if (useLocations) {
 					fontfaces_with_loc.p(node.start, toLoc(node))
 				}
-				let block = node.block
-				for (let descriptor of block?.children || []) {
+				const block = node.block
+				for (const descriptor of block?.children || []) {
 					if (is_declaration(descriptor) && descriptor.value) {
 						descriptors[descriptor.property] = descriptor.value.text
 					}
@@ -287,7 +912,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						complexity++
 					})
 				} else if (normalized_name.endsWith('keyframes')) {
-					let prelude = node.prelude.text
+					const prelude = unquote(node.prelude.text)
 					keyframes.p(prelude, toLoc(node))
 					animationNamesTracking.define(prelude)
 
@@ -299,7 +924,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					// Mark the depth at which we enter a keyframes atrule
 					keyframesDepth = depth
 				} else if (normalized_name === 'layer') {
-					for (let layer of node.prelude.text.split(',').map((s: string) => s.trim())) {
+					for (const layer of node.prelude.text.split(',').map((s: string) => s.trim())) {
 						layers.p(layer, toLoc(node))
 						// @layer name { } places CSS into a layer (use); @layer a, b; orders layers (define)
 						if (node.block) {
@@ -312,22 +937,26 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					imports.p(node.prelude.text, toLoc(node))
 
 					if (is_atrule_prelude(node.prelude) && node.prelude.has_children) {
-						for (let child of node.prelude) {
-							if (is_supports_query(child)) {
+						for (const child of node.prelude) {
+							if (!is_function(child)) {
+								continue
+							}
+
+							if (str_equals('supports', child.name) && child.value) {
 								supports.p(child.value, toLoc(child))
-							} else if (is_layer_name(child) && child.value) {
-								// can be empty string
+							} else if (str_equals('layer', child.name) && child.value) {
+								// layer() can be empty
 								layers.p(child.value, toLoc(child))
 								layerNamesTracking.use(child.value)
 							}
 						}
 					}
 				} else if (normalized_name === 'container') {
-					let { prelude } = node
+					const { prelude } = node
 					containers.p(prelude.text, toLoc(node))
 					if (is_atrule_prelude(prelude) && is_container_query(prelude.first_child)) {
-						let container_query = prelude.first_child
-						let container_name = container_query.first_child
+						const container_query = prelude.first_child
+						const container_name = container_query.first_child
 						if (container_name && is_identifier(container_name)) {
 							containerNames.p(container_name.text, toLoc(node))
 							containerNamesTracking.use(container_name.text)
@@ -337,8 +966,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					registeredProperties.p(node.prelude.text, toLoc(node))
 					customPropsTracking.define(node.prelude.text)
 				} else if (normalized_name === 'function') {
-					let prelude = node.prelude.text
-					let name = prelude.includes('(')
+					const prelude = node.prelude.text
+					const name = prelude.includes('(')
 						? prelude.slice(0, prelude.indexOf('(')).trim()
 						: prelude.trim()
 					functions.p(name, toLoc(node))
@@ -354,7 +983,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			// Handle keyframe rules specially
 			if (inKeyframes && node.has_prelude) {
 				if (is_selector_list(node.prelude) && node.prelude.child_count > 0) {
-					for (let keyframe_selector of node.prelude) {
+					for (const keyframe_selector of node.prelude) {
 						keyframeSelectors.p(keyframe_selector.text, toLoc(keyframe_selector))
 					}
 				}
@@ -373,7 +1002,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				// Count selectors and declarations in this rule
 				let numSelectors = 0
 				let numDeclarations = 0
-				let loc = toLoc(node)
+				const loc = toLoc(node)
 
 				// Find the SelectorList child and count Selector nodes inside it
 				if (node.has_prelude && is_selector_list(node.prelude)) {
@@ -412,13 +1041,13 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				return SKIP
 			}
 
-			let loc = toLoc(node)
+			const loc = toLoc(node)
 
 			selectorNesting.push(depth > 0 ? depth - 1 : 0)
 			uniqueSelectorNesting.p(depth > 0 ? depth - 1 : 0, loc)
 			uniqueSelectors.add(node.text)
 
-			let complexity = getComplexity(node)
+			const complexity = getComplexity(node)
 			selectorComplexities.push(complexity)
 			uniqueSelectorComplexities.p(complexity, loc)
 
@@ -448,12 +1077,12 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			})
 
 			getCombinators(node, (combinator) => {
-				let name = combinator.name.trim() === '' ? ' ' : combinator.name
+				const name = combinator.name.trim() === '' ? ' ' : combinator.name
 				combinators.p(name, combinator.loc)
 			})
 
-			let specificity = calculateSpecificity(node)
-			let [sa, sb, sc] = specificity
+			const specificity = calculateSpecificity(node)
+			const [sa, sb, sc] = specificity
 
 			uniqueSpecificities.p(specificity.toString(), loc)
 
@@ -493,11 +1122,11 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			return SKIP
 		} else if (is_declaration(node)) {
 			totalDeclarations++
-			let declaration = node.text
+			const declaration = node.text
 			uniqueDeclarations.add(declaration)
 
-			let loc = toLoc(node)
-			let declarationDepth = depth > 0 ? depth - 1 : 0
+			const loc = toLoc(node)
+			const declarationDepth = depth > 0 ? depth - 1 : 0
 			declarationNesting.push(declarationDepth)
 			uniqueDeclarationNesting.p(declarationDepth, loc)
 
@@ -505,7 +1134,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			if (node.is_important) {
 				complexity++
 
-				if (!declaration.toLowerCase().includes('!important')) {
+				if (str_index_of('!important', declaration) === -1) {
 					valueBrowserhacks.p('!ie', toLoc(node.value as CSSNode))
 				}
 
@@ -517,13 +1146,15 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			declarationComplexities.push(complexity)
 
 			//#region PROPERTIES
-			let { is_important, property, is_browserhack, is_vendor_prefixed } = node
+			const { is_important, property, is_browserhack, is_vendor_prefixed } = node
 
-			if (!property) return
+			if (!property) {
+				return
+			}
 
-			let propertyLoc = toLoc(node)
+			const propertyLoc = toLoc(node)
 			propertyLoc.length = property.length
-			let normalizedProperty = basename(property)
+			const normalizedProperty = property_basename(property)
 
 			properties.p(normalizedProperty, propertyLoc)
 
@@ -558,12 +1189,16 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			//#region VALUES
 			// Values are analyzed inside declaration because we need context, like which property is used
 			{
-				let value = node.value
-				if (!value) return
-				if (is_raw(value)) return
+				const value = node.value
+				if (!value) {
+					return
+				}
+				if (is_raw(value)) {
+					return
+				}
 
 				let { text } = value
-				let valueLoc = toLoc(value)
+				const valueLoc = toLoc(value)
 				let complexity = 1
 
 				// auto, inherit, initial, none, etc.
@@ -597,7 +1232,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				}
 				//#endregion VALUE COMPLEXITY
 
-				// TODO: should shorthands be counted towards complexity?
+				// Open question: should shorthands be counted towards complexity?
 				valueComplexities.push(complexity)
 
 				// Process properties first that don't have colors,
@@ -617,7 +1252,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					return SKIP
 				} else if (normalizedProperty === 'font') {
 					if (!SYSTEM_FONTS.has(text)) {
-						let result = destructure(value, function (keyword) {
+						const result = destructure(value, function (keyword) {
 							valueKeywords.p(keyword.toLowerCase(), valueLoc)
 						})
 
@@ -625,7 +1260,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							return SKIP
 						}
 
-						let { font_size, line_height, font_family } = result
+						const { font_size, line_height, font_family } = result
 						if (font_family) {
 							fontFamilies.p(font_family, valueLoc)
 						}
@@ -642,11 +1277,10 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					// units, colors, and font families in var() fallbacks
 				} else if (normalizedProperty === 'font-size') {
 					if (!SYSTEM_FONTS.has(text)) {
-						let normalized = text.toLowerCase()
-						if (normalized.includes('var(')) {
-							fontSizes.p(text, valueLoc)
+						if (str_index_of('var(', text) === -1) {
+							fontSizes.p(text.toLowerCase(), valueLoc)
 						} else {
-							fontSizes.p(normalized, valueLoc)
+							fontSizes.p(text, valueLoc)
 						}
 					}
 				} else if (normalizedProperty === 'font-family') {
@@ -655,14 +1289,13 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					}
 					return SKIP // to prevent finding color false positives (Black as font family name is not a color)
 				} else if (normalizedProperty === 'line-height') {
-					let normalized = text.toLowerCase()
-					if (normalized.includes('var(')) {
-						lineHeights.p(text, valueLoc)
+					if (str_index_of('var(', text) === -1) {
+						lineHeights.p(text.toLowerCase(), valueLoc)
 					} else {
-						lineHeights.p(normalized, valueLoc)
+						lineHeights.p(text, valueLoc)
 					}
 				} else if (normalizedProperty === 'transition' || normalizedProperty === 'animation') {
-					let isAnimation = normalizedProperty === 'animation'
+					const isAnimation = normalizedProperty === 'animation'
 					analyzeAnimation(value, function (item) {
 						if (item.type === 'fn') {
 							timingFunctions.p(item.value.text.toLowerCase(), valueLoc)
@@ -671,8 +1304,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						} else if (item.type === 'keyword') {
 							valueKeywords.p(item.value.text.toLowerCase(), valueLoc)
 						} else if (item.type === 'name' && isAnimation) {
-							animationNames.p(item.value.text, valueLoc)
-							animationNamesTracking.use(item.value.text)
+							const name = unquote(item.value.text)
+							animationNames.p(name, valueLoc)
+							animationNamesTracking.use(name)
 						}
 					})
 					return SKIP
@@ -680,9 +1314,9 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					normalizedProperty === 'animation-duration' ||
 					normalizedProperty === 'transition-duration'
 				) {
-					for (let child of value.children) {
+					for (const child of value.children) {
 						if (!is_operator(child)) {
-							let text = child.text
+							const text = child.text
 							if (/var\(/i.test(text)) {
 								durations.p(text, valueLoc)
 							} else {
@@ -694,20 +1328,24 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					normalizedProperty === 'transition-timing-function' ||
 					normalizedProperty === 'animation-timing-function'
 				) {
-					for (let child of value.children) {
+					for (const child of value.children) {
 						if (!is_operator(child)) {
 							timingFunctions.p(child.text, valueLoc)
 						}
 					}
 				} else if (normalizedProperty === 'animation-name') {
-					for (let child of value.children) {
+					for (const child of value.children) {
 						if (is_identifier(child) && !keywords.has(child.name)) {
 							animationNames.p(child.text, valueLoc)
 							animationNamesTracking.use(child.text)
+						} else if (is_string(child)) {
+							const name = unquote(child.text)
+							animationNames.p(name, valueLoc)
+							animationNamesTracking.use(name)
 						}
 					}
 				} else if (normalizedProperty === 'container-name') {
-					for (let child of value.children) {
+					for (const child of value.children) {
 						if (is_identifier(child) && !keywords.has(child.name)) {
 							containerNames.p(child.text, toLoc(child))
 							containerNamesTracking.define(child.text)
@@ -723,8 +1361,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						}
 					}
 				} else if (normalizedProperty === 'anchor-name') {
-					for (let child of value.children) {
-						if (is_identifier(child) && str_starts_with(child.text, '--')) {
+					for (const child of value.children) {
+						if (is_identifier(child) && is_custom(child.text)) {
 							anchorNamesTracking.define(child.text)
 						}
 					}
@@ -732,7 +1370,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					if (
 						value.first_child &&
 						is_identifier(value.first_child) &&
-						str_starts_with(value.first_child.text, '--')
+						is_custom(value.first_child.text)
 					) {
 						anchorNamesTracking.use(value.first_child.text)
 					}
@@ -746,19 +1384,19 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 
 				walk(value, (valueNode) => {
 					if (is_dimension(valueNode)) {
-						let unit = valueNode.unit.toLowerCase()
-						let loc = toLoc(valueNode)
+						const unit = valueNode.unit.toLowerCase()
+						const loc = toLoc(valueNode)
 						units.push(unit, property, loc)
 						return SKIP
 					}
 
 					if (is_hash(valueNode)) {
 						// Use text property for the hash value
-						let hashText = valueNode.text
+						const hashText = valueNode.text
 						if (!hashText || !hashText.startsWith('#')) {
 							return SKIP
 						}
-						let hashValue = hashText.toLowerCase()
+						const hashValue = hashText.toLowerCase()
 
 						// Calculate hex length (excluding the # and any IE9 browserhack \9)
 						let hexLength = hashValue.length - 1 // Remove the # from length
@@ -766,7 +1404,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 							hexLength = hexLength - 2 // Remove the \9 or \7 from length
 						}
 
-						let hashLoc = toLoc(valueNode)
+						const hashLoc = toLoc(valueNode)
 						colors.push(hashValue, property, hashLoc)
 						colorFormats.p(`hex` + hexLength, hashLoc)
 
@@ -774,8 +1412,8 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					}
 
 					if (is_identifier(valueNode)) {
-						let identifierText = valueNode.text
-						let identifierLoc = toLoc(valueNode)
+						const identifierText = valueNode.text
+						const identifierLoc = toLoc(valueNode)
 
 						// Skip all identifier processing for font properties to avoid:
 						// 1. False positives for colors (e.g., "Black" as a font family vs. "black" the color)
@@ -791,14 +1429,14 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						// Bail out if it can't be a color name
 						// 20 === 'lightgoldenrodyellow'.length
 						// 3 === 'red'.length
-						let nodeLen = identifierText.length
+						const nodeLen = identifierText.length
 						if (nodeLen > 20 || nodeLen < 3) {
 							return SKIP
 						}
 
 						// A keyword is most likely to be 'transparent' or 'currentColor'
 						if (colorKeywords.has(identifierText)) {
-							let colorKeyword = identifierText.toLowerCase()
+							const colorKeyword = identifierText.toLowerCase()
 							colors.push(colorKeyword, property, identifierLoc)
 							colorFormats.p(colorKeyword, identifierLoc)
 							return
@@ -821,26 +1459,24 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 					}
 
 					if (is_function(valueNode)) {
-						let funcName = valueNode.name
-						let funcLoc = toLoc(valueNode)
-						let firstFuncChild = valueNode.first_child
+						const funcName = valueNode.name
+						const funcLoc = toLoc(valueNode)
+						const firstFuncChild = valueNode.first_child
 
 						// Track var(--custom-property) usage
-						if (
-							funcName === 'var' &&
-							firstFuncChild &&
-							is_identifier(firstFuncChild) &&
-							str_starts_with(firstFuncChild.text, '--')
-						) {
-							customPropsTracking.use(firstFuncChild.text)
+						if (str_equals('var', funcName) && firstFuncChild && is_identifier(firstFuncChild)) {
+							const name = firstFuncChild.text
+							if (is_custom(name)) {
+								customPropsTracking.use(name)
+							}
 						}
 
 						// Track anchor(--name) and anchor-size(--name) usage
 						if (
-							(funcName === 'anchor' || funcName === 'anchor-size') &&
+							(str_equals('anchor', funcName) || str_equals('anchor-size', funcName)) &&
 							firstFuncChild &&
 							is_identifier(firstFuncChild) &&
-							str_starts_with(firstFuncChild.text, '--')
+							is_custom(firstFuncChild.text)
 						) {
 							anchorNamesTracking.use(firstFuncChild.text)
 						}
@@ -862,16 +1498,16 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 			}
 			//#endregion VALUES
 		} else if (is_url(node)) {
-			let { value } = node
-			let embed = unquote(value ?? '')
-			if (str_starts_with(embed, 'data:')) {
-				let size = embed.length
-				let type = getEmbedType(embed)
+			const { value } = node
+			const embed = unquote(value ?? '')
+			if (str_starts_with('data:', embed)) {
+				const size = embed.length
+				const type = getEmbedType(embed)
 
 				embedTypes.total++
 				embedSize += size
 
-				let loc = {
+				const loc = {
 					line: node.line,
 					column: node.column,
 					offset: node.start,
@@ -879,7 +1515,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 				}
 
 				if (embedTypes.unique.has(type)) {
-					let item = embedTypes.unique.get(type)!
+					const item = embedTypes.unique.get(type)!
 					item.count++
 					item.size += size
 					embedTypes.unique.set(type, item)
@@ -887,7 +1523,7 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 						item.uniqueWithLocations.push(loc)
 					}
 				} else {
-					let item = {
+					const item = {
 						count: 1,
 						size,
 						uniqueWithLocations: useLocations ? [loc] : undefined,
@@ -901,22 +1537,22 @@ function analyzeInternal<T extends boolean>(css: string, options: Options, useLo
 		}
 	})
 
-	let totalUniqueDeclarations = uniqueDeclarations.size
+	const totalUniqueDeclarations = uniqueDeclarations.size
 
-	let totalSelectors = selectorComplexities.size()
-	let specificitiesA = specificityA.aggregate()
-	let specificitiesB = specificityB.aggregate()
-	let specificitiesC = specificityC.aggregate()
-	let totalUniqueSelectors = uniqueSelectors.size
-	let assign = Object.assign
-	let cssLen = css.length
-	let fontFacesCount = fontfaces.length
-	let atRuleComplexity = atRuleComplexities.aggregate()
-	let selectorComplexity = selectorComplexities.aggregate()
-	let declarationComplexity = declarationComplexities.aggregate()
-	let propertyComplexity = propertyComplexities.aggregate()
-	let valueComplexity = valueComplexities.aggregate()
-	let atruleCount = atrules.c()
+	const totalSelectors = selectorComplexities.size()
+	const specificitiesA = specificityA.aggregate()
+	const specificitiesB = specificityB.aggregate()
+	const specificitiesC = specificityC.aggregate()
+	const totalUniqueSelectors = uniqueSelectors.size
+	const assign = Object.assign
+	const cssLen = css.length
+	const fontFacesCount = fontfaces.length
+	const atRuleComplexity = atRuleComplexities.aggregate()
+	const selectorComplexity = selectorComplexities.aggregate()
+	const declarationComplexity = declarationComplexities.aggregate()
+	const propertyComplexity = propertyComplexities.aggregate()
+	const valueComplexity = valueComplexities.aggregate()
+	const atruleCount = atrules.c()
 
 	return {
 		stylesheet: {
@@ -1163,30 +1799,30 @@ export function compareSpecificity(a: Specificity, b: Specificity): number {
 	return b[0] - a[0]
 }
 
-export { calculate as calculateSpecificity } from './selectors/specificity.js'
+export { calculate as calculateSpecificity } from './selectors/specificity.ts'
 
 export {
 	getComplexity as selectorComplexity,
 	isPrefixed as isSelectorPrefixed,
 	isAccessibility as isAccessibilitySelector,
-} from './selectors/utils.js'
+} from './selectors/utils.ts'
 
-export { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.js'
+export { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.ts'
 
-export { isHack as isPropertyHack } from './properties/property-utils.js'
+export { isHack as isPropertyHack } from './properties/property-utils.ts'
 
-export { isValuePrefixed } from './values/vendor-prefix.js'
+export { isValuePrefixed } from './values/vendor-prefix.ts'
 
-export { isValueBrowserhack } from './values/browserhacks.js'
+export { isValueBrowserhack } from './values/browserhacks.ts'
 
-export { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.js'
+export { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.ts'
 
-export { keywords as cssKeywords } from './values/values.js'
+export { keywords as cssKeywords } from './values/values.ts'
 
-export { hasVendorPrefix } from './vendor-prefix.js'
+export { hasVendorPrefix } from './vendor-prefix.ts'
 
-export { KeywordSet } from './keyword-set.js'
+export { KeywordSet } from './keyword-set.ts'
 
-export { DefinedUsed, type DefinedUsedResult } from './defined-used.js'
+export { DefinedUsed, type DefinedUsedResult } from './defined-used.ts'
 
-export type { Location, UniqueWithLocations } from './collection.js'
+export type { Location, UniqueWithLocations } from './collection.ts'

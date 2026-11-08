@@ -89,7 +89,9 @@ function compoundArgumentSpecificity(childSelector: Selector): Specificity {
 
 	let childPart = childSelector.first_child
 	while (childPart) {
-		if (is_combinator(childPart)) break
+		if (is_combinator(childPart)) {
+			break
+		}
 
 		const [pa, pb, pc] = nodeSpecificity(childPart)
 		a += pa
@@ -243,6 +245,19 @@ function nodeSpecificity(current: SelectorNode): Specificity {
 					break
 				}
 
+				case 'highlight': {
+					if (current.first_child) {
+						// The specificity of a ::highlight() selector with a * argument is zero.
+						if (current.first_child.text === '*') {
+							break
+						}
+						// The specificity of a ::highlight() selector with a <custom-ident> argument
+						// is equivalent to a type selector.
+						c += 1
+					}
+					break
+				}
+
 				default: {
 					c += 1
 					break
@@ -265,7 +280,7 @@ function nodeSpecificity(current: SelectorNode): Specificity {
 	}
 }
 
-export const calculateForAST = (selectorAST: Selector): Specificity => {
+export function calculateForAST(selectorAST: Selector): Specificity {
 	// https://www.w3.org/TR/selectors-4/#specificity-rules
 	let a = 0 /* ID Selectors */
 	let b = 0 /* Class selectors, Attributes selectors, and Pseudo-classes */
@@ -286,51 +301,26 @@ export const calculateForAST = (selectorAST: Selector): Specificity => {
 	return [a, b, c]
 }
 
-const convertToAST = (source: string | CSSNode) => {
-	// The passed in argument was a String.
-	// ~> Let's try and parse to an AST
-	if (typeof source === 'string') {
-		try {
-			return parse_selector_list(source)
-		} catch (e) {
-			const message = e instanceof Error ? e.message : String(e)
-			throw new TypeError(
-				`Could not convert passed in source '${source}' to SelectorList: ${message}`,
-			)
-		}
-	}
-
-	// The passed in argument was an Object.
-	// ~> Let's verify if it's a AST of the type NODE_SELECTOR_LIST
-	if (source instanceof Object) {
-		if (is_selector_list(source)) {
-			return source
-		}
-
-		throw new TypeError(`Passed in source is an Object but no AST / AST of the type SelectorList`)
-	}
-
-	throw new TypeError(
-		`Passed in source is not a String nor an Object. I don't know what to do with it.`,
-	)
-}
-
-export const calculate = (selector: string | CSSNode): Specificity[] => {
-	// Quit while you're ahead
+export function calculate(selector: string | CSSNode): Specificity[] {
 	if (!selector) {
 		return []
 	}
 
-	// Make sure we have a SelectorList AST
-	// If not, an exception will be thrown
-	const selector_list = convertToAST(selector)
-
-	// SelectorList - the ast is always a SelectorList
-	// Its children are NODE_SELECTOR (type 5) nodes
-	// ~> Calculate Specificity for each NODE_SELECTOR
-	const specificities: Specificity[] = []
-	for (const selector_node of selector_list) {
-		specificities.push(calculateForAST(selector_node))
+	let selector_list: CSSNode
+	if (typeof selector === 'string') {
+		try {
+			selector_list = parse_selector_list(selector)
+		} catch (event) {
+			const message = event instanceof Error ? event.message : String(event)
+			throw new TypeError(
+				`Could not convert passed in source '${selector}' to SelectorList: ${message}`,
+			)
+		}
+	} else if (is_selector_list(selector)) {
+		selector_list = selector
+	} else {
+		throw new TypeError('Passed in source is not a string or a SelectorList AST')
 	}
-	return specificities
+
+	return Array.from(selector_list, (node) => calculateForAST(node as Selector))
 }

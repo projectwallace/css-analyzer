@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze } from '../index.ts'
 
 test('handles the universal selector', () => {
 	const fixture = `
@@ -171,6 +171,38 @@ test('handles pseudo element selectors', () => {
 	expect(actual).toEqual(expected)
 })
 
+test('handles the ::part pseudo element', () => {
+	const fixture = `
+    ::part(my-ident),
+    ::part(first-ident second-ident)
+    {}
+  `
+	const actual = analyze(fixture).selectors.specificity.items
+	const expected = [
+		[0, 0, 1],
+		[0, 0, 1],
+	]
+	expect(actual).toEqual(expected)
+})
+
+test('handles the ::highlight pseudo element', () => {
+	const fixture = `
+    ::highlight,
+    ::highlight(),
+    ::highlight(my-ident),
+    ::highlight(*)
+    {}
+  `
+	const actual = analyze(fixture).selectors.specificity.items
+	const expected = [
+		[0, 0, 0],
+		[0, 0, 0],
+		[0, 0, 1],
+		[0, 0, 0],
+	]
+	expect(actual).toEqual(expected)
+})
+
 test('handles the :host and :host-context pseudo classes', () => {
 	const fixture = `
     :host(.foo), /* [0,2,0]: 1 for :host itself, 1 for .foo */
@@ -288,4 +320,28 @@ test('calculates specificity uniqueness', () => {
 	})
 	expect(actual.totalUnique).toBe(5)
 	expect(actual.uniquenessRatio).toBe(5 / 12)
+})
+
+test('does not double count nested pseudo-class functions', () => {
+	const fixture = `
+    :is(.a),
+    :is(:is(.a)),
+    :is(:is(:is(#a))),
+    :not(:is(.a, .b)),
+    .x:has(:is(.a, .b)),
+    :is(.a :is(.b)),
+    :is(.a, :is(.b)),
+    :where(:is(.a)) {}
+  `
+	const actual = analyze(fixture).selectors.specificity.items
+	expect(actual).toEqual([
+		[0, 1, 0],
+		[0, 1, 0],
+		[1, 0, 0],
+		[0, 1, 0],
+		[0, 2, 0],
+		[0, 2, 0],
+		[0, 1, 0],
+		[0, 0, 0],
+	])
 })

@@ -1,7 +1,7 @@
 import { is_number, is_dimension, type Value } from '@projectwallace/css-parser'
-import { KeywordSet } from '../keyword-set.js'
+import { KeywordSet } from '../keyword-set.ts'
 
-export const keywords = new KeywordSet([
+export const keywords: KeywordSet = new KeywordSet([
 	'auto',
 	'none', // for `text-shadow`, `box-shadow` and `background`
 	'inherit',
@@ -15,9 +15,13 @@ export const keywords = new KeywordSet([
  * Test whether a value is a reset (0, 0px, -0.0e0 etc.)
  */
 export function isValueReset(value: Value): boolean {
-	for (let node of value) {
-		if (is_number(node) && node.value === 0) continue
-		if (is_dimension(node) && node.value === 0) continue
+	for (const node of value) {
+		if (is_number(node) && node.value === 0) {
+			continue
+		}
+		if (is_dimension(node) && node.value === 0) {
+			continue
+		}
 		return false
 	}
 

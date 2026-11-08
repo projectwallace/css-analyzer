@@ -1,4 +1,4 @@
-import { Collection, type CollectionCount, type Location } from './collection.js'
+import { Collection, type CollectionCount, type Location } from './collection.ts'
 
 export class ContextCollection<UseLocations extends boolean = false> {
 	#list: Collection<UseLocations>
@@ -17,7 +17,7 @@ export class ContextCollection<UseLocations extends boolean = false> {
 	 * @param context Context to push Item to
 	 * @param node_location
 	 */
-	push(item: string, context: string, node_location: Location) {
+	push(item: string, context: string, node_location: Location): void {
 		this.#list.p(item, node_location)
 
 		if (!this.#contexts.has(context)) {
@@ -27,10 +27,12 @@ export class ContextCollection<UseLocations extends boolean = false> {
 		this.#contexts.get(context)!.p(item, node_location)
 	}
 
-	count() {
-		let itemsPerContext: Map<string, CollectionCount<UseLocations>> = new Map()
+	count(): CollectionCount<UseLocations> & {
+		itemsPerContext: { [k: string]: CollectionCount<UseLocations> }
+	} {
+		const itemsPerContext: Map<string, CollectionCount<UseLocations>> = new Map()
 
-		for (let [context, value] of this.#contexts.entries()) {
+		for (const [context, value] of this.#contexts.entries()) {
 			itemsPerContext.set(context, value.c())
 		}
 

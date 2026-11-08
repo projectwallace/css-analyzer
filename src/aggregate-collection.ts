@@ -7,15 +7,15 @@
  * @returns mode - The `mode` value of `arr`
  */
 function Mode(arr: unknown[]): number {
-	let frequencies = new Map()
+	const frequencies = new Map()
 	let maxOccurrences = -1
 	let maxOccurenceCount = 0
 	let sum = 0
-	let len = arr.length
+	const len = arr.length
 
 	for (let i = 0; i < len; i++) {
-		let element = arr[i]
-		let updatedCount = (frequencies.get(element) || 0) + 1
+		const element = arr[i]
+		const updatedCount = (frequencies.get(element) || 0) + 1
 		frequencies.set(element, updatedCount)
 
 		if (updatedCount > maxOccurrences) {
@@ -47,17 +47,24 @@ export class AggregateCollection {
 	 * Add a new Integer at the end of this AggregateCollection
 	 * @param item - The item to add
 	 */
-	push(item: number) {
+	push(item: number): void {
 		this.#items.push(item)
 		this.#sum += item
 	}
 
-	size() {
+	size(): number {
 		return this.#items.length
 	}
 
-	aggregate() {
-		let len = this.#items.length
+	aggregate(): {
+		min: number
+		max: number
+		mean: number
+		mode: number
+		range: number
+		sum: number
+	} {
+		const len = this.#items.length
 
 		if (len === 0) {
 			return {
@@ -70,13 +77,13 @@ export class AggregateCollection {
 			}
 		}
 
-		// TODO: can we avoid this sort()? It's slow
-		let sorted = this.#items.slice().sort((a, b) => a - b)
-		let min = sorted[0]!
-		let max = sorted[len - 1]!
+		// Perf: this sort() is slow, look for a way to avoid it
+		const sorted = this.#items.slice().sort((a, b) => a - b)
+		const min = sorted[0]!
+		const max = sorted[len - 1]!
 
-		let mode = Mode(sorted)
-		let sum = this.#sum
+		const mode = Mode(sorted)
+		const sum = this.#sum
 
 		return {
 			min,
@@ -88,7 +95,7 @@ export class AggregateCollection {
 		}
 	}
 
-	toArray() {
+	toArray(): number[] {
 		return this.#items
 	}
 }

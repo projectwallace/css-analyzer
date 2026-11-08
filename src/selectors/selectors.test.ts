@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze } from '../index.ts'
 
 test('are analyzed', () => {
 	const fixture = `
@@ -435,7 +435,7 @@ test('handles emoji selectors', () => {
 })
 
 test('analyzes vendor prefixed selectors', () => {
-	let actual = analyze(`
+	const actual = analyze(`
     input[type=text]::-webkit-input-placeholder {
         color: green;
     }
@@ -470,7 +470,7 @@ test('analyzes vendor prefixed selectors', () => {
 })
 
 test('counts combinators', () => {
-	let result = analyze(`
+	const result = analyze(`
     a,
     a b,
     a > b,
@@ -481,7 +481,7 @@ test('counts combinators', () => {
     :is(a + b, a, e > f) {
     }
   `)
-	let actual = result.selectors.combinators
+	const actual = result.selectors.combinators
 
 	expect(actual.total).toBe(12)
 	expect(actual.totalUnique).toBe(4)
@@ -495,7 +495,7 @@ test('counts combinators', () => {
 })
 
 test('tracks combinator locations', () => {
-	let css = `
+	const css = `
     a b,
     a > b,
     a
@@ -503,10 +503,10 @@ test('tracks combinator locations', () => {
     a:not(b) c,
     a[attr] b {}
   `
-	let result = analyze(css, {
+	const result = analyze(css, {
 		useLocations: true,
 	})
-	let actual = result.selectors.combinators
+	const actual = result.selectors.combinators
 
 	expect(actual.uniqueWithLocations).toEqual({
 		' ': [
@@ -545,7 +545,7 @@ test('tracks combinator locations', () => {
 		],
 	})
 
-	let as_strings = actual.uniqueWithLocations![' ']?.map((loc) =>
+	const as_strings = actual.uniqueWithLocations![' ']?.map((loc) =>
 		css.substring(loc.offset, loc.offset + loc.length),
 	)
 	expect(as_strings).toEqual([' ', `\n`, ' ', ' '])
@@ -616,8 +616,8 @@ test('Can keep track of selector locations if we ask it to do so', () => {
       }
     }
   `
-	let actual = analyze(fixture, { useLocations: true }).selectors.complexity.uniqueWithLocations
-	let expected = {
+	const actual = analyze(fixture, { useLocations: true }).selectors.complexity.uniqueWithLocations
+	const expected = {
 		'1': [
 			{
 				line: 2,

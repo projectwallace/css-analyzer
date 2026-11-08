@@ -1,6 +1,6 @@
-import { KeywordSet } from '../keyword-set.js'
+import { KeywordSet } from '../keyword-set.ts'
 
-export const namedColors = new KeywordSet([
+export const namedColors: KeywordSet = new KeywordSet([
 	// CSS Named Colors
 	// Spec: https://drafts.csswg.org/css-color/#named-colors
 
@@ -156,7 +156,7 @@ export const namedColors = new KeywordSet([
 	'mediumspringgreen',
 ])
 
-export const systemColors = new KeywordSet([
+export const systemColors: KeywordSet = new KeywordSet([
 	// CSS System Colors
 	// Spec: https://drafts.csswg.org/css-color/#css-system-colors
 	'accentcolor',
@@ -180,7 +180,7 @@ export const systemColors = new KeywordSet([
 	'visitedtext',
 ])
 
-export const colorFunctions = new KeywordSet([
+export const colorFunctions: KeywordSet = new KeywordSet([
 	'rgba',
 	'rgb',
 	'hsla',
@@ -193,4 +193,4 @@ export const colorFunctions = new KeywordSet([
 	'oklab',
 ])
 
-export const colorKeywords = new KeywordSet(['transparent', 'currentcolor'])
+export const colorKeywords: KeywordSet = new KeywordSet(['transparent', 'currentcolor'])

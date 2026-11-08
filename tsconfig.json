@@ -5,8 +5,6 @@
 		// TODO: set to es2025 on next major version
 		"target": "es2022",
 		"verbatimModuleSyntax": true,
-		"allowJs": true,
-		"checkJs": true,
 		"moduleDetection": "force",
 
 		// Strictness
@@ -14,11 +12,19 @@
 		"noUncheckedIndexedAccess": true,
 		"noImplicitAny": true,
 
+		// Node-compatible module resolution: relative imports must include a file
+		// extension, and we use `.ts` so source runs as-is with Node's type stripping
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
+		"allowImportingTsExtensions": true,
+		"rewriteRelativeImportExtensions": true,
+		"erasableSyntaxOnly": true,
+
 		// Type checking, not transpiling
-		"module": "ESNext",
-		"moduleResolution": "bundler",
 		"allowSyntheticDefaultImports": true,
 		"noEmit": true,
+		"declaration": true,
+		"isolatedDeclarations": true,
 
 		// Code runs in the DOM
 		"lib": ["ES2022", "DOM", "DOM.Iterable"]

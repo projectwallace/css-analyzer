@@ -1,6 +1,6 @@
 import { test } from 'vitest'
 import { expect } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze } from '../index.ts'
 
 test('finds linear-gradient', () => {
 	const fixture = `
@@ -66,19 +66,19 @@ test('finds repeating-linear-gradient', () => {
     }
   `
 	const actual = analyze(fixture).values.gradients
-	let x = `repeating-linear-gradient(
+	const x = `repeating-linear-gradient(
 				-45deg,
 				transparent,
 				transparent 20px,
 				black 20px,
 				black 40px
 			)`
-	let y = `repeating-linear-gradient(
+	const y = `repeating-linear-gradient(
 				-45deg,
 				transparent 0 20px,
 				black 20px 40px
 			)`
-	let z = `repeating-linear-gradient(
+	const z = `repeating-linear-gradient(
 				to bottom,
 				rgb(26, 198, 204),
 				rgb(26, 198, 204) 7%,
@@ -151,20 +151,20 @@ test('finds repeating-radial-gradient', () => {
     }
   `
 	const actual = analyze(fixture).values.gradients
-	let x = `repeating-radial-gradient(
+	const x = `repeating-radial-gradient(
 				black,
 				black 5px,
 				white 5px,
 				white 10px
 			)`
-	let y = `repeating-radial-gradient(
+	const y = `repeating-radial-gradient(
 				ellipse farthest-corner at 20% 20%,
 				red,
 				black 5%,
 				blue 5%,
 				green 10%
 			)`
-	let z = `repeating-radial-gradient(
+	const z = `repeating-radial-gradient(
 				ellipse farthest-corner at 20% 20%,
 				red 0 5%,
 				green 5% 10%
@@ -209,7 +209,7 @@ test('finds conic gradient', () => {
 			);
     }
   `
-	let wheel = `conic-gradient(
+	const wheel = `conic-gradient(
 				hsl(360, 100%, 50%),
 				hsl(315, 100%, 50%),
 				hsl(270, 100%, 50%),
@@ -252,7 +252,7 @@ test('finds repeating-conic-gradient', () => {
     }
   `
 	const actual = analyze(fixture).values.gradients
-	let x = `repeating-conic-gradient(
+	const x = `repeating-conic-gradient(
 				from 3deg at 25% 25%,
 				green,
 				blue 2deg 5deg,

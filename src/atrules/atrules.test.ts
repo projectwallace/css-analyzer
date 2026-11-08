@@ -1,8 +1,8 @@
 import { test, expect } from 'vitest'
-import { analyze } from '../index.js'
+import { analyze } from '../index.ts'
 
 test('counts total atrules', () => {
-	let css = `
+	const css = `
     @import url(test.css);
 
     @layer a, b, c;
@@ -17,7 +17,7 @@ test('counts total atrules', () => {
 
 		@LAYER A;
   `
-	let actual = analyze(css).atrules
+	const actual = analyze(css).atrules
 	expect(actual.total).toEqual(5)
 	expect(actual.totalUnique).toEqual(4)
 	expect(actual.unique).toEqual({
@@ -30,7 +30,7 @@ test('counts total atrules', () => {
 })
 
 test('calculates complexity', () => {
-	let css = `
+	const css = `
     /* 1 */
     @import url(test.css);
 
@@ -59,7 +59,7 @@ test('calculates complexity', () => {
     /* 2 */
     @-webkit-keyframes one {}
   `
-	let actual = analyze(css).atrules.complexity
+	const actual = analyze(css).atrules.complexity
 	expect(actual).toEqual({
 		min: 1,
 		max: 2,
@@ -434,7 +434,7 @@ test('finds @font-face (with locations)', () => {
 test.skip('handles @font-face encoding issues (GH-307)', () => {
 	// Actual CSS once found in a <style> tag on vistaprint.nl
 	// CSSTree parses it without errors, but analyzer failed on it;
-	let css = `
+	const css = `
     @font-face {
       font-family: &#x27;Graphik&#x27;;
       font-stretch: normal;
@@ -457,9 +457,9 @@ test.skip('handles @font-face encoding issues (GH-307)', () => {
   `
 	expect(() => analyze(css)).not.toThrowError()
 
-	let actual = analyze(css).atrules.fontface
+	const actual = analyze(css).atrules.fontface
 	expect(actual.total).toEqual(2)
-	let expected = {
+	const expected = {
 		'font-family': `&#x27`,
 		'font-stretch': `normal`,
 		'font-style': `normal`,
@@ -744,7 +744,7 @@ test('finds Media Features', () => {
 })
 
 test('does not crash on incomplete @media queries', () => {
-	let css = `
+	const css = `
     @media (min-width) {}
     @media (-moz-images-in-menus) {}
     @media (min--moz-device-pixel-ratio) {}
