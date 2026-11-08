@@ -1,9 +1,9 @@
-import { is_function, is_identifier, FUNCTION } from '@projectwallace/css-parser'
+import { is_function, is_identifier, FUNCTION, property_basename } from '@projectwallace/css-parser'
 import { DefinedUsed, type DefinedUsedResult } from '../defined-used.ts'
 import { create_counter } from '../engine/counter.ts'
 import { define_collector } from '../engine/define-collector.ts'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
-import { basename, shorthand_properties } from '../properties/property-utils.ts'
+import { shorthand_properties } from '../properties/property-utils.ts'
 import { get_first_identifier, get_list_items } from './shared.ts'
 
 export type PropertiesResult = CountResult & {
@@ -49,7 +49,7 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 			parse: { values: true, atrule_preludes: true },
 			atrule(node) {
 				const prelude = node.has_prelude ? node.prelude : undefined
-				if (prelude && basename(node.name) === 'property') {
+				if (prelude && property_basename(node.name) === 'property') {
 					custom_tracking.define(prelude.text)
 				}
 			},

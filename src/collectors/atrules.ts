@@ -13,6 +13,7 @@ import {
 	str_equals,
 	walk,
 	FUNCTION,
+	property_basename,
 } from '@projectwallace/css-parser'
 import { DefinedUsed, type DefinedUsedResult } from '../defined-used.ts'
 import { create_counter, to_location } from '../engine/counter.ts'
@@ -21,7 +22,6 @@ import type { CollectorDef, CountOptions, CountResult, Location } from '../engin
 import { unquote } from '../string-utils.ts'
 import { get_media_browserhacks, get_supports_browserhacks } from '../atrules/atrules.ts'
 import { keywords } from '../values/values.ts'
-import { basename } from '../properties/property-utils.ts'
 import {
 	get_animation_names,
 	get_first_identifier,
@@ -156,7 +156,7 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 			parse: { values: true, atrule_preludes: true },
 			atrule(node, ctx) {
 				const raw_name = node.name
-				const name = basename(raw_name)
+				const name = property_basename(raw_name)
 				const prelude = node.has_prelude ? node.prelude : undefined
 				const prelude_text = prelude?.text
 				const block = node.block

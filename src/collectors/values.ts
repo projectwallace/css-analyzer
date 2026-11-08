@@ -8,7 +8,7 @@ import type {
 	CountOptions,
 	CountResult,
 } from '../engine/types.ts'
-import { SPACING_RESET_PROPERTIES } from '../properties/property-utils.ts'
+import { spacing_reset_properties } from '../properties/property-utils.ts'
 import { analyze_animation } from '../values/animations.ts'
 import { get_value_browserhacks } from '../values/browserhacks.ts'
 import { is_value_reset, keywords as global_keywords } from '../values/values.ts'
@@ -137,7 +137,7 @@ export function resets(options: CountOptions = {}): CollectorDef<CountResult> {
 		return {
 			parse: { values: true },
 			declaration: {
-				properties: SPACING_RESET_PROPERTIES,
+				properties: spacing_reset_properties,
 				enter(_node, ctx) {
 					if (ctx.clean_value_text === undefined) {
 						return

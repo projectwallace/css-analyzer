@@ -61,6 +61,5 @@ describe('Public API', () => {
 
 	test('exposes property helpers', () => {
 		expect(properties.is_property_hack('*zoom')).toBe(true)
-		expect(properties.basename('-webkit-Transition')).toBe('transition')
 	})
 })

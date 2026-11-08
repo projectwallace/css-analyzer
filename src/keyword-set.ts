@@ -5,7 +5,7 @@ export class KeywordSet {
 	set: Set<string>
 
 	constructor(items: Lowercase<string>[]) {
-		/** @type {Set<string>} */
+		/** @type {ReadonlySet} */
 		this.set = new Set(items)
 	}
 
