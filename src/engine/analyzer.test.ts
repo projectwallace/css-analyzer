@@ -10,8 +10,10 @@ function declared_properties(options: CountOptions = {}) {
 	return define_collector<CountResult>(function init() {
 		const counter = create_counter(options)
 		return {
-			declaration(node, ctx) {
-				counter.add(ctx.property, node)
+			declaration: {
+				enter(node, ctx) {
+					counter.add(ctx.property, node)
+				},
 			},
 			result: () => counter.result(),
 		}
@@ -63,14 +65,16 @@ test('keys are chosen by the consumer', () => {
 test('normalizes the property and exposes declaration facts', () => {
 	const seen: Record<string, unknown>[] = []
 	const facts = define_collector<number>(() => ({
-		declaration(_node, ctx) {
-			seen.push({
-				property: ctx.property,
-				is_custom: ctx.is_custom,
-				is_important: ctx.is_important,
-				is_vendor_prefixed: ctx.is_vendor_prefixed,
-				value_text: ctx.value_text,
-			})
+		declaration: {
+			enter(_node, ctx) {
+				seen.push({
+					property: ctx.property,
+					is_custom: ctx.is_custom,
+					is_important: ctx.is_important,
+					is_vendor_prefixed: ctx.is_vendor_prefixed,
+					value_text: ctx.value_text,
+				})
+			},
 		},
 		result: () => 0,
 	}))
@@ -128,8 +132,15 @@ test('one shared value walk feeds every value subscriber', () => {
 test('structural context: depth, atrule_stack, parent_rule', () => {
 	const seen: [string, number, string[], string | undefined][] = []
 	const structure = define_collector<number>(() => ({
-		declaration(_node, ctx) {
-			seen.push([ctx.property, ctx.depth, [...ctx.atrule_stack], ctx.parent_rule?.text.slice(0, 1)])
+		declaration: {
+			enter(_node, ctx) {
+				seen.push([
+					ctx.property,
+					ctx.depth,
+					[...ctx.atrule_stack],
+					ctx.parent_rule?.text.slice(0, 1),
+				])
+			},
 		},
 		result: () => 0,
 	}))
@@ -164,8 +175,10 @@ test('unsubscribed node kinds are never dispatched', () => {
 test('values stay unparsed when nobody needs them', () => {
 	let value: unknown = 'untouched'
 	const raw = define_collector<number>(() => ({
-		declaration(_node, ctx) {
-			value = ctx.value
+		declaration: {
+			enter(_node, ctx) {
+				value = ctx.value
+			},
 		},
 		result: () => 0,
 	}))
@@ -247,8 +260,10 @@ test('clean_value_text drops IE hacks and is undefined for global keywords', () 
 	const seen: (string | undefined)[] = []
 	const clean = define_collector<number>(() => ({
 		parse: { values: true },
-		declaration(_node, ctx) {
-			seen.push(ctx.clean_value_text)
+		declaration: {
+			enter(_node, ctx) {
+				seen.push(ctx.clean_value_text)
+			},
 		},
 		result: () => 0,
 	}))
@@ -260,8 +275,10 @@ test('font_shorthand is split once and is null for everything else', () => {
 	const seen: unknown[] = []
 	const shorthand = define_collector<number>(() => ({
 		parse: { values: true },
-		declaration(_node, ctx) {
-			seen.push(ctx.font_shorthand, ctx.font_shorthand)
+		declaration: {
+			enter(_node, ctx) {
+				seen.push(ctx.font_shorthand, ctx.font_shorthand)
+			},
 		},
 		result: () => 0,
 	}))

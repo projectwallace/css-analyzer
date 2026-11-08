@@ -20,22 +20,13 @@ import type {
 	CollectorInstance,
 	CollectorMap,
 	Context,
-	DeclarationContext,
-	DeclarationHandler,
 	ResultOf,
 	StylesheetContext,
 	ParseOptions,
 } from './types.ts'
 
-type DeclarationSubscription = {
-	properties: ReadonlySet<string> | undefined
-	enter: DeclarationHandler
-}
-
-type ValueSubscription = {
-	properties: ReadonlySet<string> | undefined
-	enter: (node: CSSNode, ctx: DeclarationContext) => void
-}
+type DeclarationSubscription = NonNullable<CollectorInstance<unknown>['declaration']>
+type ValueSubscription = Omit<NonNullable<CollectorInstance<unknown>['value']>, 'types'>
 
 /**
  * Run collectors over one stylesheet.
@@ -87,12 +78,7 @@ export function analyze<C extends CollectorMap>(
 			parse_options.selectors = true
 		}
 		if (instance.declaration) {
-			const declaration = instance.declaration
-			declaration_handlers.push(
-				typeof declaration === 'function'
-					? { properties: undefined, enter: declaration }
-					: { properties: declaration.properties, enter: declaration.enter },
-			)
+			declaration_handlers.push(instance.declaration)
 		}
 		if (instance.value) {
 			parse_options.values = true

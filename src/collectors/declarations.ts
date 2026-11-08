@@ -24,20 +24,22 @@ export function declarations(options: CountOptions = {}): CollectorDef<Declarati
 		let importants_in_keyframes = 0
 
 		return {
-			declaration(node, ctx) {
-				texts.add(node.text, node)
-				nesting.add(Math.max(ctx.depth - 1, 0), node)
+			declaration: {
+				enter(node, ctx) {
+					texts.add(node.text, node)
+					nesting.add(Math.max(ctx.depth - 1, 0), node)
 
-				let weight = 1
-				if (ctx.is_important) {
-					importants++
-					weight++
-					if (ctx.atrule_stack.includes('keyframes')) {
-						importants_in_keyframes++
+					let weight = 1
+					if (ctx.is_important) {
+						importants++
 						weight++
+						if (ctx.atrule_stack.includes('keyframes')) {
+							importants_in_keyframes++
+							weight++
+						}
 					}
-				}
-				complexity.add(weight, node)
+					complexity.add(weight, node)
+				},
 			},
 			result: () => ({
 				...texts.result(),

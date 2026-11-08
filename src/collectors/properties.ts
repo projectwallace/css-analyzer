@@ -53,53 +53,55 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 					custom_tracking.define(prelude.text)
 				}
 			},
-			declaration(node, ctx) {
-				const raw = ctx.raw_property
-				if (!raw) {
-					return
-				}
-				// The location of the property name, not the whole declaration
-				const length = raw.length
-				names.add(ctx.property, node, length)
-
-				if (ctx.is_vendor_prefixed) {
-					complexity.add(2, node, length)
-					prefixed.add(raw, node, length)
-				} else if (ctx.is_custom) {
-					custom.add(raw, node, length)
-					custom_tracking.define(raw)
-					complexity.add(ctx.is_important ? 3 : 2, node, length)
-					if (ctx.is_important) {
-						custom_importants.add(raw, node, length)
+			declaration: {
+				enter(node, ctx) {
+					const raw = ctx.raw_property
+					if (!raw) {
+						return
 					}
-				} else if (ctx.is_browserhack) {
-					browserhacks.add(raw.charAt(0), node, length)
-					complexity.add(2, node, length)
-				} else {
-					complexity.add(1, node, length)
-				}
+					// The location of the property name, not the whole declaration
+					const length = raw.length
+					names.add(ctx.property, node, length)
 
-				if (shorthand_properties.has(ctx.property)) {
-					shorthands.add(raw, node, length)
-				}
+					if (ctx.is_vendor_prefixed) {
+						complexity.add(2, node, length)
+						prefixed.add(raw, node, length)
+					} else if (ctx.is_custom) {
+						custom.add(raw, node, length)
+						custom_tracking.define(raw)
+						complexity.add(ctx.is_important ? 3 : 2, node, length)
+						if (ctx.is_important) {
+							custom_importants.add(raw, node, length)
+						}
+					} else if (ctx.is_browserhack) {
+						browserhacks.add(raw.charAt(0), node, length)
+						complexity.add(2, node, length)
+					} else {
+						complexity.add(1, node, length)
+					}
 
-				// Anchor names live in values
-				if (ctx.clean_value_text === undefined) {
-					return
-				}
-				if (ctx.property === 'anchor-name') {
-					for (const item of get_list_items(ctx.value!)) {
-						const text = is_identifier(item) ? item.text : undefined
-						if (text !== undefined && is_custom_name(text)) {
-							anchor_tracking.define(text)
+					if (shorthand_properties.has(ctx.property)) {
+						shorthands.add(raw, node, length)
+					}
+
+					// Anchor names live in values
+					if (ctx.clean_value_text === undefined) {
+						return
+					}
+					if (ctx.property === 'anchor-name') {
+						for (const item of get_list_items(ctx.value!)) {
+							const text = is_identifier(item) ? item.text : undefined
+							if (text !== undefined && is_custom_name(text)) {
+								anchor_tracking.define(text)
+							}
+						}
+					} else if (ctx.property === 'position-anchor') {
+						const name = get_first_identifier(ctx.value!)
+						if (name !== undefined && is_custom_name(name)) {
+							anchor_tracking.use(name)
 						}
 					}
-				} else if (ctx.property === 'position-anchor') {
-					const name = get_first_identifier(ctx.value!)
-					if (name !== undefined && is_custom_name(name)) {
-						anchor_tracking.use(name)
-					}
-				}
+				},
 			},
 			value: {
 				types: [FUNCTION],

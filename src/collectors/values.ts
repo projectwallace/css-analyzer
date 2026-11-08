@@ -91,23 +91,25 @@ export function keywords(options: CountOptions = {}): CollectorDef<CountResult> 
 	return define_counting_collector(options, function setup(counter) {
 		return {
 			parse: { values: true },
-			declaration(_node, ctx) {
-				if (!ctx.value) {
-					return
-				}
-				const text = ctx.value_text
+			declaration: {
+				enter(_node, ctx) {
+					if (!ctx.value) {
+						return
+					}
+					const text = ctx.value_text
 
-				if (global_keywords.has(text)) {
-					counter.add(text.toLowerCase(), ctx.value)
-				} else if (ctx.property === 'font') {
-					for (const keyword of ctx.font_shorthand?.keywords ?? []) {
-						counter.add(keyword.toLowerCase(), ctx.value)
+					if (global_keywords.has(text)) {
+						counter.add(text.toLowerCase(), ctx.value)
+					} else if (ctx.property === 'font') {
+						for (const keyword of ctx.font_shorthand?.keywords ?? []) {
+							counter.add(keyword.toLowerCase(), ctx.value)
+						}
+					} else if (ctx.property === 'transition' || ctx.property === 'animation') {
+						for (const keyword of analyze_animation(ctx.value).keywords) {
+							counter.add(keyword.toLowerCase(), ctx.value)
+						}
 					}
-				} else if (ctx.property === 'transition' || ctx.property === 'animation') {
-					for (const keyword of analyze_animation(ctx.value).keywords) {
-						counter.add(keyword.toLowerCase(), ctx.value)
-					}
-				}
+				},
 			},
 			value: {
 				types: [IDENTIFIER],
@@ -154,13 +156,15 @@ export function value_prefixes(options: CountOptions = {}): CollectorDef<CountRe
 	return define_counting_collector(options, function setup(counter) {
 		return {
 			parse: { values: true },
-			declaration(_node, ctx) {
-				if (ctx.clean_value_text === undefined) {
-					return
-				}
-				for (const prefixed of get_prefixed_values(ctx.value!)) {
-					counter.add(prefixed.toLowerCase(), ctx.value!)
-				}
+			declaration: {
+				enter(_node, ctx) {
+					if (ctx.clean_value_text === undefined) {
+						return
+					}
+					for (const prefixed of get_prefixed_values(ctx.value!)) {
+						counter.add(prefixed.toLowerCase(), ctx.value!)
+					}
+				},
 			},
 		}
 	})
@@ -171,19 +175,21 @@ export function value_browserhacks(options: CountOptions = {}): CollectorDef<Cou
 	return define_counting_collector(options, function setup(counter) {
 		return {
 			parse: { values: true },
-			declaration(node, ctx) {
-				if (!ctx.value) {
-					return
-				}
-				if (ctx.is_important && str_index_of('!important', node.text) === -1) {
-					counter.add('!ie', ctx.value)
-				}
-				if (ctx.clean_value_text === undefined || ctx.is_custom) {
-					return
-				}
-				for (const hack of get_value_browserhacks(ctx.value)) {
-					counter.add(hack, ctx.value)
-				}
+			declaration: {
+				enter(node, ctx) {
+					if (!ctx.value) {
+						return
+					}
+					if (ctx.is_important && str_index_of('!important', node.text) === -1) {
+						counter.add('!ie', ctx.value)
+					}
+					if (ctx.clean_value_text === undefined || ctx.is_custom) {
+						return
+					}
+					for (const hack of get_value_browserhacks(ctx.value)) {
+						counter.add(hack, ctx.value)
+					}
+				},
 			},
 		}
 	})
@@ -197,18 +203,20 @@ export function value_complexity(options: CountOptions = {}): CollectorDef<Count
 	return define_counting_collector<number>(options, function setup(counter) {
 		return {
 			parse: { values: true },
-			declaration(_node, ctx) {
-				if (!ctx.value) {
-					return
-				}
-				let complexity = 1
-				if (ctx.clean_value_text !== undefined) {
-					complexity += get_prefixed_values(ctx.value).length
-					if (!ctx.is_custom) {
-						complexity += get_value_browserhacks(ctx.value).length
+			declaration: {
+				enter(_node, ctx) {
+					if (!ctx.value) {
+						return
 					}
-				}
-				counter.add(complexity, ctx.value)
+					let complexity = 1
+					if (ctx.clean_value_text !== undefined) {
+						complexity += get_prefixed_values(ctx.value).length
+						if (!ctx.is_custom) {
+							complexity += get_value_browserhacks(ctx.value).length
+						}
+					}
+					counter.add(complexity, ctx.value)
+				},
 			},
 		}
 	})

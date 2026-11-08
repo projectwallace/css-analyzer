@@ -105,7 +105,7 @@ export type DeclarationContext = Context & {
 	readonly font_shorthand: FontShorthand | null
 }
 
-export type DeclarationHandler = (node: Declaration, ctx: DeclarationContext) => void
+type DeclarationHandler = (node: Declaration, ctx: DeclarationContext) => void
 
 export type CollectorInstance<T> = {
 	/** Extra parsing this collector needs. Selectors/values are implied by `selector`/`value` subscriptions. */
@@ -114,13 +114,11 @@ export type CollectorInstance<T> = {
 	rule?: (node: Rule, ctx: Context) => void
 	atrule?: (node: Atrule, ctx: Context) => void
 	selector?: (node: Selector, ctx: Context) => void
-	declaration?:
-		| DeclarationHandler
-		| {
-				/** Normalized property names; the handler is skipped for other declarations */
-				properties?: ReadonlySet<string>
-				enter: DeclarationHandler
-		  }
+	declaration?: {
+		/** Normalized property names; the handler is skipped for other declarations */
+		properties?: ReadonlySet<string>
+		enter: DeclarationHandler
+	}
 	/** Subscribe to nodes inside declaration values; the engine walks each value once for all collectors */
 	value?: {
 		/** Parser node types, e.g. `[HASH, FUNCTION]` */
