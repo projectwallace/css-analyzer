@@ -104,6 +104,11 @@ describe('max_specificity', () => {
 		expect(max_specificity(list)).toEqual(expected)
 	})
 
+	test('an empty list gives the same answer every time', () => {
+		expect(max_specificity([])).toEqual([0, 0, 0])
+		expect(max_specificity([])).toEqual([0, 0, 0])
+	})
+
 	test('does not change the list it is given', () => {
 		const list: Specificity[] = [
 			[0, 0, 3],

@@ -35,9 +35,12 @@ export function compare_specificity(s1: Specificity, s2: Specificity): number {
 	return s1[0] - s2[0]
 }
 
+/** Shared result for an empty list: read it, never change it */
+const NO_SPECIFICITY: Specificity = [0, 0, 0]
+
 /** The highest specificity of a list (`[0, 0, 0]` for an empty list). Does not change the list. */
 export function max_specificity(list: readonly Specificity[]): Specificity {
-	let highest: Specificity = [0, 0, 0]
+	let highest = list[0] ?? NO_SPECIFICITY
 	for (const specificity of list) {
 		if (compare_specificity(specificity, highest) > 0) {
 			highest = specificity
