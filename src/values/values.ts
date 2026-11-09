@@ -15,15 +15,17 @@ export const keywords: KeywordSet = new KeywordSet([
  * Test whether a value is a reset (0, 0px, -0.0e0 etc.)
  */
 export function isValueReset(value: Value): boolean {
-	for (const node of value) {
+	let is_reset = true
+	value.for_each((node) => {
 		if (is_number(node) && node.value === 0) {
-			continue
+			return
 		}
 		if (is_dimension(node) && node.value === 0) {
-			continue
+			return
 		}
+		is_reset = false
 		return false
-	}
+	})
 
-	return true
+	return is_reset
 }
