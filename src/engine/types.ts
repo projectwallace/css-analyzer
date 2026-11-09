@@ -50,6 +50,23 @@ export type ContextCountResult<T extends CountItem = string> = CountResult<T> & 
 	by_context: Map<string, CountResult<T>>
 }
 
+type ByContext = Pick<ContextCountResult, 'by_context'>
+
+/**
+ * The result of a collector that can count per context: `by_context` exists exactly when
+ * the `contexts` option is `true`, and is optional when the option is only known to be a boolean.
+ */
+export type WithContexts<
+	R extends CountResult<CountItem>,
+	O extends ContextCountOptions,
+> = 'contexts' extends keyof O
+	? [O['contexts' & keyof O]] extends [true]
+		? R & ByContext
+		: [O['contexts' & keyof O]] extends [false | undefined]
+			? R
+			: R & Partial<ByContext>
+	: R
+
 export type CountOptions = {
 	locations?: boolean
 	/** Also keep every counted item in order (`result.sequence`). Costs memory; off by default. */
@@ -57,7 +74,7 @@ export type CountOptions = {
 }
 
 export type ContextCountOptions = CountOptions & {
-	/** Also count per context (e.g. per property). Without it `by_context` stays empty. */
+	/** Also count per context (e.g. per property) in `by_context`. Without it there is no `by_context`. */
 	contexts?: boolean
 	/**
 	 * How properties are named in `by_context`: `normalized` (default: lowercase, no vendor prefix or hack

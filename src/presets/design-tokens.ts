@@ -3,6 +3,7 @@ import type {
 	CSSNode,
 	CollectorDef,
 	ContextCountResult,
+	CountOptions,
 	CountResult,
 	ResultOf,
 } from '../engine/types.ts'
@@ -26,26 +27,40 @@ export type DesignTokensCollectors = {
 	line_heights: CollectorDef<CountResult>
 	gradients: CollectorDef<CountResult>
 	box_shadows: CollectorDef<CountResult>
-	radii: CollectorDef<ContextCountResult>
+	border_radiuses: CollectorDef<ContextCountResult>
 	durations: CollectorDef<CountResult>
-	easings: CollectorDef<CountResult>
+	timing_functions: CollectorDef<CountResult>
 }
 
 export type DesignTokens = ResultOf<DesignTokensCollectors>
 
-/** Everything a design-token extractor needs. Spread it to add your own collectors. */
-export const design_tokens_collectors: DesignTokensCollectors = {
-	colors: colors({ contexts: true }),
-	font_sizes: font_sizes(),
-	font_families: font_families(),
-	line_heights: line_heights(),
-	gradients: gradients(),
-	box_shadows: box_shadows(),
-	radii: border_radiuses({ contexts: true }),
-	durations: durations(),
-	easings: timing_functions(),
+/** Options for the whole set, passed on to every collector */
+export type DesignTokensOptions = Pick<CountOptions, 'locations'>
+
+/**
+ * Everything a design-token extractor needs. Spread it to add your own collectors:
+ * `{ ...design_tokens_collectors({ locations: true }), z_indexes: z_indexes() }`.
+ */
+export function design_tokens_collectors(
+	options: DesignTokensOptions = {},
+): DesignTokensCollectors {
+	const { locations } = options
+	return {
+		colors: colors({ contexts: true, locations }),
+		font_sizes: font_sizes({ locations }),
+		font_families: font_families({ locations }),
+		line_heights: line_heights({ locations }),
+		gradients: gradients({ locations }),
+		box_shadows: box_shadows({ locations }),
+		border_radiuses: border_radiuses({ contexts: true, locations }),
+		durations: durations({ locations }),
+		timing_functions: timing_functions({ locations }),
+	}
 }
 
-export function analyze_design_tokens(input: string | CSSNode): DesignTokens {
-	return analyze(input, design_tokens_collectors)
+export function analyze_design_tokens(
+	input: string | CSSNode,
+	options?: DesignTokensOptions,
+): DesignTokens {
+	return analyze(input, design_tokens_collectors(options))
 }

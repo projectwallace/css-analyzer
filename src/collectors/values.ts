@@ -4,9 +4,9 @@ import { define_collector } from '../engine/define-collector.ts'
 import type {
 	CollectorDef,
 	ContextCountOptions,
-	ContextCountResult,
 	CountOptions,
 	CountResult,
+	WithContexts,
 } from '../engine/types.ts'
 import { spacing_reset_properties } from '../properties/property-utils.ts'
 import { analyze_animation } from '../values/animations.ts'
@@ -63,8 +63,10 @@ export function displays(options: CountOptions = {}): CollectorDef<CountResult> 
 }
 
 /** Units of every dimension (`px`, `em`, ...), lowercased; with `contexts` also per property */
-export function units(options: ContextCountOptions = {}): CollectorDef<ContextCountResult> {
-	return define_collector<ContextCountResult>(function init() {
+export function units<O extends ContextCountOptions = {}>(
+	options?: O,
+): CollectorDef<WithContexts<CountResult, O>> {
+	return define_collector<WithContexts<CountResult, O>>(function init() {
 		const counter = create_context_counter(options)
 		return {
 			parse: { values: true },
@@ -76,12 +78,12 @@ export function units(options: ContextCountOptions = {}): CollectorDef<ContextCo
 					}
 					counter.add(
 						(node as Dimension).unit.toLowerCase(),
-						get_context_property(ctx, options.property),
+						get_context_property(ctx, options?.property),
 						node,
 					)
 				},
 			},
-			result: () => counter.result(),
+			result: () => counter.result() as WithContexts<CountResult, O>,
 		}
 	})
 }

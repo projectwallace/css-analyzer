@@ -64,8 +64,8 @@ test('context counter counts per context', () => {
 
 	expect(result.total).toBe(3)
 	expect(result.total_unique).toBe(2)
-	expect(result.by_context.get('color')?.total).toBe(2)
-	expect(result.by_context.get('background-color')?.unique.get('red')).toEqual({ count: 1 })
+	expect(result.by_context?.get('color')?.total).toBe(2)
+	expect(result.by_context?.get('background-color')?.unique.get('red')).toEqual({ count: 1 })
 })
 
 test('summarize derives the uniqueness ratio', () => {
@@ -80,5 +80,5 @@ test('context counter only tracks contexts when asked', () => {
 	const counter = create_context_counter()
 	counter.add('red', 'color', at)
 	expect(counter.result().total).toBe(1)
-	expect(counter.result().by_context.size).toBe(0)
+	expect(counter.result().by_context).toBeUndefined()
 })

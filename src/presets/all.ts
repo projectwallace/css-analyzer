@@ -1,5 +1,12 @@
 import { analyze } from '../engine/analyzer.ts'
-import type { CSSNode, ResultOf } from '../engine/types.ts'
+import type {
+	CSSNode,
+	CollectorDef,
+	ContextCountResult,
+	CountOptions,
+	ResultOf,
+} from '../engine/types.ts'
+import type { ColorsResult } from '../collectors/colors.ts'
 import {
 	animation_names,
 	atrules,
@@ -37,13 +44,13 @@ export type AllCollectors = {
 	specificity: ReturnType<typeof specificity>
 	declarations: ReturnType<typeof declarations>
 	properties: ReturnType<typeof properties>
-	colors: ReturnType<typeof colors>
+	colors: CollectorDef<ColorsResult>
 	font_sizes: ReturnType<typeof font_sizes>
 	font_families: ReturnType<typeof font_families>
 	line_heights: ReturnType<typeof line_heights>
 	gradients: ReturnType<typeof gradients>
 	box_shadows: ReturnType<typeof box_shadows>
-	border_radiuses: ReturnType<typeof border_radiuses>
+	border_radiuses: CollectorDef<ContextCountResult>
 	durations: ReturnType<typeof durations>
 	timing_functions: ReturnType<typeof timing_functions>
 	text_shadows: ReturnType<typeof text_shadows>
@@ -52,40 +59,46 @@ export type AllCollectors = {
 	animation_names: ReturnType<typeof animation_names>
 	value_prefixes: ReturnType<typeof value_prefixes>
 	value_browserhacks: ReturnType<typeof value_browserhacks>
-	units: ReturnType<typeof units>
+	units: CollectorDef<ContextCountResult>
 	value_complexity: ReturnType<typeof value_complexity>
 	keywords: ReturnType<typeof keywords>
 	resets: ReturnType<typeof resets>
 }
 
+/** Options for the whole set, passed on to every collector */
+export type AllOptions = Pick<CountOptions, 'locations'>
+
 /** Every collector, with per-property counts for colors, border radiuses and units */
-export const all_collectors: AllCollectors = {
-	stylesheet: stylesheet(),
-	atrules: atrules(),
-	rules: rules(),
-	selectors: selectors(),
-	specificity: specificity(),
-	declarations: declarations(),
-	properties: properties(),
-	colors: colors({ contexts: true }),
-	font_sizes: font_sizes(),
-	font_families: font_families(),
-	line_heights: line_heights(),
-	gradients: gradients(),
-	box_shadows: box_shadows(),
-	border_radiuses: border_radiuses({ contexts: true }),
-	durations: durations(),
-	timing_functions: timing_functions(),
-	text_shadows: text_shadows(),
-	z_indexes: z_indexes(),
-	displays: displays(),
-	animation_names: animation_names(),
-	value_prefixes: value_prefixes(),
-	value_browserhacks: value_browserhacks(),
-	units: units({ contexts: true }),
-	value_complexity: value_complexity(),
-	keywords: keywords(),
-	resets: resets(),
+export function all_collectors(options: AllOptions = {}): AllCollectors {
+	const { locations } = options
+	return {
+		stylesheet: stylesheet({ locations }),
+		atrules: atrules({ locations }),
+		rules: rules({ locations }),
+		selectors: selectors({ locations }),
+		specificity: specificity({ locations }),
+		declarations: declarations({ locations }),
+		properties: properties({ locations }),
+		colors: colors({ contexts: true, locations }),
+		font_sizes: font_sizes({ locations }),
+		font_families: font_families({ locations }),
+		line_heights: line_heights({ locations }),
+		gradients: gradients({ locations }),
+		box_shadows: box_shadows({ locations }),
+		border_radiuses: border_radiuses({ contexts: true, locations }),
+		durations: durations({ locations }),
+		timing_functions: timing_functions({ locations }),
+		text_shadows: text_shadows({ locations }),
+		z_indexes: z_indexes({ locations }),
+		displays: displays({ locations }),
+		animation_names: animation_names({ locations }),
+		value_prefixes: value_prefixes({ locations }),
+		value_browserhacks: value_browserhacks({ locations }),
+		units: units({ contexts: true, locations }),
+		value_complexity: value_complexity({ locations }),
+		keywords: keywords({ locations }),
+		resets: resets({ locations }),
+	}
 }
 
 export type AllResult = ResultOf<AllCollectors>
@@ -93,6 +106,6 @@ export type AllResult = ResultOf<AllCollectors>
 /**
  * Run every collector. The result is flat: one key per collector (`result.colors`, `result.atrules`, ...).
  */
-export function analyze_all(input: string | CSSNode): AllResult {
-	return analyze(input, all_collectors)
+export function analyze_all(input: string | CSSNode, options?: AllOptions): AllResult {
+	return analyze(input, all_collectors(options))
 }

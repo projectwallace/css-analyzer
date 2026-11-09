@@ -21,4 +21,5 @@ export type {
 	ParseOptions,
 	ResultOf,
 	StylesheetContext,
+	WithContexts,
 } from './types.ts'

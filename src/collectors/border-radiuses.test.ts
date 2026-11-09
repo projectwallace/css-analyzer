@@ -1,4 +1,4 @@
-import { test, expect } from 'vitest'
+import { test, expect, expectTypeOf } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
 import { plain } from '../test-utils.ts'
 import { border_radiuses } from './border-radiuses.ts'
@@ -235,4 +235,15 @@ test('ignores keywords', () => {
 	}
 
 	expect(actual).toEqual(expected)
+})
+
+test('by_context only exists with `contexts: true`', () => {
+	const css = 'a { border-radius: 4px }'
+	const without = analyze(css, { radii: border_radiuses() }).radii
+	const with_contexts = analyze(css, { radii: border_radiuses({ contexts: true }) }).radii
+
+	expect('by_context' in without).toBe(false)
+	expect(with_contexts.by_context.get('border-radius')?.total).toBe(1)
+	expectTypeOf(without).not.toHaveProperty('by_context')
+	expectTypeOf(with_contexts).toHaveProperty('by_context')
 })

@@ -1,4 +1,4 @@
-import { test, expect, describe } from 'vitest'
+import { test, expect, expectTypeOf, describe } from 'vitest'
 import * as api from './index.ts'
 import * as collectors from './collectors/index.ts'
 import * as presets from './presets/index.ts'
@@ -34,6 +34,25 @@ describe('Public API', () => {
 		expect(definitions.map((definition) => typeof definition.create)).toEqual(
 			definitions.map(() => 'function'),
 		)
+	})
+
+	test('the types to write down a collector map come from the entry that has the collectors', () => {
+		type Collectors = {
+			colors: ReturnType<typeof collectors.colors<{ contexts: true }>>
+			font_sizes: ReturnType<typeof collectors.font_sizes>
+		}
+		expectTypeOf<Collectors['font_sizes']>().toEqualTypeOf<
+			collectors.CollectorDef<collectors.CountResult>
+		>()
+		expectTypeOf<
+			collectors.ResultOf<Collectors>['font_sizes']
+		>().toEqualTypeOf<collectors.CountResult>()
+		expectTypeOf<
+			collectors.ResultOf<Collectors>['colors']
+		>().toEqualTypeOf<collectors.ColorsResult>()
+		expectTypeOf<
+			presets.ResultOf<presets.DesignTokensCollectors>
+		>().toEqualTypeOf<presets.DesignTokens>()
 	})
 
 	test('presets', () => {

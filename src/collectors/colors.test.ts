@@ -1,7 +1,8 @@
-import { test, expect } from 'vitest'
+import { test, expect, expectTypeOf } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
 import { plain } from '../test-utils.ts'
-import { colors } from './colors.ts'
+import { colors, type ColorsResult } from './colors.ts'
+import type { CollectorDef, CountResult } from '../engine/types.ts'
 
 function run(css: string) {
 	return plain(analyze(css, { result: colors({ contexts: true, property: 'as_written' }) }).result)
@@ -992,4 +993,31 @@ test('insane color mode', () => {
   `
 
 	expect(() => run(fixture)).not.toThrow()
+})
+
+test('by_context only exists with `contexts: true`', () => {
+	const css = 'a { color: red }'
+	const without = analyze(css, { colors: colors() }).colors
+	const with_contexts = analyze(css, { colors: colors({ contexts: true }) }).colors
+
+	expect('by_context' in without).toBe(false)
+	expect(with_contexts.by_context.get('color')?.total).toBe(1)
+
+	expectTypeOf(without).not.toHaveProperty('by_context')
+	expectTypeOf(with_contexts.by_context).toEqualTypeOf<Map<string, CountResult>>()
+	expectTypeOf(with_contexts.formats).toEqualTypeOf<CountResult>()
+})
+
+test('by_context is optional when `contexts` is only known to be a boolean', () => {
+	function create(contexts: boolean) {
+		return colors({ contexts })
+	}
+	type Result = ReturnType<typeof create> extends CollectorDef<infer T> ? T : never
+	expectTypeOf<Result['by_context']>().toEqualTypeOf<Map<string, CountResult> | undefined>()
+})
+
+test('the collector type can be written without helper types', () => {
+	expectTypeOf<ReturnType<typeof colors<{ contexts: true }>>>().toEqualTypeOf<
+		CollectorDef<ColorsResult>
+	>()
 })

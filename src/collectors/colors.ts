@@ -6,6 +6,7 @@ import type {
 	ContextCountOptions,
 	ContextCountResult,
 	CountResult,
+	WithContexts,
 } from '../engine/types.ts'
 import { color_functions, color_keywords, named_colors, system_colors } from '../values/colors.ts'
 import { NO_VALUE_WALK, get_context_property, type Normalize } from './shared.ts'
@@ -15,16 +16,19 @@ export type ColorsOptions = ContextCountOptions & {
 	normalize?: Normalize
 }
 
+/** The result with `{ contexts: true }`. Without `contexts` there is no `by_context`. */
 export type ColorsResult = ContextCountResult & {
 	/** `hex3`, `hex6`, `named`, `system`, `transparent`, `rgb`, `oklch`, ... */
 	formats: CountResult
 }
 
-export function colors(options: ColorsOptions = {}): CollectorDef<ColorsResult> {
-	return define_collector<ColorsResult>(function init() {
+export function colors<O extends ColorsOptions = {}>(
+	options?: O,
+): CollectorDef<WithContexts<CountResult & { formats: CountResult }, O>> {
+	return define_collector<WithContexts<CountResult & { formats: CountResult }, O>>(function init() {
 		const counter = create_context_counter(options)
 		const formats = create_counter(options)
-		const lowercase = options.normalize !== 'none'
+		const lowercase = options?.normalize !== 'none'
 
 		function normalize(text: string): string {
 			return lowercase ? text.toLowerCase() : text
@@ -39,7 +43,7 @@ export function colors(options: ColorsOptions = {}): CollectorDef<ColorsResult> 
 					if (NO_VALUE_WALK.has(property)) {
 						return
 					}
-					const context = get_context_property(ctx, options.property)
+					const context = get_context_property(ctx, options?.property)
 					const text = node.text
 
 					if (node.type === HASH) {
@@ -79,7 +83,11 @@ export function colors(options: ColorsOptions = {}): CollectorDef<ColorsResult> 
 					}
 				},
 			},
-			result: () => ({ ...counter.result(), formats: formats.result() }),
+			result: () =>
+				({ ...counter.result(), formats: formats.result() }) as WithContexts<
+					CountResult & { formats: CountResult },
+					O
+				>,
 		}
 	})
 }

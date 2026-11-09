@@ -52,7 +52,7 @@ describe('options', () => {
 
 		const authored = analyze(css, { colors: colors({ normalize: 'none' }) }).colors
 		expect([...authored.unique.keys()]).toEqual(['RED', '#FFF'])
-		expect(authored.by_context.size).toBe(0)
+		expect('by_context' in authored).toBe(false)
 	})
 
 	test('font sizes, families and line heights can skip var()', () => {

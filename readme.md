@@ -98,12 +98,30 @@ Use `summarize_numbers(result.sizes)` for min, max, mean, mode, median, range an
 ```js
 import { analyze_design_tokens, analyze_all } from '@projectwallace/css-analyzer/presets'
 
-analyze_design_tokens(css) // colors, font sizes/families, line heights, gradients, shadows, radii, durations, easings
+analyze_design_tokens(css) // colors, font_sizes, font_families, line_heights, gradients, box_shadows, border_radiuses, durations, timing_functions
 analyze_all(css) // every collector, flat: result.colors, result.atrules, result.selectors, ...
+analyze_design_tokens(css, { locations: true }) // locations for every collector
 ```
 
-Each preset also exists as a collector map (`design_tokens_collectors`, `all_collectors`) that you can spread, narrow or extend:
-`analyze(css, { ...design_tokens_collectors, z: z_indexes() })`.
+Each preset also exists as a function that returns a collector map (`design_tokens_collectors(options)`, `all_collectors(options)`), which you can spread, narrow or extend. The keys are the collector names.
+`analyze(css, { ...design_tokens_collectors({ locations: true }), z_indexes: z_indexes() })`.
+
+### Typing a collector map
+
+Collectors are plain functions, so their types come for free. With `isolatedDeclarations`, write the type of an exported map with `ReturnType`:
+
+```ts
+import { colors, font_sizes, type ResultOf } from '@projectwallace/css-analyzer/collectors'
+
+export const collectors: {
+	colors: ReturnType<typeof colors<{ contexts: true }>>
+	font_sizes: ReturnType<typeof font_sizes>
+} = { colors: colors({ contexts: true }), font_sizes: font_sizes() }
+
+export type Report = ResultOf<typeof collectors>
+```
+
+`CollectorDef`, `CountResult`, `ContextCountResult`, `Location` and `ResultOf` can be imported from `@projectwallace/css-analyzer/collectors` too.
 
 ### Collectors
 
@@ -120,7 +138,7 @@ Each preset also exists as a collector map (`design_tokens_collectors`, `all_col
 | `units`, `z_indexes`, `displays`, `keywords`, `resets`     | other values                                                                                                                                 |
 | `value_prefixes`, `value_browserhacks`, `value_complexity` | vendor prefixes, hacks, complexity of values                                                                                                 |
 
-Options (all optional): `locations`, `sequence` (numeric series), `contexts` (`colors`, `units`, `border_radiuses`: count per property), `normalize: 'none'` (keep the authored case), `skip_var` (font sizes, families, line heights).
+Options (all optional): `locations`, `sequence` (numeric series), `contexts` (`colors`, `units`, `border_radiuses`: count per property in `by_context`, which only exists with `contexts: true`), `normalize: 'none'` (keep the authored case), `skip_var` (font sizes, families, line heights).
 
 ### Write your own collector
 

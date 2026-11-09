@@ -1,7 +1,6 @@
 import type { CSSNode } from '@projectwallace/css-parser'
 import type {
 	ContextCountOptions,
-	ContextCountResult,
 	CountItem,
 	CountMap,
 	CountOptions,
@@ -25,7 +24,8 @@ export type Counter<T extends CountItem = string> = {
 
 export type ContextCounter<T extends CountItem = string> = {
 	add(item: T, context: string, node: CSSNode, length?: number): void
-	result(): ContextCountResult<T>
+	/** `by_context` is only there when the counter was created with `{ contexts: true }` */
+	result(): CountResult<T> & { by_context?: Map<string, CountResult<T>> }
 }
 
 function add_to<T extends CountItem>(
@@ -110,12 +110,16 @@ export function create_context_counter<T extends CountItem = string>(
 		add_to(scoped.map, item, node, length, locations)
 	}
 
-	function result(): ContextCountResult<T> {
+	function result(): CountResult<T> & { by_context?: Map<string, CountResult<T>> } {
+		const counted = to_result(map, total)
+		if (!track_contexts) {
+			return counted
+		}
 		const by_context = new Map<string, CountResult<T>>()
 		for (const [context, scoped] of contexts) {
 			by_context.set(context, to_result(scoped.map, scoped.total))
 		}
-		return { ...to_result(map, total), by_context }
+		return { ...counted, by_context }
 	}
 
 	return { add, result }
