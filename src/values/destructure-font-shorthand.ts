@@ -97,11 +97,11 @@ export function destructure_font_shorthand(input: ValueInput): FontShorthand | n
 	}
 
 	// Report global keywords (inherit, initial, …) that appear anywhere in the value.
-	for (const child of value) {
+	value.for_each((child) => {
 		if (is_identifier(child) && keywords.has(child.name)) {
 			found_keywords.push(child.name!)
 		}
-	}
+	})
 
 	const children = value.children
 	let font_size: string | undefined

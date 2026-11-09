@@ -164,14 +164,14 @@ function selector_complexity(selector: CSSNode): number {
 				const child_complexities: number[] = []
 
 				if (node.has_children) {
-					for (const child of node) {
+					node.for_each((child) => {
 						if (is_selector(child)) {
 							child_complexities.push(selector_complexity(child))
 						} else {
 							// Recurse to find nested selectors
 							find_selectors(child, child_complexities)
 						}
-					}
+					})
 				}
 
 				// If there are child selectors (like in :where(), :is(), etc.), add their complexity
