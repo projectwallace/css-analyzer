@@ -47,11 +47,11 @@ function find_media_features(prelude: CSSNode | null | undefined): MediaFeature[
 /** `property: value` descriptors inside an at-rule block (e.g. `@font-face`) */
 function get_descriptors(block: Atrule['block']): Record<string, string> {
 	const descriptors: Record<string, string> = Object.create(null)
-	for (const child of block?.children ?? []) {
+	block?.for_each(function (child) {
 		if (is_declaration(child) && child.value) {
 			descriptors[child.property] = child.value.text
 		}
-	}
+	})
 	return descriptors
 }
 
@@ -72,9 +72,9 @@ function get_import_functions(prelude: CSSNode | null | undefined) {
 	if (!prelude || !is_atrule_prelude(prelude) || !prelude.has_children) {
 		return found
 	}
-	for (const child of prelude) {
+	prelude.for_each(function (child) {
 		if (!is_function(child) || !child.value) {
-			continue
+			return
 		}
 		const name = child.name
 		if (str_equals('supports', name)) {
@@ -82,7 +82,7 @@ function get_import_functions(prelude: CSSNode | null | undefined) {
 		} else if (str_equals('layer', name)) {
 			found.push({ name: 'layer', value: child.value, node: child })
 		}
-	}
+	})
 	return found
 }
 

@@ -88,7 +88,13 @@ export function get_context_property(
 
 /** The items of a comma/slash separated value, without the separators */
 export function get_list_items(value: Value): CSSNode[] {
-	return Array.from(value).filter((child) => !is_operator(child))
+	const items: CSSNode[] = []
+	value.for_each(function (child) {
+		if (!is_operator(child)) {
+			items.push(child)
+		}
+	})
+	return items
 }
 
 /** Text of the first child when that child is an identifier (e.g. `--x` in `var(--x)`) */

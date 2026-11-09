@@ -42,18 +42,18 @@ export function rules(options: CountOptions = {}): CollectorDef<RulesResult> {
 				let selector_count = 0
 				const prelude = node.prelude
 				if (prelude && is_selector_list(prelude)) {
-					for (const selector of prelude) {
+					prelude.for_each(function (selector) {
 						if (is_selector(selector)) {
 							selector_count++
 						}
-					}
+					})
 				}
 				let declaration_count = 0
-				for (const child of block ?? []) {
+				block?.for_each(function (child) {
 					if (is_declaration(child)) {
 						declaration_count++
 					}
-				}
+				})
 
 				sizes.add(selector_count + declaration_count, node)
 				nesting.add(ctx.depth, node)

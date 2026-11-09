@@ -25,6 +25,14 @@ export function as_value(input: ValueInput): Value {
 	return typeof input === 'string' ? parse_value(input) : input
 }
 
+function list_to_selectors(list: SelectorList): Selector[] {
+	const selectors: Selector[] = []
+	list.for_each(function (selector) {
+		selectors.push(selector)
+	})
+	return selectors
+}
+
 /** A selector list, or a single selector, as selectors */
 export function as_selectors(input: SelectorInput): Selector[] {
 	if (typeof input === 'string') {
@@ -37,13 +45,13 @@ export function as_selectors(input: SelectorInput): Selector[] {
 				`Could not convert passed in source '${input}' to SelectorList: ${message}`,
 			)
 		}
-		return Array.from(list)
+		return list_to_selectors(list)
 	}
 	if (is_selector(input)) {
 		return [input]
 	}
 	if (is_selector_list(input)) {
-		return Array.from(input)
+		return list_to_selectors(input)
 	}
 	throw new TypeError('Passed in source is an Object but no AST / AST of the type SelectorList')
 }

@@ -58,7 +58,7 @@ export function analyze_animation(input: ValueInput): AnimationParts {
 	const parts: AnimationParts = { durations: [], timing_functions: [], names: [], keywords: [] }
 	let duration_found = false
 
-	for (const node of as_value(input)) {
+	as_value(input).for_each(function (node) {
 		// Right after a ',' we start over again
 		if (is_operator(node)) {
 			duration_found = false
@@ -81,7 +81,7 @@ export function analyze_animation(input: ValueInput): AnimationParts {
 			// A quoted string is always a valid animation name, even when it's a reserved keyword (e.g. "none" or "infinite")
 			parts.names.push(node.text)
 		}
-	}
+	})
 
 	return parts
 }

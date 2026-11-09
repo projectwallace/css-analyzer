@@ -69,9 +69,9 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 				if (!prelude || !is_selector_list(prelude)) {
 					return
 				}
-				for (const item of prelude) {
+				prelude.for_each(function (item) {
 					keyframes.add(item.text, item)
-				}
+				})
 			},
 			selector(node, ctx) {
 				if (ctx.atrule_stack.includes('keyframes')) {

@@ -35,4 +35,5 @@ Write unit tests: small, fast and next to the code they test.
 - Avoid repeated CSS node property reads: each `.text`, `.name`, `.column` etc. makes the css-parser node read from its memory arena. Read it once and keep it in a `const`.
 - Compare names case-insensitively with `str_equals('var', node.name)` from `@projectwallace/css-parser`, not with `node.name.toLowerCase() === 'var'`.
 - Search case-insensitively with `str_index_of('var(', text) !== -1` from `@projectwallace/css-parser`, not with `text.toLowerCase().includes('var(')`. The search string must be lowercase.
+- Iterate the children of a parser node with `node.for_each((child) => { ... })`, not `for...of`: the iterator is a generator, which is slow. Inside the callback `return` skips to the next child and `return false` stops.
 - `str_equals` and `str_index_of` do not allocate a new string, `toLowerCase()` does. Use them wherever a value is only compared or searched, not transformed.
