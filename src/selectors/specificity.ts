@@ -35,8 +35,15 @@ export function compare_specificity(s1: Specificity, s2: Specificity): number {
 	return s1[0] - s2[0]
 }
 
-function max(list: Specificity[]): Specificity {
-	return list.sort(compare_specificity).at(-1)!
+/** The highest specificity of a list (`[0, 0, 0]` for an empty list). Does not change the list. */
+export function max_specificity(list: readonly Specificity[]): Specificity {
+	let highest: Specificity = [0, 0, 0]
+	for (const specificity of list) {
+		if (compare_specificity(specificity, highest) > 0) {
+			highest = specificity
+		}
+	}
+	return highest
 }
 
 function argument_specificity(node: CSSNode): Specificity {
@@ -110,7 +117,7 @@ function selector_specificity(selector_ast: Selector): Specificity {
 							const child_selector_list = current.first_child
 							if (child_selector_list && is_selector_list(child_selector_list)) {
 								// Calculate Specificity for all selectors in the list and get max
-								const max1 = max(get_specificity(child_selector_list))
+								const max1 = max_specificity(get_specificity(child_selector_list))
 
 								add(max1)
 							}
@@ -128,7 +135,7 @@ function selector_specificity(selector_ast: Selector): Specificity {
 						const nth_of = current.first_child
 						if (nth_of && is_nth_of_selector(nth_of) && nth_of.selector) {
 							// Use the convenience property to access the selector list directly
-							const max2 = max(get_specificity(nth_of.selector))
+							const max2 = max_specificity(get_specificity(nth_of.selector))
 
 							add(max2)
 						}

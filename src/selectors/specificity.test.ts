@@ -1,6 +1,11 @@
-import { test, expect } from 'vitest'
+import { test, expect, describe } from 'vitest'
 import { parse_selector_list } from '@projectwallace/css-parser/parse-selector'
-import { get_specificity, compare_specificity } from './specificity.ts'
+import {
+	get_specificity,
+	compare_specificity,
+	max_specificity,
+	type Specificity,
+} from './specificity.ts'
 
 test('get_specificity returns one tuple per selector in the list', () => {
 	expect(get_specificity('a, .b, #c')).toEqual([
@@ -54,4 +59,59 @@ test.each<[string, [number, number, number]]>([
 	['::highlight(name)', [0, 0, 1]],
 ])('specificity of "%s"', (selector, expected) => {
 	expect(get_specificity(selector)).toEqual([expected])
+})
+
+describe('max_specificity', () => {
+	test.each<[string, Specificity[], Specificity]>([
+		['an empty list', [], [0, 0, 0]],
+		['a single entry', [[0, 1, 2]], [0, 1, 2]],
+		[
+			'the highest id count wins',
+			[
+				[0, 5, 5],
+				[1, 0, 0],
+				[0, 9, 9],
+			],
+			[1, 0, 0],
+		],
+		[
+			'then classes',
+			[
+				[0, 1, 9],
+				[0, 2, 0],
+				[0, 1, 0],
+			],
+			[0, 2, 0],
+		],
+		[
+			'then types',
+			[
+				[0, 0, 1],
+				[0, 0, 3],
+				[0, 0, 2],
+			],
+			[0, 0, 3],
+		],
+		[
+			'equal entries',
+			[
+				[0, 1, 0],
+				[0, 1, 0],
+			],
+			[0, 1, 0],
+		],
+	])('finds the highest of %s', (_name, list, expected) => {
+		expect(max_specificity(list)).toEqual(expected)
+	})
+
+	test('does not change the list it is given', () => {
+		const list: Specificity[] = [
+			[0, 0, 3],
+			[1, 0, 0],
+			[0, 2, 0],
+		]
+		const copy = structuredClone(list)
+		max_specificity(list)
+		expect(list).toEqual(copy)
+	})
 })
