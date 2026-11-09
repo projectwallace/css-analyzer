@@ -876,11 +876,11 @@ function analyzeInternal<T extends boolean>(
 					fontfaces_with_loc.p(node.start, toLoc(node))
 				}
 				const block = node.block
-				for (const descriptor of block?.children || []) {
+				block?.for_each((descriptor) => {
 					if (is_declaration(descriptor) && descriptor.value) {
 						descriptors[descriptor.property] = descriptor.value.text
 					}
-				}
+				})
 				atRuleComplexities.push(1)
 				fontfaces.push(descriptors)
 			}
@@ -937,9 +937,9 @@ function analyzeInternal<T extends boolean>(
 					imports.p(node.prelude.text, toLoc(node))
 
 					if (is_atrule_prelude(node.prelude) && node.prelude.has_children) {
-						for (const child of node.prelude) {
+						node.prelude.for_each((child) => {
 							if (!is_function(child)) {
-								continue
+								return
 							}
 
 							if (str_equals('supports', child.name) && child.value) {
@@ -949,7 +949,7 @@ function analyzeInternal<T extends boolean>(
 								layers.p(child.value, toLoc(child))
 								layerNamesTracking.use(child.value)
 							}
-						}
+						})
 					}
 				} else if (normalized_name === 'container') {
 					const { prelude } = node
@@ -983,9 +983,9 @@ function analyzeInternal<T extends boolean>(
 			// Handle keyframe rules specially
 			if (inKeyframes && node.has_prelude) {
 				if (is_selector_list(node.prelude) && node.prelude.child_count > 0) {
-					for (const keyframe_selector of node.prelude) {
+					node.prelude.for_each((keyframe_selector) => {
 						keyframeSelectors.p(keyframe_selector.text, toLoc(keyframe_selector))
-					}
+					})
 				}
 				// Don't count keyframe rules as regular rules, but continue walking
 				// children to count declarations inside keyframes
@@ -1006,20 +1006,20 @@ function analyzeInternal<T extends boolean>(
 
 				// Find the SelectorList child and count Selector nodes inside it
 				if (node.has_prelude && is_selector_list(node.prelude)) {
-					for (const selector of node.prelude) {
+					node.prelude.for_each((selector) => {
 						if (is_selector(selector)) {
 							numSelectors++
 						}
-					}
+					})
 				}
 
 				// Count declarations in the block
 				if (node.block) {
-					for (const declaration of node.block) {
+					node.block.for_each((declaration) => {
 						if (is_declaration(declaration)) {
 							numDeclarations++
 						}
-					}
+					})
 				}
 
 				// Track rule metrics
@@ -1314,7 +1314,7 @@ function analyzeInternal<T extends boolean>(
 					normalizedProperty === 'animation-duration' ||
 					normalizedProperty === 'transition-duration'
 				) {
-					for (const child of value.children) {
+					value.for_each((child) => {
 						if (!is_operator(child)) {
 							const text = child.text
 							if (/var\(/i.test(text)) {
@@ -1323,18 +1323,18 @@ function analyzeInternal<T extends boolean>(
 								durations.p(text.toLowerCase(), valueLoc)
 							}
 						}
-					}
+					})
 				} else if (
 					normalizedProperty === 'transition-timing-function' ||
 					normalizedProperty === 'animation-timing-function'
 				) {
-					for (const child of value.children) {
+					value.for_each((child) => {
 						if (!is_operator(child)) {
 							timingFunctions.p(child.text, valueLoc)
 						}
-					}
+					})
 				} else if (normalizedProperty === 'animation-name') {
-					for (const child of value.children) {
+					value.for_each((child) => {
 						if (is_identifier(child) && !keywords.has(child.name)) {
 							animationNames.p(child.text, valueLoc)
 							animationNamesTracking.use(child.text)
@@ -1343,14 +1343,14 @@ function analyzeInternal<T extends boolean>(
 							animationNames.p(name, valueLoc)
 							animationNamesTracking.use(name)
 						}
-					}
+					})
 				} else if (normalizedProperty === 'container-name') {
-					for (const child of value.children) {
+					value.for_each((child) => {
 						if (is_identifier(child) && !keywords.has(child.name)) {
 							containerNames.p(child.text, toLoc(child))
 							containerNamesTracking.define(child.text)
 						}
-					}
+					})
 				} else if (normalizedProperty === 'container') {
 					// The first identifier in the `container` shorthand is the container name
 					// Example: container: my-layout / inline-size;
@@ -1361,11 +1361,11 @@ function analyzeInternal<T extends boolean>(
 						}
 					}
 				} else if (normalizedProperty === 'anchor-name') {
-					for (const child of value.children) {
+					value.for_each((child) => {
 						if (is_identifier(child) && is_custom(child.text)) {
 							anchorNamesTracking.define(child.text)
 						}
-					}
+					})
 				} else if (normalizedProperty === 'position-anchor') {
 					if (
 						value.first_child &&
