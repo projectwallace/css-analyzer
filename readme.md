@@ -162,7 +162,7 @@ function important_declarations() {
 analyze(css, { important: important_declarations() })
 ```
 
-A collector subscribes to what it needs: `stylesheet`, `rule`, `atrule`, `selector`, `declaration`, `value` and `comment`. The engine walks the CSS once and only dispatches to subscribers. Collectors must not keep nodes or the `ctx` object after the handler returns.
+A collector subscribes to what it needs: `stylesheet`, `rule`, `atrule`, `selector`, `declaration`, `value` and `comment`. The engine walks the CSS once and only dispatches to subscribers. `selector` handlers get the selectors of style rules (not keyframe selectors, nor selectors in at-rule preludes) and no `ctx`: use `rule` when you need `depth` or `atrule_stack`. Collectors must not keep nodes or the `ctx` object after the handler returns.
 `ctx` offers lazy, shared facts: `property`, `is_important`, `is_custom`, `value`, `clean_value_text`, `font_shorthand`, `depth`, `atrule_stack`, `loc`, and more.
 
 ### Utilities

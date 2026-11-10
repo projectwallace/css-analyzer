@@ -61,27 +61,28 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 		const combinators = create_counter(without_sequence(options))
 
 		return {
+			// The selectors of a rule, with the nesting of the rule. Keyframe selectors are counted on their own.
 			rule(node, ctx) {
-				if (!ctx.atrule_stack.includes('keyframes')) {
-					return
-				}
 				const prelude = node.prelude
 				if (!prelude || !is_selector_list(prelude)) {
 					return
 				}
-				prelude.for_each(function (item) {
-					keyframes.add(item.text, item)
-				})
-			},
-			selector(node, ctx) {
 				if (ctx.atrule_stack.includes('keyframes')) {
+					prelude.for_each(function (item) {
+						keyframes.add(item.text, item)
+					})
 					return
 				}
+				const depth = ctx.depth
+				prelude.for_each(function (item) {
+					nesting.add(depth, item)
+				})
+			},
+			selector(node) {
 				const text = node.text
 
 				texts.add(text, node)
 				complexity.add(get_complexity(node)[0]!, node)
-				nesting.add(Math.max(ctx.depth - 1, 0), node)
 
 				for (const prefix of get_vendor_prefixes(node)) {
 					prefixed.add(prefix.toLowerCase(), node)

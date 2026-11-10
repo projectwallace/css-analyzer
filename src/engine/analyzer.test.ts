@@ -167,6 +167,28 @@ test('structural context: depth, atrule_stack, and the parent rule via node.clos
 	])
 })
 
+test('selector subscribers get the selectors of style rules, not keyframe or at-rule prelude selectors', () => {
+	const seen: string[] = []
+	const selectors = define_collector<string[]>(() => ({
+		parse: { atrule_preludes: true },
+		selector(node) {
+			seen.push(node.text)
+		},
+		result: () => seen,
+	}))
+	analyze(
+		`a, b > c { d { color: red } }
+		@scope (.s) to (.e) { f {} }
+		@supports selector(g) { h {} }
+		@keyframes k { from {} 50% {} }
+		@-webkit-keyframes k { to {} }
+		@media screen { @keyframes m { to {} } i:is(j) {} }`,
+		{ selectors },
+	)
+	// Selectors nested in :is() belong to the selector that holds them
+	expect(seen).toEqual(['a', 'b > c', 'd', 'f', 'h', 'i:is(j)'])
+})
+
 test('unsubscribed node kinds are never dispatched', () => {
 	const calls: string[] = []
 	const only_rules = define_collector<number>(() => ({

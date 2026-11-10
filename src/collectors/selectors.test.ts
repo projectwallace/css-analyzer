@@ -2,6 +2,7 @@ import { describe, test, expect } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
 import { plain, series } from '../test-utils.ts'
 import { selectors } from './selectors.ts'
+import { atrules } from './atrules.ts'
 import { specificity, summarize_specificity } from './specificity.ts'
 
 /** Selector results with the shape the old tests were written for */
@@ -870,4 +871,25 @@ test('tracks nesting depth', () => {
 		},
 	}
 	expect(actual).toEqual(expected)
+})
+
+test('nesting counts the depth of the rule, also inside at-rules, and leaves keyframes out', () => {
+	const result = analyze(
+		`a { b, c { d {} } }
+		@media screen { e {} @keyframes k { from {} to {} } }
+		@keyframes top { 50% {} }`,
+		{ selectors: selectors({ sequence: true }) },
+	).selectors
+
+	expect(result.nesting.sequence).toEqual([0, 1, 1, 2, 1])
+	expect(result.total).toBe(5)
+	expect([...result.keyframes.unique.keys()]).toEqual(['from', 'to', '50%'])
+})
+
+test('selectors in at-rule preludes are not counted, whether preludes are parsed or not', () => {
+	const css = '@scope (.s) to (.e) { a {} } @supports selector(b) { c {} }'
+	const without = analyze(css, { selectors: selectors() }).selectors
+	const parsed = analyze(css, { selectors: selectors(), atrules: atrules() }).selectors
+	expect([...without.unique.keys()]).toEqual(['a', 'c'])
+	expect([...parsed.unique.keys()]).toEqual(['a', 'c'])
 })

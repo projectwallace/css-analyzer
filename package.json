@@ -77,7 +77,7 @@
 		"precommit": "pnpm run test --run && pnpm run check && pnpm run lint && pnpm run knip"
 	},
 	"dependencies": {
-		"@projectwallace/css-parser": "~0.19.6"
+		"@projectwallace/css-parser": "~0.19.7"
 	},
 	"devDependencies": {
 		"@projectwallace/preset-oxlint": "^0.0.13",

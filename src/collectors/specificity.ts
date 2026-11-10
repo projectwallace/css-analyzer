@@ -20,10 +20,7 @@ export type SpecificitySummary = {
 export function specificity(options: CountOptions = {}): CollectorDef<CountResult> {
 	return define_counting_collector(options, function setup(counter) {
 		return {
-			selector(node, ctx) {
-				if (ctx.atrule_stack.includes('keyframes')) {
-					return
-				}
+			selector(node) {
 				counter.add(get_specificity(node)[0]!.join(','), node)
 			},
 		}

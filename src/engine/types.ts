@@ -129,7 +129,12 @@ export type CollectorInstance<T> = {
 	stylesheet?: (node: StyleSheet, ctx: StylesheetContext) => void
 	rule?: (node: Rule, ctx: Context) => void
 	atrule?: (node: Atrule, ctx: Context) => void
-	selector?: (node: Selector, ctx: Context) => void
+	/**
+	 * Every selector of a style rule, except those in `@keyframes` (keyframe selectors are `rule`s
+	 * inside `@keyframes`) and those in at-rule preludes (`@scope`, `@supports selector()`).
+	 * It gets no context: use `rule` when you need `ctx.depth` or `ctx.atrule_stack`.
+	 */
+	selector?: (node: Selector) => void
 	declaration?: {
 		/** Normalized property names; the handler is skipped for other declarations */
 		properties?: ReadonlySet<string>

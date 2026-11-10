@@ -5,15 +5,20 @@ import {
 	AT_RULE,
 	DECLARATION,
 	SELECTOR,
+	SELECTOR_LIST,
 	SKIP,
 	STYLE_RULE,
 	SUPPORTS_DECLARATION,
 	parse,
 	traverse,
+	walk_selectors,
 	walk_values,
 } from '@projectwallace/css-parser'
 import { create_context } from './context.ts'
 import type { CollectorInstance, CollectorMap, ResultOf, ParseOptions } from './types.ts'
+
+// Keyframe selectors (`from`, `50%`) are not selectors in the sense of the selector metrics
+const KEYFRAMES = new Set<Lowercase<string>>(['keyframes'])
 
 type DeclarationSubscription = NonNullable<CollectorInstance<unknown>['declaration']>
 type ValueSubscription = Omit<NonNullable<CollectorInstance<unknown>['value']>, 'types'>
@@ -144,14 +149,9 @@ export function analyze<C extends CollectorMap>(
 				}
 				controller.enter_atrule(node)
 				break
+			case SELECTOR_LIST:
 			case SELECTOR:
-				if (selector_handlers.length > 0) {
-					controller.set_node(node, depth)
-					for (const handler of selector_handlers) {
-						handler(node, ctx)
-					}
-				}
-				// Selectors nested in :is(), :not(), ... belong to the selector that holds them
+				// Selectors have their own walk (see `walk_selectors` below)
 				return true
 			default:
 				break
@@ -204,6 +204,18 @@ export function analyze<C extends CollectorMap>(
 		},
 		leave,
 	})
+
+	if (selector_handlers.length > 0) {
+		walk_selectors(
+			ast,
+			function (selector) {
+				for (const handler of selector_handlers) {
+					handler(selector)
+				}
+			},
+			{ skip_atrules: KEYFRAMES, skip_atrule_preludes: true },
+		)
+	}
 
 	const result: Record<string, unknown> = Object.create(null)
 	keys.forEach(function (key, index) {
