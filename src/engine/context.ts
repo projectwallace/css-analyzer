@@ -1,9 +1,10 @@
 import {
+	type AnyNode,
 	type Atrule,
-	type CSSNode,
 	type Declaration,
 	type Value,
 	is_custom,
+	is_declaration,
 	is_raw,
 	property_basename,
 	strip_value_hack,
@@ -21,8 +22,8 @@ export type ContextController = {
 	readonly ctx: DeclarationContext & StylesheetContext
 	begin(css: string): void
 	/** `depth`: the number of enclosing rules and at-rules, as reported by `traverse()` */
-	set_node(node: CSSNode, depth: number): void
-	enter_atrule(node: CSSNode): void
+	set_node(node: AnyNode, depth: number): void
+	enter_atrule(node: Atrule): void
 	leave_atrule(): void
 }
 
@@ -35,7 +36,8 @@ const NOT_COMPUTED = Symbol('not-computed-yet')
  */
 export function create_context(): ContextController {
 	let css = ''
-	let node: CSSNode | undefined
+	// The visited node, when it is a declaration: the property and value facts read from it
+	let declaration: Declaration | undefined
 	let property_cache: string | undefined
 	let raw_property_cache: string | undefined
 	let value_text_cache: string | undefined
@@ -60,23 +62,23 @@ export function create_context(): ContextController {
 			return property_cache
 		},
 		get raw_property() {
-			raw_property_cache ??= (node as Declaration).property ?? ''
+			raw_property_cache ??= declaration?.property ?? ''
 			return raw_property_cache
 		},
 		get is_custom() {
 			return is_custom(ctx.raw_property)
 		},
 		get is_important() {
-			return (node as Declaration).is_important
+			return declaration?.is_important ?? false
 		},
 		get is_browserhack() {
-			return (node as Declaration).is_browserhack
+			return declaration?.is_browserhack ?? false
 		},
 		get is_vendor_prefixed() {
-			return (node as Declaration).is_vendor_prefixed
+			return declaration?.is_vendor_prefixed ?? false
 		},
 		get value_text() {
-			value_text_cache ??= (node as Declaration).value?.text ?? ''
+			value_text_cache ??= declaration?.value?.text ?? ''
 			return value_text_cache
 		},
 		get clean_value_text() {
@@ -104,8 +106,8 @@ export function create_context(): ContextController {
 		get value() {
 			if (value_cache === NOT_COMPUTED) {
 				// Values that were not parsed (see `parse.values`) are RAW nodes
-				const value = (node as Declaration).value
-				value_cache = value && !is_raw(value) ? (value as Value) : undefined
+				const value = declaration?.value
+				value_cache = value && !is_raw(value) ? value : undefined
 			}
 			return value_cache
 		},
@@ -115,12 +117,12 @@ export function create_context(): ContextController {
 		ctx,
 		begin(next_css) {
 			css = next_css
-			node = undefined
+			declaration = undefined
 			depth = 0
 			atrule_stack.length = 0
 		},
 		set_node(next, next_depth) {
-			node = next
+			declaration = is_declaration(next) ? next : undefined
 			depth = next_depth
 			property_cache = undefined
 			raw_property_cache = undefined
@@ -130,7 +132,7 @@ export function create_context(): ContextController {
 			font_cache = NOT_COMPUTED
 		},
 		enter_atrule(atrule) {
-			atrule_stack.push(property_basename((atrule as Atrule).name ?? ''))
+			atrule_stack.push(property_basename(atrule.name))
 		},
 		leave_atrule() {
 			atrule_stack.pop()
