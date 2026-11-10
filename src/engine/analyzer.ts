@@ -1,9 +1,6 @@
 import {
-	type Atrule,
-	type CSSNode,
+	type AnyNode,
 	type Declaration,
-	type Rule,
-	type Selector,
 	type StyleSheet,
 	AT_RULE,
 	DECLARATION,
@@ -16,14 +13,7 @@ import {
 	walk_values,
 } from '@projectwallace/css-parser'
 import { create_context } from './context.ts'
-import type {
-	CollectorInstance,
-	CollectorMap,
-	Context,
-	ResultOf,
-	StylesheetContext,
-	ParseOptions,
-} from './types.ts'
+import type { CollectorInstance, CollectorMap, ResultOf, ParseOptions } from './types.ts'
 
 type DeclarationSubscription = NonNullable<CollectorInstance<unknown>['declaration']>
 type ValueSubscription = Omit<NonNullable<CollectorInstance<unknown>['value']>, 'types'>
@@ -40,14 +30,14 @@ type ValueSubscription = Omit<NonNullable<CollectorInstance<unknown>['value']>, 
  * (normalized property, parsed value, font shorthand, ...) are computed lazily and memoized per
  * node, so the first collector that asks pays and the others read the cached result. The
  * context is only valid during the handler call it is passed to.
- * @param input - CSS text, or an already parsed stylesheet node
+ * @param input - CSS text, or an already parsed stylesheet (the result of the parser's `parse()`)
  * @param collectors - Object map of collectors; the keys become the keys of the result
  */
 export function analyze<C extends CollectorMap>(
-	input: string | CSSNode,
+	input: string | StyleSheet,
 	collectors: C,
 ): ResultOf<C> {
-	const keys = Object.keys(collectors) as (keyof C & string)[]
+	const keys = Object.keys(collectors)
 	const instances: CollectorInstance<unknown>[] = keys.map((key) => collectors[key]!.create())
 
 	// Build the dispatch table once: only subscribed handlers ever run
@@ -130,11 +120,11 @@ export function analyze<C extends CollectorMap>(
 		})
 	}
 
-	function enter(node: CSSNode, depth: number): boolean | void {
+	function enter(node: AnyNode, depth: number): boolean | void {
 		switch (node.type) {
 			case DECLARATION:
 				if (needs_declarations) {
-					visit_declaration(node as Declaration, depth)
+					visit_declaration(node, depth)
 				}
 				// Value nodes are handled by the single value walk above
 				return true
@@ -144,13 +134,13 @@ export function analyze<C extends CollectorMap>(
 			case STYLE_RULE:
 				controller.set_node(node, depth)
 				for (const handler of rule_handlers) {
-					handler(node as Rule, ctx as Context)
+					handler(node, ctx)
 				}
 				break
 			case AT_RULE:
 				controller.set_node(node, depth)
 				for (const handler of atrule_handlers) {
-					handler(node as Atrule, ctx as Context)
+					handler(node, ctx)
 				}
 				controller.enter_atrule(node)
 				break
@@ -158,7 +148,7 @@ export function analyze<C extends CollectorMap>(
 				if (selector_handlers.length > 0) {
 					controller.set_node(node, depth)
 					for (const handler of selector_handlers) {
-						handler(node as Selector, ctx as Context)
+						handler(node, ctx)
 					}
 				}
 				// Selectors nested in :is(), :not(), ... belong to the selector that holds them
@@ -168,13 +158,13 @@ export function analyze<C extends CollectorMap>(
 		}
 	}
 
-	function leave(node: CSSNode): void {
+	function leave(node: AnyNode): void {
 		if (node.type === AT_RULE) {
 			controller.leave_atrule()
 		}
 	}
 
-	let ast: CSSNode
+	let ast: StyleSheet
 	if (typeof input === 'string') {
 		controller.begin(input)
 		ast = parse(input, {
@@ -204,7 +194,7 @@ export function analyze<C extends CollectorMap>(
 	if (stylesheet_handlers.length > 0) {
 		controller.set_node(ast, 0)
 		for (const handler of stylesheet_handlers) {
-			handler(ast as StyleSheet, ctx as StylesheetContext)
+			handler(ast, ctx)
 		}
 	}
 
@@ -219,5 +209,6 @@ export function analyze<C extends CollectorMap>(
 	keys.forEach(function (key, index) {
 		result[key] = instances[index]!.result()
 	})
+	// The one cast left: TypeScript cannot relate keys that are only known at runtime to the mapped type
 	return result as ResultOf<C>
 }

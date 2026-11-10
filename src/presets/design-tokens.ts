@@ -1,6 +1,6 @@
+import type { StyleSheet } from '@projectwallace/css-parser'
 import { analyze } from '../engine/analyzer.ts'
 import type {
-	CSSNode,
 	CollectorDef,
 	ContextCountResult,
 	CountOptions,
@@ -59,7 +59,7 @@ export function design_tokens_collectors(
 }
 
 export function analyze_design_tokens(
-	input: string | CSSNode,
+	input: string | StyleSheet,
 	options?: DesignTokensOptions,
 ): DesignTokens {
 	return analyze(input, design_tokens_collectors(options))
