@@ -6,6 +6,7 @@ import * as selectors from './selectors/index.ts'
 import * as values from './values/index.ts'
 import * as atrules from './atrules/index.ts'
 import * as properties from './properties/index.ts'
+import * as stylesheet from './stylesheet/index.ts'
 import * as collections from './utils/collections/index.ts'
 
 describe('Public API', () => {
@@ -61,7 +62,7 @@ describe('Public API', () => {
 	})
 
 	test('utility subpaths expose snake_case functions only', () => {
-		for (const module of [selectors, values, atrules, properties]) {
+		for (const module of [selectors, values, atrules, properties, stylesheet]) {
 			for (const name of Object.keys(module)) {
 				expect(name).toMatch(/^[a-z][a-z0-9_]*$/)
 			}
@@ -79,6 +80,10 @@ describe('Public API', () => {
 	test('utils/collections exposes DefinedUsed and KeywordSet', () => {
 		expect(Object.keys(collections).sort()).toEqual(['DefinedUsed', 'KeywordSet'])
 		expect(collections.KeywordSet).toBeTypeOf('function')
+	})
+
+	test('exposes the stylesheet helper', () => {
+		expect(stylesheet.get_embed_type('data:image/png;base64,iVBOR')).toBe('image/png')
 	})
 
 	test('exposes property helpers', () => {

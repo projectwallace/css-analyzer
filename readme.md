@@ -177,7 +177,7 @@ get_specificity('a.b > #c') // [[1, 1, 1]]
 is_value_reset('0 0px') // true
 ```
 
-Also: `get_complexity`, `get_vendor_prefixes`, `get_accessibility_selectors`, `get_combinators` (`/selectors`); `destructure_font_shorthand`, `analyze_animation`, `get_prefixed_values`, `named_colors`, `system_colors`, `color_functions`, `keywords` (`/values`); `get_media_browserhacks`, `get_supports_browserhacks` (`/atrules`); `shorthand_properties`, `is_property_hack` (`/properties`).
+Also: `get_complexity`, `get_vendor_prefixes`, `get_accessibility_selectors`, `get_combinators` (`/selectors`); `destructure_font_shorthand`, `analyze_animation`, `get_prefixed_values`, `named_colors`, `system_colors`, `color_functions`, `keywords` (`/values`); `get_media_browserhacks`, `get_supports_browserhacks` (`/atrules`); `shorthand_properties`, `is_property_hack` (`/properties`); `get_embed_type` (`/stylesheet`).
 
 ## Upgrading from 9.x
 

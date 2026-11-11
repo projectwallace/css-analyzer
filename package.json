@@ -59,6 +59,10 @@
 			"types": "./dist/atrules/index.d.ts",
 			"default": "./dist/atrules/index.js"
 		},
+		"./stylesheet": {
+			"types": "./dist/stylesheet/index.d.ts",
+			"default": "./dist/stylesheet/index.js"
+		},
 		"./values": {
 			"types": "./dist/values/index.d.ts",
 			"default": "./dist/values/index.js"
