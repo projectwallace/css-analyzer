@@ -29,6 +29,15 @@ export type ColorsResult = ContextCountResult & {
 	formats: CountResult
 }
 
+/**
+ * Colors in values: hex, named, system and `currentcolor`/`transparent` keywords, and color functions
+ * (`rgb()`, `oklch()`, ...), with their `formats`. With `contexts: true` also counted per property.
+ *
+ * Words that are names are not colors: values of `font-family`, `transition`, `animation`,
+ * `animation-name` and `z-index` are skipped (`animation-name: red` is not a color), and so are
+ * the words in a `font` shorthand (`font: 12px Black`). Colors in custom properties (`--brand: red`)
+ * and in properties the collector does not know (`unknown: blue`) are counted.
+ */
 export function colors<O extends ColorsOptions = {}>(
 	options?: O,
 ): CollectorDef<WithContexts<CountResult & { formats: CountResult }, O>> {
