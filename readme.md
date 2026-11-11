@@ -137,7 +137,7 @@ export type Report = ResultOf<typeof collectors>
 
 | Collector                                                  | Counts                                                                                                                                       |
 | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `stylesheet`                                               | size, lines, comments, embedded `data:` content                                                                                              |
+| `stylesheet`                                               | size, lines, source lines of code, complexity, comments, embedded `data:` content                                                            |
 | `atrules`                                                  | every at-rule, with `@font-face`, `@import`, `@media`, `@supports`, `@keyframes`, `@container`, `@layer`, `@property`, `@function`, `@scope` |
 | `rules`, `selectors`, `specificity`                        | rule sizes and nesting, selector kinds and complexity, specificity                                                                           |
 | `declarations`, `properties`                               | declarations, `!important`, prefixes, custom properties, shorthands, hacks, anchor names                                                     |
