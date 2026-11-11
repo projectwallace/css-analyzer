@@ -389,10 +389,9 @@ test('finds @font-face', () => {
 	expect(actual).toEqual(expected)
 })
 
-// oxlint-disable-next-line vitest/no-disabled-tests
-test.skip('handles @font-face encoding issues (GH-307)', () => {
+test('handles @font-face encoding issues (GH-307)', () => {
 	// Actual CSS once found in a <style> tag on vistaprint.nl
-	// CSSTree parses it without errors, but analyzer failed on it;
+	// The analyzer once failed on it: it must not throw and still finds both @font-face rules
 	const css = `
     @font-face {
       font-family: &#x27;Graphik&#x27;;
@@ -419,7 +418,8 @@ test.skip('handles @font-face encoding issues (GH-307)', () => {
 	const actual = run(css).fontface
 	expect(actual.total).toEqual(2)
 	const expected = {
-		'font-family': `&#x27`,
+		// The input is invalid: `&#x27;` ends the declaration at the `;`, and the parser drops the leading `&`
+		'font-family': `#x27`,
 		'font-stretch': `normal`,
 		'font-style': `normal`,
 		'font-weight': `400`,
