@@ -16,7 +16,7 @@ import {
 } from '@projectwallace/css-parser'
 import { unquote } from '../utils/string-utils.ts'
 import { type SelectorInput, as_selectors } from '../utils/input.ts'
-import type { Location } from '../engine/types.ts'
+import type { Location } from '../utils/location.ts'
 
 const PSEUDO_FUNCTIONS = new KeywordSet([
 	'nth-child',
