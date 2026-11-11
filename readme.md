@@ -20,6 +20,7 @@ Turn your CSS into <b>actionable stats</b> — specificity, complexity, design t
 - **Pick what you need**: metrics are opt-in collectors, so you only pay (runtime and bundle size) for what you use
 - **Tree-shakable** ES modules and **TypeScript** types, with the result type inferred from the collectors you pass
 - Write your **own collectors** with the same API the built-ins use
+- **Design system** audit ready: a design-tokens preset (colors, font sizes, shadows, ...) and uniqueness ratios via `summarize()`
 - Runs anywhere — **NodeJS and browsers**
 - Tiny footprint, only one dependency
 - Battle-tested — powers [Project Wallace](https://www.projectwallace.com)
@@ -188,6 +189,14 @@ import { is_value_reset, get_value_browserhacks } from '@projectwallace/css-anal
 
 get_specificity('a.b > #c') // [[1, 1, 1]]
 is_value_reset('0 0px') // true
+
+// compare_specificity sorts ascending: lowest specificity first
+;[
+	[0, 1, 1],
+	[2, 0, 0],
+	[0, 0, 1],
+].sort(compare_specificity) // [[0, 0, 1], [0, 1, 1], [2, 0, 0]]
+compare_specificity([0, 1, 0], [0, 1, 0]) // 0
 ```
 
 Also: `get_complexity`, `get_vendor_prefixes`, `get_accessibility_selectors`, `get_combinators` (`/selectors`); `destructure_font_shorthand`, `analyze_animation`, `get_prefixed_values`, `named_colors`, `system_colors`, `color_functions`, `keywords` (`/values`); `get_media_browserhacks`, `get_supports_browserhacks` (`/atrules`); `shorthand_properties`, `is_property_hack` (`/properties`); `get_embed_type` (`/stylesheet`).
