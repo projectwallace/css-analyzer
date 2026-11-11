@@ -35,7 +35,9 @@ type ValueSubscription = Omit<NonNullable<CollectorInstance<unknown>['value']>, 
  * (normalized property, parsed value, font shorthand, ...) are computed lazily and memoized per
  * node, so the first collector that asks pays and the others read the cached result. The
  * context is only valid during the handler call it is passed to.
- * @param input - CSS text, or an already parsed stylesheet (the result of the parser's `parse()`)
+ * @param input - CSS text, or an already parsed stylesheet (the result of the parser's `parse()`).
+ *   Collectors that subscribe to `comment` (e.g. `stylesheet()`) only see comments when you pass text:
+ *   the parser reports them while parsing.
  * @param collectors - Object map of collectors; the keys become the keys of the result
  */
 export function analyze<C extends CollectorMap>(
