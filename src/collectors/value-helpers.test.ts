@@ -2,6 +2,10 @@ import { test, expect } from 'vitest'
 import { parse_value } from '@projectwallace/css-parser/parse-value'
 import { analyze } from '../engine/analyzer.ts'
 import { define_collector } from '../engine/define-collector.ts'
+import { colors } from './colors.ts'
+import { gradients } from './gradients.ts'
+import { keywords } from './keywords.ts'
+import { units } from './units.ts'
 import { get_animation_names, get_first_identifier, get_list_items } from './value-helpers.ts'
 
 function names_of(css: string): string[][] {
@@ -41,3 +45,42 @@ test('get_first_identifier gives the name inside a function, or undefined', () =
 	expect(get_first_identifier(parse_value('var(1px)').first_child!)).toBeUndefined()
 	expect(get_first_identifier(parse_value('var()').first_child!)).toBeUndefined()
 })
+
+// Why these four: their values are names, timing and numbers, so words in them (`red` in `font-family: Red`,
+// `1s` in `transition`) are not colors, units or gradients.
+const SKIPPED = ['font-family', 'transition', 'animation', 'z-index'] as const
+const VALUE = 'foo red 1px, calc(2em + var(--x, blue)) linear-gradient(red, blue) bar'
+
+test.each(SKIPPED)('colors, units and gradients do not look inside %s', (property) => {
+	const result = analyze(`a { ${property}: ${VALUE} }`, {
+		colors: colors(),
+		units: units(),
+		gradients: gradients(),
+	})
+	expect(result.colors.total).toBe(0)
+	expect(result.units.total).toBe(0)
+	expect(result.gradients.total).toBe(0)
+})
+
+test('the same value is counted in a property that is not skipped (the control)', () => {
+	const result = analyze(`a { margin: ${VALUE} }`, {
+		colors: colors(),
+		units: units(),
+		gradients: gradients(),
+	})
+	expect(result.colors.total).toBe(4)
+	expect(result.units.total).toBe(2)
+	expect(result.gradients.total).toBe(1)
+})
+
+test.each(['font-family', 'z-index'])('keywords do not look inside %s', (property) => {
+	expect(analyze(`a { ${property}: foo auto }`, { keywords: keywords() }).keywords.total).toBe(0)
+})
+
+test.each(['transition', 'animation'])(
+	'keywords in %s are counted once, by the shorthand and not by the value walk',
+	(property) => {
+		const result = analyze(`a { ${property}: foo 1s auto }`, { keywords: keywords() })
+		expect([...result.keywords.unique]).toEqual([['auto', { count: 1 }]])
+	},
+)
