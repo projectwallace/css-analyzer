@@ -26,7 +26,7 @@ Rules of thumb:
 - `var()` is now tracked as a use of a custom property in every property. 9.x skipped `font-family`, `transition`, `animation` and `z-index`, so a custom property used only there looked unused.
 - The collectors lowercase values the same way everywhere (values with `var()` keep their case). In 9.x a longhand timing function was left as written and a `font` shorthand size was always lowercased.
 - Embedded `data:` URIs in `@import` preludes are not counted (only `url()` values).
-- `animation-name: red` still counts `red` as a color, as in 9.x.
+- `animation-name: red` is no longer counted as a color (9.x counted it).
 
 ## Utilities
 

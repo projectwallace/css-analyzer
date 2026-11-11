@@ -747,13 +747,12 @@ test('does not report false positives for color keywords', () => {
 	expect(actual).toEqual(expected)
 })
 
-// Source: https://gist.github.com/lahmatiy/84c7fd877a78e561cac57e59e142c9e3
-// oxlint-disable-next-line vitest/no-disabled-tests
-test.skip('ignores color names that are not actual colors', () => {
+test('does not count animation names as colors', () => {
 	const fixture = `
     test {
-      animation: red; /* it's not a color but an animation name */
-      unknown-property: blue; /* don't match value as a color when property is unknown */
+      animation: red; /* an animation name */
+      animation-name: red, blue;
+      animation: 1s ease-in blue;
     }
   `
 	const actual = run(fixture)
@@ -769,6 +768,11 @@ test.skip('ignores color names that are not actual colors', () => {
 	}
 
 	expect(actual).toEqual(expected)
+})
+
+test('counts color names in unknown properties', () => {
+	const actual = run('test { unknown-property: blue }')
+	expect(actual.unique).toEqual({ blue: 1 })
 })
 
 test('finds colors in var() as fallback values', () => {

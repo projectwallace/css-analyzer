@@ -41,7 +41,8 @@ export function colors<O extends ColorsOptions = {}>(
 				types: [HASH, IDENTIFIER, FUNCTION],
 				enter(node, ctx) {
 					const property = ctx.property
-					if (NO_VALUE_WALK.has(property)) {
+					// `animation-name: red` is a name, not a color
+					if (NO_VALUE_WALK.has(property) || property === 'animation-name') {
 						return
 					}
 					const context = get_context_property(ctx, options?.property)
