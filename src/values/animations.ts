@@ -5,9 +5,9 @@ import {
 	is_function,
 	is_string,
 } from '@projectwallace/css-parser'
-import { KeywordSet } from '../keyword-set.ts'
+import { KeywordSet } from '../utils/collections/keyword-set.ts'
 import { keywords } from './values.ts'
-import { type ValueInput, as_value } from '../input.ts'
+import { type ValueInput, as_value } from '../utils/input.ts'
 
 const TIMING_KEYWORDS = new KeywordSet([
 	'linear',

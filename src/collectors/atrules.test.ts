@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
-import { plain, series } from '../test-utils.ts'
+import { plain, series } from '../test/test-utils.ts'
 import { summarize_numbers } from '../engine/summary.ts'
 import { atrules } from './atrules.ts'
 

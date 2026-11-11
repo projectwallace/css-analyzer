@@ -1,5 +1,5 @@
 import { is_function, is_identifier, FUNCTION, property_basename } from '@projectwallace/css-parser'
-import { DefinedUsed, type DefinedUsedResult } from '../defined-used.ts'
+import { DefinedUsed, type DefinedUsedResult } from '../utils/collections/defined-used.ts'
 import { create_counter } from '../engine/counter.ts'
 import { define_collector } from '../engine/define-collector.ts'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'

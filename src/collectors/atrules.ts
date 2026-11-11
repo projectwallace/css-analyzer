@@ -15,11 +15,11 @@ import {
 	FUNCTION,
 	property_basename,
 } from '@projectwallace/css-parser'
-import { DefinedUsed, type DefinedUsedResult } from '../defined-used.ts'
+import { DefinedUsed, type DefinedUsedResult } from '../utils/collections/defined-used.ts'
 import { create_counter, to_location } from '../engine/counter.ts'
 import { define_collector } from '../engine/define-collector.ts'
 import type { CollectorDef, CountOptions, CountResult, Location } from '../engine/types.ts'
-import { unquote } from '../string-utils.ts'
+import { unquote } from '../utils/string-utils.ts'
 import { get_media_browserhacks, get_supports_browserhacks } from '../atrules/atrules.ts'
 import { keywords } from '../values/values.ts'
 import {

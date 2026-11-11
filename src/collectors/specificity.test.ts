@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
-import { plain } from '../test-utils.ts'
+import { plain } from '../test/test-utils.ts'
 import { specificity, summarize_specificity } from './specificity.ts'
 
 /** The specificity result with the shape the old tests were written for */

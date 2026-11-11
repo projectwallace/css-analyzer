@@ -6,13 +6,12 @@ import * as selectors from './selectors/index.ts'
 import * as values from './values/index.ts'
 import * as atrules from './atrules/index.ts'
 import * as properties from './properties/index.ts'
+import * as collections from './utils/collections/index.ts'
 
 describe('Public API', () => {
 	test('main entry exports the engine', () => {
 		expect(Object.keys(api).sort()).toEqual(
 			[
-				'DefinedUsed',
-				'KeywordSet',
 				'analyze',
 				'create_context_counter',
 				'create_counter',
@@ -75,7 +74,11 @@ describe('Public API', () => {
 		expect(values.color_functions.has('okLAB')).toBeTruthy()
 		expect(values.color_keywords.has('TRANSPARENT')).toBeTruthy()
 		expect(values.keywords.has('INHERIT')).toBeTruthy()
-		expect(api.KeywordSet).toBeTypeOf('function')
+	})
+
+	test('utils/collections exposes DefinedUsed and KeywordSet', () => {
+		expect(Object.keys(collections).sort()).toEqual(['DefinedUsed', 'KeywordSet'])
+		expect(collections.KeywordSet).toBeTypeOf('function')
 	})
 
 	test('exposes property helpers', () => {

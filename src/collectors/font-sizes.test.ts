@@ -1,6 +1,6 @@
 import { test, expect, describe } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
-import { plain } from '../test-utils.ts'
+import { plain } from '../test/test-utils.ts'
 import { font_sizes } from './font-sizes.ts'
 
 function run(css: string) {

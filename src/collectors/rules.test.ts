@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
-import { series } from '../test-utils.ts'
+import { series } from '../test/test-utils.ts'
 import { rules } from './rules.ts'
 
 /** Rule results with the shape the old tests were written for */

@@ -18,7 +18,7 @@ import {
 	is_selector,
 	is_combinator,
 } from '@projectwallace/css-parser'
-import { type SelectorInput, as_selectors } from '../input.ts'
+import { type SelectorInput, as_selectors } from '../utils/input.ts'
 
 export type Specificity = [number, number, number]
 

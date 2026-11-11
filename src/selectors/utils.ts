@@ -1,4 +1,4 @@
-import { KeywordSet } from '../keyword-set.ts'
+import { KeywordSet } from '../utils/collections/keyword-set.ts'
 import {
 	type CSSNode,
 	type Combinator,
@@ -14,8 +14,8 @@ import {
 	is_nth_selector,
 	is_combinator,
 } from '@projectwallace/css-parser'
-import { unquote } from '../string-utils.ts'
-import { type SelectorInput, as_selectors } from '../input.ts'
+import { unquote } from '../utils/string-utils.ts'
+import { type SelectorInput, as_selectors } from '../utils/input.ts'
 import type { Location } from '../engine/types.ts'
 
 const PSEUDO_FUNCTIONS = new KeywordSet([

@@ -1,6 +1,6 @@
 import { is_function, FUNCTION } from '@projectwallace/css-parser'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
-import { ends_with } from '../string-utils.ts'
+import { ends_with } from '../utils/string-utils.ts'
 import { NO_VALUE_WALK, define_counting_collector } from './shared.ts'
 
 /** Every `*-gradient()` function, as written, including nested ones and `var()` fallbacks */

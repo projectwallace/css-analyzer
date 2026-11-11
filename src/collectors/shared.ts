@@ -8,7 +8,7 @@ import {
 } from '@projectwallace/css-parser'
 import { analyze_animation } from '../values/animations.ts'
 import { keywords } from '../values/values.ts'
-import { unquote } from '../string-utils.ts'
+import { unquote } from '../utils/string-utils.ts'
 import { create_counter } from '../engine/counter.ts'
 import { define_collector } from '../engine/define-collector.ts'
 import type { Counter } from '../engine/counter.ts'

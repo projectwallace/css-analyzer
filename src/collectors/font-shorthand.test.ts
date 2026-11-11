@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
-import { plain } from '../test-utils.ts'
+import { plain } from '../test/test-utils.ts'
 import { font_families } from './font-families.ts'
 import { font_sizes } from './font-sizes.ts'
 import { line_heights } from './line-heights.ts'

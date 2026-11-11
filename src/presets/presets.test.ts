@@ -1,6 +1,6 @@
 import { test, expect, expectTypeOf, describe } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
-import { tokens_fixture } from '../test-fixture.ts'
+import { tokens_fixture } from '../test/test-fixture.ts'
 import type { CollectorDef, CountResult } from '../engine/types.ts'
 import {
 	all_collectors,

@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
-import { plain, series } from '../test-utils.ts'
+import { plain, series } from '../test/test-utils.ts'
 import { selectors } from './selectors.ts'
 import { atrules } from './atrules.ts'
 import { specificity, summarize_specificity } from './specificity.ts'

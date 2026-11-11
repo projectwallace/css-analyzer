@@ -47,6 +47,10 @@
 			"types": "./dist/presets/index.d.ts",
 			"default": "./dist/presets/index.js"
 		},
+		"./utils/collections": {
+			"types": "./dist/utils/collections/index.d.ts",
+			"default": "./dist/utils/collections/index.js"
+		},
 		"./selectors": {
 			"types": "./dist/selectors/index.d.ts",
 			"default": "./dist/selectors/index.js"
