@@ -25,6 +25,7 @@ Rules of thumb:
 
 - `var()` is now tracked as a use of a custom property in every property. 9.x skipped `font-family`, `transition`, `animation` and `z-index`, so a custom property used only there looked unused.
 - The collectors lowercase values the same way everywhere (values with `var()` keep their case). In 9.x a longhand timing function was left as written and a `font` shorthand size was always lowercased.
+- `stylesheet().embedded` uses the standard count shape: `{ total, total_unique, unique: Map<mime type, { count, locations? }>, size }`. The per-type `size` of 9.x is gone; `size` is the total of all embedded content.
 - Embedded `data:` URIs in `@import` preludes are not counted (only `url()` values).
 - `animation-name: red` is no longer counted as a color (9.x counted it).
 

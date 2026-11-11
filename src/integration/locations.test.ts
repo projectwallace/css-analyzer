@@ -49,8 +49,8 @@ test('embedded content lists the url() that holds it', () => {
     c { background: url(data:image/svg+xml,%3Csvg%3E%3C/svg%3E) }
   `
 	const { sheet } = analyze(css, { sheet: stylesheet({ locations: true }) })
-	const gif = sheet.embedded.types.get('image/gif')!
-	const svg = sheet.embedded.types.get('image/svg+xml')!
+	const gif = sheet.embedded.unique.get('image/gif')!
+	const svg = sheet.embedded.unique.get('image/svg+xml')!
 
 	expect(gif.count).toBe(1)
 	expect(gif.locations?.map((loc) => text_at(css, loc))).toEqual([

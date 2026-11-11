@@ -1,5 +1,6 @@
 import { test, expect } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
+import { plain } from '../test/test-utils.ts'
 import { stylesheet } from '../collectors/stylesheet.ts'
 
 /** Stylesheet results with the shape the old tests were written for */
@@ -9,13 +10,8 @@ function run(css: string) {
 		size: result.size,
 		lines: result.lines,
 		comments: result.comments,
-		embedded: {
-			total: result.embedded.total,
-			size: result.embedded.size,
-			types: Object.fromEntries(
-				[...result.embedded.types].map(([type, { count, size }]) => [type, { count, size }]),
-			),
-		},
+		embedded: plain(result.embedded),
+		embedded_size: result.embedded.size,
 	}
 }
 
@@ -97,17 +93,13 @@ test('measures base64 contents', () => {
     }
   `
 
-	const actual = run(fixture).embedded
-	const expected = {
+	const actual = run(fixture)
+	expect(actual.embedded).toEqual({
 		total: 5,
-		size: 2337,
-		types: {
-			'image/gif': { count: 1, size: 310 },
-			'image/svg+xml': { count: 4, size: 2027 },
-		},
-	}
-
-	expect(actual).toEqual(expected)
+		total_unique: 2,
+		unique: { 'image/gif': 1, 'image/svg+xml': 4 },
+	})
+	expect(actual.embedded_size).toBe(2337)
 })
 
 test('reports embed size correctly when there are duplicates', () => {
@@ -122,14 +114,11 @@ test('reports embed size correctly when there are duplicates', () => {
     }
   `
 
-	const actual = run(fixture).embedded
-	const expected = {
+	const actual = run(fixture)
+	expect(actual.embedded).toEqual({
 		total: 2,
-		size: 918,
-		types: {
-			'image/svg+xml': { count: 2, size: 918 },
-		},
-	}
-
-	expect(actual).toEqual(expected)
+		total_unique: 1,
+		unique: { 'image/svg+xml': 2 },
+	})
+	expect(actual.embedded_size).toBe(918)
 })

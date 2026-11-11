@@ -26,7 +26,7 @@ export { rules, type RulesResult } from './rules.ts'
 export { selectors, type SelectorsResult } from './selectors.ts'
 export { properties, type PropertiesResult } from './properties.ts'
 export { atrules, type AtrulesResult } from './atrules.ts'
-export { stylesheet, type StylesheetResult, type EmbeddedType } from './stylesheet.ts'
+export { stylesheet, type StylesheetResult } from './stylesheet.ts'
 // The types you need to write down a collector map, so there is one import for the whole signature
 export type {
 	CollectorDef,

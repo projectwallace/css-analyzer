@@ -1,11 +1,9 @@
 import { is_url, str_starts_with, URL } from '@projectwallace/css-parser'
-import { to_location } from '../engine/counter.ts'
+import { create_counter } from '../engine/counter.ts'
 import { define_collector } from '../engine/define-collector.ts'
-import type { CollectorDef, Location } from '../engine/types.ts'
+import type { CollectorDef, CountResult } from '../engine/types.ts'
 import { unquote } from '../utils/string-utils.ts'
 import { get_embed_type } from '../stylesheet/stylesheet.ts'
-
-export type EmbeddedType = { count: number; size: number; locations?: Location[] }
 
 export type StylesheetResult = {
 	/** Characters of CSS */
@@ -13,13 +11,10 @@ export type StylesheetResult = {
 	/** Lines of CSS (a stylesheet without line breaks has 1) */
 	lines: number
 	comments: { total: number; size: number }
-	/** `data:` URIs in `url()` values */
-	embedded: {
-		total: number
+	/** `data:` URIs in `url()` values, counted by mime type (`unique` has e.g. `image/png`) */
+	embedded: CountResult & {
 		/** Characters of all embedded content together */
 		size: number
-		/** Counted by mime type, e.g. `image/png` */
-		types: Map<string, EmbeddedType>
 	}
 }
 
@@ -30,16 +25,13 @@ export type StylesheetOptions = { locations?: boolean }
  * Comments are only found when the analyzer parses the CSS itself (not for an AST you pass in).
  */
 export function stylesheet(options: StylesheetOptions = {}): CollectorDef<StylesheetResult> {
-	const locations = options.locations === true
-
 	return define_collector<StylesheetResult>(function init() {
 		let size = 0
 		let lines = 0
 		let comments = 0
 		let comments_size = 0
 		let embedded_size = 0
-		let embedded_total = 0
-		const types = new Map<string, EmbeddedType>()
+		const embedded = create_counter({ locations: options.locations })
 
 		return {
 			parse: { values: true },
@@ -62,33 +54,15 @@ export function stylesheet(options: StylesheetOptions = {}): CollectorDef<Styles
 					if (!str_starts_with('data:', embed)) {
 						return
 					}
-					embedded_total++
 					embedded_size += embed.length
-					const type = get_embed_type(embed)
-					const entry = types.get(type) ?? { count: 0, size: 0 }
-					entry.count++
-					entry.size += embed.length
-					if (locations) {
-						entry.locations ??= []
-						entry.locations.push(to_location(node))
-					}
-					types.set(type, entry)
+					embedded.add(get_embed_type(embed), node)
 				},
 			},
 			result: () => ({
 				size,
 				lines,
 				comments: { total: comments, size: comments_size },
-				embedded: {
-					total: embedded_total,
-					size: embedded_size,
-					types: new Map(
-						[...types].map(([type, entry]) => [
-							type,
-							{ count: entry.count, size: entry.size, locations: entry.locations?.slice() },
-						]),
-					),
-				},
+				embedded: { ...embedded.result(), size: embedded_size },
 			}),
 		}
 	})
