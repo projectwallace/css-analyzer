@@ -1,5 +1,14 @@
 # Migrating from 9.x to 10
 
+## Breaking changes at a glance
+
+- **Node.js >= 22.18** (was >= 18). The source uses `.ts` import specifiers; the published package is plain ES modules plus types.
+- `analyze()` takes collectors and returns only what they report (see below).
+- `unique` and `by_context` are `Map`s, not plain objects. Use `to_json(result)` to get plain data for `JSON.stringify()`.
+- All names are `snake_case`.
+- `DefinedUsed` and `KeywordSet` moved from the package root to `@projectwallace/css-analyzer/utils/collections`.
+- Need the 9.x report shape in one call? `analyze_compat` is tracked in [#649](https://github.com/projectwallace/css-analyzer/pull/649); `analyze_all()` returns the same data under new keys (see the table below).
+
 ## From `analyze()` to collectors
 
 | 9.x                                           | 10                                                                                 |
@@ -21,6 +30,50 @@ Rules of thumb:
 - Derived statistics are separate functions, so you only pay for what you use.
 - Per-property counts (`by_context`) use the normalized property by default: lowercase, no vendor prefix or hack character (`-webkit-box-shadow` is `box-shadow`). Pass `property: 'as_written'` for the old behaviour.
 
+## Where did each 9.x key go?
+
+`analyze_all(css)` has one key per collector; with `analyze(css, { key: collector() })` the key is yours. Everything counted has `{ total, total_unique, unique }`. The `ratio` and `uniquenessRatio` fields are gone (see above).
+
+| 9.x                                                               | 10 (collector → path in its result)                                                               |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `stylesheet.size`, `linesOfCode`                                  | `stylesheet()` → `size`, `lines`                                                                  |
+| `stylesheet.comments`                                             | `stylesheet()` → `comments` (`{ total, size }`; only for CSS text, not for a parsed AST)          |
+| `stylesheet.embeddedContent`                                      | `stylesheet()` → `embedded` (count result by mime type, plus `size`)                              |
+| `stylesheet.sourceLinesOfCode`, `stylesheet.complexity`           | removed: add up `rules`, `selectors`, `declarations` totals and the `complexity` results yourself |
+| `atrules.{total,unique}`                                          | `atrules()` → `total`, `unique`                                                                   |
+| `atrules.fontface`                                                | `atrules()` → `font_faces` (`{ total, items }`)                                                   |
+| `atrules.import`, `charset`, `scope`, `function`                  | `atrules()` → `imports`, `charsets`, `scopes`, `functions`                                        |
+| `atrules.media` (`browserhacks`, `features`)                      | `atrules()` → `media` (`browserhacks`, `features`)                                                |
+| `atrules.supports`                                                | `atrules()` → `supports` (`browserhacks`)                                                         |
+| `atrules.keyframes` (`defined`, `used`, ..., `prefixed`)          | `atrules()` → `keyframes` (`defined`, `used`, `unused`, `unknown`, `prefixed`)                    |
+| `atrules.container.names`, `atrules.layer`                        | `atrules()` → `containers` (`names`), `layers`                                                    |
+| `atrules.property`                                                | `atrules()` → `properties` (also tracks `var()` use)                                              |
+| `atrules.complexity`, `atrules.nesting`                           | `atrules()` → `complexity`, `nesting` (items are numbers: `summarize_numbers()`)                  |
+| `rules.{total,empty,sizes,nesting,selectors,declarations}`        | `rules()` → same names; `empty` is a number                                                       |
+| `selectors.{total,unique}`, `complexity`, `nesting`               | `selectors()` → `total`, `unique`, `complexity`, `nesting`                                        |
+| `selectors.specificity`                                           | `specificity()` + `summarize_specificity()`                                                       |
+| `selectors.id`                                                    | `selectors()` → `ids` (selectors that contain an ID)                                              |
+| `selectors.pseudoClasses`, `pseudoElements`, `customElements`     | `selectors()` → `pseudo_classes`, `pseudo_elements`, `custom_elements`                            |
+| `selectors.accessibility`, `attributes`, `keyframes`, `prefixed`  | `selectors()` → same names                                                                        |
+| `selectors.combinators`                                           | `selectors()` → `combinators`                                                                     |
+| `declarations.{total,unique,complexity,nesting}`                  | `declarations()` → same names                                                                     |
+| `declarations.importants`                                         | `declarations()` → `importants` (`{ total, in_keyframes }`)                                       |
+| `properties.{total,unique}`                                       | `properties()` → `total`, `unique` (normalized: `-webkit-transition` is `transition`)             |
+| `properties.prefixed`, `shorthands`, `browserhacks`, `complexity` | `properties()` → same names                                                                       |
+| `properties.custom` (`defined`, `used`, `unused`, `importants`)   | `properties()` → `custom`                                                                         |
+| `properties.anchorNames`                                          | `properties()` → `anchor_names`                                                                   |
+| `values.colors` (`itemsPerContext`, `formats`)                    | `colors({ contexts: true })` → `by_context`, `formats`                                            |
+| `values.gradients`                                                | `gradients()`                                                                                     |
+| `values.fontFamilies`, `fontSizes`, `lineHeights`                 | `font_families()`, `font_sizes()`, `line_heights()`                                               |
+| `values.zindexes`                                                 | `z_indexes()`                                                                                     |
+| `values.textShadows`, `boxShadows`                                | `text_shadows()`, `box_shadows()`                                                                 |
+| `values.borderRadiuses` (`itemsPerContext`)                       | `border_radiuses({ contexts: true })` → `by_context`                                              |
+| `values.animations.{durations,timingFunctions,names}`             | `durations()`, `timing_functions()`, `animation_names()`                                          |
+| `values.prefixes`, `values.browserhacks`                          | `value_prefixes()`, `value_browserhacks()`                                                        |
+| `values.units` (`itemsPerContext`)                                | `units({ contexts: true })` → `by_context`                                                        |
+| `values.complexity`                                               | `value_complexity()` (items are numbers)                                                          |
+| `values.keywords`, `resets`, `displays`                           | `keywords()`, `resets()`, `displays()`                                                            |
+
 ## Behaviour changes
 
 - `var()` is now tracked as a use of a custom property in every property. 9.x skipped `font-family`, `transition`, `animation` and `z-index`, so a custom property used only there looked unused.
@@ -28,6 +81,7 @@ Rules of thumb:
 - `stylesheet().embedded` uses the standard count shape: `{ total, total_unique, unique: Map<mime type, { count, locations? }>, size }`. The per-type `size` of 9.x is gone; `size` is the total of all embedded content.
 - Embedded `data:` URIs in `@import` preludes are not counted (only `url()` values).
 - `animation-name: red` is no longer counted as a color (9.x counted it).
+- Specificity of `:host()`, `:host-context()` and `:nth-child(… of …)` counts the compound selector in the argument once. 9.x counted every part of it again from its own position onward, so `:host(.a.b.c)` was `[0,7,0]`; it is `[0,4,0]` now.
 
 ## Utilities
 
