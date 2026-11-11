@@ -2,7 +2,8 @@
 	"compilerOptions": {
 		// Base options:
 		"skipLibCheck": true,
-		"target": "es2024",
+		// TODO: set to es2025 on next major version
+		"target": "es2022",
 		"verbatimModuleSyntax": true,
 		"moduleDetection": "force",
 
@@ -20,15 +21,14 @@
 		"erasableSyntaxOnly": true,
 
 		// Type checking, not transpiling
-		"resolveJsonModule": true,
 		"allowSyntheticDefaultImports": true,
 		"noEmit": true,
 		"declaration": true,
 		"isolatedDeclarations": true,
 
 		// Code runs in the DOM
-		"lib": ["ES2024", "DOM", "DOM.Iterable"]
+		"lib": ["ES2022", "DOM", "DOM.Iterable"]
 	},
-	"include": ["src/**/*.ts", "src/**/*.json"],
+	"include": ["src/**/*.ts"],
 	"exclude": ["node_modules"]
 }
