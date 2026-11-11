@@ -1,7 +1,13 @@
 import { test, expect } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
 import { plain } from '../test/test-utils.ts'
-import { stylesheet } from '../collectors/stylesheet.ts'
+import type { CountResult } from '../engine/types.ts'
+import { atrules } from './atrules.ts'
+import { declarations } from './declarations.ts'
+import { properties } from './properties.ts'
+import { selectors } from './selectors.ts'
+import { stylesheet } from './stylesheet.ts'
+import { value_complexity } from './value-complexity.ts'
 
 /** Stylesheet results with the shape the old tests were written for */
 function run(css: string) {
@@ -121,4 +127,83 @@ test('reports embed size correctly when there are duplicates', () => {
 		unique: { 'image/svg+xml': 2 },
 	})
 	expect(actual.embedded_size).toBe(918)
+})
+
+// The expected numbers are the ones 9.x reported for the same CSS
+test.each([
+	['empty', '', 0, 0],
+	['a rule with a declaration', 'a { color: red }', 2, 4],
+	['two selectors, two declarations', 'a, b { color: red; margin: 0 }', 4, 8],
+	['!important', 'a { color: red !important }', 2, 5],
+	['!important custom property', 'a { --x: 1px !important }', 2, 7],
+	['vendor prefixed property', 'a { -webkit-box-shadow: 0 0 1px red }', 2, 5],
+	['vendor prefixed value', 'a { background: -webkit-linear-gradient(red, blue) }', 2, 5],
+	['property hack', 'a { *zoom: 1 }', 2, 5],
+	['empty declaration', 'a { color: red; ; }', 2, 4],
+	['nested rule', 'a { b { color: red } }', 3, 5],
+	['complex selector', 'a:not(.b) > c { color: red }', 2, 8],
+	['@media', '@media (min-width: 1px) { a { color: red } }', 3, 5],
+	['@media browserhack', '@media \\0screen { a { color: red } }', 3, 6],
+	['@supports', '@supports (display: grid) { a { display: grid } }', 3, 5],
+	['@font-face', '@font-face { font-family: x }', 2, 4],
+	['@layer statement', '@layer base, components;', 1, 1],
+	['@layer block without a name', '@layer { a { color: red } }', 3, 6],
+	[
+		'keyframe selectors count as source lines',
+		'@keyframes x { from { opacity: 0 } 50%, 75% { opacity: .5 } to { opacity: 1 } }',
+		8,
+		10,
+	],
+	['!important in keyframes', '@keyframes x { to { opacity: 1 !important } }', 3, 6],
+	['prefixed keyframes', '@-webkit-keyframes x { to { opacity: 1 } }', 3, 5],
+])('source lines of code and complexity: %s', (_name, css, source_lines_of_code, complexity) => {
+	const { result } = analyze(css, { result: stylesheet() })
+	expect(result.source_lines_of_code).toBe(source_lines_of_code)
+	expect(result.complexity).toBe(complexity)
+})
+
+test('source lines of code ignore comments and blank lines, lines do not', () => {
+	const { result } = analyze('/* c */\n\na {\n  color: red;\n}\n', { result: stylesheet() })
+	expect(result.lines).toBe(6)
+	expect(result.source_lines_of_code).toBe(2)
+})
+
+// 9.x counted these selectors; they are not style rule selectors, so `selectors()` leaves them out too
+test.each([
+	['@scope', '@scope (.a) { b { color: red } }', 3, 5],
+	['@scope with a limit', '@scope (.a) to (.b) { c { color: red } }', 3, 5],
+	['@supports selector()', '@supports selector(:has(a)) { a { color: red } }', 3, 5],
+])(
+	'selectors in at-rule preludes are not counted: %s',
+	(_name, css, source_lines_of_code, complexity) => {
+		const { result } = analyze(css, { result: stylesheet() })
+		expect(result.source_lines_of_code).toBe(source_lines_of_code)
+		expect(result.complexity).toBe(complexity)
+	},
+)
+
+test('complexity is the sum of the complexity of every part', () => {
+	const css = `
+		@media (min-width: 1px) { a:not(.b) { color: red !important; -webkit-box-shadow: none } }
+		@keyframes x { to { background: -webkit-linear-gradient(red, blue) } }
+	`
+	const { s, at, sel, dec, prop, val } = analyze(css, {
+		s: stylesheet(),
+		at: atrules(),
+		sel: selectors(),
+		dec: declarations(),
+		prop: properties(),
+		val: value_complexity(),
+	})
+	function sum(counted: CountResult<number>): number {
+		return [...counted.unique].reduce((total, [weight, { count }]) => total + weight * count, 0)
+	}
+	expect(s.complexity).toBe(
+		sum(at.complexity) +
+			sum(sel.complexity) +
+			sum(dec.complexity) +
+			sum(prop.complexity) +
+			sum(val),
+	)
+	expect(s.source_lines_of_code).toBe(at.total + sel.total + sel.keyframes.total + dec.total)
 })

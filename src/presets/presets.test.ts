@@ -70,6 +70,12 @@ describe('analyze_all', () => {
 		expect(report.specificity.total).toBe(1)
 	})
 
+	test('reports the source lines of code and complexity of the stylesheet', () => {
+		const { stylesheet } = analyze_all('a { color: red }')
+		expect(stylesheet.source_lines_of_code).toBe(2)
+		expect(stylesheet.complexity).toBe(4)
+	})
+
 	test('can be extended and narrowed like any collector map', () => {
 		const { colors, units } = all_collectors()
 		const result = analyze('a { color: red; width: 1px }', { colors, units })
