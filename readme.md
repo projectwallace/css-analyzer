@@ -158,8 +158,10 @@ function important_declarations() {
 	return define_collector(function init() {
 		const counter = create_counter()
 		return {
-			declaration(node, ctx) {
-				if (ctx.is_important) counter.add(ctx.property, ctx)
+			declaration: {
+				enter(node, ctx) {
+					if (ctx.is_important) counter.add(ctx.property, node)
+				},
 			},
 			result() {
 				return counter.result()
@@ -171,7 +173,7 @@ function important_declarations() {
 analyze(css, { important: important_declarations() })
 ```
 
-A collector subscribes to what it needs: `stylesheet`, `rule`, `atrule`, `selector`, `declaration`, `value` and `comment`. The engine walks the CSS once and only dispatches to subscribers. `selector` handlers get the selectors of style rules (not keyframe selectors, nor selectors in at-rule preludes) and no `ctx`: use `rule` when you need `depth` or `atrule_stack`. Collectors must not keep nodes or the `ctx` object after the handler returns.
+A collector subscribes to what it needs: `stylesheet`, `rule`, `atrule`, `selector`, `declaration` (`{ properties?, enter }`), `value` (`{ types, properties?, enter }`) and `comment`. The engine walks the CSS once and only dispatches to subscribers. `selector` handlers get the selectors of style rules (not keyframe selectors, nor selectors in at-rule preludes) and no `ctx`: use `rule` when you need `depth` or `atrule_stack`. Collectors must not keep nodes or the `ctx` object after the handler returns.
 `ctx` offers lazy, shared facts: `property`, `raw_property`, `is_important`, `is_custom`, `is_browserhack`, `is_vendor_prefixed`, `value`, `value_text`, `clean_value_text`, `font_shorthand`, `depth`, `atrule_stack` and (in `stylesheet`) `css`. Counters take the node that was found (`counter.add(item, node)`): that is where `locations` come from.
 
 `comment` handlers only run when you pass CSS text to `analyze()`: the comments of an AST that was parsed elsewhere are not available.
