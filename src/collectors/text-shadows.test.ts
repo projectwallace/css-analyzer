@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
 import { plain } from '../test/test-utils.ts'
-import { text_shadows } from './values.ts'
+import { text_shadows } from './text-shadows.ts'
 
 function run(css: string) {
 	return plain(analyze(css, { result: text_shadows() }).result)

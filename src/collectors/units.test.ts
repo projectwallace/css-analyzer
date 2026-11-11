@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
 import { plain } from '../test/test-utils.ts'
-import { units } from './values.ts'
+import { units } from './units.ts'
 
 function run(css: string) {
 	return plain(analyze(css, { result: units({ contexts: true, property: 'as_written' }) }).result)

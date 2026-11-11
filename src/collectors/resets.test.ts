@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
 import { plain } from '../test/test-utils.ts'
-import { resets } from './values.ts'
+import { resets } from './resets.ts'
 
 function run(css: string) {
 	return plain(analyze(css, { result: resets() }).result)

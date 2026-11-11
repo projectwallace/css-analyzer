@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
 import { plain } from '../test/test-utils.ts'
-import { value_prefixes } from './values.ts'
+import { value_prefixes } from './value-prefixes.ts'
 
 function run(css: string) {
 	return plain(analyze(css, { result: value_prefixes() }).result)

@@ -12,17 +12,15 @@ export { timing_functions, type TimingFunctionsOptions } from './timing-function
 export type { Normalize } from './shared.ts'
 export { z_indexes } from './z-indexes.ts'
 export { specificity, summarize_specificity, type SpecificitySummary } from './specificity.ts'
-export {
-	text_shadows,
-	displays,
-	units,
-	keywords,
-	resets,
-	value_prefixes,
-	value_browserhacks,
-	value_complexity,
-	animation_names,
-} from './values.ts'
+export { text_shadows } from './text-shadows.ts'
+export { displays } from './displays.ts'
+export { units } from './units.ts'
+export { keywords } from './keywords.ts'
+export { resets } from './resets.ts'
+export { value_prefixes } from './value-prefixes.ts'
+export { value_browserhacks } from './value-browserhacks.ts'
+export { value_complexity } from './value-complexity.ts'
+export { animation_names } from './animation-names.ts'
 export { declarations, type DeclarationsResult } from './declarations.ts'
 export { rules, type RulesResult } from './rules.ts'
 export { selectors, type SelectorsResult } from './selectors.ts'

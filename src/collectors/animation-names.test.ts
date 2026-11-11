@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
 import { plain } from '../test/test-utils.ts'
-import { animation_names } from './values.ts'
+import { animation_names } from './animation-names.ts'
 
 function run(css: string) {
 	return plain(analyze(css, { result: animation_names() }).result)

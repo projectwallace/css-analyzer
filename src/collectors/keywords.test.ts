@@ -1,7 +1,7 @@
 import { test, expect, describe } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
 import { plain } from '../test/test-utils.ts'
-import { keywords } from './values.ts'
+import { keywords } from './keywords.ts'
 
 function run(css: string) {
 	return plain(analyze(css, { result: keywords() }).result)
