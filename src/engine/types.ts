@@ -120,6 +120,14 @@ export type DeclarationContext = Context & {
 
 type DeclarationHandler = (node: Declaration, ctx: DeclarationContext) => void
 
+/**
+ * What a collector subscribes to. The engine walks the CSS once and calls only the handlers that exist.
+ *
+ * The `ctx` that handlers receive is ONE shared, mutable object that the engine reuses for every node
+ * (facts are computed lazily and cached per node). It is only valid during the handler call: read what
+ * you need from it right away and never store `ctx` (or a node) for later, or you will read the data
+ * of a different node. Copy values (strings, numbers) instead.
+ */
 export type CollectorInstance<T> = {
 	/** Extra parsing this collector needs. Selectors/values are implied by `selector`/`value` subscriptions. */
 	parse?: Partial<ParseOptions>
@@ -144,7 +152,10 @@ export type CollectorInstance<T> = {
 		properties?: ReadonlySet<string>
 		enter: (node: CSSNode, ctx: DeclarationContext) => void
 	}
-	/** Called for every comment. Only works when the engine parses the input itself. */
+	/**
+	 * Called for every comment. Only works when `analyze()` gets CSS text: the parser reports comments
+	 * while parsing, so an AST that was parsed elsewhere gives no comments (no error, the handler never runs).
+	 */
 	comment?: (loc: Location) => void
 	/** Build the result. Keep it separate from internal state; it can be called repeatedly. */
 	result(): T
