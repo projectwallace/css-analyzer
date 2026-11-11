@@ -104,3 +104,15 @@ test('counts timing functions of animations and transitions with value lists', (
 		},
 	})
 })
+
+test('does not count global keywords', () => {
+	expect(run('a { transition: inherit; animation-timing-function: initial }').total).toBe(0)
+})
+
+test('normalize: none keeps the case as written', () => {
+	const css = 'a { transition-timing-function: EASE }'
+	expect([
+		...analyze(css, { result: timing_functions({ normalize: 'none' }) }).result.unique.keys(),
+	]).toEqual(['EASE'])
+	expect([...analyze(css, { result: timing_functions() }).result.unique.keys()]).toEqual(['ease'])
+})

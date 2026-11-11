@@ -123,3 +123,7 @@ test.each([
 ])('no false positive: %s', (_name, css) => {
 	expect(run(css).total).toBe(0)
 })
+
+test('global keywords and custom properties are not searched for hacks', () => {
+	expect(run('a { color: inherit; --x: green\\9 }').total).toBe(0)
+})

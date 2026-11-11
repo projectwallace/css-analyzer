@@ -30,3 +30,13 @@ test('a global keyword value has complexity 1', () => {
 	const { complexity } = analyze('a { color: inherit }', { complexity: value_complexity() })
 	expect(summarize_numbers(complexity).sum).toBe(1)
 })
+
+test('global keywords and custom property hacks add nothing, custom property prefixes do', () => {
+	const { complexity } = analyze('a { color: inherit; --x: green\\9; --y: -webkit-box }', {
+		complexity: value_complexity(),
+	})
+	expect([...complexity.unique]).toEqual([
+		[1, { count: 2 }],
+		[2, { count: 1 }],
+	])
+})

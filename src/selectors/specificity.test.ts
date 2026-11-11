@@ -62,6 +62,19 @@ test.each<[string, [number, number, number]]>([
 	[':host-context(.a.b)', [0, 3, 0]],
 	['::part(label)', [0, 0, 1]],
 	['::highlight(name)', [0, 0, 1]],
+	['::highlight(*)', [0, 0, 0]],
+	['::highlight', [0, 0, 0]],
+	[':any(.a)', [0, 1, 0]],
+	[':-webkit-any(.a)', [0, 1, 0]],
+	[':any()', [0, 0, 0]],
+	[':-moz-any(a, b)', [0, 0, 1]],
+	['::view-transition-group(*)', [0, 0, 0]],
+	['::view-transition-group(root)', [0, 0, 1]],
+	['::view-transition-image-pair(root)', [0, 0, 1]],
+	['::view-transition-old(root)', [0, 0, 1]],
+	['::view-transition-new(*)', [0, 0, 0]],
+	['ns|a', [0, 0, 1]],
+	['*|a', [0, 0, 1]],
 ])('specificity of "%s"', (selector, expected) => {
 	expect(get_specificity(selector)).toEqual([expected])
 })

@@ -247,3 +247,8 @@ test('by_context only exists with `contexts: true`', () => {
 	expectTypeOf(without).not.toHaveProperty('by_context')
 	expectTypeOf(with_contexts).toHaveProperty('by_context')
 })
+
+test('does not count global keywords', () => {
+	const actual = run('a { border-radius: inherit; border-top-left-radius: initial }')
+	expect(actual.total).toBe(0)
+})

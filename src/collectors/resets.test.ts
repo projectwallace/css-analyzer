@@ -186,3 +186,14 @@ test('padding-block: 0 0', () => {
 	const resets = actual
 	expect(resets.unique).toEqual({ 'padding-block': 1 })
 })
+
+test('a global keyword is not a reset', () => {
+	expect(run('a { margin: inherit; padding: initial }').total).toBe(0)
+})
+
+test('counts resets by property', () => {
+	expect(run('a { margin: 0; MARGIN: 0px; padding-top: 0 }').unique).toEqual({
+		margin: 2,
+		'padding-top': 1,
+	})
+})

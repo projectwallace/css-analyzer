@@ -17,3 +17,21 @@ test.each(['flex', '1px solid red', '--custom-property', 'calc(-1 * var(--x))'])
 		expect(get_prefixed_values(value)).toEqual([])
 	},
 )
+
+test.each([
+	['-moz-1px', ['-moz-1px']],
+	['-webkit-10px', ['-webkit-10px']],
+	['1px -webkit-', ['-webkit-']],
+])(
+	'reports prefixed nodes that are not identifiers or functions as written: "%s"',
+	(value, expected) => {
+		expect(get_prefixed_values(value)).toEqual(expected)
+	},
+)
+
+test.each(['"-webkit-x"', '#-webkit-x'])(
+	'ignores prefixes inside strings and hashes: %s',
+	(value) => {
+		expect(get_prefixed_values(value)).toEqual([])
+	},
+)

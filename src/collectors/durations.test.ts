@@ -132,3 +132,17 @@ test('counts durations of animations and transitions with value lists', () => {
 		'0.0014s',
 	])
 })
+
+test('does not count global keywords', () => {
+	expect(run('a { transition: inherit; animation-duration: initial }').total).toBe(0)
+})
+
+test('normalize: none keeps the case as written', () => {
+	const result = analyze('a { transition-duration: 1S }', {
+		result: durations({ normalize: 'none' }),
+	})
+	expect([...result.result.unique.keys()]).toEqual(['1S'])
+	expect([
+		...analyze('a { transition-duration: 1S }', { result: durations() }).result.unique.keys(),
+	]).toEqual(['1s'])
+})

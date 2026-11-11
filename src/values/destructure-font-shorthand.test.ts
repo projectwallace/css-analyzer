@@ -58,3 +58,20 @@ test('accepts a parsed value as well as text', () => {
 		destructure_font_shorthand('12px Arial'),
 	)
 })
+
+test.each<[string, Parts]>([
+	['"Noto Sans", serif', { font_family: '"Noto Sans", serif' }],
+	['Arial', { font_family: 'Arial' }],
+	['bold Arial, serif', { font_family: 'Arial, serif' }],
+	['700 12px serif', { font_size: '12px', font_family: 'serif' }],
+	['calc(1px + 2px) serif', { font_size: 'calc(1px + 2px)', font_family: 'serif' }],
+	['medium', { font_size: 'medium', font_family: null }],
+	['12px/', { font_size: '12px', font_family: null }],
+	['12px/1.5', { font_size: '12px', line_height: '1.5', font_family: null }],
+])('splits "%s" when parts are missing or unusual', (value, expected) => {
+	expect(parts(value)).toEqual(expected)
+})
+
+test('an empty value cannot be split', () => {
+	expect(destructure_font_shorthand('')).toBeNull()
+})
