@@ -58,5 +58,6 @@ Removed: `isIe9Hack` (use `get_value_browserhacks`), `hasVendorPrefix`, `cssKeyw
 
 - Collectors.
 - Your own collectors with `define_collector()`.
+- `to_json(result)`: a copy of a result without `Map`s, for `JSON.stringify()` (`unique` was a plain object in 9.x, it is a `Map` now).
 - Presets for design tokens and for everything (`analyze_all`). `design_tokens_collectors(options)` and `all_collectors(options)` are functions; `{ locations: true }` turns locations on for every collector. The keys of the design-token preset are the collector names (`border_radiuses`, `timing_functions`).
 - `by_context` only exists on `colors`, `units` and `border_radiuses` results when `contexts: true` is passed; the types follow the option.
