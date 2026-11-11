@@ -20,6 +20,24 @@ pnpm build       # build + publint
 
 `pnpm lint` enforces most of this.
 
+## Where does code go?
+
+```
+src/
+  index.ts       package root: analyze(), define_collector(), counters, summaries
+  engine/        the walk, the shared context, counters. Knows nothing about collectors.
+  collectors/    one file per collector, built on the engine
+  presets/       ready-made collector sets (analyze_all, analyze_design_tokens)
+  selectors/ values/ atrules/ properties/ stylesheet/
+                 public utilities: plain functions on text or parsed nodes, one subpath export each
+  utils/         shared helpers (string-utils, input, location); utils/collections is public
+  integration/   tests that run several collectors together
+  test/          test helpers
+```
+
+Imports only go downwards: `presets` -> `collectors` -> `engine` -> utility modules and `utils`.
+Utility modules and `utils` never import `engine`, `collectors` or `presets`; the engine never imports `collectors` or `presets`; collectors never import `presets`. `pnpm lint` enforces this (`no-restricted-imports` in `.oxlintrc.json`).
+
 ## Tests
 
 Write unit tests: small, fast and next to the code they test.
@@ -28,7 +46,7 @@ Write unit tests: small, fast and next to the code they test.
 - Test a collector on its own: `analyze(css, { result: colors() }).result`. Do not use the `analyze_all` preset for it, it runs every collector.
 - Test a utility by calling it directly, with text (and with a parsed node when that matters). Prefer `test.each` tables over long fixtures.
 - Use `plain()` and `series()` from `src/test-utils.ts` to compare count results with `toEqual()`.
-- Integration tests are few and live with the presets: `src/presets/presets.test.ts`.
+- Integration tests are few. Tests of the presets live in `src/presets/presets.test.ts`; tests that run several collectors together live in `src/integration/`.
 
 ## Performance
 
