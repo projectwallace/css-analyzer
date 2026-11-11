@@ -55,6 +55,11 @@ test.each<[string, [number, number, number]]>([
 	['a:has(> img.logo)', [0, 1, 2]],
 	['li:nth-child(2n + 1)', [0, 1, 1]],
 	['li:nth-child(2n + 1 of .odd, #special)', [1, 1, 1]],
+	['li:nth-child(2 of .a.b.c)', [0, 4, 1]],
+	[':host', [0, 1, 0]],
+	[':host(.a.b.c)', [0, 4, 0]],
+	[':host(#a.b)', [1, 2, 0]],
+	[':host-context(.a.b)', [0, 3, 0]],
 	['::part(label)', [0, 0, 1]],
 	['::highlight(name)', [0, 0, 1]],
 ])('specificity of "%s"', (selector, expected) => {
