@@ -11,7 +11,7 @@ import {
 	gradients,
 	line_heights,
 	timing_functions,
-} from './index.ts'
+} from '../collectors/index.ts'
 
 /** Compare on counts only: the legacy shape has `unique` as a plain record */
 function counts(result: CountResult): Record<string, number> {

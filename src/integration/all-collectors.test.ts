@@ -18,7 +18,7 @@ import {
 	value_complexity,
 	value_prefixes,
 	z_indexes,
-} from './index.ts'
+} from '../collectors/index.ts'
 
 function collectors() {
 	const options = { locations: true }

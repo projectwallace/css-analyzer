@@ -1,8 +1,8 @@
 import { test, expect, describe } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
-import { colors } from './colors.ts'
-import { specificity, summarize_specificity } from './specificity.ts'
-import { z_indexes } from './z-indexes.ts'
+import { colors } from '../collectors/colors.ts'
+import { specificity, summarize_specificity } from '../collectors/specificity.ts'
+import { z_indexes } from '../collectors/z-indexes.ts'
 
 const fixture = `
 	a { color: red; z-index: 1 }

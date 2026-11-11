@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
-import { atrules, colors, properties, selectors, stylesheet } from './index.ts'
+import { atrules, colors, properties, selectors, stylesheet } from '../collectors/index.ts'
 
 /** The text a location points at */
 function text_at(css: string, loc: { offset: number; length: number }): string {
