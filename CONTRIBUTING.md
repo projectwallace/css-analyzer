@@ -38,6 +38,8 @@ src/
 Imports only go downwards: `presets` -> `collectors` -> `engine` -> utility modules and `utils`.
 Utility modules and `utils` never import `engine`, `collectors` or `presets`; the engine never imports `collectors` or `presets`; collectors never import `presets`. `pnpm lint` enforces this (`no-restricted-imports` in `.oxlintrc.json`).
 
+Every public subpath of the package (`/collectors`, `/presets`, `/selectors`, `/values`, `/atrules`, `/properties`, `/stylesheet`, `/utils/collections`) is a folder with an `index.ts`, an entry in `exports` in `package.json` and an entry in `tsdown.config.ts` (`src/*/index.ts` covers all of them except `utils/collections`, which is listed on its own). A new public function needs a test next to it and a line in the readme; a new collector also needs an entry in `collectors/index.ts`, in `presets/all.ts` and in the collectors table of the readme.
+
 ## Tests
 
 Write unit tests: small, fast and next to the code they test.
@@ -45,7 +47,7 @@ Write unit tests: small, fast and next to the code they test.
 - `src/foo/bar.ts` has its tests in `src/foo/bar.test.ts`. That goes for every public function.
 - Test a collector on its own: `analyze(css, { result: colors() }).result`. Do not use the `analyze_all` preset for it, it runs every collector.
 - Test a utility by calling it directly, with text (and with a parsed node when that matters). Prefer `test.each` tables over long fixtures.
-- Use `plain()` and `series()` from `src/test-utils.ts` to compare count results with `toEqual()`.
+- Use `plain()` and `series()` from `src/test/test-utils.ts` to compare count results with `toEqual()`.
 - Integration tests are few. Tests of the presets live in `src/presets/presets.test.ts`; tests that run several collectors together live in `src/integration/`.
 
 ## Performance
