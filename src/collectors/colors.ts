@@ -1,4 +1,10 @@
-import { is_function, FUNCTION, HASH, IDENTIFIER } from '@projectwallace/css-parser'
+import {
+	is_function,
+	strip_value_hack,
+	FUNCTION,
+	HASH,
+	IDENTIFIER,
+} from '@projectwallace/css-parser'
 import { create_context_counter, create_counter } from '../engine/counter.ts'
 import { define_collector } from '../engine/define-collector.ts'
 import type {
@@ -53,7 +59,7 @@ export function colors<O extends ColorsOptions = {}>(
 							return
 						}
 						// Exclude the # and any IE hack (\9, \7) from the hex length
-						const hex_length = text.length - (text.endsWith('\\9') || text.endsWith('\\7') ? 3 : 1)
+						const hex_length = strip_value_hack(text).length - 1
 						counter.add(normalize(text), context, node)
 						formats.add('hex' + hex_length, node)
 					} else if (node.type === IDENTIFIER) {
