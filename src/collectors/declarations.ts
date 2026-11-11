@@ -4,6 +4,7 @@ import { define_collector } from '../engine/define-collector.ts'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 
 export type DeclarationsResult = CountResult & {
+	/** `!important` declarations: how many, and how many of those are inside `@keyframes` (where they are ignored) */
 	importants: { total: number; in_keyframes: number }
 	/** 1, plus 1 for `!important`, plus 1 more inside keyframes. Items are numbers. */
 	complexity: CountResult<number>

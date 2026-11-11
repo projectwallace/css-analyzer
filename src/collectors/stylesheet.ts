@@ -18,7 +18,10 @@ export type StylesheetResult = {
 	}
 }
 
-export type StylesheetOptions = { locations?: boolean }
+export type StylesheetOptions = {
+	/** Also keep where every embedded `data:` URI was found (`embedded.unique.get(type).locations`) */
+	locations?: boolean
+}
 
 /**
  * Size, lines, comments and embedded content.

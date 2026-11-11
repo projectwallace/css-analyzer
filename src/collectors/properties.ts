@@ -6,6 +6,7 @@ import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts
 import { shorthand_properties } from '../properties/property-utils.ts'
 import { get_first_identifier, get_list_items } from './value-helpers.ts'
 
+/** Counted by normalized property name; the keys below break the same declarations down by kind */
 export type PropertiesResult = CountResult & {
 	/** Vendor prefixed properties, as written */
 	prefixed: CountResult

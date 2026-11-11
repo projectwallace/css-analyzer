@@ -64,6 +64,7 @@ export type WithContexts<
 	: R
 
 export type CountOptions = {
+	/** Also keep where every item was found (`unique.get(item).locations`). Costs memory; off by default. */
 	locations?: boolean
 	/** Also keep every counted item in order (`result.sequence`). Costs memory; off by default. */
 	sequence?: boolean

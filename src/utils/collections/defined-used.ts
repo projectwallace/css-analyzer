@@ -1,10 +1,25 @@
 export type DefinedUsedResult = {
+	/** Names that were defined (a custom property declaration, `@keyframes name`, ...) */
 	defined: string[]
+	/** Names that were used (`var(--x)`, `animation-name: x`, ...) */
 	used: string[]
+	/** Defined, but never used */
 	unused: string[]
+	/** Used, but never defined (for example defined in another stylesheet) */
 	unknown: string[]
 }
 
+/**
+ * Tracks which names are defined and which are used, in any order, and tells which ones are
+ * unused (defined, never used) and unknown (used, never defined). Each name is counted once.
+ *
+ * ```js
+ * const names = new DefinedUsed()
+ * names.use('--a')
+ * names.define('--b')
+ * names.analyze() // { defined: ['--b'], used: ['--a'], unused: ['--b'], unknown: ['--a'] }
+ * ```
+ */
 export class DefinedUsed {
 	#defined = new Set<string>()
 	#used = new Set<string>()

@@ -4,12 +4,17 @@ import { define_collector } from '../engine/define-collector.ts'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 
 export type RulesResult = {
+	/** Number of style rules */
 	total: number
+	/** Rules with an empty block (`a {}`) */
 	empty: number
 	/** Selectors + declarations per rule. Items are numbers. */
 	sizes: CountResult<number>
+	/** How deep each rule is nested (0 for a top-level rule). Items are numbers. */
 	nesting: CountResult<number>
+	/** Number of selectors per rule. Items are numbers. */
 	selectors: CountResult<number>
+	/** Number of declarations per rule. Items are numbers. */
 	declarations: CountResult<number>
 }
 

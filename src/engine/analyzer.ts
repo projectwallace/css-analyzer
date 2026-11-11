@@ -39,6 +39,15 @@ type ValueSubscription = Omit<NonNullable<CollectorInstance<unknown>['value']>, 
  *   Collectors that subscribe to `comment` (e.g. `stylesheet()`) only see comments when you pass text:
  *   the parser reports them while parsing.
  * @param collectors - Object map of collectors; the keys become the keys of the result
+ * @example
+ * ```js
+ * import { analyze } from '@projectwallace/css-analyzer'
+ * import { colors, z_indexes } from '@projectwallace/css-analyzer/collectors'
+ *
+ * const result = analyze('a { color: red; z-index: 2 }', { colors: colors(), z: z_indexes() })
+ * result.colors.unique.get('red') // { count: 1 }
+ * result.z.total // 1
+ * ```
  */
 export function analyze<C extends CollectorMap>(
 	input: string | StyleSheet,

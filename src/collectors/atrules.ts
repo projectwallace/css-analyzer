@@ -82,6 +82,7 @@ function get_import_functions(prelude: CSSNode | null | undefined) {
 	return found
 }
 
+/** Counted by at-rule name (`@media` is `media`), with a breakdown per kind of at-rule */
 export type AtrulesResult = CountResult & {
 	font_faces: {
 		total: number
@@ -89,16 +90,22 @@ export type AtrulesResult = CountResult & {
 		items: Record<string, string>[]
 		locations?: Location[]
 	}
+	/** `@import` preludes (the `url()` or string and any conditions) */
 	imports: CountResult
+	/** `@media` preludes; `features` are the media features (`min-width`), `browserhacks` the hacks found in the preludes */
 	media: CountResult & { browserhacks: CountResult; features: CountResult }
 	charsets: CountResult
+	/** `@supports` preludes, with the browserhacks found in them */
 	supports: CountResult & { browserhacks: CountResult }
+	/** Keyframe names (counted by name), defined by `@keyframes` and used by `animation` and `animation-name` */
 	keyframes: CountResult &
 		DefinedUsedResult & {
 			/** Vendor prefixed `@-webkit-keyframes`, counted as `@-webkit-keyframes name` */
 			prefixed: CountResult
 		}
+	/** `@container` preludes; `names` are the container names, defined by `container-name`/`container` and used by `@container` */
 	containers: CountResult & { names: CountResult & DefinedUsedResult }
+	/** Layer names: defined by `@layer a, b;` statements, used by `@layer a { }` blocks and `@import ... layer(a)` */
 	layers: CountResult & DefinedUsedResult
 	/** `@property` registrations: defined by `@property`, used by `var()` */
 	properties: CountResult & DefinedUsedResult
