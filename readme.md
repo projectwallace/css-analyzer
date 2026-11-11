@@ -19,7 +19,6 @@ Turn your CSS into <b>actionable stats</b> — specificity, complexity, design t
 - Extremely **detailed** (200+ metrics)
 - **Pick what you need**: metrics are opt-in collectors, so you only pay (runtime and bundle size) for what you use
 - **Tree-shakable** ES modules and **TypeScript** types, with the result type inferred from the collectors you pass
-- **Merge** results of many stylesheets, pages or workers
 - Write your **own collectors** with the same API the built-ins use
 - Runs anywhere — **NodeJS and browsers**
 - Tiny footprint, only one dependency
@@ -173,7 +172,9 @@ analyze(css, { important: important_declarations() })
 ```
 
 A collector subscribes to what it needs: `stylesheet`, `rule`, `atrule`, `selector`, `declaration`, `value` and `comment`. The engine walks the CSS once and only dispatches to subscribers. `selector` handlers get the selectors of style rules (not keyframe selectors, nor selectors in at-rule preludes) and no `ctx`: use `rule` when you need `depth` or `atrule_stack`. Collectors must not keep nodes or the `ctx` object after the handler returns.
-`ctx` offers lazy, shared facts: `property`, `is_important`, `is_custom`, `value`, `clean_value_text`, `font_shorthand`, `depth`, `atrule_stack`, `loc`, and more.
+`ctx` offers lazy, shared facts: `property`, `raw_property`, `is_important`, `is_custom`, `is_browserhack`, `is_vendor_prefixed`, `value`, `value_text`, `clean_value_text`, `font_shorthand`, `depth`, `atrule_stack` and (in `stylesheet`) `css`. Counters take the node that was found (`counter.add(item, node)`): that is where `locations` come from.
+
+`comment` handlers only run when you pass CSS text to `analyze()`: the comments of an AST that was parsed elsewhere are not available.
 
 ### Utilities
 
@@ -188,6 +189,8 @@ is_value_reset('0 0px') // true
 ```
 
 Also: `get_complexity`, `get_vendor_prefixes`, `get_accessibility_selectors`, `get_combinators` (`/selectors`); `destructure_font_shorthand`, `analyze_animation`, `get_prefixed_values`, `named_colors`, `system_colors`, `color_functions`, `keywords` (`/values`); `get_media_browserhacks`, `get_supports_browserhacks` (`/atrules`); `shorthand_properties`, `is_property_hack` (`/properties`); `get_embed_type` (`/stylesheet`).
+
+`DefinedUsed` (track what is defined and what is used, for names like custom properties or keyframes) and `KeywordSet` (a case-insensitive set of keywords) are the building blocks the built-in collectors use. They are exported from `@projectwallace/css-analyzer/utils/collections`.
 
 ## Upgrading from 9.x
 
