@@ -10,7 +10,7 @@ import {
 	STYLE_RULE,
 	parse,
 } from '@projectwallace/css-parser'
-import type { CollectorInstance, CountOptions, CountResult } from './types.ts'
+import type { CollectorInstance, CountOptions, CountResult, DeclarationContext } from './types.ts'
 
 // Toy collectors: they exercise the contract the same way built-ins will
 function declared_properties(options: CountOptions = {}) {
@@ -324,4 +324,102 @@ test('font_shorthand is split once and is null for everything else', () => {
 	})
 	expect(seen[2]).toBeNull()
 	expect(seen[4]).toBeNull()
+})
+
+function selector_count() {
+	return define_collector<number>(function init() {
+		let count = 0
+		return {
+			selector() {
+				count++
+			},
+			result: () => count,
+		}
+	})
+}
+
+test('declaration facts have defaults in handlers for nodes that are not declarations', () => {
+	const seen: unknown[] = []
+	const facts = define_collector<number>(() => ({
+		rule(_node, ctx) {
+			const declaration_ctx = ctx as DeclarationContext
+			seen.push({
+				property: declaration_ctx.property,
+				raw_property: declaration_ctx.raw_property,
+				is_custom: declaration_ctx.is_custom,
+				is_important: declaration_ctx.is_important,
+				is_browserhack: declaration_ctx.is_browserhack,
+				is_vendor_prefixed: declaration_ctx.is_vendor_prefixed,
+				value_text: declaration_ctx.value_text,
+				value: declaration_ctx.value,
+			})
+		},
+		result: () => seen.length,
+	}))
+	analyze('a { color: red }', { facts })
+	expect(seen).toEqual([
+		{
+			property: '',
+			raw_property: '',
+			is_custom: false,
+			is_important: false,
+			is_browserhack: false,
+			is_vendor_prefixed: false,
+			value_text: '',
+			value: undefined,
+		},
+	])
+})
+
+test('ctx is one shared object that is re-filled for every node, so keep copies of what you need', () => {
+	const contexts: DeclarationContext[] = []
+	const properties: string[] = []
+	const keeper = define_collector<number>(() => ({
+		declaration: {
+			enter(_node, ctx) {
+				contexts.push(ctx)
+				properties.push(ctx.property)
+			},
+		},
+		result: () => contexts.length,
+	}))
+	const result = analyze('a { color: red; margin: 0 }', { keeper })
+	expect(result.keeper).toBe(2)
+	// The same object every time...
+	expect(contexts[0]).toBe(contexts[1])
+	// ...so a primitive copied in the handler is right...
+	expect(properties).toEqual(['color', 'margin'])
+	// ...and the object itself only describes the node that was visited last
+	expect(contexts[0]!.property).toBe('margin')
+})
+
+test('an AST that was parsed without selectors gives no selectors (nothing throws)', () => {
+	const css = 'a.b, c { color: #fff }'
+	const collectors = { selectors: selector_count(), colors: hash_colors() }
+	expect(analyze(parse(css), collectors).selectors).toBe(2)
+	const partial = analyze(parse(css, { parse_selectors: false }), collectors)
+	expect(partial.selectors).toBe(0)
+	expect(partial.colors.total).toBe(1)
+})
+
+test('an AST that was parsed without values gives no value-based results (nothing throws)', () => {
+	const css = 'a { color: #fff }'
+	const collectors = { selectors: selector_count(), colors: hash_colors() }
+	const partial = analyze(parse(css, { parse_values: false }), collectors)
+	expect(partial.colors.total).toBe(0)
+	expect(partial.selectors).toBe(1)
+})
+
+test.each([
+	['an empty string', '', 0, 0],
+	['only a comment', '/* nothing */', 0, 0],
+	['an unclosed block', 'a { color: #fff', 1, 1],
+	['an empty block', 'a {', 0, 1],
+	['stray braces', '}}}', 0, 0],
+	['a rule without selector', '{ color: #fff }', 1, 0],
+	['an at-rule without prelude or block', '@media', 0, 0],
+])('invalid or empty CSS does not throw: %s', (_name, css, colors, selectors) => {
+	const result = analyze(css, { colors: hash_colors(), selectors: selector_count() })
+	expect(result.colors.total).toBe(colors)
+	expect(result.selectors).toBe(selectors)
 })
