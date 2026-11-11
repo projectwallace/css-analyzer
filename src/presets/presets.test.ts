@@ -6,6 +6,8 @@ import {
 	analyze_all,
 	analyze_design_tokens,
 	design_tokens_collectors,
+	type AllCollectors,
+	type AllResult,
 	type DesignTokensCollectors,
 } from './index.ts'
 
@@ -125,5 +127,28 @@ describe('preset options', () => {
 	test('the type of the map is exported, so it never has to be written by hand', () => {
 		expectTypeOf(design_tokens_collectors()).toEqualTypeOf<DesignTokensCollectors>()
 		expectTypeOf(design_tokens_collectors().font_sizes).toEqualTypeOf<CollectorDef<CountResult>>()
+	})
+})
+
+describe('collector maps stay in sync', () => {
+	test('analyze_all has a collector for every collector the package exports', async () => {
+		const exported = Object.keys(await import('../collectors/index.ts')).filter(
+			(name) => name !== 'summarize_specificity',
+		)
+		expect(Object.keys(all_collectors()).sort()).toEqual(exported.sort())
+	})
+
+	test('the key lists of the preset types are the keys of the maps', () => {
+		expectTypeOf<keyof AllCollectors>().toEqualTypeOf<keyof ReturnType<typeof all_collectors>>()
+		expectTypeOf<keyof DesignTokensCollectors>().toEqualTypeOf<
+			keyof ReturnType<typeof design_tokens_collectors>
+		>()
+	})
+
+	test('the per-property collectors of the presets have by_context', () => {
+		expectTypeOf<AllResult['colors']>().toHaveProperty('by_context')
+		expectTypeOf<AllResult['units']>().toHaveProperty('by_context')
+		expectTypeOf<AllResult['border_radiuses']>().toHaveProperty('by_context')
+		expectTypeOf<AllResult['font_sizes']>().not.toHaveProperty('by_context')
 	})
 })
