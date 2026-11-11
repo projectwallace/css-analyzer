@@ -1,7 +1,8 @@
 import { is_function, FUNCTION } from '@projectwallace/css-parser'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 import { ends_with } from '../utils/string-utils.ts'
-import { NO_VALUE_WALK, define_counting_collector } from './shared.ts'
+import { define_counting_collector } from './shared.ts'
+import { NO_VALUE_WALK } from './value-helpers.ts'
 
 /** Every `*-gradient()` function, as written, including nested ones and `var()` fallbacks */
 export function gradients(options: CountOptions = {}): CollectorDef<CountResult> {

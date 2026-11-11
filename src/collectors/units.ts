@@ -7,7 +7,8 @@ import type {
 	CountResult,
 	WithContexts,
 } from '../engine/types.ts'
-import { NO_VALUE_WALK, get_context_property } from './shared.ts'
+import { get_context_property } from './shared.ts'
+import { NO_VALUE_WALK } from './value-helpers.ts'
 
 /** Units of every dimension (`px`, `em`, ...), lowercased; with `contexts` also per property */
 export function units<O extends ContextCountOptions = {}>(

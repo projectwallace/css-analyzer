@@ -4,7 +4,7 @@ import { create_counter } from '../engine/counter.ts'
 import { define_collector } from '../engine/define-collector.ts'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 import { shorthand_properties } from '../properties/property-utils.ts'
-import { get_first_identifier, get_list_items } from './shared.ts'
+import { get_first_identifier, get_list_items } from './value-helpers.ts'
 
 export type PropertiesResult = CountResult & {
 	/** Vendor prefixed properties, as written */

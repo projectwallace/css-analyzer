@@ -9,7 +9,8 @@ import type {
 	WithContexts,
 } from '../engine/types.ts'
 import { color_functions, color_keywords, named_colors, system_colors } from '../values/colors.ts'
-import { NO_VALUE_WALK, get_context_property, type Normalize } from './shared.ts'
+import { get_context_property, type Normalize } from './shared.ts'
+import { NO_VALUE_WALK } from './value-helpers.ts'
 
 export type ColorsOptions = ContextCountOptions & {
 	/** `lowercase` (default) lowercases hex colors and color names. Color functions are always kept as written. */

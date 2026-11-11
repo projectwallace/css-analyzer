@@ -2,7 +2,8 @@ import { IDENTIFIER } from '@projectwallace/css-parser'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 import { analyze_animation } from '../values/animations.ts'
 import { keywords as global_keywords } from '../values/values.ts'
-import { NO_VALUE_WALK, define_counting_collector } from './shared.ts'
+import { define_counting_collector } from './shared.ts'
+import { NO_VALUE_WALK } from './value-helpers.ts'
 
 /** Global keywords (`inherit`, `none`, `auto`, ...) used as values, lowercased */
 export function keywords(options: CountOptions = {}): CollectorDef<CountResult> {

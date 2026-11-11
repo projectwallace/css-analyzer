@@ -22,12 +22,8 @@ import type { CollectorDef, CountOptions, CountResult, Location } from '../engin
 import { unquote } from '../utils/string-utils.ts'
 import { get_media_browserhacks, get_supports_browserhacks } from '../atrules/atrules.ts'
 import { keywords } from '../values/values.ts'
-import {
-	get_animation_names,
-	get_first_identifier,
-	get_list_items,
-	without_sequence,
-} from './shared.ts'
+import { without_sequence } from './shared.ts'
+import { get_animation_names, get_first_identifier, get_list_items } from './value-helpers.ts'
 
 /** Media features (`(min-width: 40em)`) anywhere in an at-rule prelude */
 function find_media_features(prelude: CSSNode | null | undefined): MediaFeature[] {
