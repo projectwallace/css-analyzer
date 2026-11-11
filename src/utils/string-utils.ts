@@ -16,30 +16,30 @@ function compare_char(reference_code: number, test_code: number): boolean {
 }
 
 /**
- * Case-insensitive testing whether a string ends with a given substring
+ * Case-insensitive testing whether a string ends with a given suffix
  *
  * @example
  * ends_with('test', 'my-test') // true
  * ends_with('test', 'est') // false
  *
- * @param base e.g. '-webkit-transform'; MUST be lowercase
- * @param maybe e.g. 'transform'
- * @returns true if `test` ends with `base`, false otherwise
+ * @param suffix e.g. 'transform'; MUST be lowercase
+ * @param text e.g. '-webkit-transform'
+ * @returns true if `text` ends with `suffix`, false otherwise
  */
-export function ends_with(base: string, maybe: string): boolean {
-	if (base === maybe) {
+export function ends_with(suffix: string, text: string): boolean {
+	if (suffix === text) {
 		return true
 	}
 
-	const len = maybe.length
-	const offset = len - base.length
+	const len = text.length
+	const offset = len - suffix.length
 
 	if (offset < 0) {
 		return false
 	}
 
 	for (let i = len - 1; i >= offset; i--) {
-		if (compare_char(base.charCodeAt(i - offset), maybe.charCodeAt(i)) === false) {
+		if (compare_char(suffix.charCodeAt(i - offset), text.charCodeAt(i)) === false) {
 			return false
 		}
 	}
