@@ -1,6 +1,5 @@
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
-import { get_value_browserhacks } from '../values/browserhacks.ts'
-import { get_prefixed_values } from '../values/vendor-prefix.ts'
+import { get_value_weight } from './complexity.ts'
 import { define_counting_collector } from './shared.ts'
 
 /**
@@ -16,14 +15,7 @@ export function value_complexity(options: CountOptions = {}): CollectorDef<Count
 					if (!ctx.value) {
 						return
 					}
-					let complexity = 1
-					if (ctx.clean_value_text !== undefined) {
-						complexity += get_prefixed_values(ctx.value).length
-						if (!ctx.is_custom) {
-							complexity += get_value_browserhacks(ctx.value).length
-						}
-					}
-					counter.add(complexity, ctx.value)
+					counter.add(get_value_weight(ctx), ctx.value)
 				},
 			},
 		}

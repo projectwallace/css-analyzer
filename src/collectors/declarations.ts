@@ -1,4 +1,5 @@
 import { create_counter } from '../engine/counter.ts'
+import { get_declaration_weight } from './complexity.ts'
 import { without_sequence } from './shared.ts'
 import { define_collector } from '../engine/define-collector.ts'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
@@ -30,16 +31,13 @@ export function declarations(options: CountOptions = {}): CollectorDef<Declarati
 					texts.add(node.text, node)
 					nesting.add(Math.max(ctx.depth - 1, 0), node)
 
-					let weight = 1
 					if (ctx.is_important) {
 						importants++
-						weight++
 						if (ctx.atrule_stack.includes('keyframes')) {
 							importants_in_keyframes++
-							weight++
 						}
 					}
-					complexity.add(weight, node)
+					complexity.add(get_declaration_weight(ctx), node)
 				},
 			},
 			result: () => ({

@@ -4,6 +4,7 @@ import { create_counter } from '../engine/counter.ts'
 import { define_collector } from '../engine/define-collector.ts'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 import { shorthand_properties } from '../properties/property-utils.ts'
+import { get_property_weight } from './complexity.ts'
 import { get_first_identifier, get_list_items } from './value-helpers.ts'
 
 /** Counted by normalized property name; the keys below break the same declarations down by kind */
@@ -64,21 +65,17 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 					const length = raw.length
 					names.add(ctx.property, node, length)
 
+					complexity.add(get_property_weight(ctx), node, length)
 					if (ctx.is_vendor_prefixed) {
-						complexity.add(2, node, length)
 						prefixed.add(raw, node, length)
 					} else if (ctx.is_custom) {
 						custom.add(raw, node, length)
 						custom_tracking.define(raw)
-						complexity.add(ctx.is_important ? 3 : 2, node, length)
 						if (ctx.is_important) {
 							custom_importants.add(raw, node, length)
 						}
 					} else if (ctx.is_browserhack) {
 						browserhacks.add(raw.charAt(0), node, length)
-						complexity.add(2, node, length)
-					} else {
-						complexity.add(1, node, length)
 					}
 
 					if (shorthand_properties.has(ctx.property)) {

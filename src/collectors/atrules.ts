@@ -22,6 +22,7 @@ import type { CollectorDef, CountOptions, CountResult, Location } from '../engin
 import { unquote } from '../utils/string-utils.ts'
 import { get_media_browserhacks, get_supports_browserhacks } from '../atrules/atrules.ts'
 import { keywords } from '../values/values.ts'
+import { get_atrule_weight } from './complexity.ts'
 import { without_sequence } from './shared.ts'
 import { get_animation_names, get_first_identifier, get_list_items } from './value-helpers.ts'
 
@@ -174,30 +175,32 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 					font_faces.total++
 					font_faces.items.push({ ...get_descriptors(block) })
 					font_faces.locations?.push(to_location(node))
-					complexity.add(1, node)
 				}
 
 				if (prelude_text === undefined) {
 					if (name === 'layer') {
 						// @layer without a prelude is anonymous
 						layers.add('<anonymous>', node)
-						complexity.add(2, node)
+					}
+					const weight = get_atrule_weight(node, name, false, 0)
+					if (weight > 0) {
+						complexity.add(weight, node)
 					}
 					return
 				}
 
-				let weight = 1
+				let hacks = 0
 				if (name === 'media') {
 					medias.add(prelude_text, node)
 					for (const hack of get_media_browserhacks(prelude!)) {
 						media_browserhacks.add(hack, node)
-						weight++
+						hacks++
 					}
 				} else if (name === 'supports') {
 					supports.add(prelude_text, node)
 					for (const hack of get_supports_browserhacks(prelude!)) {
 						supports_browserhacks.add(hack, node)
-						weight++
+						hacks++
 					}
 				} else if (name.endsWith('keyframes')) {
 					const keyframes_name = unquote(prelude_text)
@@ -205,7 +208,6 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 					keyframes_tracking.define(keyframes_name)
 					if (node.is_vendor_prefixed) {
 						prefixed_keyframes.add(`@${raw_name.toLowerCase()} ${prelude_text}`, node)
-						weight++
 					}
 				} else if (name === 'layer') {
 					for (const layer of prelude_text.split(',').map((part) => part.trim())) {
@@ -247,7 +249,7 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 					scopes.add(prelude_text, node)
 				}
 
-				complexity.add(weight, node)
+				complexity.add(get_atrule_weight(node, name, true, hacks), node)
 			},
 			declaration: {
 				properties: new Set([...CONTAINER_PROPERTIES, ...ANIMATION_PROPERTIES]),
