@@ -1,3 +1,5 @@
+// The built-in collectors. `analyze()` and `define_collector()` (to write your own) come from the package root;
+// the types needed to write down a collector map are re-exported at the bottom so one import covers the signature.
 export { colors, type ColorsOptions, type ColorsResult } from './colors.ts'
 export { font_sizes, type FontSizesOptions } from './font-sizes.ts'
 export { font_families, type FontFamiliesOptions } from './font-families.ts'
