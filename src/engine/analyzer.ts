@@ -47,7 +47,11 @@ export function analyze<C extends CollectorMap>(input: string, collectors: C): R
 	const comment_handlers: NonNullable<CollectorInstance<unknown>['comment']>[] = []
 	const declaration_handlers: DeclarationSubscription[] = []
 	const value_handlers = new Map<number, ValueSubscription[]>()
-	const parse_options: ParseOptions = { selectors: false, values: false, atrule_preludes: false }
+	const parse_options: ParseOptions = {
+		selectors: false,
+		values: false,
+		atrule_preludes: false,
+	}
 
 	for (const instance of instances) {
 		if (instance.parse?.selectors) {
@@ -83,7 +87,10 @@ export function analyze<C extends CollectorMap>(input: string, collectors: C): R
 			parse_options.values = true
 			for (const type of instance.value.types) {
 				const list = value_handlers.get(type) ?? []
-				list.push({ properties: instance.value.properties, enter: instance.value.enter })
+				list.push({
+					properties: instance.value.properties,
+					enter: instance.value.enter,
+				})
 				value_handlers.set(type, list)
 			}
 		}
@@ -209,6 +216,6 @@ export function analyze<C extends CollectorMap>(input: string, collectors: C): R
 	keys.forEach(function (key, index) {
 		result[key] = instances[index]!.result()
 	})
-	// The one cast left: TypeScript cannot relate keys that are only known at runtime to the mapped type
+	// TypeScript cannot relate keys that are only known at runtime to the mapped type
 	return result as ResultOf<C>
 }

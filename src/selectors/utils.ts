@@ -13,6 +13,7 @@ import {
 	is_selector,
 	is_nth_selector,
 	is_combinator,
+	type AttributeSelector,
 } from '@projectwallace/css-parser'
 import { unquote } from '../utils/string-utils.ts'
 import { type SelectorInput, as_selectors } from '../utils/input.ts'
@@ -55,33 +56,26 @@ export function get_vendor_prefixes(input: SelectorInput): string[] {
 	return found
 }
 
+function normalize_accessibility_selector(node: AttributeSelector) {
+	// // We're intentionally not adding attr_flags here because they don't matter for normalization
+	// // Also not lowercasing node.value because that DOES matter for CSS
+	const name = node.name.toLowerCase()
+	if (node.value) {
+		return `[${name}${node.attr_operator ?? ''}"${unquote(node.value || '')}"]`
+	}
+	return `[${name}]`
+}
+
 /** Find accessibility selectors: attribute selectors for `role` and `aria-*` */
 export function get_accessibility_selectors(input: SelectorInput): string[] {
 	const found: string[] = []
-	function normalize(node: CSSNode) {
-		const clone = node.clone()
-		// We're intentionally not adding attr_flags here because they don't matter for normalization
-		// Also not lowercasing node.value because that DOES matter for CSS
-		if (clone.value) {
-			return (
-				'[' +
-				clone.name?.toLowerCase() +
-				clone.attr_operator +
-				'"' +
-				unquote(clone.value.toString()) +
-				'"' +
-				']'
-			)
-		}
-		return '[' + clone.name?.toLowerCase() + ']'
-	}
 
 	for (const selector of as_selectors(input)) {
 		walk(selector, function (node) {
 			if (is_attribute_selector(node)) {
 				const name = node.name || ''
 				if (str_equals('role', name) || str_starts_with('aria-', name)) {
-					found.push(normalize(node))
+					found.push(normalize_accessibility_selector(node))
 				}
 			}
 		})

@@ -10,7 +10,12 @@ import type {
 
 /** Where `node` is in the source. `length` overrides the node's length (e.g. only the property name). */
 export function to_location(node: CSSNode, length: number = node.length): Location {
-	return { line: node.line, column: node.column, offset: node.start, length }
+	return {
+		line: node.line,
+		column: node.column,
+		offset: node.start,
+		length,
+	}
 }
 
 export type Counter<T extends CountItem = string> = {
@@ -107,7 +112,9 @@ export function create_context_counter<T extends CountItem = string>(
 		add_to(scoped.map, item, node, length, locations)
 	}
 
-	function result(): CountResult<T> & { by_context?: Map<string, CountResult<T>> } {
+	function result(): CountResult<T> & {
+		by_context?: Map<string, CountResult<T>>
+	} {
 		const counted = to_result(map, total)
 		if (!track_contexts) {
 			return counted
@@ -123,7 +130,9 @@ export function create_context_counter<T extends CountItem = string>(
 }
 
 /** Derived numbers for a count result. Kept out of the core so unused stats cost nothing. */
-export function summarize(counts: CountResult<CountItem>): { uniqueness_ratio: number } {
+export function summarize(counts: CountResult<CountItem>): {
+	uniqueness_ratio: number
+} {
 	return {
 		uniqueness_ratio: counts.total === 0 ? 0 : counts.total_unique / counts.total,
 	}
