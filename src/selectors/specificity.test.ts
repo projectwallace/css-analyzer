@@ -309,3 +309,13 @@ test('does not double count nested pseudo-class functions', () => {
 		[0, 0, 0],
 	])
 })
+
+test.each<[string, [number, number, number]]>([
+	['li:nth-child(2 of .a.b.c)', [0, 4, 1]],
+	[':host', [0, 1, 0]],
+	[':host(.a.b.c)', [0, 4, 0]],
+	[':host(#a.b)', [1, 2, 0]],
+	[':host-context(.a.b)', [0, 3, 0]],
+])('specificity of "%s"', (selector, expected) => {
+	expect(analyze(`${selector} {}`).selectors.specificity.items).toEqual([expected])
+})
