@@ -1,4 +1,4 @@
-import { test } from 'vitest'
+import { describe, test } from 'vitest'
 import { expect } from 'vitest'
 import { analyze } from '../index.ts'
 
@@ -151,83 +151,97 @@ test('counts multiple declarations with the same hack', () => {
 	expect(actual.unique).toMatchObject({ 'alpha()': 2, '.htc': 1 })
 })
 
-test('no false positive: url() without .htc extension', () => {
+test('counts both hacks if a value has two', () => {
 	const fixture = `
+    a {
+      filter: alpha(opacity=50)\\9;
+    }
+  `
+	const actual = analyze(fixture).values.browserhacks
+	expect(actual.total).toBe(2)
+	expect(actual.totalUnique).toBe(2)
+	expect(actual.unique).toMatchObject({ 'alpha()': 1, '\\9': 1 })
+})
+
+describe('prevent false positives', () => {
+	test('url() without .htc extension', () => {
+		const fixture = `
     a {
       background: url(/assets/image.png);
       content: url('/fonts/icon.woff2');
     }
   `
-	const actual = analyze(fixture).values.browserhacks
-	expect(actual.total).toBe(0)
-})
+		const actual = analyze(fixture).values.browserhacks
+		expect(actual.total).toBe(0)
+	})
 
-test('no false positive: gradient() without progid', () => {
-	const fixture = `
+	test('gradient() without progid', () => {
+		const fixture = `
     a {
       background: linear-gradient(red, blue);
       background: radial-gradient(circle, #fff, #000);
     }
   `
-	const actual = analyze(fixture).values.browserhacks
-	expect(actual.total).toBe(0)
-})
+		const actual = analyze(fixture).values.browserhacks
+		expect(actual.total).toBe(0)
+	})
 
-test('no false positive: custom properties are not flagged for \\9 hack', () => {
-	const fixture = `a { --my-color: red\\9; }`
-	const actual = analyze(fixture).values.browserhacks
-	expect(actual.total).toBe(0)
-})
+	test('custom properties are not flagged for \\9 hack', () => {
+		const fixture = `a { --my-color: red\\9; }`
+		const actual = analyze(fixture).values.browserhacks
+		expect(actual.total).toBe(0)
+	})
 
-test('no false positive: custom properties are not flagged for \\7 hack', () => {
-	const fixture = `a { --my-size: 100px\\7; }`
-	const actual = analyze(fixture).values.browserhacks
-	expect(actual.total).toBe(0)
-})
+	test('custom properties are not flagged for \\7 hack', () => {
+		const fixture = `a { --my-size: 100px\\7; }`
+		const actual = analyze(fixture).values.browserhacks
+		expect(actual.total).toBe(0)
+	})
 
-test('no false positive: custom properties are not flagged for progid:', () => {
-	const fixture = `a { --filter: progid:DXImageTransform.Microsoft.gradient(); }`
-	const actual = analyze(fixture).values.browserhacks
-	expect(actual.total).toBe(0)
-})
+	test('custom properties are not flagged for progid:', () => {
+		const fixture = `a { --filter: progid:DXImageTransform.Microsoft.gradient(); }`
+		const actual = analyze(fixture).values.browserhacks
+		expect(actual.total).toBe(0)
+	})
 
-test('no false positive: custom properties are not flagged for alpha()', () => {
-	const fixture = `a { --opacity: alpha(opacity=50); }`
-	const actual = analyze(fixture).values.browserhacks
-	expect(actual.total).toBe(0)
-})
+	test('custom properties are not flagged for alpha()', () => {
+		const fixture = `a { --opacity: alpha(opacity=50); }`
+		const actual = analyze(fixture).values.browserhacks
+		expect(actual.total).toBe(0)
+	})
 
-test('no false positive: modern `alpha(from ...)` is not flagged for alpha()', () => {
-	const fixture = `
+	test('modern `alpha(from ...)` is not flagged for alpha()', () => {
+		const fixture = `
 	a {
 		color: alpha(from red / 50%);
 		color: alpha(from var(--my-color) / 80%);
 		color: alpha(from var(--my-color) / calc(alpha * 0.5));
 	}`
-	const actual = analyze(fixture).values.browserhacks
-	expect(actual.total).toBe(0)
-})
+		const actual = analyze(fixture).values.browserhacks
+		expect(actual.total).toBe(0)
+	})
 
-test('no false positive: custom properties are not flagged for expression()', () => {
-	const fixture = `a { --width: expression(document.body.clientWidth); }`
-	const actual = analyze(fixture).values.browserhacks
-	expect(actual.total).toBe(0)
-})
+	test('custom properties are not flagged for expression()', () => {
+		const fixture = `a { --width: expression(document.body.clientWidth); }`
+		const actual = analyze(fixture).values.browserhacks
+		expect(actual.total).toBe(0)
+	})
 
-test('no false positive: custom properties are not flagged for .htc url', () => {
-	const fixture = `a { --behavior: url(/assets/pie.htc); }`
-	const actual = analyze(fixture).values.browserhacks
-	expect(actual.total).toBe(0)
-})
+	test('custom properties are not flagged for .htc url', () => {
+		const fixture = `a { --behavior: url(/assets/pie.htc); }`
+		const actual = analyze(fixture).values.browserhacks
+		expect(actual.total).toBe(0)
+	})
 
-test('no false positive: aspect-ratio with slash is not a \\7 hack', () => {
-	const fixture = `a { aspect-ratio: 16/7; }`
-	const actual = analyze(fixture).values.browserhacks
-	expect(actual.total).toBe(0)
-})
+	test('aspect-ratio with slash is not a \\7 hack', () => {
+		const fixture = `a { aspect-ratio: 16/7; }`
+		const actual = analyze(fixture).values.browserhacks
+		expect(actual.total).toBe(0)
+	})
 
-test('no false positive: regular identifier ending in 7 is not a hack', () => {
-	const fixture = `a { grid-area: col7; }`
-	const actual = analyze(fixture).values.browserhacks
-	expect(actual.total).toBe(0)
+	test('regular identifier ending in 7 is not a hack', () => {
+		const fixture = `a { grid-area: col7; }`
+		const actual = analyze(fixture).values.browserhacks
+		expect(actual.total).toBe(0)
+	})
 })

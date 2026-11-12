@@ -7,7 +7,7 @@ import {
 	str_equals,
 	walk,
 	str_index_of,
-	SKIP,
+	BREAK,
 } from '@projectwallace/css-parser'
 import { endsWith, unquote } from '../string-utils.ts'
 
@@ -56,16 +56,16 @@ export function isValueBrowserhack(node: Value, on_hack: (hack: string) => void)
 				const { first_child } = child
 				// Modern `alpha(from red / 50%)` has `from` as first child and then at least 3 more children
 				if (is_identifier(first_child) && str_equals('from', first_child.name)) {
-					return SKIP
+					return BREAK
 				}
 				on_hack('alpha()')
 			} else if (str_equals('expression', name)) {
 				on_hack('expression()')
-				return SKIP
+				return BREAK
 			}
 		} else if (is_url(child) && endsWith('.htc', unquote(child.value ?? ''))) {
 			on_hack('.htc')
-			return SKIP
+			return BREAK
 		}
 	})
 }
