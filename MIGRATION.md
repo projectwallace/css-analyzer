@@ -39,7 +39,7 @@ Rules of thumb:
 | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | `stylesheet.size`, `linesOfCode`                                  | `stylesheet()` → `size`, `lines`                                                                    |
 | `stylesheet.sourceLinesOfCode`, `stylesheet.complexity`           | `stylesheet()` → `source_lines_of_code`, `complexity` (numbers, same as 9.x; see Behaviour changes) |
-| `stylesheet.comments`                                             | `stylesheet()` → `comments` (`{ total, size }`; only for CSS text, not for a parsed AST)            |
+| `stylesheet.comments`                                             | `stylesheet()` → `comments` (`{ total, size }`)                                                     |
 | `stylesheet.embeddedContent`                                      | `stylesheet()` → `embedded` (count result by mime type, plus `size`)                                |
 | `atrules.{total,unique}`                                          | `atrules()` → `total`, `unique`                                                                     |
 | `atrules.fontface`                                                | `atrules()` → `font_faces` (`{ total, items }`)                                                     |
