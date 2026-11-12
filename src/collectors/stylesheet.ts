@@ -53,7 +53,6 @@ export type StylesheetOptions = {
  * Source lines of code and complexity need selectors, values and at-rule preludes to be parsed,
  * so this collector parses all three. Selectors in at-rule preludes (`@scope (.a)`,
  * `@supports selector(...)`) are not counted, as in `selectors()`.
- * Comments are only found when the analyzer parses the CSS itself (not for an AST you pass in).
  */
 export function stylesheet(options: StylesheetOptions = {}): CollectorDef<StylesheetResult> {
 	return define_collector<StylesheetResult>(function init() {

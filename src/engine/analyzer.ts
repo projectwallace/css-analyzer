@@ -1,7 +1,6 @@
 import {
 	type AnyNode,
 	type Declaration,
-	type StyleSheet,
 	AT_RULE,
 	DECLARATION,
 	SELECTOR,
@@ -35,9 +34,7 @@ type ValueSubscription = Omit<NonNullable<CollectorInstance<unknown>['value']>, 
  * (normalized property, parsed value, font shorthand, ...) are computed lazily and memoized per
  * node, so the first collector that asks pays and the others read the cached result. The
  * context is only valid during the handler call it is passed to.
- * @param input - CSS text, or an already parsed stylesheet (the result of the parser's `parse()`).
- *   Collectors that subscribe to `comment` (e.g. `stylesheet()`) only see comments when you pass text:
- *   the parser reports them while parsing.
+ * @param input - CSS text. The engine parses it itself, with only the parts the collectors need.
  * @param collectors - Object map of collectors; the keys become the keys of the result
  * @example
  * ```js
@@ -49,10 +46,7 @@ type ValueSubscription = Omit<NonNullable<CollectorInstance<unknown>['value']>, 
  * result.z.total // 1
  * ```
  */
-export function analyze<C extends CollectorMap>(
-	input: string | StyleSheet,
-	collectors: C,
-): ResultOf<C> {
+export function analyze<C extends CollectorMap>(input: string, collectors: C): ResultOf<C> {
 	const keys = Object.keys(collectors)
 	const instances: CollectorInstance<unknown>[] = keys.map((key) => collectors[key]!.create())
 
@@ -175,32 +169,26 @@ export function analyze<C extends CollectorMap>(
 		}
 	}
 
-	let ast: StyleSheet
-	if (typeof input === 'string') {
-		controller.begin(input)
-		ast = parse(input, {
-			parse_selectors: parse_options.selectors,
-			parse_values: parse_options.values,
-			parse_atrule_preludes: parse_options.atrule_preludes,
-			on_comment:
-				comment_handlers.length === 0
-					? undefined
-					: function (comment) {
-							const loc = {
-								line: comment.line,
-								column: comment.column,
-								offset: comment.start,
-								length: comment.length,
-							}
-							for (const handler of comment_handlers) {
-								handler(loc)
-							}
-						},
-		})
-	} else {
-		ast = input
-		controller.begin(ast.text)
-	}
+	controller.begin(input)
+	const ast = parse(input, {
+		parse_selectors: parse_options.selectors,
+		parse_values: parse_options.values,
+		parse_atrule_preludes: parse_options.atrule_preludes,
+		on_comment:
+			comment_handlers.length === 0
+				? undefined
+				: function (comment) {
+						const loc = {
+							line: comment.line,
+							column: comment.column,
+							offset: comment.start,
+							length: comment.length,
+						}
+						for (const handler of comment_handlers) {
+							handler(loc)
+						}
+					},
+	})
 
 	if (stylesheet_handlers.length > 0) {
 		controller.set_node(ast, 0)

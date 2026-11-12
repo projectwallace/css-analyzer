@@ -152,10 +152,7 @@ export type CollectorInstance<T> = {
 		properties?: ReadonlySet<string>
 		enter: (node: CSSNode, ctx: DeclarationContext) => void
 	}
-	/**
-	 * Called for every comment. Only works when `analyze()` gets CSS text: the parser reports comments
-	 * while parsing, so an AST that was parsed elsewhere gives no comments (no error, the handler never runs).
-	 */
+	/** Called for every comment */
 	comment?: (loc: Location) => void
 	/** Build the result. Keep it separate from internal state; it can be called repeatedly. */
 	result(): T

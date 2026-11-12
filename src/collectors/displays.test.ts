@@ -1,5 +1,4 @@
 import { test, expect } from 'vitest'
-import { parse } from '@projectwallace/css-parser'
 import { analyze } from '../engine/analyzer.ts'
 import { plain } from '../test/test-utils.ts'
 import { displays } from './displays.ts'
@@ -181,9 +180,4 @@ test.each([
 	['var(--Display)', 'var(--Display)'],
 ])('counts "%s" as "%s"', (value, expected) => {
 	expect(Object.keys(run(`a { display: ${value} }`).unique)).toEqual([expected])
-})
-
-test('values that were not parsed are not counted', () => {
-	const ast = parse('a { display: flex }', { parse_values: false })
-	expect(analyze(ast, { result: displays() }).result.total).toBe(0)
 })

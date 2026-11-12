@@ -2,14 +2,7 @@ import { test, expect, expectTypeOf } from 'vitest'
 import { analyze } from './analyzer.ts'
 import { define_collector } from './define-collector.ts'
 import { create_counter } from './counter.ts'
-import {
-	DIMENSION,
-	FUNCTION,
-	HASH,
-	IDENTIFIER,
-	STYLE_RULE,
-	parse,
-} from '@projectwallace/css-parser'
+import { DIMENSION, FUNCTION, HASH, IDENTIFIER, STYLE_RULE } from '@projectwallace/css-parser'
 import type { CollectorInstance, CountOptions, CountResult, DeclarationContext } from './types.ts'
 
 // Toy collectors: they exercise the contract the same way built-ins will
@@ -227,12 +220,8 @@ test('locations are opt-in per collector', () => {
 	expect(result.without.unique.get('color')).toEqual({ count: 1 })
 })
 
-test('accepts an already parsed AST', () => {
-	const collectors = { colors: hash_colors(), rules: rule_count() }
-	const ast = parse('a { color: #fff }')
-	const result = analyze(ast, collectors)
-	expect(result.colors.total).toBe(1)
-	expect(result.rules).toBe(1)
+test('only takes CSS text', () => {
+	expectTypeOf(analyze).parameter(0).toEqualTypeOf<string>()
 })
 
 test('definitions are reusable and never share state between analyzers', () => {
@@ -391,23 +380,6 @@ test('ctx is one shared object that is re-filled for every node, so keep copies 
 	expect(properties).toEqual(['color', 'margin'])
 	// ...and the object itself only describes the node that was visited last
 	expect(contexts[0]!.property).toBe('margin')
-})
-
-test('an AST that was parsed without selectors gives no selectors (nothing throws)', () => {
-	const css = 'a.b, c { color: #fff }'
-	const collectors = { selectors: selector_count(), colors: hash_colors() }
-	expect(analyze(parse(css), collectors).selectors).toBe(2)
-	const partial = analyze(parse(css, { parse_selectors: false }), collectors)
-	expect(partial.selectors).toBe(0)
-	expect(partial.colors.total).toBe(1)
-})
-
-test('an AST that was parsed without values gives no value-based results (nothing throws)', () => {
-	const css = 'a { color: #fff }'
-	const collectors = { selectors: selector_count(), colors: hash_colors() }
-	const partial = analyze(parse(css, { parse_values: false }), collectors)
-	expect(partial.colors.total).toBe(0)
-	expect(partial.selectors).toBe(1)
 })
 
 test.each([

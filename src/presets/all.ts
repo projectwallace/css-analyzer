@@ -1,4 +1,3 @@
-import type { StyleSheet } from '@projectwallace/css-parser'
 import { analyze } from '../engine/analyzer.ts'
 import type { CollectorDef, ContextCountResult, CountOptions, ResultOf } from '../engine/types.ts'
 import type { ColorsResult } from '../collectors/colors.ts'
@@ -101,6 +100,6 @@ export type AllResult = ResultOf<AllCollectors>
 /**
  * Run every collector. The result is flat: one key per collector (`result.colors`, `result.atrules`, ...).
  */
-export function analyze_all(input: string | StyleSheet, options?: AllOptions): AllResult {
+export function analyze_all(input: string, options?: AllOptions): AllResult {
 	return analyze(input, all_collectors(options))
 }
