@@ -3,7 +3,6 @@ export { analyze } from './engine/analyzer.ts'
 export { define_collector } from './engine/define-collector.ts'
 export { create_counter, create_context_counter, summarize, to_location } from './engine/counter.ts'
 export { summarize_frequencies, summarize_numbers, type NumberSummary } from './engine/summary.ts'
-export { to_json, type Json } from './engine/to-json.ts'
 export type { Counter, ContextCounter } from './engine/counter.ts'
 export type {
 	CSSNode,

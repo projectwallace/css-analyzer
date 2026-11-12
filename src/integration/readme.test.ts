@@ -1,6 +1,6 @@
 // The code in the README, as tests. If a snippet changes in the README, change it here too.
 import { test, expect, expectTypeOf } from 'vitest'
-import { analyze, create_counter, define_collector, summarize, to_json } from '../index.ts'
+import { analyze, create_counter, define_collector, summarize } from '../index.ts'
 import {
 	colors,
 	font_sizes,
@@ -48,15 +48,6 @@ test('Derived numbers are separate functions', () => {
 		'mean',
 		'mode',
 	])
-})
-
-test('Serialize results', () => {
-	const result = analyze(css, { colors: colors() })
-	expect(JSON.parse(JSON.stringify(to_json(result.colors)))).toMatchObject({
-		total: 4,
-		total_unique: 2,
-		unique: { red: { count: 3 }, '#fff': { count: 1 } },
-	})
 })
 
 test('Locations', () => {

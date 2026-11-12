@@ -4,7 +4,7 @@
 
 - **Node.js >= 22.18** (was >= 18). The source uses `.ts` import specifiers; the published package is plain ES modules plus types.
 - `analyze()` takes collectors and returns only what they report (see below).
-- `unique` and `by_context` are `Map`s, not plain objects. Use `to_json(result)` to get plain data for `JSON.stringify()`.
+- `unique` and `by_context` are `Map`s, not plain objects: `JSON.stringify()` turns them into `{}`. Use `Object.fromEntries(result.unique)` when you need a plain object.
 - All names are `snake_case`.
 - **Selectors inside at-rule preludes are no longer in the data**: `@scope (.card) to (.content)` and `@supports selector(:has(a))`. 9.x counted them; now `selectors()`, `specificity()` and `stylesheet()` all leave them out, so `selectors().total`, the specificity results and `stylesheet().source_lines_of_code` / `complexity` can be lower than in 9.x for CSS that uses these at-rules (all other CSS gives the same numbers). Selectors of style rules inside these at-rules are still counted.
 - `DefinedUsed` and `KeywordSet` moved from the package root to `@projectwallace/css-analyzer/utils/collections`.
@@ -112,6 +112,5 @@ Removed: `isIe9Hack` (use `get_value_browserhacks`), `hasVendorPrefix`, `cssKeyw
 
 - Collectors.
 - Your own collectors with `define_collector()`.
-- `to_json(result)`: a copy of a result without `Map`s, for `JSON.stringify()` (`unique` was a plain object in 9.x, it is a `Map` now).
 - Presets for design tokens and for everything (`analyze_all`). `design_tokens_collectors(options)` and `all_collectors(options)` are functions; `{ locations: true }` turns locations on for every collector. The keys of the design-token preset are the collector names (`border_radiuses`, `timing_functions`, `text_shadows`, `units`, ...).
 - `by_context` only exists on `colors`, `units` and `border_radiuses` results when `contexts: true` is passed; the types follow the option.

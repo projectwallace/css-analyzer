@@ -20,7 +20,6 @@ describe('Public API', () => {
 				'summarize',
 				'summarize_frequencies',
 				'summarize_numbers',
-				'to_json',
 				'to_location',
 			].sort(),
 		)

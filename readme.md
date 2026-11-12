@@ -70,16 +70,6 @@ summarize_specificity(s) // { total, min, max, sum, mean, mode }
 
 `summarize_specificity` only accepts the result of `specificity()` (type `SpecificityResult`); passing the result of another collector is a type error.
 
-### Serialize results
-
-`unique` and `by_context` are `Map`s, which `JSON.stringify()` turns into `{}`. Use `to_json()` to get a plain copy that serializes (to send results between workers, store them or snapshot them):
-
-```js
-import { to_json } from '@projectwallace/css-analyzer'
-
-JSON.stringify(to_json(result.colors)) // '{"total":12,"total_unique":5,"unique":{"red":{"count":3}, ...}}'
-```
-
 ### Locations
 
 Locations are opt-in per collector:
