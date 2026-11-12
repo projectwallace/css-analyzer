@@ -9,6 +9,7 @@ import {
 	SKIP,
 	STYLE_RULE,
 	SUPPORTS_DECLARATION,
+	is_raw,
 	parse,
 	traverse,
 	walk_selectors,
@@ -23,6 +24,15 @@ const KEYFRAMES = new Set<Lowercase<string>>(['keyframes'])
 type DeclarationSubscription = NonNullable<CollectorInstance<unknown>['declaration']>
 type ValueSubscription = Omit<NonNullable<CollectorInstance<unknown>['value']>, 'types'>
 
+function assert_parsed(node: AnyNode | null, what: string, option: string): void {
+	if (node && is_raw(node)) {
+		throw new TypeError(
+			`analyze() got a parsed stylesheet without ${what}, which the collectors need. ` +
+				`Parse it with parse(css, { ${option}: true }) (the parser's default), or pass the CSS text.`,
+		)
+	}
+}
+
 /**
  * Run collectors over one stylesheet.
  *
@@ -36,8 +46,10 @@ type ValueSubscription = Omit<NonNullable<CollectorInstance<unknown>['value']>, 
  * node, so the first collector that asks pays and the others read the cached result. The
  * context is only valid during the handler call it is passed to.
  * @param input - CSS text, or an already parsed stylesheet (the result of the parser's `parse()`).
- *   Collectors that subscribe to `comment` (e.g. `stylesheet()`) only see comments when you pass text:
- *   the parser reports them while parsing.
+ *   A parsed stylesheet must have been parsed with everything the collectors need (selectors,
+ *   values, at-rule preludes; the parser's defaults parse all three), otherwise `analyze()` throws
+ *   a `TypeError` that says what is missing. Collectors that subscribe to `comment` (e.g.
+ *   `stylesheet()`) only see comments when you pass text: the parser reports them while parsing.
  * @param collectors - Object map of collectors; the keys become the keys of the result
  * @example
  * ```js
@@ -106,6 +118,12 @@ export function analyze<C extends CollectorMap>(
 		}
 	}
 
+	// A parsed stylesheet has to be parsed with what the collectors need. The parser leaves unparsed
+	// selectors, values and preludes as RAW nodes, so the first node of each kind tells (no extra walk).
+	let verify_selectors = typeof input !== 'string' && parse_options.selectors
+	let verify_values = typeof input !== 'string' && parse_options.values
+	let verify_preludes = typeof input !== 'string' && parse_options.atrule_preludes
+
 	const needs_declarations = declaration_handlers.length > 0 || value_handlers.size > 0
 	const controller = create_context()
 	const ctx = controller.ctx
@@ -139,6 +157,10 @@ export function analyze<C extends CollectorMap>(
 	function enter(node: AnyNode, depth: number): boolean | void {
 		switch (node.type) {
 			case DECLARATION:
+				if (verify_values && node.value) {
+					assert_parsed(node.value, 'values', 'parse_values')
+					verify_values = false
+				}
 				if (needs_declarations) {
 					visit_declaration(node, depth)
 				}
@@ -148,12 +170,20 @@ export function analyze<C extends CollectorMap>(
 				// `@supports (display: grid)`: a condition, not a declaration
 				return true
 			case STYLE_RULE:
+				if (verify_selectors && node.has_prelude) {
+					assert_parsed(node.prelude, 'selectors', 'parse_selectors')
+					verify_selectors = false
+				}
 				controller.set_node(node, depth)
 				for (const handler of rule_handlers) {
 					handler(node, ctx)
 				}
 				break
 			case AT_RULE:
+				if (verify_preludes && node.has_prelude) {
+					assert_parsed(node.prelude, 'at-rule preludes', 'parse_atrule_preludes')
+					verify_preludes = false
+				}
 				controller.set_node(node, depth)
 				for (const handler of atrule_handlers) {
 					handler(node, ctx)

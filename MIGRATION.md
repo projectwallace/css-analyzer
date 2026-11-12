@@ -4,6 +4,7 @@
 
 - **Node.js >= 22.18** (was >= 18). The source uses `.ts` import specifiers; the published package is plain ES modules plus types.
 - `analyze()` takes collectors and returns only what they report (see below).
+- `analyze()` throws a `TypeError` when you pass a parsed stylesheet that was parsed without the selectors, values or at-rule preludes your collectors need (it never reports silent zeros). Pass CSS text, or parse with the parser's defaults.
 - `unique` and `by_context` are `Map`s, not plain objects. Use `to_json(result)` to get plain data for `JSON.stringify()`.
 - All names are `snake_case`.
 - `DefinedUsed` and `KeywordSet` moved from the package root to `@projectwallace/css-analyzer/utils/collections`.
