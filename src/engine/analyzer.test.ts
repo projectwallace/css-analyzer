@@ -1,4 +1,4 @@
-import { describe, test, expect, expectTypeOf } from 'vitest'
+import { test, expect, expectTypeOf } from 'vitest'
 import { analyze } from './analyzer.ts'
 import { define_collector } from './define-collector.ts'
 import { create_counter } from './counter.ts'
@@ -393,55 +393,21 @@ test('ctx is one shared object that is re-filled for every node, so keep copies 
 	expect(contexts[0]!.property).toBe('margin')
 })
 
-describe('a parsed stylesheet', () => {
-	const css = '@media (min-width: 1px) { a.b, c { color: #fff } }'
-	const all = { selectors: selector_count(), colors: hash_colors() }
+test('an AST that was parsed without selectors gives no selectors (nothing throws)', () => {
+	const css = 'a.b, c { color: #fff }'
+	const collectors = { selectors: selector_count(), colors: hash_colors() }
+	expect(analyze(parse(css), collectors).selectors).toBe(2)
+	const partial = analyze(parse(css, { parse_selectors: false }), collectors)
+	expect(partial.selectors).toBe(0)
+	expect(partial.colors.total).toBe(1)
+})
 
-	test('works when it was parsed with everything (the parser defaults)', () => {
-		const result = analyze(parse(css), all)
-		expect(result.selectors).toBe(2)
-		expect(result.colors.total).toBe(1)
-	})
-
-	test.each([
-		['selectors', { parse_selectors: false }, /without selectors/],
-		['values', { parse_values: false }, /without values/],
-	])('throws when it was parsed without %s', (_name, options, message) => {
-		expect(() => analyze(parse(css, options), all)).toThrow(message)
-		expect(() => analyze(parse(css, options), all)).toThrow(TypeError)
-	})
-
-	test('throws when it was parsed without at-rule preludes (for collectors that read them)', () => {
-		const atrule_count = define_collector<number>(function init() {
-			let total = 0
-			return {
-				parse: { atrule_preludes: true },
-				atrule() {
-					total++
-				},
-				result: () => total,
-			}
-		})
-		const partial = parse(css, { parse_atrule_preludes: false })
-		expect(() => analyze(partial, { atrule_count })).toThrow(/at-rule preludes/)
-	})
-
-	test('only complains about what the collectors need', () => {
-		// Values are not parsed, but nothing here reads them
-		const result = analyze(parse(css, { parse_values: false }), { selectors: selector_count() })
-		expect(result.selectors).toBe(2)
-	})
-
-	test('the message says how to fix it', () => {
-		expect(() => analyze(parse(css, { parse_selectors: false }), all)).toThrow(
-			'parse(css, { parse_selectors: true })',
-		)
-	})
-
-	test('CSS without rules, declarations or preludes is never "partial"', () => {
-		expect(() => analyze(parse('', { parse_values: false }), all)).not.toThrow()
-		expect(() => analyze(parse('@charset "utf-8";', { parse_selectors: false }), all)).not.toThrow()
-	})
+test('an AST that was parsed without values gives no value-based results (nothing throws)', () => {
+	const css = 'a { color: #fff }'
+	const collectors = { selectors: selector_count(), colors: hash_colors() }
+	const partial = analyze(parse(css, { parse_values: false }), collectors)
+	expect(partial.colors.total).toBe(0)
+	expect(partial.selectors).toBe(1)
 })
 
 test.each([

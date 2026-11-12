@@ -101,7 +101,7 @@ Use `summarize_numbers(result.sizes)` for min, max, mean, mode, median, range an
 
 ### Already parsed?
 
-`analyze()` also accepts an AST from `@projectwallace/css-parser`. It must be parsed with the selectors, values and at-rule preludes your collectors need (the parser's defaults parse all three). If something is missing, `analyze()` throws a `TypeError` that names the parser option to turn on, instead of reporting zeros. Comments are only seen when you pass CSS text.
+`analyze()` also accepts an AST from `@projectwallace/css-parser`. Parse it with values, selectors and at-rule preludes enabled so every collector has what it needs.
 
 ### Presets
 

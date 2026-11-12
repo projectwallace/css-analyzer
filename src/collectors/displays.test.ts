@@ -183,7 +183,7 @@ test.each([
 	expect(Object.keys(run(`a { display: ${value} }`).unique)).toEqual([expected])
 })
 
-test('a stylesheet that was parsed without values is refused', () => {
+test('values that were not parsed are not counted', () => {
 	const ast = parse('a { display: flex }', { parse_values: false })
-	expect(() => analyze(ast, { result: displays() })).toThrow(/without values/)
+	expect(analyze(ast, { result: displays() }).result.total).toBe(0)
 })

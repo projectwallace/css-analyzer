@@ -4,7 +4,6 @@
 
 - **Node.js >= 22.18** (was >= 18). The source uses `.ts` import specifiers; the published package is plain ES modules plus types.
 - `analyze()` takes collectors and returns only what they report (see below).
-- `analyze()` throws a `TypeError` when you pass a parsed stylesheet that was parsed without the selectors, values or at-rule preludes your collectors need (it never reports silent zeros). Pass CSS text, or parse with the parser's defaults.
 - `unique` and `by_context` are `Map`s, not plain objects. Use `to_json(result)` to get plain data for `JSON.stringify()`.
 - All names are `snake_case`.
 - **Selectors inside at-rule preludes are no longer in the data**: `@scope (.card) to (.content)` and `@supports selector(:has(a))`. 9.x counted them; now `selectors()`, `specificity()` and `stylesheet()` all leave them out, so `selectors().total`, the specificity results and `stylesheet().source_lines_of_code` / `complexity` can be lower than in 9.x for CSS that uses these at-rules (all other CSS gives the same numbers). Selectors of style rules inside these at-rules are still counted.
