@@ -181,3 +181,10 @@ test.each([
 ])('counts "%s" as "%s"', (value, expected) => {
 	expect(Object.keys(run(`a { display: ${value} }`).unique)).toEqual([expected])
 })
+
+test.each(['a { display: }', 'a { display:; }', 'a { display: ; color: red }'])(
+	'does not count the empty value of %j',
+	(css) => {
+		expect(run(css)).toEqual({ total: 0, total_unique: 0, unique: {} })
+	},
+)

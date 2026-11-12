@@ -13,10 +13,11 @@ export function displays(options: CountOptions = {}): CollectorDef<CountResult> 
 			declaration: {
 				properties: PROPERTIES,
 				enter(_node, ctx) {
-					if (!ctx.value) {
+					const raw = ctx.value_text
+					// `display: ` has no value to count
+					if (!ctx.value || raw === '') {
 						return
 					}
-					const raw = ctx.value_text
 					const text = global_keywords.has(raw) ? raw.toLowerCase() : ctx.clean_value_text
 					counter.add(lowercase_unless_var(text!), ctx.value)
 				},
