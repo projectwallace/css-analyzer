@@ -61,7 +61,7 @@
 		"provenance": true
 	},
 	"scripts": {
-		"lint": "oxlint --config .oxlintrc.json; oxfmt --check",
+		"lint": "oxlint && oxfmt --check",
 		"test": "vitest --coverage",
 		"check": "tsc --noEmit",
 		"build": "tsdown",
