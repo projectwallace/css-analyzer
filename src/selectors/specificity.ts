@@ -40,25 +40,20 @@ function max(list: Specificity[]): Specificity {
 }
 
 function argument_specificity(node: CSSNode): Specificity {
-	let a = 0
-	let b = 0
-	let c = 0
-	const childSelector = node.first_child?.first_child
-	if (childSelector && is_selector(childSelector)) {
+	const child_selector = node.first_child?.first_child
+	if (child_selector && is_selector(child_selector)) {
 		// Only the parts before the first combinator count
-		let part = childSelector.first_child
-		while (part && !is_combinator(part)) {
-			const [pa, pb, pc] = calculateForAST({ first_child: part } as Selector)
-			a += pa
-			b += pb
-			c += pc
-			part = part.next_sibling as SelectorNode
-		}
+		return parts_specificity(child_selector.first_child, true)
 	}
-	return [a, b, c]
+	return [0, 0, 0]
 }
 
 export function calculateForAST(selectorAST: Selector): Specificity {
+	return parts_specificity(selectorAST.first_child)
+}
+
+/** Specificity of the parts from `first` on; with `until_combinator`, only the compound selector before the first combinator */
+function parts_specificity(first: SelectorNode | null, until_combinator = false): Specificity {
 	// https://www.w3.org/TR/selectors-4/#specificity-rules
 	let a = 0 /* ID Selectors */
 	let b = 0 /* Class selectors, Attributes selectors, and Pseudo-classes */
@@ -70,9 +65,9 @@ export function calculateForAST(selectorAST: Selector): Specificity {
 	}
 
 	// Iterate through all parts of the selector (children of NODE_SELECTOR)
-	let current = selectorAST.first_child
+	let current = first
 
-	while (current) {
+	while (current && !(until_combinator && is_combinator(current))) {
 		switch (current.type) {
 			case ID_SELECTOR:
 				a += 1
