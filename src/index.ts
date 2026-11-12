@@ -32,13 +32,7 @@ import {
 	property_basename,
 } from '@projectwallace/css-parser'
 import { isSupportsBrowserhack, isMediaBrowserhack } from './atrules/atrules.ts'
-import {
-	getCombinators,
-	getComplexity,
-	isPrefixed,
-	isAccessibility,
-	SELECTOR_ARG_PSEUDOS,
-} from './selectors/utils.ts'
+import { getCombinators, getComplexity, isPrefixed, isAccessibility } from './selectors/utils.ts'
 import { calculateForAST as calculateSpecificity } from './selectors/specificity.ts'
 import { colorFunctions, colorKeywords, namedColors, systemColors } from './values/colors.ts'
 import { destructure, SYSTEM_FONTS } from './values/destructure-font-shorthand.ts'
@@ -1073,16 +1067,8 @@ function analyzeInternal<T extends boolean>(
 					customElementSelectors.p(child.name.toLowerCase(), loc)
 				} else if (is_pseudo_class_selector(child)) {
 					pseudoClasses.p(child.name.toLowerCase(), loc)
-					// Arguments of non-selector pseudos (e.g. `:state(foo)`) are not selectors
-					if (!SELECTOR_ARG_PSEUDOS.has(child.name)) {
-						return SKIP
-					}
 				} else if (is_pseudo_element_selector(child)) {
 					pseudoElements.p(child.name.toLowerCase(), loc)
-					// Arguments of non-selector pseudos (e.g. `::highlight(foo)`) are not selectors
-					if (!SELECTOR_ARG_PSEUDOS.has(child.name)) {
-						return SKIP
-					}
 				}
 			})
 
