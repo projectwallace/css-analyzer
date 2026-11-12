@@ -1,5 +1,6 @@
 import {
 	is_attribute_selector,
+	is_custom,
 	is_pseudo_class_selector,
 	is_pseudo_element_selector,
 	is_selector_list,
@@ -95,7 +96,7 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 						attributes.add(part.name.toLowerCase(), node)
 					} else if (is_type_selector(part)) {
 						const name = part.name
-						if (!name.startsWith('--') && name.includes('-')) {
+						if (!is_custom(name) && name.includes('-')) {
 							custom_elements.add(name.toLowerCase(), node)
 						}
 					} else if (is_pseudo_class_selector(part)) {

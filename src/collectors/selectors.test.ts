@@ -645,26 +645,75 @@ test('counts attribute selectors', () => {
 	})
 })
 
-test('counts custom element selectors', () => {
-	const fixture = `
+describe('custom element selectors', () => {
+	test('finds top-level type selectors', () => {
+		const fixture = `
 		product-card,
 		event-date,
 		next-route-announcer,
 		Camel-Cased-Element {}
+	`
+		const actual = run(fixture).custom_elements
+
+		expect(actual.total).toBe(4)
+		expect(actual.total_unique).toBe(4)
+		expect(actual.unique).toEqual({
+			'product-card': 1,
+			'event-date': 1,
+			'next-route-announcer': 1,
+			'camel-cased-element': 1,
+		})
+	})
+
+	test('finds custom elements nested in pseudo-element/pseudo-class selectors', () => {
+		const fixture = `
+		::slotted(slotted-element),
+		:has(has-custom-element),
+		:host-context(host-context-element),
+		:host(host-element),
+		:is(is-custom-element, is-custom-element2),
+		:where(where-custom-element, where-custom-element2),
+		li:nth-child(3n of nth-custom-element),
+		:has(::slotted(has-slotted-element)) {}
+	`
+		const actual = run(fixture).custom_elements
+
+		expect(actual.total).toBe(10)
+		expect(actual.total_unique).toBe(10)
+		expect(actual.unique).toEqual({
+			'slotted-element': 1,
+			'has-custom-element': 1,
+			'host-context-element': 1,
+			'host-element': 1,
+			'is-custom-element': 1,
+			'is-custom-element2': 1,
+			'where-custom-element': 1,
+			'where-custom-element2': 1,
+			'nth-custom-element': 1,
+			'has-slotted-element': 1,
+		})
+	})
+
+	test('no false positives', () => {
+		const fixture = `
+		:active-view-transition-type(theme-toggle)::view-transition-old(root) {}
+		::highlight(attribute-value) {}
+		::highlight(character-entity) {}
+		::scroll-button(foo-test) {}
+		::picker(my-picker),
+		:state(custom-checked),
+		*:lang(en-US) {}
 
 		/* Not custom elements, but custom identifiers */
 		::view-transition-new(--light-box-img),
 		::view-transition-old(--light-box-img) {}
-	`
-	const actual = run(fixture).custom_elements
 
-	expect(actual.total).toBe(4)
-	expect(actual.total_unique).toBe(4)
-	expect(actual.unique).toEqual({
-		'product-card': 1,
-		'event-date': 1,
-		'next-route-announcer': 1,
-		'camel-cased-element': 1,
+		::view-transition-old(figure-caption),
+		::view-transition-new(figure-caption) {}
+	`
+		const actual = run(fixture).custom_elements
+
+		expect(actual.total).toBe(0)
 	})
 })
 

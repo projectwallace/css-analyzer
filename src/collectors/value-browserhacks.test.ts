@@ -100,6 +100,13 @@ test('counts multiple declarations with the same hack', () => {
 	expect(actual.unique).toEqual({ 'alpha()': 2, '.htc': 1 })
 })
 
+test('counts both hacks if a value has two', () => {
+	const actual = run(`a { filter: alpha(opacity=50)\\9; }`)
+	expect(actual.total).toBe(2)
+	expect(actual.total_unique).toBe(2)
+	expect(actual.unique).toEqual({ 'alpha()': 1, '\\9': 1 })
+})
+
 test.each([
 	[
 		'url() without .htc extension',
@@ -120,6 +127,10 @@ test.each([
 	['custom properties with a .htc url', `a { --behavior: url(/assets/pie.htc); }`],
 	['aspect-ratio with a slash', `a { aspect-ratio: 16/7; }`],
 	['an identifier ending in 7', `a { grid-area: col7; }`],
+	[
+		'modern alpha(from ...)',
+		`a { color: alpha(from red / 50%); color: alpha(from var(--my-color) / 80%); color: alpha(from var(--my-color) / calc(alpha * 0.5)); }`,
+	],
 ])('no false positive: %s', (_name, css) => {
 	expect(run(css).total).toBe(0)
 })
