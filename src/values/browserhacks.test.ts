@@ -197,6 +197,12 @@ test('no false positive: custom properties are not flagged for alpha()', () => {
 	expect(actual.total).toBe(0)
 })
 
+test('no false positive: modern `alpha(from ...)` is not flagged for alpha()', () => {
+	const fixture = `a { color: alpha(from red / 50%); }`
+	const actual = analyze(fixture).values.browserhacks
+	expect(actual.total).toBe(0)
+})
+
 test('no false positive: custom properties are not flagged for expression()', () => {
 	const fixture = `a { --width: expression(document.body.clientWidth); }`
 	const actual = analyze(fixture).values.browserhacks
