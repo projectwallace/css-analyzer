@@ -9,6 +9,7 @@ import {
 	is_dimension,
 	is_number,
 	type AnyNode,
+	str_index_of,
 } from '@projectwallace/css-parser'
 import { type PreludeInput, as_prelude } from '../utils/input.ts'
 
@@ -32,19 +33,21 @@ function find_hacks(
 	return hacks
 }
 
+const WHITESPACE_REGEX = /\s+/g
+
 /** Find @supports browserhacks (`-webkit-appearance: none`, `-moz-appearance: meterbar`) */
 export function get_supports_browserhacks(input: PreludeInput): string[] {
 	return find_hacks('supports', input, function (node, on_hack) {
 		// Check SupportsQuery nodes for browserhack patterns
 		if (is_supports_query(node)) {
-			const normalized_prelude = node.value.toString().toLowerCase().replaceAll(/\s+/g, '')
+			const normalized_prelude = node.value.toString().replaceAll(WHITESPACE_REGEX, '')
 
 			// Check for known browserhack patterns
-			if (normalized_prelude.includes('-webkit-appearance:none')) {
+			if (str_index_of('-webkit-appearance:none', normalized_prelude) !== -1) {
 				on_hack('-webkit-appearance: none')
 				return BREAK
 			}
-			if (normalized_prelude.includes('-moz-appearance:meterbar')) {
+			if (str_index_of('-moz-appearance:meterbar', normalized_prelude) !== -1) {
 				on_hack('-moz-appearance: meterbar')
 				return BREAK
 			}

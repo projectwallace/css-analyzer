@@ -25,3 +25,12 @@ test('get_supports_browserhacks finds hacks in prelude text and nodes', () => {
 	const prelude = prelude_of('@supports (-moz-appearance: meterbar) {}')
 	expect(get_supports_browserhacks(prelude)).toEqual(['-moz-appearance: meterbar'])
 })
+
+test('get_supports_browserhacks finds hacks in uppercase prelude text and nodes', () => {
+	expect(get_supports_browserhacks('(-WEBKIT-APPEARANCE: NONE)')).toEqual([
+		'-webkit-appearance: none',
+	])
+
+	const prelude = prelude_of('@supports (-MOZ-APPEARANCE: METERBAR) {}')
+	expect(get_supports_browserhacks(prelude)).toEqual(['-moz-appearance: meterbar'])
+})
