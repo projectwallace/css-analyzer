@@ -14,10 +14,7 @@ export function to_location(node: CSSNode, length: number = node.length): Locati
 }
 
 export type Counter<T extends CountItem = string> = {
-	/**
-	 * Count `item`, found at `node`. The location is only read if locations are enabled;
-	 * `length` overrides the node's length.
-	 */
+	/** Count `item`, found at `node`; the location is only read when locations are enabled */
 	add(item: T, node: CSSNode, length?: number): void
 	result(): CountResult<T>
 }

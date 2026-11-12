@@ -30,11 +30,7 @@ function is_custom_name(name: string): boolean {
 	return name.startsWith('--')
 }
 
-/**
- * Properties (normalized, so `-webkit-transition` counts as `transition`) and what they tell:
- * prefixes, custom properties (defined with a declaration or `@property`, used with `var()`),
- * shorthands, hacks and anchor names.
- */
+/** Properties (normalized: `-webkit-transition` is `transition`), prefixes, custom properties, shorthands, hacks and anchor names */
 export function properties(options: CountOptions = {}): CollectorDef<PropertiesResult> {
 	return define_collector<PropertiesResult>(function init() {
 		const names = create_counter(options)

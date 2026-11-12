@@ -24,16 +24,9 @@ export type StylesheetResult = {
 	size: number
 	/** Lines of CSS (a stylesheet without line breaks has 1) */
 	lines: number
-	/**
-	 * Statements: at-rules + selectors + declarations (keyframe selectors included).
-	 * Unlike `lines`, it ignores blank lines, comments and formatting.
-	 */
+	/** Statements: at-rules + selectors + declarations. Ignores blank lines and comments, unlike `lines` */
 	source_lines_of_code: number
-	/**
-	 * The sum of the complexity of every at-rule, selector, declaration, property and value.
-	 * These are the same weights as `atrules().complexity`, `selectors().complexity`,
-	 * `declarations().complexity`, `properties().complexity` and `value_complexity()`, added up.
-	 */
+	/** The summed complexity of every at-rule, selector, declaration, property and value */
 	complexity: number
 	comments: { total: number; size: number }
 	/** `data:` URIs in `url()` values, counted by mime type (`unique` has e.g. `image/png`) */
@@ -48,12 +41,10 @@ export type StylesheetOptions = {
 	locations?: boolean
 }
 
-/**
- * Size, lines, source lines of code, complexity, comments and embedded content.
- * Source lines of code and complexity need selectors, values and at-rule preludes to be parsed,
- * so this collector parses all three. Selectors in at-rule preludes (`@scope (.a)`,
- * `@supports selector(...)`) are not counted, as in `selectors()`.
- */
+// Source lines of code and complexity need selectors, values and at-rule preludes to be parsed,
+// so this collector parses all three. Selectors in at-rule preludes (`@scope (.a)`,
+// `@supports selector(...)`) are not counted, as in `selectors()`.
+/** Size, lines, source lines of code, complexity, comments and embedded content */
 export function stylesheet(options: StylesheetOptions = {}): CollectorDef<StylesheetResult> {
 	return define_collector<StylesheetResult>(function init() {
 		let size = 0

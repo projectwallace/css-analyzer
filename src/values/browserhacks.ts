@@ -10,13 +10,10 @@ import {
 import { ends_with, unquote } from '../utils/string-utils.ts'
 import { type ValueInput, as_value } from '../utils/input.ts'
 
-/**
- * Find the browserhacks in a CSS value: `progid:`, `\9`, `\7`, `alpha()`, `expression()`, `.htc`
- *
- * Browserhacks sourced from:
- * - https://browserhacks.com/
- * - https://www.alwaystwisted.com/relicss/old-css
- */
+// Browserhacks sourced from:
+// - https://browserhacks.com/
+// - https://www.alwaystwisted.com/relicss/old-css
+/** Find the browserhacks in a CSS value: `progid:`, `\\9`, `\\7`, `alpha()`, `expression()`, `.htc` */
 export function get_value_browserhacks(input: ValueInput): string[] {
 	const node = as_value(input)
 	const hacks: string[] = []

@@ -21,9 +21,7 @@ import { type SelectorInput, as_selectors } from '../utils/input.ts'
 
 export type Specificity = [number, number, number]
 
-/**
- * @returns 0 if s1 equals s2, a negative number if s1 is lower than s2, or a positive number if s1 higher than s2
- */
+/** Compare two specificities: negative if `s1` is lower, 0 if equal, positive if `s1` is higher */
 export function compare_specificity(s1: Specificity, s2: Specificity): number {
 	if (s1[0] === s2[0]) {
 		if (s1[1] === s2[1]) {
@@ -34,7 +32,7 @@ export function compare_specificity(s1: Specificity, s2: Specificity): number {
 	return s1[0] - s2[0]
 }
 
-/** Shared result for an empty list: read it, never change it */
+//  Shared result for an empty list: read it, never change it
 const NO_SPECIFICITY: Specificity = [0, 0, 0]
 
 /** The highest specificity of a list (`[0, 0, 0]` for an empty list). Does not change the list. */
@@ -57,7 +55,7 @@ function argument_specificity(node: CSSNode): Specificity {
 	return [0, 0, 0]
 }
 
-/** Specificity of the parts from `first` on; with `until_combinator`, only the compound selector before the first combinator */
+//  Specificity of the parts from `first` on; with `until_combinator`, only the compound selector before the first combinator
 function parts_specificity(first: SelectorNode | null, until_combinator = false): Specificity {
 	// https://www.w3.org/TR/selectors-4/#specificity-rules
 	let a = 0 /* ID Selectors */
@@ -231,11 +229,7 @@ function parts_specificity(first: SelectorNode | null, until_combinator = false)
 	return [a, b, c]
 }
 
-/**
- * Calculate the specificity of a selector (list).
- * @param input - Selector text, or an already parsed Selector/SelectorList node
- * @returns One `[a, b, c]` tuple for every selector in the list
- */
+/** The specificity of every selector in a selector (list), as `[a, b, c]` */
 export function get_specificity(input: SelectorInput): Specificity[] {
 	// Quit while you're ahead
 	if (!input) {

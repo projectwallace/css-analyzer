@@ -32,11 +32,7 @@ function find_hacks(
 	return hacks
 }
 
-/**
- * Find @supports browserhacks (`-webkit-appearance: none`, `-moz-appearance: meterbar`).
- * @param input - Prelude text, or an already parsed prelude node
- * @returns The hacks that were found (at most one)
- */
+/** Find @supports browserhacks (`-webkit-appearance: none`, `-moz-appearance: meterbar`) */
 export function get_supports_browserhacks(input: PreludeInput): string[] {
 	return find_hacks('supports', input, function (node, on_hack) {
 		// Check SupportsQuery nodes for browserhack patterns
@@ -56,11 +52,7 @@ export function get_supports_browserhacks(input: PreludeInput): string[] {
 	})
 }
 
-/**
- * Find @media browserhacks (`\\0`, `\\9`, `-ms-high-contrast`, `min-resolution: .001dpcm`, ...).
- * @param input - Prelude text, or an already parsed prelude node
- * @returns The hacks that were found (at most one)
- */
+/** Find @media browserhacks (`\\0`, `\\9`, `-ms-high-contrast`, `min-resolution: .001dpcm`, ...) */
 export function get_media_browserhacks(input: PreludeInput): string[] {
 	return find_hacks('media', input, function (node, on_hack) {
 		// Check MediaType nodes for \0 prefix or \9 suffix

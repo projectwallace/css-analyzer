@@ -40,11 +40,7 @@ export type DesignTokens = ResultOf<DesignTokensCollectors>
 /** Options for the whole set, passed on to every collector */
 export type DesignTokensOptions = Pick<CountOptions, 'locations'>
 
-/**
- * Everything a design-token extractor needs. Spread it to add your own collectors or to replace
- * one with different options:
- * `{ ...design_tokens_collectors({ locations: true }), colors: colors({ normalize: 'none' }) }`.
- */
+/** The collectors a design-token extractor needs. Spread it to add collectors or replace one with other options */
 export function design_tokens_collectors(
 	options: DesignTokensOptions = {},
 ): DesignTokensCollectors {

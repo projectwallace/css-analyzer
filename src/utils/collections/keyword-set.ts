@@ -1,6 +1,4 @@
-/**
- * @description A Set-like construct to search CSS keywords in a case-insensitive way
- */
+/** A Set-like construct to search CSS keywords in a case-insensitive way */
 export class KeywordSet {
 	set: Set<string>
 

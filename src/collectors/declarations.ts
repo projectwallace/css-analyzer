@@ -13,10 +13,7 @@ export type DeclarationsResult = CountResult & {
 	nesting: CountResult<number>
 }
 
-/**
- * Every declaration (counted by its text), `!important` usage, complexity and nesting.
- * Use `summarize_numbers()` on `complexity` and `nesting` for min, max, mean, ...
- */
+/** Every declaration (counted by its text), `!important` usage, complexity and nesting */
 export function declarations(options: CountOptions = {}): CollectorDef<DeclarationsResult> {
 	return define_collector<DeclarationsResult>(function init() {
 		const texts = create_counter(without_sequence(options))

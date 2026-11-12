@@ -23,10 +23,7 @@ const EMPTY: NumberSummary = {
 	median: 0,
 }
 
-/**
- * Statistics for numbers that were counted as `value -> how often`.
- * Keeping counts (instead of a mean) keeps every statistic derivable afterwards.
- */
+/** Statistics for numbers that were counted as `value -> how often` */
 export function summarize_frequencies(frequencies: ReadonlyMap<number, number>): NumberSummary {
 	const values = [...frequencies.keys()].sort((a, b) => a - b)
 	if (values.length === 0) {

@@ -6,4 +6,6 @@ export default defineConfig({
 	platform: 'neutral',
 	publint: true,
 	dts: true,
+	// JSDoc ships in the .d.ts files, where editors read it; it is not needed in the JavaScript
+	outputOptions: { comments: { jsdoc: false } },
 })

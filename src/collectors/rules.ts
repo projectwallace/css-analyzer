@@ -18,10 +18,7 @@ export type RulesResult = {
 	declarations: CountResult<number>
 }
 
-/**
- * Rules (keyframe steps are not rules): how many, how big, how nested.
- * Pass `{ sequence: true }` to also get the numbers in source order (for charts).
- */
+/** Rules (keyframe steps are not rules): how many, how big, how nested */
 export function rules(options: CountOptions = {}): CollectorDef<RulesResult> {
 	return define_collector<RulesResult>(function init() {
 		const sizes = create_counter<number>(options)

@@ -26,7 +26,7 @@ import { get_atrule_weight } from './complexity.ts'
 import { without_sequence } from './shared.ts'
 import { get_animation_names, get_first_identifier, get_list_items } from './value-helpers.ts'
 
-/** Media features (`(min-width: 40em)`) anywhere in an at-rule prelude */
+//  Media features (`(min-width: 40em)`) anywhere in an at-rule prelude
 function find_media_features(prelude: CSSNode | null | undefined): MediaFeature[] {
 	const found: MediaFeature[] = []
 	if (!prelude) {
@@ -41,7 +41,7 @@ function find_media_features(prelude: CSSNode | null | undefined): MediaFeature[
 	return found
 }
 
-/** `property: value` descriptors inside an at-rule block (e.g. `@font-face`) */
+//  `property: value` descriptors inside an at-rule block (e.g. `@font-face`)
 function get_descriptors(block: Atrule['block']): Record<string, string> {
 	const descriptors: Record<string, string> = Object.create(null)
 	block?.for_each(function (child) {
@@ -52,7 +52,7 @@ function get_descriptors(block: Atrule['block']): Record<string, string> {
 	return descriptors
 }
 
-/** The container name in `@container name (min-width: 1px)` */
+//  The container name in `@container name (min-width: 1px)`
 function get_container_name(prelude: CSSNode | null | undefined): string | undefined {
 	if (prelude && is_atrule_prelude(prelude) && is_container_query(prelude.first_child)) {
 		const name = prelude.first_child.first_child
@@ -63,7 +63,7 @@ function get_container_name(prelude: CSSNode | null | undefined): string | undef
 	return undefined
 }
 
-/** `supports(...)` and `layer(...)` in an `@import` prelude */
+//  `supports(...)` and `layer(...)` in an `@import` prelude
 function get_import_functions(prelude: CSSNode | null | undefined) {
 	const found: { name: 'supports' | 'layer'; value: string; node: CSSNode }[] = []
 	if (!prelude || !is_atrule_prelude(prelude) || !prelude.has_children) {
@@ -122,11 +122,7 @@ export type AtrulesResult = CountResult & {
 const CONTAINER_PROPERTIES = new Set(['container-name', 'container'])
 const ANIMATION_PROPERTIES = new Set(['animation', 'animation-name'])
 
-/**
- * Every at-rule: counted by name, with a breakdown for @font-face, @import, @media, @charset,
- * @supports, @keyframes, @container, @layer, @property, @function and @scope.
- * Keyframe, container and layer names are tracked as defined and used.
- */
+/** Every at-rule by name, with a breakdown per kind and the defined and used names of keyframes, containers, layers and `@property` */
 export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult> {
 	return define_collector<AtrulesResult>(function init() {
 		const names = create_counter(without_sequence(options))

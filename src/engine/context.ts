@@ -27,13 +27,11 @@ export type ContextController = {
 	leave_atrule(): void
 }
 
-/** Cache marker for facts whose computed value can itself be `undefined` or `null` */
+//  Cache marker for facts whose computed value can itself be `undefined` or `null`
 const NOT_COMPUTED = Symbol('not-computed-yet')
 
-/**
- * Builds the shared context object. Facts are lazy and memoized per node:
- * whoever asks first pays, everybody else reads the cached value.
- */
+// Builds the shared context object. Facts are lazy and memoized per node:
+// whoever asks first pays, everybody else reads the cached value.
 export function create_context(): ContextController {
 	let css = ''
 	// The visited node, when it is a declaration: the property and value facts read from it

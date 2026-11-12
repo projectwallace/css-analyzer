@@ -50,10 +50,7 @@ export type AnimationParts = {
 	keywords: string[]
 }
 
-/**
- * Split an `animation` or `transition` value into its parts.
- * @param input - Value text, or an already parsed Value node
- */
+/** Split an `animation` or `transition` value into its parts */
 export function analyze_animation(input: ValueInput): AnimationParts {
 	const parts: AnimationParts = { durations: [], timing_functions: [], names: [], keywords: [] }
 	let duration_found = false

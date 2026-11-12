@@ -9,17 +9,7 @@ export type DefinedUsedResult = {
 	unknown: string[]
 }
 
-/**
- * Tracks which names are defined and which are used, in any order, and tells which ones are
- * unused (defined, never used) and unknown (used, never defined). Each name is counted once.
- *
- * ```js
- * const names = new DefinedUsed()
- * names.use('--a')
- * names.define('--b')
- * names.analyze() // { defined: ['--b'], used: ['--a'], unused: ['--b'], unknown: ['--a'] }
- * ```
- */
+/** Tracks which names are defined and which are used: `unused` is defined but never used, `unknown` is used but never defined */
 export class DefinedUsed {
 	#defined = new Set<string>()
 	#used = new Set<string>()

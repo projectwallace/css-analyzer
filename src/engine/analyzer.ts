@@ -22,29 +22,18 @@ const KEYFRAMES = new Set<Lowercase<string>>(['keyframes'])
 type DeclarationSubscription = NonNullable<CollectorInstance<unknown>['declaration']>
 type ValueSubscription = Omit<NonNullable<CollectorInstance<unknown>['value']>, 'types'>
 
+// A single-pass, multiplexed visitor (the same pattern as ESLint rule listeners or PostCSS 8 plugin
+// visitors): collectors subscribe to the node types they care about, the subscriptions are merged
+// into one dispatch table and the AST is traversed once for all of them. Each declaration value is
+// walked once as well, for every value subscriber.
+//
+// Handlers receive a shared context object (see `create_context()`): a flyweight whose facts are
+// computed lazily and memoized per node, so the first collector that asks pays and the others read
+// the cached result. It is only valid during the handler call it is passed to.
 /**
- * Run collectors over one stylesheet.
- *
- * This is a single-pass, multiplexed visitor (the same pattern as ESLint rule listeners or
- * PostCSS 8 plugin visitors): every collector subscribes to the node types it cares about,
- * the subscriptions are merged into one dispatch table, and the AST is traversed once for all
- * collectors. Each declaration value is walked once as well, for every value subscriber.
- *
- * Handlers receive a shared context object (see `create_context()`): a flyweight whose facts
- * (normalized property, parsed value, font shorthand, ...) are computed lazily and memoized per
- * node, so the first collector that asks pays and the others read the cached result. The
- * context is only valid during the handler call it is passed to.
- * @param input - CSS text. The engine parses it itself, with only the parts the collectors need.
- * @param collectors - Object map of collectors; the keys become the keys of the result
+ * Run collectors over a stylesheet. The keys of `collectors` become the keys of the result.
  * @example
- * ```js
- * import { analyze } from '@projectwallace/css-analyzer'
- * import { colors, z_indexes } from '@projectwallace/css-analyzer/collectors'
- *
- * const result = analyze('a { color: red; z-index: 2 }', { colors: colors(), z: z_indexes() })
- * result.colors.unique.get('red') // { count: 1 }
- * result.z.total // 1
- * ```
+ * analyze('a { color: red }', { colors: colors(), z: z_indexes() }).colors.unique.get('red') // { count: 1 }
  */
 export function analyze<C extends CollectorMap>(input: string, collectors: C): ResultOf<C> {
 	const keys = Object.keys(collectors)

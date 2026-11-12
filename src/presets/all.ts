@@ -97,9 +97,7 @@ export function all_collectors(options: AllOptions = {}): AllCollectors {
 
 export type AllResult = ResultOf<AllCollectors>
 
-/**
- * Run every collector. The result is flat: one key per collector (`result.colors`, `result.atrules`, ...).
- */
+/** Run every collector; the result has one key per collector */
 export function analyze_all(input: string, options?: AllOptions): AllResult {
 	return analyze(input, all_collectors(options))
 }

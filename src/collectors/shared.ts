@@ -12,10 +12,8 @@ import type {
 
 export type Normalize = 'lowercase' | 'none'
 
-/**
- * Most collectors just count strings: this wires a counter to a handler set
- * and returns the standard count result.
- */
+// Most collectors just count strings: this wires a counter to a handler set
+// and returns the standard count result.
 export function define_counting_collector<T extends CountItem = string>(
 	options: CountOptions,
 	setup: (counter: Counter<T>) => Omit<CollectorInstance<CountResult<T>>, 'result'>,

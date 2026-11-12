@@ -8,11 +8,7 @@ export type Json<T> =
 				? { [K in keyof T]: Json<T[K]> }
 				: T
 
-/**
- * A copy of a result that `JSON.stringify()` can serialize: every `Map` (`unique`, `by_context`, ...)
- * becomes a plain object, at any depth. Arrays and other values are kept (arrays are copied).
- * Use it to send results between workers, store them or snapshot them.
- */
+/** A copy of a result that `JSON.stringify()` can serialize: every `Map` becomes a plain object */
 export function to_json<T>(value: T): Json<T> {
 	if (value instanceof Map) {
 		const entries: [string, unknown][] = []

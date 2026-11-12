@@ -30,10 +30,7 @@ const PSEUDO_FUNCTIONS = new KeywordSet([
 	'-moz-any',
 ])
 
-/**
- * Find vendor prefixed pseudo-classes, pseudo-elements and type selectors.
- * @returns The prefixed names, including their colons (`:-moz-focusring`, `::-webkit-scrollbar`)
- */
+/** Find vendor prefixed pseudo-classes, pseudo-elements and type selectors */
 export function get_vendor_prefixes(input: SelectorInput): string[] {
 	const found: string[] = []
 	for (const selector of as_selectors(input)) {
@@ -58,10 +55,7 @@ export function get_vendor_prefixes(input: SelectorInput): string[] {
 	return found
 }
 
-/**
- * Find accessibility selectors: attribute selectors for `role` and `aria-*`.
- * @returns The normalized attribute selectors, e.g. `[aria-hidden="true"]`
- */
+/** Find accessibility selectors: attribute selectors for `role` and `aria-*` */
 export function get_accessibility_selectors(input: SelectorInput): string[] {
 	const found: string[] = []
 	function normalize(node: CSSNode) {
@@ -95,10 +89,7 @@ export function get_accessibility_selectors(input: SelectorInput): string[] {
 	return found
 }
 
-/**
- * Get the complexity of every selector in a selector (list).
- * @param input - Selector text, or an already parsed Selector/SelectorList node
- */
+/** The complexity of every selector in a selector (list) */
 export function get_complexity(input: SelectorInput): number[] {
 	return as_selectors(input).map((selector) => selector_complexity(selector))
 }
@@ -199,10 +190,7 @@ export function combinator_name(node: Combinator): string {
 
 export type CombinatorMatch = { name: string; loc: Location }
 
-/**
- * Find all combinators in a selector (list).
- * @returns The combinator (`' '` for the descendant combinator) and where it was found
- */
+/** Find all combinators in a selector (list), with where they were found */
 export function get_combinators(input: SelectorInput): CombinatorMatch[] {
 	const found: CombinatorMatch[] = []
 	for (const selector of as_selectors(input)) {

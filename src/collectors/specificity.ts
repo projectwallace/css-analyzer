@@ -6,11 +6,7 @@ import { compare_specificity, get_specificity, type Specificity } from '../selec
 
 declare const specificity_brand: unique symbol
 
-/**
- * The result of `specificity()`: a count result of `"a,b,c"` items.
- * The brand exists only in the type (there is no such property at runtime): it makes
- * `summarize_specificity()` refuse results of other collectors.
- */
+/** The result of `specificity()`: `"a,b,c"` items. The brand is type-only, there is no such property at runtime */
 export type SpecificityResult = CountResult & { readonly [specificity_brand]: true }
 
 export type SpecificitySummary = {
@@ -23,10 +19,7 @@ export type SpecificitySummary = {
 	mode: Specificity
 }
 
-/**
- * Specificity of every selector (keyframe selectors are left out), counted as `"a,b,c"`.
- * Use `summarize_specificity()` for min, max, mean, ... of a result.
- */
+/** Specificity of every selector, counted as `"a,b,c"`; see `summarize_specificity()` */
 export function specificity(options: CountOptions = {}): CollectorDef<SpecificityResult> {
 	return define_collector<SpecificityResult>(function init() {
 		const counter = create_counter(options)

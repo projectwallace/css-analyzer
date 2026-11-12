@@ -41,11 +41,7 @@ export type SelectorsResult = CountResult & {
 	combinators: CountResult
 }
 
-/**
- * Selectors, counted by text, with complexity, nesting and a breakdown per kind.
- * Specificity has its own collector: `specificity()`.
- * Pass `{ sequence: true }` to also get complexity and nesting in source order (for charts).
- */
+/** Selectors, counted by text, with complexity, nesting and a breakdown per kind */
 export function selectors(options: CountOptions = {}): CollectorDef<SelectorsResult> {
 	return define_collector<SelectorsResult>(function init() {
 		const texts = create_counter(without_sequence(options))

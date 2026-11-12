@@ -9,11 +9,9 @@ import type { DeclarationContext } from '../engine/types.ts'
  * `stylesheet()` adds them all up. They share these functions so the numbers always agree.
  */
 
-/**
- * At-rule weight: 1 for an at-rule with a prelude, plus 1 for every media/supports browserhack
- * (`hacks`) and for a vendor prefixed `@keyframes`. `@font-face` is 1, `@layer` without a prelude is 2.
- * Other at-rules without a prelude have no weight: 0.
- */
+// At-rule weight: 1 for an at-rule with a prelude, plus 1 for every media/supports browserhack
+// (`hacks`) and for a vendor prefixed `@keyframes`. `@font-face` is 1, `@layer` without a prelude is 2.
+// Other at-rules without a prelude have no weight: 0.
 export function get_atrule_weight(
 	node: Atrule,
 	name: string,

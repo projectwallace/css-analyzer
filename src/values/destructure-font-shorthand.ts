@@ -18,7 +18,7 @@ export const SYSTEM_FONTS: KeywordSet = new KeywordSet([
 	'status-bar',
 ])
 
-/** Keyword values for <absolute-size> and <relative-size> */
+//  Keyword values for <absolute-size> and <relative-size>
 const SIZE_KEYWORDS = new KeywordSet([
 	'xx-small',
 	'x-small',
@@ -32,10 +32,8 @@ const SIZE_KEYWORDS = new KeywordSet([
 	'larger',
 ])
 
-/**
- * Identifier keywords that appear before font-size in the font shorthand:
- * font-style, font-variant, font-weight (keyword form), font-stretch, and "normal"
- */
+// Identifier keywords that appear before font-size in the font shorthand:
+// font-style, font-variant, font-weight (keyword form), font-stretch, and "normal"
 const PRE_SIZE_KEYWORDS = new KeywordSet([
 	// font-style
 	'italic',
@@ -61,21 +59,6 @@ const PRE_SIZE_KEYWORDS = new KeywordSet([
 
 const SLASH = 47 // '/'.charCodeAt(0)
 
-/**
- * Parse the CSS `font` shorthand value and extract its structural components.
- *
- * Grammar:
- *   font: [<font-style> || <font-variant> || <font-weight> || <font-stretch>]?
- *         <font-size>[/<line-height>]? <font-family>
- *
- * Does NOT handle system fonts (caption, icon, menu, …) — the caller should
- * check SYSTEM_FONTS before calling this function.
- *
- * Returns null when the value is a single var() and can't be decomposed.
- *
- * @param value - The VALUE CSSNode for a `font` declaration
- * @param cb    - Called for every global CSS keyword found in the value (e.g. inherit)
- */
 export type FontShorthand = {
 	font_size?: string
 	line_height?: string
@@ -84,6 +67,12 @@ export type FontShorthand = {
 	keywords: string[]
 }
 
+// Grammar:
+//   font: [<font-style> || <font-variant> || <font-weight> || <font-stretch>]?
+//         <font-size>[/<line-height>]? <font-family>
+//
+// System fonts (caption, icon, menu, ...) are not handled: check SYSTEM_FONTS first.
+/** Split a `font` shorthand value into font size, line height, family and global keywords; `null` for a lone `var()` */
 export function destructure_font_shorthand(input: ValueInput): FontShorthand | null {
 	const value = as_value(input)
 	const found_keywords: string[] = []

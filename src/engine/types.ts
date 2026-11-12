@@ -48,10 +48,7 @@ export type ContextCountResult<T extends CountItem = string> = CountResult<T> & 
 
 type ByContext = Pick<ContextCountResult, 'by_context'>
 
-/**
- * The result of a collector that can count per context: `by_context` exists exactly when
- * the `contexts` option is `true`, and is optional when the option is only known to be a boolean.
- */
+/** `by_context` exists exactly when `contexts` is `true`, and is optional when that is only known to be a boolean */
 export type WithContexts<
 	R extends CountResult<CountItem>,
 	O extends ContextCountOptions,
@@ -73,10 +70,7 @@ export type CountOptions = {
 export type ContextCountOptions = CountOptions & {
 	/** Also count per context (e.g. per property) in `by_context`. Without it there is no `by_context`. */
 	contexts?: boolean
-	/**
-	 * How properties are named in `by_context`: `normalized` (default: lowercase, no vendor prefix or hack
-	 * character, so `-webkit-box-shadow` is `box-shadow`) or `as_written`.
-	 */
+	/** `normalized` (default: lowercase, no vendor prefix or hack character) or `as_written` */
 	property?: 'normalized' | 'as_written'
 }
 
@@ -106,27 +100,17 @@ export type DeclarationContext = Context & {
 	readonly value_text: string
 	/** Parsed value node, `undefined` when values are not parsed (see `parse.values`) */
 	readonly value: Value | undefined
-	/**
-	 * Value text without a trailing IE hack (`\\9`, `\\7`). `undefined` when the value is not parsed
-	 * or is a global keyword (`inherit`, `initial`, `none`, ...).
-	 */
+	/** Value text without a trailing IE hack (`\\9`, `\\7`); `undefined` for unparsed values and global keywords */
 	readonly clean_value_text: string | undefined
-	/**
-	 * The `font` shorthand split into size, line-height and family; shared by every collector that asks.
-	 * `null` for other properties, system fonts, global keywords and values that cannot be split (`var()`).
-	 */
+	/** The `font` shorthand split into size, line-height and family; `null` for other properties, system fonts, global keywords and `var()` */
 	readonly font_shorthand: FontShorthand | null
 }
 
 type DeclarationHandler = (node: Declaration, ctx: DeclarationContext) => void
 
 /**
- * What a collector subscribes to. The engine walks the CSS once and calls only the handlers that exist.
- *
- * The `ctx` that handlers receive is ONE shared, mutable object that the engine reuses for every node
- * (facts are computed lazily and cached per node). It is only valid during the handler call: read what
- * you need from it right away and never store `ctx` (or a node) for later, or you will read the data
- * of a different node. Copy values (strings, numbers) instead.
+ * What a collector subscribes to. The `ctx` that handlers receive is one shared object that the engine
+ * reuses for every node: read what you need right away and never store `ctx` or a node.
  */
 export type CollectorInstance<T> = {
 	/** Extra parsing this collector needs. Selectors/values are implied by `selector`/`value` subscriptions. */
@@ -134,11 +118,7 @@ export type CollectorInstance<T> = {
 	stylesheet?: (node: StyleSheet, ctx: StylesheetContext) => void
 	rule?: (node: Rule, ctx: Context) => void
 	atrule?: (node: Atrule, ctx: Context) => void
-	/**
-	 * Every selector of a style rule, except those in `@keyframes` (keyframe selectors are `rule`s
-	 * inside `@keyframes`) and those in at-rule preludes (`@scope`, `@supports selector()`).
-	 * It gets no context: use `rule` when you need `ctx.depth` or `ctx.atrule_stack`.
-	 */
+	/** Selectors of style rules, not keyframe selectors or selectors in at-rule preludes. Gets no `ctx`: use `rule` for `depth` or `atrule_stack` */
 	selector?: (node: Selector) => void
 	declaration?: {
 		/** Normalized property names; the handler is skipped for other declarations */
