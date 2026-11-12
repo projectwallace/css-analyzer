@@ -28,6 +28,30 @@ const PSEUDO_FUNCTIONS = new KeywordSet([
 	'-moz-any',
 ])
 
+/**
+ * Pseudo-classes and pseudo-elements whose argument is a selector.
+ * Arguments of other functional pseudos (e.g. `::highlight(name)`, `:state(name)`)
+ * are parsed as selectors too, but they are custom identifiers, not selectors.
+ */
+export const SELECTOR_ARG_PSEUDOS: KeywordSet = new KeywordSet([
+	'is',
+	'where',
+	'not',
+	'has',
+	'matches',
+	'-webkit-any',
+	'-moz-any',
+	'nth-child',
+	'nth-last-child',
+	'host',
+	'host-context',
+	'slotted',
+	'cue',
+	'current',
+	'past',
+	'future',
+])
+
 export function isPrefixed(selector: CSSNode, on_selector: (prefix: string) => void): void {
 	walk(selector, function (node) {
 		if (
