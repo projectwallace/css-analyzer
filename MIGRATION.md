@@ -7,6 +7,7 @@
 - `analyze()` throws a `TypeError` when you pass a parsed stylesheet that was parsed without the selectors, values or at-rule preludes your collectors need (it never reports silent zeros). Pass CSS text, or parse with the parser's defaults.
 - `unique` and `by_context` are `Map`s, not plain objects. Use `to_json(result)` to get plain data for `JSON.stringify()`.
 - All names are `snake_case`.
+- **Selectors inside at-rule preludes are no longer in the data**: `@scope (.card) to (.content)` and `@supports selector(:has(a))`. 9.x counted them; now `selectors()`, `specificity()` and `stylesheet()` all leave them out, so `selectors().total`, the specificity results and `stylesheet().source_lines_of_code` / `complexity` can be lower than in 9.x for CSS that uses these at-rules (all other CSS gives the same numbers). Selectors of style rules inside these at-rules are still counted.
 - `DefinedUsed` and `KeywordSet` moved from the package root to `@projectwallace/css-analyzer/utils/collections`.
 - Need the 9.x report shape in one call? `analyze_compat` is tracked in [#649](https://github.com/projectwallace/css-analyzer/pull/649); `analyze_all()` returns the same data under new keys (see the table below).
 
@@ -82,8 +83,6 @@ Rules of thumb:
 - `stylesheet().embedded` uses the standard count shape: `{ total, total_unique, unique: Map<mime type, { count, locations? }>, size }`. The per-type `size` of 9.x is gone; `size` is the total of all embedded content.
 - Embedded `data:` URIs in `@import` preludes are not counted (only `url()` values).
 - `animation-name: red` is no longer counted as a color (9.x counted it).
-- Selectors inside at-rule preludes (`@scope (.card) to (.content)`, `@supports selector(:has(a))`) are not counted as selectors. 9.x counted them in `selectors`, `specificity` and `stylesheet.sourceLinesOfCode`/`complexity`; they now count in none of them, so `stylesheet().source_lines_of_code` and `complexity` can be lower than 9.x for CSS with `@scope` or `@supports selector()`. For all other CSS the numbers are equal to 9.x.
-- Specificity of `:host()`, `:host-context()` and `:nth-child(… of …)` counts the compound selector in the argument once. 9.x counted every part of it again from its own position onward, so `:host(.a.b.c)` was `[0,7,0]`; it is `[0,4,0]` now.
 
 ## Utilities
 

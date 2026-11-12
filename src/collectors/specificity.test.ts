@@ -320,3 +320,12 @@ test('does not double count nested pseudo-class functions', () => {
 		[0, 0, 0],
 	])
 })
+
+// 9.x counted these selectors; v10 only counts the selectors of style rules (a breaking change)
+test.each([
+	['@scope', '@scope (.a) { b {} }', ['0,0,1']],
+	['@scope with a limit', '@scope (#a) to (.b) { c {} }', ['0,0,1']],
+	['@supports selector()', '@supports selector(:has(#a)) { b.c {} }', ['0,1,1']],
+])('selectors in at-rule preludes have no specificity: %s', (_name, css, expected) => {
+	expect(run(css).items.map((item) => item.join(','))).toEqual(expected)
+})
