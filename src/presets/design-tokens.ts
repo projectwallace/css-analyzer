@@ -15,7 +15,9 @@ import {
 	font_sizes,
 	gradients,
 	line_heights,
+	text_shadows,
 	timing_functions,
+	units,
 } from '../collectors/index.ts'
 import type { ColorsResult } from '../collectors/colors.ts'
 
@@ -29,6 +31,8 @@ export type DesignTokensCollectors = {
 	border_radiuses: CollectorDef<ContextCountResult>
 	durations: CollectorDef<CountResult>
 	timing_functions: CollectorDef<CountResult>
+	text_shadows: CollectorDef<CountResult>
+	units: CollectorDef<ContextCountResult>
 }
 
 export type DesignTokens = ResultOf<DesignTokensCollectors>
@@ -37,8 +41,9 @@ export type DesignTokens = ResultOf<DesignTokensCollectors>
 export type DesignTokensOptions = Pick<CountOptions, 'locations'>
 
 /**
- * Everything a design-token extractor needs. Spread it to add your own collectors:
- * `{ ...design_tokens_collectors({ locations: true }), z_indexes: z_indexes() }`.
+ * Everything a design-token extractor needs. Spread it to add your own collectors or to replace
+ * one with different options:
+ * `{ ...design_tokens_collectors({ locations: true }), colors: colors({ normalize: 'none' }) }`.
  */
 export function design_tokens_collectors(
 	options: DesignTokensOptions = {},
@@ -54,6 +59,8 @@ export function design_tokens_collectors(
 		border_radiuses: border_radiuses({ contexts: true, locations }),
 		durations: durations({ locations }),
 		timing_functions: timing_functions({ locations }),
+		text_shadows: text_shadows({ locations }),
+		units: units({ contexts: true, locations }),
 	}
 }
 

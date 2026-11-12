@@ -82,6 +82,15 @@ test('Presets can be spread and extended', () => {
 	expect(result.colors.unique.get('red')?.locations).toHaveLength(3)
 })
 
+test('Presets: replace a collector to give it options', () => {
+	const result = analyze('a { color: RED }', {
+		...design_tokens_collectors(),
+		colors: colors({ normalize: 'none' }),
+	})
+	expect([...result.colors.unique.keys()]).toEqual(['RED'])
+	expect(result.font_sizes.total).toBe(0)
+})
+
 test('Typing a collector map', () => {
 	const collectors: {
 		colors: ReturnType<typeof colors<{ contexts: true }>>

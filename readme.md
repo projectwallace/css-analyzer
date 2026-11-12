@@ -104,13 +104,24 @@ Use `summarize_numbers(result.sizes)` for min, max, mean, mode, median, range an
 ```js
 import { analyze_design_tokens, analyze_all } from '@projectwallace/css-analyzer/presets'
 
-analyze_design_tokens(css) // colors, font_sizes, font_families, line_heights, gradients, box_shadows, border_radiuses, durations, timing_functions
+analyze_design_tokens(css) // colors, font_sizes, font_families, line_heights, gradients, box_shadows, border_radiuses, durations, timing_functions, text_shadows, units
 analyze_all(css) // every collector, flat: result.colors, result.atrules, result.selectors, ...
 analyze_design_tokens(css, { locations: true }) // locations for every collector
 ```
 
 Each preset also exists as a function that returns a collector map (`design_tokens_collectors(options)`, `all_collectors(options)`), which you can spread, narrow or extend. The keys are the collector names.
 `analyze(css, { ...design_tokens_collectors({ locations: true }), z_indexes: z_indexes() })`.
+
+#### Design tokens
+
+`analyze_design_tokens` has 11 collectors: `colors`, `font_sizes`, `font_families`, `line_heights`, `gradients`, `box_shadows`, `border_radiuses`, `durations`, `timing_functions`, `text_shadows` and `units`. The result is keyed by collector name, like every other result: `result.colors`, `result.units`, ...
+`colors`, `border_radiuses` and `units` also have `by_context` (counts per property). It deliberately leaves out `z_indexes`, `displays`, `keywords` and everything about selectors, rules and at-rules.
+
+The preset takes the global `locations` option only. To give one collector other options, spread the preset and replace that collector:
+
+```js
+analyze(css, { ...design_tokens_collectors(), colors: colors({ normalize: 'none' }) })
+```
 
 ### Typing a collector map
 
