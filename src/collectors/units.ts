@@ -8,7 +8,7 @@ import type {
 	WithContexts,
 } from '../engine/types.ts'
 import { get_context_property } from './shared.ts'
-import { NO_VALUE_WALK } from './value-helpers.ts'
+import { no_value_walk } from './value-helpers.ts'
 
 // Dimensions in `font-family`, `transition`, `animation` and `z-index` are not counted
 // (their numbers are names or timings: `animation: 2s` is not a length).
@@ -23,7 +23,7 @@ export function units<O extends ContextCountOptions = {}>(
 			value: {
 				types: [DIMENSION],
 				enter(node, ctx) {
-					if (NO_VALUE_WALK.has(ctx.property)) {
+					if (no_value_walk.has(ctx.property)) {
 						return
 					}
 					counter.add(

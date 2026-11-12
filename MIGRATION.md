@@ -5,7 +5,7 @@
 - **Node.js >= 22.18** (was >= 18). The source uses `.ts` import specifiers; the published package is plain ES modules plus types.
 - `analyze()` takes collectors and returns only what they report (see below).
 - `unique` and `by_context` are `Map`s, not plain objects: `JSON.stringify()` turns them into `{}`. Use `Object.fromEntries(result.unique)` when you need a plain object.
-- All names are `snake_case`.
+- All names are `snake_case`, constants included. The former `ALL_CAPS` constants (`SYSTEM_FONTS`, `NO_VALUE_WALK`, `TIMING_KEYWORDS`, ...) were module internals and never part of the public API, so there is nothing to rename in your code.
 - **Selectors inside at-rule preludes are no longer in the data**: `@scope (.card) to (.content)` and `@supports selector(:has(a))`. 9.x counted them; now `selectors()`, `specificity()` and `stylesheet()` all leave them out, so `selectors().total`, the specificity results and `stylesheet().source_lines_of_code` / `complexity` can be lower than in 9.x for CSS that uses these at-rules (all other CSS gives the same numbers). Selectors of style rules inside these at-rules are still counted.
 - `DefinedUsed` and `KeywordSet` moved from the package root to `@projectwallace/css-analyzer/utils/collections`.
 - Need the 9.x report shape in one call? `analyze_compat` is tracked in [#649](https://github.com/projectwallace/css-analyzer/pull/649); `analyze_all()` returns the same data under new keys (see the table below).

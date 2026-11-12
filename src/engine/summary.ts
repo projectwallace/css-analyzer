@@ -12,7 +12,7 @@ export type NumberSummary = {
 	median: number
 }
 
-const EMPTY: NumberSummary = {
+const empty_summary: NumberSummary = {
 	total: 0,
 	min: 0,
 	max: 0,
@@ -27,7 +27,7 @@ const EMPTY: NumberSummary = {
 export function summarize_frequencies(frequencies: ReadonlyMap<number, number>): NumberSummary {
 	const values = [...frequencies.keys()].sort((a, b) => a - b)
 	if (values.length === 0) {
-		return { ...EMPTY }
+		return { ...empty_summary }
 	}
 
 	let total = 0

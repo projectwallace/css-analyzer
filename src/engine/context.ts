@@ -10,7 +10,7 @@ import {
 	strip_value_hack,
 } from '@projectwallace/css-parser'
 import {
-	SYSTEM_FONTS,
+	system_fonts,
 	destructure_font_shorthand,
 	type FontShorthand,
 } from '../values/destructure-font-shorthand.ts'
@@ -28,7 +28,7 @@ export type ContextController = {
 }
 
 //  Cache marker for facts whose computed value can itself be `undefined` or `null`
-const NOT_COMPUTED = Symbol('not-computed-yet')
+const not_computed = Symbol('not-computed-yet')
 
 // Builds the shared context object. Facts are lazy and memoized per node:
 // whoever asks first pays, everybody else reads the cached value.
@@ -39,9 +39,9 @@ export function create_context(): ContextController {
 	let property_cache: string | undefined
 	let raw_property_cache: string | undefined
 	let value_text_cache: string | undefined
-	let value_cache: Value | undefined | typeof NOT_COMPUTED = NOT_COMPUTED
-	let clean_text_cache: string | undefined | typeof NOT_COMPUTED = NOT_COMPUTED
-	let font_cache: FontShorthand | null | typeof NOT_COMPUTED = NOT_COMPUTED
+	let value_cache: Value | undefined | typeof not_computed = not_computed
+	let clean_text_cache: string | undefined | typeof not_computed = not_computed
+	let font_cache: FontShorthand | null | typeof not_computed = not_computed
 	const atrule_stack: string[] = []
 	let depth = 0
 
@@ -80,7 +80,7 @@ export function create_context(): ContextController {
 			return value_text_cache
 		},
 		get clean_value_text() {
-			if (clean_text_cache === NOT_COMPUTED) {
+			if (clean_text_cache === not_computed) {
 				const text = ctx.value_text
 				clean_text_cache =
 					ctx.value && !keywords.has(text)
@@ -92,17 +92,17 @@ export function create_context(): ContextController {
 			return clean_text_cache
 		},
 		get font_shorthand() {
-			if (font_cache === NOT_COMPUTED) {
+			if (font_cache === not_computed) {
 				const text = ctx.clean_value_text
 				font_cache =
-					ctx.property === 'font' && text !== undefined && !SYSTEM_FONTS.has(text)
+					ctx.property === 'font' && text !== undefined && !system_fonts.has(text)
 						? destructure_font_shorthand(ctx.value!)
 						: null
 			}
 			return font_cache
 		},
 		get value() {
-			if (value_cache === NOT_COMPUTED) {
+			if (value_cache === not_computed) {
 				// Values that were not parsed (see `parse.values`) are RAW nodes
 				const value = declaration?.value
 				value_cache = value && !is_raw(value) ? value : undefined
@@ -125,9 +125,9 @@ export function create_context(): ContextController {
 			property_cache = undefined
 			raw_property_cache = undefined
 			value_text_cache = undefined
-			value_cache = NOT_COMPUTED
-			clean_text_cache = NOT_COMPUTED
-			font_cache = NOT_COMPUTED
+			value_cache = not_computed
+			clean_text_cache = not_computed
+			font_cache = not_computed
 		},
 		enter_atrule(atrule) {
 			atrule_stack.push(property_basename(atrule.name))

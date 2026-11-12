@@ -19,7 +19,7 @@ import { unquote } from '../utils/string-utils.ts'
 import { type SelectorInput, as_selectors } from '../utils/input.ts'
 import type { Location } from '../utils/location.ts'
 
-const PSEUDO_FUNCTIONS = new KeywordSet([
+const pseudo_functions = new KeywordSet([
 	'nth-child',
 	'where',
 	'not',
@@ -144,7 +144,7 @@ function selector_complexity(selector: CSSNode): number {
 		if (is_pseudo_class_selector(node)) {
 			const name = node.name
 
-			if (PSEUDO_FUNCTIONS.has(name.toLowerCase())) {
+			if (pseudo_functions.has(name.toLowerCase())) {
 				// Find child selectors and recursively calculate their complexity
 				const child_complexities: number[] = []
 

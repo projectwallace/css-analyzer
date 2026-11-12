@@ -3,7 +3,7 @@ import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts
 import { analyze_animation } from '../values/animations.ts'
 import { keywords as global_keywords } from '../values/values.ts'
 import { define_counting_collector } from './shared.ts'
-import { NO_VALUE_WALK } from './value-helpers.ts'
+import { no_value_walk } from './value-helpers.ts'
 
 /** Global keywords (`inherit`, `none`, `auto`, ...) used as values, lowercased */
 export function keywords(options: CountOptions = {}): CollectorDef<CountResult> {
@@ -34,7 +34,7 @@ export function keywords(options: CountOptions = {}): CollectorDef<CountResult> 
 				types: [IDENTIFIER],
 				enter(node, ctx) {
 					// Whole-value keywords and shorthands were handled above
-					if (NO_VALUE_WALK.has(ctx.property) || ctx.property === 'font') {
+					if (no_value_walk.has(ctx.property) || ctx.property === 'font') {
 						return
 					}
 					if (global_keywords.has(ctx.value_text)) {

@@ -8,7 +8,7 @@ export type DurationsOptions = CountOptions & {
 	normalize?: Normalize
 }
 
-const PROPERTIES = new Set(['transition', 'animation', 'transition-duration', 'animation-duration'])
+const properties = new Set(['transition', 'animation', 'transition-duration', 'animation-duration'])
 
 /** Durations of `transition` and `animation` (and their `-duration` longhands). Delays are not counted. */
 export function durations(options: DurationsOptions = {}): CollectorDef<CountResult> {
@@ -18,7 +18,7 @@ export function durations(options: DurationsOptions = {}): CollectorDef<CountRes
 		return {
 			parse: { values: true },
 			declaration: {
-				properties: PROPERTIES,
+				properties,
 				enter(_node, ctx) {
 					if (ctx.clean_value_text === undefined) {
 						return

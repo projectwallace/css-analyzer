@@ -33,14 +33,14 @@ function find_hacks(
 	return hacks
 }
 
-const WHITESPACE_REGEX = /\s+/g
+const whitespace_regex = /\s+/g
 
 /** Find @supports browserhacks (`-webkit-appearance: none`, `-moz-appearance: meterbar`) */
 export function get_supports_browserhacks(input: PreludeInput): string[] {
 	return find_hacks('supports', input, function (node, on_hack) {
 		// Check SupportsQuery nodes for browserhack patterns
 		if (is_supports_query(node)) {
-			const normalized_prelude = node.value.toString().replaceAll(WHITESPACE_REGEX, '')
+			const normalized_prelude = node.value.toString().replaceAll(whitespace_regex, '')
 
 			// Check for known browserhack patterns
 			if (str_index_of('-webkit-appearance:none', normalized_prelude) !== -1) {

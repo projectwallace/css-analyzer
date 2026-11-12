@@ -1,7 +1,7 @@
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 import { define_counting_collector } from './shared.ts'
 
-const PROPERTIES = new Set(['z-index'])
+const properties = new Set(['z-index'])
 
 /** The values of every `z-index` declaration, as written */
 export function z_indexes(options: CountOptions = {}): CollectorDef<CountResult> {
@@ -9,7 +9,7 @@ export function z_indexes(options: CountOptions = {}): CollectorDef<CountResult>
 		return {
 			parse: { values: true },
 			declaration: {
-				properties: PROPERTIES,
+				properties,
 				enter(_node, ctx) {
 					const text = ctx.clean_value_text
 					if (text === undefined) {

@@ -1,7 +1,7 @@
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 import { define_counting_collector } from './shared.ts'
 
-const PROPERTIES = new Set(['text-shadow'])
+const properties = new Set(['text-shadow'])
 
 /** The whole `text-shadow` value, as written */
 export function text_shadows(options: CountOptions = {}): CollectorDef<CountResult> {
@@ -9,7 +9,7 @@ export function text_shadows(options: CountOptions = {}): CollectorDef<CountResu
 		return {
 			parse: { values: true },
 			declaration: {
-				properties: PROPERTIES,
+				properties,
 				enter(_node, ctx) {
 					const text = ctx.clean_value_text
 					if (text !== undefined) {

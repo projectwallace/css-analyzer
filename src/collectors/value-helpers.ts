@@ -16,7 +16,7 @@ import { keywords } from '../values/values.ts'
 // `font-family: Black` (a font, not a color), `animation: red 1s` (an animation name, not a color),
 // `transition` and `animation` (names and timings; their durations and timing functions have their
 // own collectors) and `z-index` (a number). `colors()` also skips `animation-name`.
-export const NO_VALUE_WALK: ReadonlySet<string> = new Set([
+export const no_value_walk: ReadonlySet<string> = new Set([
 	'font-family',
 	'transition',
 	'animation',

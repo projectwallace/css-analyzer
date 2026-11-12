@@ -8,7 +8,7 @@ export type TimingFunctionsOptions = CountOptions & {
 	normalize?: Normalize
 }
 
-const PROPERTIES = new Set([
+const properties = new Set([
 	'transition',
 	'animation',
 	'transition-timing-function',
@@ -23,7 +23,7 @@ export function timing_functions(options: TimingFunctionsOptions = {}): Collecto
 		return {
 			parse: { values: true },
 			declaration: {
-				properties: PROPERTIES,
+				properties,
 				enter(_node, ctx) {
 					if (ctx.clean_value_text === undefined) {
 						return

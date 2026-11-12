@@ -13,7 +13,7 @@ pnpm build       # build + publint
 
 ## Code style
 
-- `snake_case` for functions, variables, parameters, options and result keys. `PascalCase` for types and classes.
+- `snake_case` for functions, variables, constants (`system_fonts`, not `SYSTEM_FONTS`), parameters, options and result keys. `PascalCase` for types and classes.
 - `const` wherever possible; `let` only for bindings that are reassigned.
 - Functions are declarations (`function my_fn() {}`), never `const my_fn = () => {}`. Arrow functions are fine as inline callbacks.
 - Keep JSDoc to a minimum: a short `/** ... */` on what the package exports (it ends up in the `.d.ts` files, which are part of the package size), plain `//` comments for everything else and for the reasoning behind the code. The build drops JSDoc from the JavaScript.

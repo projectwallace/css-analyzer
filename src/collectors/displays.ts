@@ -3,7 +3,7 @@ import { keywords as global_keywords } from '../values/values.ts'
 import { define_counting_collector } from './shared.ts'
 import { lowercase_unless_var } from './value-helpers.ts'
 
-const PROPERTIES = new Set(['display'])
+const properties = new Set(['display'])
 
 /** Values of `display`, lowercased (values with `var()` are kept as written) */
 export function displays(options: CountOptions = {}): CollectorDef<CountResult> {
@@ -11,7 +11,7 @@ export function displays(options: CountOptions = {}): CollectorDef<CountResult> 
 		return {
 			parse: { values: true },
 			declaration: {
-				properties: PROPERTIES,
+				properties,
 				enter(_node, ctx) {
 					const raw = ctx.value_text
 					// `display: ` has no value to count

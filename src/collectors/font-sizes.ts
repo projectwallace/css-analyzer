@@ -1,6 +1,6 @@
 import { str_index_of } from '@projectwallace/css-parser'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
-import { SYSTEM_FONTS } from '../values/destructure-font-shorthand.ts'
+import { system_fonts } from '../values/destructure-font-shorthand.ts'
 import { define_counting_collector, type Normalize } from './shared.ts'
 import { lowercase_unless_var } from './value-helpers.ts'
 
@@ -11,7 +11,7 @@ export type FontSizesOptions = CountOptions & {
 	skip_var?: boolean
 }
 
-const PROPERTIES = new Set(['font-size', 'font'])
+const properties = new Set(['font-size', 'font'])
 
 export function font_sizes(options: FontSizesOptions = {}): CollectorDef<CountResult> {
 	const lowercase = options.normalize !== 'none'
@@ -20,7 +20,7 @@ export function font_sizes(options: FontSizesOptions = {}): CollectorDef<CountRe
 		return {
 			parse: { values: true },
 			declaration: {
-				properties: PROPERTIES,
+				properties,
 				enter(_node, ctx) {
 					const text =
 						ctx.property === 'font' ? ctx.font_shorthand?.font_size : ctx.clean_value_text
@@ -31,7 +31,7 @@ export function font_sizes(options: FontSizesOptions = {}): CollectorDef<CountRe
 						return
 					}
 					// The font shorthand never reaches this point for system fonts and global keywords
-					if (ctx.property === 'font-size' && SYSTEM_FONTS.has(text)) {
+					if (ctx.property === 'font-size' && system_fonts.has(text)) {
 						return
 					}
 					counter.add(lowercase ? lowercase_unless_var(text) : text, ctx.value!)

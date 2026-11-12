@@ -9,7 +9,7 @@ import { KeywordSet } from '../utils/collections/keyword-set.ts'
 import { type ValueInput, as_value } from '../utils/input.ts'
 import { keywords } from './values.ts'
 
-export const SYSTEM_FONTS: KeywordSet = new KeywordSet([
+export const system_fonts: KeywordSet = new KeywordSet([
 	'caption',
 	'icon',
 	'menu',
@@ -19,7 +19,7 @@ export const SYSTEM_FONTS: KeywordSet = new KeywordSet([
 ])
 
 //  Keyword values for <absolute-size> and <relative-size>
-const SIZE_KEYWORDS = new KeywordSet([
+const size_keywords = new KeywordSet([
 	'xx-small',
 	'x-small',
 	'small',
@@ -34,7 +34,7 @@ const SIZE_KEYWORDS = new KeywordSet([
 
 // Identifier keywords that appear before font-size in the font shorthand:
 // font-style, font-variant, font-weight (keyword form), font-stretch, and "normal"
-const PRE_SIZE_KEYWORDS = new KeywordSet([
+const pre_size_keywords = new KeywordSet([
 	// font-style
 	'italic',
 	'oblique',
@@ -57,7 +57,7 @@ const PRE_SIZE_KEYWORDS = new KeywordSet([
 	'normal',
 ])
 
-const SLASH = 47 // '/'.charCodeAt(0)
+const slash = 47 // '/'.charCodeAt(0)
 
 export type FontShorthand = {
 	font_size?: string
@@ -71,7 +71,7 @@ export type FontShorthand = {
 //   font: [<font-style> || <font-variant> || <font-weight> || <font-stretch>]?
 //         <font-size>[/<line-height>]? <font-family>
 //
-// System fonts (caption, icon, menu, ...) are not handled: check SYSTEM_FONTS first.
+// System fonts (caption, icon, menu, ...) are not handled: check system_fonts first.
 /** Split a `font` shorthand value into font size, line height, family and global keywords; `null` for a lone `var()` */
 export function destructure_font_shorthand(input: ValueInput): FontShorthand | null {
 	const value = as_value(input)
@@ -104,7 +104,7 @@ export function destructure_font_shorthand(input: ValueInput): FontShorthand | n
 	let slash_index = -1
 	for (let i = 0; i < value.child_count; i++) {
 		const child = children[i]
-		if (child && is_operator(child) && child.text.charCodeAt(0) === SLASH) {
+		if (child && is_operator(child) && child.text.charCodeAt(0) === slash) {
 			slash_index = i
 			break
 		}
@@ -115,13 +115,13 @@ export function destructure_font_shorthand(input: ValueInput): FontShorthand | n
 		// Step 2: no slash — scan left-to-right to locate font-size.
 		//
 		// Pre-font-size tokens to skip:
-		//   • IDENTIFIER matching PRE_SIZE_KEYWORDS (bold, italic, condensed, …)
+		//   • IDENTIFIER matching pre_size_keywords (bold, italic, condensed, …)
 		//   • IDENTIFIER matching global keywords (inherit, initial, …)
 		//   • NUMBER (font-weight like 400, 700)
 		//
 		// Font-size tokens that end the pre-font-size section:
 		//   • DIMENSION  (e.g. 16px, 1.2em)
-		//   • IDENTIFIER in SIZE_KEYWORDS (small, large, medium, …)
+		//   • IDENTIFIER in size_keywords (small, large, medium, …)
 		//   • FUNCTION   (calc(), var(), …)
 		//
 		// Anything else signals we've reached font-family without a
@@ -147,12 +147,12 @@ export function destructure_font_shorthand(input: ValueInput): FontShorthand | n
 
 			if (is_identifier(child)) {
 				const name = child.name
-				if (SIZE_KEYWORDS.has(name)) {
+				if (size_keywords.has(name)) {
 					font_size = child.text
 					font_family_start = i + 1
 					break
 				}
-				if (PRE_SIZE_KEYWORDS.has(name) || keywords.has(name)) {
+				if (pre_size_keywords.has(name) || keywords.has(name)) {
 					continue
 				}
 				// Unrecognised identifier: treat as start of font-family.

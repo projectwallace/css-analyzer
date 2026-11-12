@@ -17,7 +17,7 @@ import { create_context } from './context.ts'
 import type { CollectorInstance, CollectorMap, ResultOf, ParseOptions } from './types.ts'
 
 // Keyframe selectors (`from`, `50%`) are not selectors in the sense of the selector metrics
-const KEYFRAMES = new Set<Lowercase<string>>(['keyframes'])
+const skip_atrules = new Set<Lowercase<string>>(['keyframes'])
 
 type DeclarationSubscription = NonNullable<CollectorInstance<unknown>['declaration']>
 type ValueSubscription = Omit<NonNullable<CollectorInstance<unknown>['value']>, 'types'>
@@ -208,7 +208,7 @@ export function analyze<C extends CollectorMap>(input: string, collectors: C): R
 					handler(selector)
 				}
 			},
-			{ skip_atrules: KEYFRAMES, skip_atrule_preludes: true },
+			{ skip_atrules: skip_atrules, skip_atrule_preludes: true },
 		)
 	}
 

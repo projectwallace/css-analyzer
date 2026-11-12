@@ -119,8 +119,8 @@ export type AtrulesResult = CountResult & {
 	nesting: CountResult<number>
 }
 
-const CONTAINER_PROPERTIES = new Set(['container-name', 'container'])
-const ANIMATION_PROPERTIES = new Set(['animation', 'animation-name'])
+const container_properties = new Set(['container-name', 'container'])
+const animation_properties = new Set(['animation', 'animation-name'])
 
 /** Every at-rule by name, with a breakdown per kind and the defined and used names of keyframes, containers, layers and `@property` */
 export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult> {
@@ -248,7 +248,7 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 				complexity.add(get_atrule_weight(node, name, true, hacks), node)
 			},
 			declaration: {
-				properties: new Set([...CONTAINER_PROPERTIES, ...ANIMATION_PROPERTIES]),
+				properties: new Set([...container_properties, ...animation_properties]),
 				enter(_node, ctx) {
 					const value = ctx.value
 					if (ctx.clean_value_text === undefined || !value) {

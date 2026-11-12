@@ -16,7 +16,7 @@ import type {
 } from '../engine/types.ts'
 import { color_functions, color_keywords, named_colors, system_colors } from '../values/colors.ts'
 import { get_context_property, type Normalize } from './shared.ts'
-import { NO_VALUE_WALK } from './value-helpers.ts'
+import { no_value_walk } from './value-helpers.ts'
 
 export type ColorsOptions = ContextCountOptions & {
 	/** `lowercase` (default) lowercases hex colors and color names. Color functions are always kept as written. */
@@ -53,7 +53,7 @@ export function colors<O extends ColorsOptions = {}>(
 				enter(node, ctx) {
 					const property = ctx.property
 					// `animation-name: red` is a name, not a color
-					if (NO_VALUE_WALK.has(property) || property === 'animation-name') {
+					if (no_value_walk.has(property) || property === 'animation-name') {
 						return
 					}
 					const context = get_context_property(ctx, options?.property)
