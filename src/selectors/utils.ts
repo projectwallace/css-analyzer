@@ -144,7 +144,7 @@ function selector_complexity(selector: CSSNode): number {
 		if (is_pseudo_class_selector(node)) {
 			const name = node.name
 
-			if (pseudo_functions.has(name.toLowerCase())) {
+			if (pseudo_functions.has(name)) {
 				// Find child selectors and recursively calculate their complexity
 				const child_complexities: number[] = []
 

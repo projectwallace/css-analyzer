@@ -56,6 +56,8 @@ test.each<[string, number]>([
 	['[attr]', 1],
 	['[attr=value]', 2],
 	[':where(#id, .class)', 3],
+	[':WHERE(#id, .class)', 3],
+	['main > :IS(h1, h2)', 5],
 	['main > :is(h1, h2)', 5],
 	['input[type=text]::-webkit-input-placeholder', 5],
 	['::-webkit-scrollbar', 2],

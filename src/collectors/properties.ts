@@ -1,4 +1,10 @@
-import { is_function, is_identifier, FUNCTION, property_basename } from '@projectwallace/css-parser'
+import {
+	is_function,
+	is_identifier,
+	FUNCTION,
+	property_basename,
+	is_custom,
+} from '@projectwallace/css-parser'
 import { DefinedUsed, type DefinedUsedResult } from '../utils/collections/defined-used.ts'
 import { create_counter } from '../engine/counter.ts'
 import { define_collector } from '../engine/define-collector.ts'
@@ -24,10 +30,6 @@ export type PropertiesResult = CountResult & {
 	complexity: CountResult<number>
 	/** `anchor-name` / `position-anchor` names, defined and used */
 	anchor_names: DefinedUsedResult
-}
-
-function is_custom_name(name: string): boolean {
-	return name.startsWith('--')
 }
 
 /** Properties (normalized: `-webkit-transition` is `transition`), prefixes, custom properties, shorthands, hacks and anchor names */
@@ -85,13 +87,13 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 					if (ctx.property === 'anchor-name') {
 						for (const item of get_list_items(ctx.value!)) {
 							const text = is_identifier(item) ? item.text : undefined
-							if (text !== undefined && is_custom_name(text)) {
+							if (text !== undefined && is_custom(text)) {
 								anchor_tracking.define(text)
 							}
 						}
 					} else if (ctx.property === 'position-anchor') {
 						const name = get_first_identifier(ctx.value!)
-						if (name !== undefined && is_custom_name(name)) {
+						if (name !== undefined && is_custom(name)) {
 							anchor_tracking.use(name)
 						}
 					}
@@ -105,7 +107,7 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 						return
 					}
 					const first = get_first_identifier(node)
-					if (first === undefined || !is_custom_name(first)) {
+					if (first === undefined || !is_custom(first)) {
 						return
 					}
 					if (name === 'var') {

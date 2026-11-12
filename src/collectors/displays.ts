@@ -18,7 +18,7 @@ export function displays(options: CountOptions = {}): CollectorDef<CountResult> 
 					if (!ctx.value || raw === '') {
 						return
 					}
-					const text = global_keywords.has(raw) ? raw.toLowerCase() : ctx.clean_value_text
+					const text = global_keywords.has(raw) ? raw : ctx.clean_value_text
 					counter.add(lowercase_unless_var(text!), ctx.value)
 				},
 			},
