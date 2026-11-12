@@ -206,8 +206,9 @@ function parts_specificity(first: SelectorNode | null, until_combinator = false)
 			case TYPE_SELECTOR: {
 				// Omit namespace
 				let type_selector = current.name ?? ''
-				if (type_selector.includes('|')) {
-					type_selector = type_selector.split('|')[1] ?? ''
+				const namespace = type_selector.indexOf('|')
+				if (namespace !== -1) {
+					type_selector = type_selector.substring(0, namespace) ?? ''
 				}
 
 				// "Ignore the universal selector"
