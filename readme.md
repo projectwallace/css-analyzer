@@ -68,6 +68,8 @@ const { s } = analyze(css, { s: specificity() })
 summarize_specificity(s) // { total, min, max, sum, mean, mode }
 ```
 
+`summarize_specificity` only accepts the result of `specificity()` (type `SpecificityResult`); passing the result of another collector is a type error.
+
 ### Serialize results
 
 `unique` and `by_context` are `Map`s, which `JSON.stringify()` turns into `{}`. Use `to_json()` to get a plain copy that serializes (to send results between workers, store them or snapshot them):

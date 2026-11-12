@@ -1,7 +1,17 @@
+import { create_counter } from '../engine/counter.ts'
+import { define_collector } from '../engine/define-collector.ts'
 import { summarize_frequencies } from '../engine/summary.ts'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 import { compare_specificity, get_specificity, type Specificity } from '../selectors/specificity.ts'
-import { define_counting_collector } from './shared.ts'
+
+declare const specificity_brand: unique symbol
+
+/**
+ * The result of `specificity()`: a count result of `"a,b,c"` items.
+ * The brand exists only in the type (there is no such property at runtime): it makes
+ * `summarize_specificity()` refuse results of other collectors.
+ */
+export type SpecificityResult = CountResult & { readonly [specificity_brand]: true }
 
 export type SpecificitySummary = {
 	/** Number of selectors */
@@ -17,18 +27,21 @@ export type SpecificitySummary = {
  * Specificity of every selector (keyframe selectors are left out), counted as `"a,b,c"`.
  * Use `summarize_specificity()` for min, max, mean, ... of a result.
  */
-export function specificity(options: CountOptions = {}): CollectorDef<CountResult> {
-	return define_counting_collector(options, function setup(counter) {
+export function specificity(options: CountOptions = {}): CollectorDef<SpecificityResult> {
+	return define_collector<SpecificityResult>(function init() {
+		const counter = create_counter(options)
 		return {
 			selector(node) {
 				counter.add(get_specificity(node)[0]!.join(','), node)
 			},
+			// The brand is type-only: the runtime value is a plain count result
+			result: () => counter.result() as SpecificityResult,
 		}
 	})
 }
 
-/** Derive min, max, sum, mean and mode from a `specificity()` result. Works on merged results too. */
-export function summarize_specificity(counts: CountResult): SpecificitySummary {
+/** Derive min, max, sum, mean and mode from a `specificity()` result. */
+export function summarize_specificity(counts: SpecificityResult): SpecificitySummary {
 	const parts: [Map<number, number>, Map<number, number>, Map<number, number>] = [
 		new Map(),
 		new Map(),

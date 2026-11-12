@@ -1,7 +1,8 @@
-import { test, expect } from 'vitest'
+import { test, expect, expectTypeOf } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
 import { plain } from '../test/test-utils.ts'
-import { specificity, summarize_specificity } from './specificity.ts'
+import { colors } from './colors.ts'
+import { specificity, summarize_specificity, type SpecificityResult } from './specificity.ts'
 
 /** The specificity result with the shape the old tests were written for */
 function run(css: string) {
@@ -328,4 +329,25 @@ test.each([
 	['@supports selector()', '@supports selector(:has(#a)) { b.c {} }', ['0,1,1']],
 ])('selectors in at-rule preludes have no specificity: %s', (_name, css, expected) => {
 	expect(run(css).items.map((item) => item.join(','))).toEqual(expected)
+})
+
+test('summarize_specificity only accepts the result of specificity()', () => {
+	const result = analyze('a {} #b {}', { s: specificity(), c: colors() })
+
+	expectTypeOf(result.s).toEqualTypeOf<SpecificityResult>()
+	expect(summarize_specificity(result.s).total).toBe(2)
+
+	// @ts-expect-error: the result of another collector is not a specificity result
+	expectTypeOf(summarize_specificity).toBeCallableWith(result.c)
+	// @ts-expect-error: neither is a plain count result
+	expectTypeOf(summarize_specificity).toBeCallableWith({
+		total: 0,
+		total_unique: 0,
+		unique: new Map(),
+	})
+})
+
+test('the brand is type-only: a specificity result is a plain count result at runtime', () => {
+	const { s } = analyze('a {}', { s: specificity() })
+	expect(Object.keys(s)).toEqual(['total', 'total_unique', 'unique'])
 })

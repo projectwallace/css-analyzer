@@ -11,7 +11,12 @@ export { durations, type DurationsOptions } from './durations.ts'
 export { timing_functions, type TimingFunctionsOptions } from './timing-functions.ts'
 export type { Normalize } from './shared.ts'
 export { z_indexes } from './z-indexes.ts'
-export { specificity, summarize_specificity, type SpecificitySummary } from './specificity.ts'
+export {
+	specificity,
+	summarize_specificity,
+	type SpecificityResult,
+	type SpecificitySummary,
+} from './specificity.ts'
 export { text_shadows } from './text-shadows.ts'
 export { displays } from './displays.ts'
 export { units } from './units.ts'
