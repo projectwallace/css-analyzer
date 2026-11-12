@@ -22,8 +22,10 @@ test.each([
 	['-moz-1px', ['-moz-1px']],
 	['-webkit-10px', ['-webkit-10px']],
 	['1px -webkit-', ['-webkit-']],
+	['-webkit-calc(1px)', ['-webkit-calc']],
+	['-moz-element(#x)', ['-moz-element']],
 ])(
-	'reports prefixed nodes that are not identifiers or functions as written: "%s"',
+	'the parser reads prefixed number-like words as identifiers, so they are found by name: "%s"',
 	(value, expected) => {
 		expect(get_prefixed_values(value)).toEqual(expected)
 	},

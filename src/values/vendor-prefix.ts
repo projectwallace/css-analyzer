@@ -8,13 +8,10 @@ import { type ValueInput, as_value } from '../utils/input.ts'
 export function get_prefixed_values(input: ValueInput): string[] {
 	const found: string[] = []
 	walk_values(as_value(input), function (node) {
-		if (node.is_vendor_prefixed) {
-			// .name in case of Identifier or Function, .text as fallback
-			if (is_identifier(node) || is_function(node)) {
-				found.push(node.name)
-			} else {
-				found.push(node.text)
-			}
+		// Identifiers and functions are the only vendor prefixed nodes a value can hold
+		// (declarations, at-rules and pseudo selectors never appear in a value)
+		if (node.is_vendor_prefixed && (is_identifier(node) || is_function(node))) {
+			found.push(node.name)
 		}
 	})
 	return found
