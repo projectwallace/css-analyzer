@@ -1063,11 +1063,7 @@ function analyzeInternal<T extends boolean>(
 			walk(node, (child) => {
 				if (is_attribute_selector(child)) {
 					attributeSelectors.p(child.name.toLowerCase(), loc)
-				} else if (
-					is_type_selector(child) &&
-					!child.name.startsWith('--') &&
-					child.name.includes('-')
-				) {
+				} else if (is_type_selector(child) && !is_custom(child.name) && child.name.includes('-')) {
 					customElementSelectors.p(child.name.toLowerCase(), loc)
 				} else if (is_pseudo_class_selector(child)) {
 					pseudoClasses.p(child.name.toLowerCase(), loc)
