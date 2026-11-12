@@ -11,11 +11,12 @@ import { unquote } from '../utils/string-utils.ts'
 import { analyze_animation } from '../values/animations.ts'
 import { keywords } from '../values/values.ts'
 
-// Properties whose values are never searched for colors, units, gradients and keywords inside the
-// value, because their words are names, timings or plain numbers, not what the collectors look for:
+// Properties whose values are never searched for colors, gradients and keywords inside the value,
+// because their words are names, timings or plain numbers, not what the collectors look for:
 // `font-family: Black` (a font, not a color), `animation: red 1s` (an animation name, not a color),
 // `transition` and `animation` (names and timings; their durations and timing functions have their
 // own collectors) and `z-index` (a number). `colors()` also skips `animation-name`.
+// `units()` is not in this list: `1s` and `200ms` are units too, so it only skips `font-family` and `z-index`.
 export const no_value_walk: ReadonlySet<string> = new Set([
 	'font-family',
 	'transition',

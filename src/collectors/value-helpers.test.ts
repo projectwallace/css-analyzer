@@ -51,15 +51,17 @@ test('get_first_identifier gives the name inside a function, or undefined', () =
 const skipped_properties = ['font-family', 'transition', 'animation', 'z-index'] as const
 const sample_value = 'foo red 1px, calc(2em + var(--x, blue)) linear-gradient(red, blue) bar'
 
-test.each(skipped_properties)('colors, units and gradients do not look inside %s', (property) => {
+test.each(skipped_properties)('colors and gradients do not look inside %s', (property) => {
 	const result = analyze(`a { ${property}: ${sample_value} }`, {
 		colors: colors(),
-		units: units(),
 		gradients: gradients(),
 	})
 	expect(result.colors.total).toBe(0)
-	expect(result.units.total).toBe(0)
 	expect(result.gradients.total).toBe(0)
+})
+
+test.each(['font-family', 'z-index'])('units do not look inside %s', (property) => {
+	expect(analyze(`a { ${property}: ${sample_value} }`, { units: units() }).units.total).toBe(0)
 })
 
 test('the same value is counted in a property that is not skipped (the control)', () => {

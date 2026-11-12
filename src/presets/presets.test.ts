@@ -174,12 +174,13 @@ describe('analyze_design_tokens', () => {
 		)
 		expect(plain(tokens.text_shadows)).toEqual(counted({ '0 1px 2px rgb(0 0 0 / 50%)': 1 }))
 		expect(plain(tokens.units)).toEqual({
-			...counted({ px: 7, '%': 1, em: 1, rem: 1, s: 1 }),
+			...counted({ px: 7, '%': 1, ms: 1, em: 1, rem: 1, s: 1 }),
 			by_context: {
 				font: counted({ px: 1 }),
 				'box-shadow': counted({ px: 1 }),
 				'text-shadow': counted({ px: 2, '%': 1 }),
 				'border-radius': counted({ px: 2 }),
+				transition: counted({ ms: 1 }),
 				margin: counted({ em: 1, px: 1 }),
 				'font-size': counted({ rem: 1 }),
 				'animation-duration': counted({ s: 1 }),

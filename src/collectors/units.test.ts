@@ -98,3 +98,22 @@ test('should not include browserhacks', () => {
 	expect(actual.total).toBe(2)
 	expect(actual.total_unique).toBe(2)
 })
+
+test('counts the units of durations: they are units, not lengths', () => {
+	const result = analyze(
+		`a {
+			transition: opacity 200ms ease, color 1s;
+			animation: spin 2s linear 100ms;
+			animation-duration: 3S;
+			transition-delay: 50ms;
+		}`,
+		{ result: units({ contexts: true }) },
+	).result
+	expect(plain(result).unique).toEqual({ ms: 3, s: 3 })
+	expect([...result.by_context.keys()]).toEqual([
+		'transition',
+		'animation',
+		'animation-duration',
+		'transition-delay',
+	])
+})

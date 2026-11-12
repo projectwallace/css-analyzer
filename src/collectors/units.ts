@@ -8,11 +8,12 @@ import type {
 	WithContexts,
 } from '../engine/types.ts'
 import { get_context_property } from './shared.ts'
-import { no_value_walk } from './value-helpers.ts'
 
-// Dimensions in `font-family`, `transition`, `animation` and `z-index` are not counted
-// (their numbers are names or timings: `animation: 2s` is not a length).
-/** Units of every dimension (`px`, `em`, ...), lowercased; with `contexts` also per property */
+// These are units, not lengths: `s` and `ms` in `transition` and `animation` count too. Only the values
+// that are names and numbers are left out (a font name, a z-index), as 9.x did.
+const skipped_properties = new Set(['font-family', 'z-index'])
+
+/** Units of every dimension (`px`, `em`, `s`, ...), lowercased; with `contexts` also per property */
 export function units<O extends ContextCountOptions = {}>(
 	options?: O,
 ): CollectorDef<WithContexts<CountResult, O>> {
@@ -23,7 +24,7 @@ export function units<O extends ContextCountOptions = {}>(
 			value: {
 				types: [DIMENSION],
 				enter(node, ctx) {
-					if (no_value_walk.has(ctx.property)) {
+					if (skipped_properties.has(ctx.property)) {
 						return
 					}
 					counter.add(
