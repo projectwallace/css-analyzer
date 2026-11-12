@@ -248,7 +248,7 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 				complexity.add(get_atrule_weight(node, name, true, hacks), node)
 			},
 			declaration: {
-				properties: new Set([...container_properties, ...animation_properties]),
+				properties: container_properties.union(animation_properties),
 				enter(_node, ctx) {
 					const value = ctx.value
 					if (ctx.clean_value_text === undefined || !value) {
