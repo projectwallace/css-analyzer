@@ -1300,6 +1300,10 @@ function analyzeInternal<T extends boolean>(
 							if (is_dimension(item.value)) {
 								units.push(item.value.unit.toLowerCase(), property, toLoc(item.value))
 							}
+						} else if (item.type === 'delay') {
+							if (is_dimension(item.value)) {
+								units.push(item.value.unit.toLowerCase(), property, toLoc(item.value))
+							}
 						} else if (item.type === 'keyword') {
 							valueKeywords.p(item.value.text.toLowerCase(), valueLoc)
 						} else if (item.type === 'name' && isAnimation) {

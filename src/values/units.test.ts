@@ -100,6 +100,8 @@ test('should not include browserhacks', () => {
 test.each([
 	['transition: opacity 300ms ease', 'ms'],
 	['animation: spin 2s linear infinite', 's'],
+	['transition: opacity 1s ease 150ms', 'ms'],
+	['animation: spin 2s linear 500ms infinite', 'ms'],
 	['font: 14px/1.5 sans-serif', 'px'],
 	['font: 1.2em/20px Arial', 'em'],
 	['margin: 1px 2rem', 'rem'],

@@ -50,13 +50,13 @@ export function analyzeAnimation(
 		// Right after a ',' we start over again
 		if (is_operator(node)) {
 			durationFound = false
-		} else if (is_dimension(node) && durationFound === false) {
+		} else if (is_dimension(node)) {
 			// The first Dimension is the duration, the second is the delay
-			durationFound = true
 			cb({
-				type: 'duration',
+				type: durationFound ? 'delay' : 'duration',
 				value: node,
 			})
+			durationFound = true
 		} else if (is_identifier(node)) {
 			if (TIMING_KEYWORDS.has(node.name)) {
 				cb({
