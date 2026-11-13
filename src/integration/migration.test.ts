@@ -92,3 +92,15 @@ test('animation-name: red is not a color', () => {
 	const { c } = analyze('a { animation-name: red; animation: red 1s }', { c: colors() })
 	expect(c.total).toBe(0)
 })
+
+test('units() counts s and ms inside the transition and animation shorthands', () => {
+	const { u } = analyze('a { transition: opacity .15s; animation: spin 2s 100ms; margin: 1px }', {
+		u: units({ contexts: true }),
+	})
+	expect(Object.fromEntries([...u.unique].map(([unit, { count }]) => [unit, count]))).toEqual({
+		s: 2,
+		ms: 1,
+		px: 1,
+	})
+	expect([...u.by_context.keys()]).toEqual(['transition', 'animation', 'margin'])
+})
