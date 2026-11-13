@@ -117,3 +117,25 @@ test('counts the units of durations: they are units, not lengths', () => {
 		'transition-delay',
 	])
 })
+
+test.each([
+	['transition: opacity 300ms ease', 'ms'],
+	['animation: spin 2s linear infinite', 's'],
+	['transition: opacity 1s ease 150ms', 'ms'],
+	['animation: spin 2s linear 500ms infinite', 'ms'],
+	['font: 14px/1.5 sans-serif', 'px'],
+	['font: 1.2em/20px Arial', 'em'],
+	['margin: 1px 2rem', 'rem'],
+	['border: 1px solid red', 'px'],
+	['padding: 0 10vw', 'vw'],
+	['box-shadow: 0 0 4px 2px red', 'px'],
+	['text-shadow: 1px 1px 2px red', 'px'],
+	['border-radius: 4px 8%', 'px'],
+	['grid-template-columns: 1fr 2fr', 'fr'],
+	['flex: 1 1 10%', '%'],
+	['background: url(a.png) 10px 20px', 'px'],
+	['transform: rotate(45deg)', 'deg'],
+])('counts units in shorthand `%s`', (declaration, unit) => {
+	const result = analyze(`a { ${declaration} }`, { units: units() }).units
+	expect(result.unique.get(unit)?.count).toBeGreaterThan(0)
+})
