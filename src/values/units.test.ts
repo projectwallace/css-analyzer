@@ -1,5 +1,4 @@
-import { test } from 'vitest'
-import { expect } from 'vitest'
+import { test, expect } from 'vitest'
 import { analyze } from '../index.ts'
 
 test('analyzes length units', () => {
@@ -96,4 +95,24 @@ test('should not include browserhacks', () => {
 	})
 	expect(actual.total).toBe(2)
 	expect(actual.totalUnique).toBe(2)
+})
+
+test.each([
+	['transition: opacity 300ms ease', 'ms'],
+	['animation: spin 2s linear infinite', 's'],
+	['font: 14px/1.5 sans-serif', 'px'],
+	['font: 1.2em/20px Arial', 'em'],
+	['margin: 1px 2rem', 'rem'],
+	['border: 1px solid red', 'px'],
+	['padding: 0 10vw', 'vw'],
+	['box-shadow: 0 0 4px 2px red', 'px'],
+	['text-shadow: 1px 1px 2px red', 'px'],
+	['border-radius: 4px 8%', 'px'],
+	['grid-template-columns: 1fr 2fr', 'fr'],
+	['flex: 1 1 10%', '%'],
+	['background: url(a.png) 10px 20px', 'px'],
+	['transform: rotate(45deg)', 'deg'],
+])('counts units in shorthand `%s`', (declaration, unit) => {
+	const result = analyze(`a { ${declaration} }`)
+	expect(result.values.units.unique[unit]).toBeGreaterThan(0)
 })

@@ -1297,6 +1297,9 @@ function analyzeInternal<T extends boolean>(
 							timingFunctions.p(item.value.text.toLowerCase(), valueLoc)
 						} else if (item.type === 'duration') {
 							durations.p(item.value.text.toLowerCase(), valueLoc)
+							if (is_dimension(item.value)) {
+								units.push(item.value.unit.toLowerCase(), property, toLoc(item.value))
+							}
 						} else if (item.type === 'keyword') {
 							valueKeywords.p(item.value.text.toLowerCase(), valueLoc)
 						} else if (item.type === 'name' && isAnimation) {
