@@ -82,7 +82,6 @@ Rules of thumb:
 - `stylesheet().embedded` uses the standard count shape: `{ total, total_unique, unique: Map<mime type, { count, locations? }>, size }`. The per-type `size` of 9.x is gone; `size` is the total of all embedded content.
 - Embedded `data:` URIs in `@import` preludes are not counted (only `url()` values).
 - `animation-name: red` is no longer counted as a color (9.x counted it).
-- `units()` also counts the units inside the `transition` and `animation` shorthands (`transition: opacity .15s`, `animation: spin 2s 100ms`): `s` and `ms` are units. 9.x skipped these shorthands and only counted `s` and `ms` from longhands such as `transition-duration`, so the `s` and `ms` totals are higher than in 9.x (all other units are the same).
 
 ## Utilities
 
