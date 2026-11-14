@@ -50,6 +50,7 @@ import {
 import { AggregateCollection } from './aggregate-collection.ts'
 import { DefinedUsed, type DefinedUsedResult } from './defined-used.ts'
 import { endsWith, unquote } from './string-utils.ts'
+import { strip_unit_hack } from './values/units.ts'
 import { getEmbedType } from './stylesheet/stylesheet.ts'
 import {
 	SPACING_RESET_PROPERTIES,
@@ -829,6 +830,14 @@ function analyzeInternal<T extends boolean>(
 	const colors = new ContextCollection(useLocations)
 	const colorFormats = new Collection(useLocations)
 	const units = new ContextCollection(useLocations)
+
+	// Units may carry a browserhack escape (`10px\9`); a unit that is only a hack (`0\9`) is no unit
+	function push_unit(raw_unit: string, property: string, loc: Location) {
+		const unit = strip_unit_hack(raw_unit).toLowerCase()
+		if (unit !== '') {
+			units.push(unit, property, loc)
+		}
+	}
 	const gradients = new Collection(useLocations)
 	const valueKeywords = new Collection(useLocations)
 	const borderRadiuses = new ContextCollection(useLocations)
@@ -1298,11 +1307,11 @@ function analyzeInternal<T extends boolean>(
 						} else if (item.type === 'duration') {
 							durations.p(item.value.text.toLowerCase(), valueLoc)
 							if (is_dimension(item.value)) {
-								units.push(item.value.unit.toLowerCase(), property, toLoc(item.value))
+								push_unit(item.value.unit, property, toLoc(item.value))
 							}
 						} else if (item.type === 'delay') {
 							if (is_dimension(item.value)) {
-								units.push(item.value.unit.toLowerCase(), property, toLoc(item.value))
+								push_unit(item.value.unit, property, toLoc(item.value))
 							}
 						} else if (item.type === 'keyword') {
 							valueKeywords.p(item.value.text.toLowerCase(), valueLoc)
@@ -1387,9 +1396,7 @@ function analyzeInternal<T extends boolean>(
 
 				walk(value, (valueNode) => {
 					if (is_dimension(valueNode)) {
-						const unit = valueNode.unit.toLowerCase()
-						const loc = toLoc(valueNode)
-						units.push(unit, property, loc)
+						push_unit(valueNode.unit, property, toLoc(valueNode))
 						return SKIP
 					}
 
@@ -1399,13 +1406,13 @@ function analyzeInternal<T extends boolean>(
 						if (!hashText || !hashText.startsWith('#')) {
 							return SKIP
 						}
-						const hashValue = hashText.toLowerCase()
+						let hashValue = hashText.toLowerCase()
 
-						// Calculate hex length (excluding the # and any IE9 browserhack \9)
-						let hexLength = hashValue.length - 1 // Remove the # from length
+						// Strip any IE9 browserhack (\9 or \7) so only the color remains
 						if (endsWith('\\9', hashValue) || endsWith('\\7', hashValue)) {
-							hexLength = hexLength - 2 // Remove the \9 or \7 from length
+							hashValue = hashValue.slice(0, -2)
 						}
+						const hexLength = hashValue.length - 1 // Remove the # from length
 
 						const hashLoc = toLoc(valueNode)
 						colors.push(hashValue, property, hashLoc)

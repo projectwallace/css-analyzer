@@ -1,5 +1,6 @@
 import { test, expect } from 'vitest'
 import { analyze } from '../index.ts'
+import { calculate } from './specificity.ts'
 
 test('handles the universal selector', () => {
 	const fixture = `
@@ -318,4 +319,14 @@ test.each<[string, [number, number, number]]>([
 	[':host-context(.a.b)', [0, 3, 0]],
 ])('specificity of "%s"', (selector, expected) => {
 	expect(analyze(`${selector} {}`).selectors.specificity.items).toEqual([expected])
+})
+
+test.each<[string, [number, number, number]]>([
+	['#main', [1, 0, 0]],
+	['#md\\:hidden', [1, 0, 0]],
+	['#\\31 23', [1, 0, 0]],
+	['.md\\:hidden', [0, 1, 0]],
+])('specificity of selector with escapes "%s"', (selector, expected) => {
+	expect(analyze(`${selector} {}`).selectors.specificity.items).toEqual([expected])
+	expect(calculate(selector)).toEqual([expected])
 })
