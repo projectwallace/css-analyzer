@@ -1,0 +1,332 @@
+import {
+	type Atrule,
+	type CSSNode,
+	type MediaFeature,
+	SKIP,
+	is_atrule_prelude,
+	is_container_query,
+	is_custom,
+	is_declaration,
+	is_function,
+	is_identifier,
+	is_media_feature,
+	str_equals,
+	walk,
+	FUNCTION,
+	property_basename,
+} from '@projectwallace/css-parser'
+import { DefinedUsed, type DefinedUsedResult } from '../utils/collections/defined-used.ts'
+import { create_counter, to_location } from '../engine/counter.ts'
+import { define_collector } from '../engine/define-collector.ts'
+import type { CollectorDef, CountOptions, CountResult, Location } from '../engine/types.ts'
+import { unquote } from '../utils/string-utils.ts'
+import { get_media_browserhacks, get_supports_browserhacks } from '../atrules/atrules.ts'
+import { keywords } from '../values/values.ts'
+import { get_atrule_weight } from './complexity.ts'
+import { without_sequence } from './shared.ts'
+import { get_animation_names, get_first_identifier, get_list_items } from './value-helpers.ts'
+
+//  Media features (`(min-width: 40em)`) anywhere in an at-rule prelude
+function find_media_features(prelude: CSSNode | null | undefined): MediaFeature[] {
+	const found: MediaFeature[] = []
+	if (!prelude) {
+		return found
+	}
+	walk(prelude, function (child) {
+		if (is_media_feature(child)) {
+			found.push(child)
+			return SKIP
+		}
+	})
+	return found
+}
+
+//  `property: value` descriptors inside an at-rule block (e.g. `@font-face`)
+function get_descriptors(block: Atrule['block']): Record<string, string> {
+	const descriptors: Record<string, string> = Object.create(null)
+	block?.for_each(function (child) {
+		if (is_declaration(child) && child.value) {
+			descriptors[child.property] = child.value.text
+		}
+	})
+	return descriptors
+}
+
+//  The container name in `@container name (min-width: 1px)`
+function get_container_name(prelude: CSSNode | null | undefined): string | undefined {
+	if (prelude && is_atrule_prelude(prelude) && is_container_query(prelude.first_child)) {
+		const name = prelude.first_child.first_child
+		if (name && is_identifier(name)) {
+			return name.text
+		}
+	}
+	return undefined
+}
+
+//  `supports(...)` and `layer(...)` in an `@import` prelude
+function get_import_functions(prelude: CSSNode | null | undefined) {
+	const found: { name: 'supports' | 'layer'; value: string; node: CSSNode }[] = []
+	if (!prelude || !is_atrule_prelude(prelude) || !prelude.has_children) {
+		return found
+	}
+	prelude.for_each(function (child) {
+		if (!is_function(child) || !child.value) {
+			return
+		}
+		const name = child.name
+		if (str_equals('supports', name)) {
+			found.push({ name: 'supports', value: child.value, node: child })
+		} else if (str_equals('layer', name)) {
+			found.push({ name: 'layer', value: child.value, node: child })
+		}
+	})
+	return found
+}
+
+/** Counted by at-rule name (`@media` is `media`), with a breakdown per kind of at-rule */
+export type AtrulesResult = CountResult & {
+	font_faces: {
+		total: number
+		/** The descriptors of each `@font-face`, as written */
+		items: Record<string, string>[]
+		locations?: Location[]
+	}
+	/** `@import` preludes (the `url()` or string and any conditions) */
+	imports: CountResult
+	/** `@media` preludes; `features` are the media features (`min-width`), `browserhacks` the hacks found in the preludes */
+	media: CountResult & { browserhacks: CountResult; features: CountResult }
+	charsets: CountResult
+	/** `@supports` preludes, with the browserhacks found in them */
+	supports: CountResult & { browserhacks: CountResult }
+	/** Keyframe names (counted by name), defined by `@keyframes` and used by `animation` and `animation-name` */
+	keyframes: CountResult &
+		DefinedUsedResult & {
+			/** Vendor prefixed `@-webkit-keyframes`, counted as `@-webkit-keyframes name` */
+			prefixed: CountResult
+		}
+	/** `@container` preludes; `names` are the container names, defined by `container-name`/`container` and used by `@container` */
+	containers: CountResult & { names: CountResult & DefinedUsedResult }
+	/** Layer names: defined by `@layer a, b;` statements, used by `@layer a { }` blocks and `@import ... layer(a)` */
+	layers: CountResult & DefinedUsedResult
+	/** `@property` registrations: defined by `@property`, used by `var()` */
+	properties: CountResult & DefinedUsedResult
+	/** `@function` definitions */
+	functions: CountResult
+	scopes: CountResult
+	/** 1 per at-rule, plus 1 for hacks and prefixed keyframes. Items are numbers. */
+	complexity: CountResult<number>
+	/** Items are numbers */
+	nesting: CountResult<number>
+}
+
+const container_properties = new Set(['container-name', 'container'])
+const animation_properties = new Set(['animation', 'animation-name'])
+
+/** Every at-rule by name, with a breakdown per kind and the defined and used names of keyframes, containers, layers and `@property` */
+export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult> {
+	return define_collector<AtrulesResult>(function init() {
+		const names = create_counter(without_sequence(options))
+		const imports = create_counter(without_sequence(options))
+		const medias = create_counter(without_sequence(options))
+		const media_browserhacks = create_counter(without_sequence(options))
+		const media_features = create_counter(without_sequence(options))
+		const charsets = create_counter(without_sequence(options))
+		const supports = create_counter(without_sequence(options))
+		const supports_browserhacks = create_counter(without_sequence(options))
+		const keyframes = create_counter(without_sequence(options))
+		const prefixed_keyframes = create_counter(without_sequence(options))
+		const containers = create_counter(without_sequence(options))
+		const container_names = create_counter(without_sequence(options))
+		const layers = create_counter(without_sequence(options))
+		const registered = create_counter(without_sequence(options))
+		const functions = create_counter(without_sequence(options))
+		const scopes = create_counter(without_sequence(options))
+		const complexity = create_counter<number>(without_sequence(options))
+		const nesting = create_counter<number>(options)
+		const keyframes_tracking = new DefinedUsed()
+		const container_tracking = new DefinedUsed()
+		const layer_tracking = new DefinedUsed()
+		const property_tracking = new DefinedUsed()
+		const font_faces: AtrulesResult['font_faces'] = { total: 0, items: [] }
+		if (options.locations) {
+			font_faces.locations = []
+		}
+
+		return {
+			parse: { values: true, atrule_preludes: true },
+			atrule(node, ctx) {
+				const raw_name = node.name
+				const name = property_basename(raw_name)
+				const prelude = node.has_prelude ? node.prelude : undefined
+				const prelude_text = prelude?.text
+				const block = node.block
+				names.add(name, node)
+				nesting.add(ctx.depth, node)
+
+				for (const feature of find_media_features(prelude)) {
+					media_features.add(feature.property.toLowerCase(), feature)
+				}
+
+				if (name === 'font-face') {
+					font_faces.total++
+					font_faces.items.push({ ...get_descriptors(block) })
+					font_faces.locations?.push(to_location(node))
+				}
+
+				if (prelude_text === undefined) {
+					if (name === 'layer') {
+						// @layer without a prelude is anonymous
+						layers.add('<anonymous>', node)
+					}
+					const weight = get_atrule_weight(node, name, false, 0)
+					if (weight > 0) {
+						complexity.add(weight, node)
+					}
+					return
+				}
+
+				let hacks = 0
+				if (name === 'media') {
+					medias.add(prelude_text, node)
+					for (const hack of get_media_browserhacks(prelude!)) {
+						media_browserhacks.add(hack, node)
+						hacks++
+					}
+				} else if (name === 'supports') {
+					supports.add(prelude_text, node)
+					for (const hack of get_supports_browserhacks(prelude!)) {
+						supports_browserhacks.add(hack, node)
+						hacks++
+					}
+				} else if (name.endsWith('keyframes')) {
+					const keyframes_name = unquote(prelude_text)
+					keyframes.add(keyframes_name, node)
+					keyframes_tracking.define(keyframes_name)
+					if (node.is_vendor_prefixed) {
+						prefixed_keyframes.add(`@${raw_name.toLowerCase()} ${prelude_text}`, node)
+					}
+				} else if (name === 'layer') {
+					for (const layer of prelude_text.split(',').map((part) => part.trim())) {
+						layers.add(layer, node)
+						// `@layer name { }` places CSS into a layer (use); `@layer a, b;` orders layers (define)
+						if (block) {
+							layer_tracking.use(layer)
+						} else {
+							layer_tracking.define(layer)
+						}
+					}
+				} else if (name === 'import') {
+					imports.add(prelude_text, node)
+					for (const item of get_import_functions(prelude)) {
+						if (item.name === 'supports') {
+							supports.add(item.value, item.node)
+						} else {
+							// layer() can be empty
+							layers.add(item.value, item.node)
+							layer_tracking.use(item.value)
+						}
+					}
+				} else if (name === 'container') {
+					containers.add(prelude_text, node)
+					const container_name = get_container_name(prelude)
+					if (container_name !== undefined) {
+						container_names.add(container_name, node)
+						container_tracking.use(container_name)
+					}
+				} else if (name === 'property') {
+					registered.add(prelude_text, node)
+					property_tracking.define(prelude_text)
+				} else if (name === 'function') {
+					const end = prelude_text.indexOf('(')
+					functions.add((end === -1 ? prelude_text : prelude_text.slice(0, end)).trim(), node)
+				} else if (name === 'charset') {
+					charsets.add(prelude_text.toLowerCase(), node)
+				} else if (name === 'scope') {
+					scopes.add(prelude_text, node)
+				}
+
+				complexity.add(get_atrule_weight(node, name, true, hacks), node)
+			},
+			declaration: {
+				properties: container_properties.union(animation_properties),
+				enter(_node, ctx) {
+					const value = ctx.value
+					if (ctx.clean_value_text === undefined || !value) {
+						return
+					}
+					const property = ctx.property
+					if (property === 'container-name') {
+						for (const item of get_list_items(value)) {
+							if (!is_identifier(item)) {
+								continue
+							}
+							const text = item.text
+							if (!keywords.has(text)) {
+								container_names.add(text, item)
+								container_tracking.define(text)
+							}
+						}
+					} else if (property === 'container') {
+						// The first identifier in the `container` shorthand is the container name
+						// Example: container: my-layout / inline-size;
+						const first = get_first_identifier(value)
+						if (first !== undefined) {
+							container_names.add(first, value)
+							if (!keywords.has(first)) {
+								container_tracking.define(first)
+							}
+						}
+					} else {
+						for (const animation_name of get_animation_names(ctx)) {
+							keyframes_tracking.use(animation_name)
+						}
+					}
+				},
+			},
+			value: {
+				types: [FUNCTION],
+				enter(node) {
+					// var(--x) is a use of a registered custom property
+					if (!is_function(node) || !str_equals('var', node.name)) {
+						return
+					}
+					const first = get_first_identifier(node)
+					if (first !== undefined && is_custom(first)) {
+						property_tracking.use(first)
+					}
+				},
+			},
+			result: () => ({
+				...names.result(),
+				font_faces: {
+					total: font_faces.total,
+					items: font_faces.items.slice(),
+					locations: font_faces.locations?.slice(),
+				},
+				imports: imports.result(),
+				media: {
+					...medias.result(),
+					browserhacks: media_browserhacks.result(),
+					features: media_features.result(),
+				},
+				charsets: charsets.result(),
+				supports: { ...supports.result(), browserhacks: supports_browserhacks.result() },
+				keyframes: {
+					...keyframes.result(),
+					...keyframes_tracking.analyze(),
+					prefixed: prefixed_keyframes.result(),
+				},
+				containers: {
+					...containers.result(),
+					names: { ...container_names.result(), ...container_tracking.analyze() },
+				},
+				layers: { ...layers.result(), ...layer_tracking.analyze() },
+				properties: { ...registered.result(), ...property_tracking.analyze() },
+				functions: functions.result(),
+				scopes: scopes.result(),
+				complexity: complexity.result(),
+				nesting: nesting.result(),
+			}),
+		}
+	})
+}

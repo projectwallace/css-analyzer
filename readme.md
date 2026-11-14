@@ -17,607 +17,192 @@ Turn your CSS into <b>actionable stats</b> — specificity, complexity, design t
 ## Features
 
 - Extremely **detailed** (200+ metrics)
-- **TypeScript** types built-in, zero config
+- **Pick what you need**: metrics are opt-in collectors, so you only pay (runtime and bundle size) for what you use
+- **Tree-shakable** ES modules and **TypeScript** types, with the result type inferred from the collectors you pass
+- Write your **own collectors** with the same API the built-ins use
+- **Design system** audit ready: a design-tokens preset (colors, font sizes, shadows, ...) and uniqueness ratios via `summarize()`
 - Runs anywhere — **NodeJS and browsers**
 - Tiny footprint, only one dependency
-- **Design system** audit ready (token usage, uniqueness ratios)
 - Battle-tested — powers [Project Wallace](https://www.projectwallace.com)
 
 ## Install
 
 ```sh
-npm install @projectwallace/css-analyzer
+pnpm add @projectwallace/css-analyzer
 ```
 
 ## Usage
 
-### Analyzing CSS
+### Pick the metrics you need
 
 ```js
 import { analyze } from '@projectwallace/css-analyzer'
+import { colors, font_sizes, z_indexes } from '@projectwallace/css-analyzer/collectors'
 
-const result = analyze(`
-	p {
-		color: blue;
-		font-size: 100%;
-	}
+const result = analyze(css, {
+	colors: colors(),
+	font_sizes: font_sizes(),
+	z: z_indexes(),
+})
 
-	.component[data-state="loading"] {
-		background-color: whitesmoke;
-	}
-`)
+result.colors.total // 12
+result.colors.total_unique // 5
+result.colors.unique.get('red') // { count: 3 }
+result.font_sizes.unique // Map { '16px' => { count: 4 }, ... }
 ```
 
-<details>
-  <summary>Output looks roughly like this:</summary>
+- The keys are yours: they become the keys of the result.
+- Every collector is a function: call it (`colors()`), optionally with options.
+- Only the parts of the CSS that your collectors need are parsed. A collector set that only looks at values never parses selectors.
 
-```json
-{
-	"stylesheet": {
-		"sourceLinesOfCode": 0,
-		"linesOfCode": 1,
-		"size": 0,
-		"comments": {
-			"total": 0,
-			"size": 0
-		},
-		"embeddedContent": {
-			"size": {
-				"total": 0,
-				"ratio": 0
-			},
-			"types": {
-				"total": 0,
-				"totalUnique": 0,
-				"uniquenessRatio": 0,
-				"unique": {}
-			}
-		},
-		"complexity": 0
-	},
-	"atrules": {
-		"total": 0,
-		"totalUnique": 0,
-		"unique": {},
-		"uniquenessRatio": 0,
-		"fontface": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": [],
-			"uniquenessRatio": 0
-		},
-		"import": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"media": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0,
-			"browserhacks": {
-				"total": 0,
-				"totalUnique": 0,
-				"unique": {},
-				"uniquenessRatio": 0
-			},
-			"features": {
-				"total": 0,
-				"totalUnique": 0,
-				"unique": {},
-				"uniquenessRatio": 0
-			}
-		},
-		"charset": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"supports": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0,
-			"browserhacks": {
-				"total": 0,
-				"totalUnique": 0,
-				"unique": {},
-				"uniquenessRatio": 0
-			}
-		},
-		"keyframes": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0,
-			"defined": [],
-			"used": [],
-			"unused": [],
-			"unknown": [],
-			"prefixed": {
-				"total": 0,
-				"totalUnique": 0,
-				"unique": {},
-				"uniquenessRatio": 0,
-				"ratio": 0
-			}
-		},
-		"container": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0,
-			"names": {
-				"total": 0,
-				"totalUnique": 0,
-				"unique": {},
-				"uniquenessRatio": 0,
-				"defined": [],
-				"used": [],
-				"unused": [],
-				"unknown": []
-			}
-		},
-		"layer": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0,
-			"defined": [],
-			"used": [],
-			"unused": [],
-			"unknown": []
-		},
-		"property": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"function": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"scope": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"complexity": {
-			"min": 0,
-			"max": 0,
-			"mean": 0,
-			"mode": 0,
-			"range": 0,
-			"sum": 0
-		},
-		"nesting": {
-			"min": 0,
-			"max": 0,
-			"mean": 0,
-			"mode": 0,
-			"range": 0,
-			"sum": 0,
-			"items": [],
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		}
-	},
-	"rules": {
-		"total": 0,
-		"empty": {
-			"total": 0,
-			"ratio": 0
-		},
-		"sizes": {
-			"min": 0,
-			"max": 0,
-			"mean": 0,
-			"mode": 0,
-			"range": 0,
-			"sum": 0,
-			"items": [],
-			"unique": {},
-			"total": 0,
-			"totalUnique": 0,
-			"uniquenessRatio": 0
-		},
-		"nesting": {
-			"min": 0,
-			"max": 0,
-			"mean": 0,
-			"mode": 0,
-			"range": 0,
-			"sum": 0,
-			"items": [],
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"selectors": {
-			"min": 0,
-			"max": 0,
-			"mean": 0,
-			"mode": 0,
-			"range": 0,
-			"sum": 0,
-			"items": [],
-			"unique": {},
-			"total": 0,
-			"totalUnique": 0,
-			"uniquenessRatio": 0
-		},
-		"declarations": {
-			"min": 0,
-			"max": 0,
-			"mean": 0,
-			"mode": 0,
-			"range": 0,
-			"sum": 0,
-			"items": [],
-			"unique": {},
-			"total": 0,
-			"totalUnique": 0,
-			"uniquenessRatio": 0
-		}
-	},
-	"selectors": {
-		"total": 0,
-		"totalUnique": 0,
-		"uniquenessRatio": 0,
-		"specificity": {
-			"min": [0, 0, 0],
-			"max": [0, 0, 0],
-			"sum": [0, 0, 0],
-			"mean": [0, 0, 0],
-			"mode": [0, 0, 0],
-			"items": [],
-			"unique": {},
-			"total": 0,
-			"totalUnique": 0,
-			"uniquenessRatio": 0
-		},
-		"complexity": {
-			"min": 0,
-			"max": 0,
-			"mean": 0,
-			"mode": 0,
-			"range": 0,
-			"sum": 0,
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0,
-			"items": []
-		},
-		"nesting": {
-			"min": 0,
-			"max": 0,
-			"mean": 0,
-			"mode": 0,
-			"range": 0,
-			"sum": 0,
-			"items": [],
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"id": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0,
-			"ratio": 0
-		},
-		"pseudoClasses": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"pseudoElements": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"accessibility": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0,
-			"ratio": 0
-		},
-		"attributes": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"customElements": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"keyframes": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"prefixed": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0,
-			"ratio": 0
-		},
-		"combinators": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		}
-	},
-	"declarations": {
-		"total": 0,
-		"totalUnique": 0,
-		"uniquenessRatio": 0,
-		"importants": {
-			"total": 0,
-			"ratio": 0,
-			"inKeyframes": {
-				"total": 0,
-				"ratio": 0
-			}
-		},
-		"complexity": {
-			"min": 0,
-			"max": 0,
-			"mean": 0,
-			"mode": 0,
-			"range": 0,
-			"sum": 0
-		},
-		"nesting": {
-			"min": 0,
-			"max": 0,
-			"mean": 0,
-			"mode": 0,
-			"range": 0,
-			"sum": 0,
-			"items": [],
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		}
-	},
-	"properties": {
-		"total": 0,
-		"totalUnique": 0,
-		"unique": {},
-		"uniquenessRatio": 0,
-		"prefixed": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0,
-			"ratio": 0
-		},
-		"custom": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0,
-			"defined": [],
-			"used": [],
-			"unused": [],
-			"unknown": [],
-			"ratio": 0,
-			"importants": {
-				"total": 0,
-				"totalUnique": 0,
-				"unique": {},
-				"uniquenessRatio": 0,
-				"ratio": 0
-			}
-		},
-		"shorthands": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0,
-			"ratio": 0
-		},
-		"browserhacks": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0,
-			"ratio": 0
-		},
-		"complexity": {
-			"min": 0,
-			"max": 0,
-			"mean": 0,
-			"mode": 0,
-			"range": 0,
-			"sum": 0
-		},
-		"anchorNames": {
-			"defined": [],
-			"used": [],
-			"unused": [],
-			"unknown": []
-		}
-	},
-	"values": {
-		"colors": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0,
-			"itemsPerContext": {},
-			"formats": {
-				"total": 0,
-				"totalUnique": 0,
-				"unique": {},
-				"uniquenessRatio": 0
-			}
-		},
-		"gradients": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"fontFamilies": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"fontSizes": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"lineHeights": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"zindexes": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"textShadows": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"boxShadows": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"borderRadiuses": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"itemsPerContext": {},
-			"uniquenessRatio": 0
-		},
-		"animations": {
-			"durations": {
-				"total": 0,
-				"totalUnique": 0,
-				"unique": {},
-				"uniquenessRatio": 0
-			},
-			"timingFunctions": {
-				"total": 0,
-				"totalUnique": 0,
-				"unique": {},
-				"uniquenessRatio": 0
-			},
-			"names": {
-				"total": 0,
-				"totalUnique": 0,
-				"unique": {},
-				"uniquenessRatio": 0
-			}
-		},
-		"prefixes": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"browserhacks": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"units": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0,
-			"itemsPerContext": {}
-		},
-		"complexity": {
-			"min": 0,
-			"max": 0,
-			"mean": 0,
-			"mode": 0,
-			"range": 0,
-			"sum": 0
-		},
-		"keywords": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"resets": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		},
-		"displays": {
-			"total": 0,
-			"totalUnique": 0,
-			"unique": {},
-			"uniquenessRatio": 0
-		}
-	}
-}
-```
-
-</details>
-
-### Comparing specificity
+All collectors count things the same way: `{ total, total_unique, unique: Map<string, { count, locations? }> }`.
+Derived numbers are separate functions, so unused statistics cost nothing:
 
 ```js
-import { compareSpecificity } from '@projectwallace/css-analyzer'
+import { summarize } from '@projectwallace/css-analyzer'
+import { summarize_specificity, specificity } from '@projectwallace/css-analyzer/collectors'
 
-const result = [
+summarize(result.colors) // { uniqueness_ratio: 0.41 }
+
+const { s } = analyze(css, { s: specificity() })
+summarize_specificity(s) // { total, min, max, sum, mean, mode }
+```
+
+`summarize_specificity` only accepts the result of `specificity()` (type `SpecificityResult`); passing the result of another collector is a type error.
+
+### Locations
+
+Locations are opt-in per collector:
+
+```js
+const { colors: result } = analyze(css, { colors: colors({ locations: true }) })
+result.unique.get('red').locations // [{ line: 3, column: 14, offset: 26, length: 3 }, ...]
+```
+
+### Ordered numbers (for charts)
+
+Numeric series (nesting, sizes, complexity, specificity) are counted as values. Pass `sequence: true` to also get them in source order:
+
+```js
+import { rules } from '@projectwallace/css-analyzer/collectors'
+const { r } = analyze(css, { r: rules({ sequence: true }) })
+r.sizes.sequence // [2, 3, 1]
+```
+
+Use `summarize_numbers(result.sizes)` for min, max, mean, mode, median, range and sum.
+
+### Presets
+
+```js
+import { analyze_design_tokens, analyze_all } from '@projectwallace/css-analyzer/presets'
+
+analyze_design_tokens(css) // colors, font_sizes, font_families, line_heights, gradients, box_shadows, border_radiuses, durations, timing_functions, text_shadows, units
+analyze_all(css) // every collector, flat: result.colors, result.atrules, result.selectors, ...
+analyze_design_tokens(css, { locations: true }) // locations for every collector
+```
+
+Each preset also exists as a function that returns a collector map (`design_tokens_collectors(options)`, `all_collectors(options)`), which you can spread, narrow or extend. The keys are the collector names.
+`analyze(css, { ...design_tokens_collectors({ locations: true }), z_indexes: z_indexes() })`.
+
+#### Design tokens
+
+`analyze_design_tokens` has 11 collectors: `colors`, `font_sizes`, `font_families`, `line_heights`, `gradients`, `box_shadows`, `border_radiuses`, `durations`, `timing_functions`, `text_shadows` and `units`. The result is keyed by collector name, like every other result: `result.colors`, `result.units`, ...
+`colors`, `border_radiuses` and `units` also have `by_context` (counts per property). It deliberately leaves out `z_indexes`, `displays`, `keywords` and everything about selectors, rules and at-rules.
+
+The preset takes the global `locations` option only. To give one collector other options, spread the preset and replace that collector:
+
+```js
+analyze(css, { ...design_tokens_collectors(), colors: colors({ normalize: 'none' }) })
+```
+
+### Typing a collector map
+
+Collectors are plain functions, so their types come for free. With `isolatedDeclarations`, write the type of an exported map with `ReturnType`:
+
+```ts
+import { colors, font_sizes, type ResultOf } from '@projectwallace/css-analyzer/collectors'
+
+export const collectors: {
+	colors: ReturnType<typeof colors<{ contexts: true }>>
+	font_sizes: ReturnType<typeof font_sizes>
+} = { colors: colors({ contexts: true }), font_sizes: font_sizes() }
+
+export type Report = ResultOf<typeof collectors>
+```
+
+`CollectorDef`, `CountResult`, `ContextCountResult`, `Location` and `ResultOf` can be imported from `@projectwallace/css-analyzer/collectors` too.
+
+### Collectors
+
+| Collector                                                  | Counts                                                                                                                                       |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `stylesheet`                                               | size, lines, source lines of code, complexity, comments, embedded `data:` content                                                            |
+| `atrules`                                                  | every at-rule, with `@font-face`, `@import`, `@media`, `@supports`, `@keyframes`, `@container`, `@layer`, `@property`, `@function`, `@scope` |
+| `rules`, `selectors`, `specificity`                        | rule sizes and nesting, selector kinds and complexity, specificity                                                                           |
+| `declarations`, `properties`                               | declarations, `!important`, prefixes, custom properties, shorthands, hacks, anchor names                                                     |
+| `colors`, `gradients`                                      | colors (with formats and per-property counts), gradients                                                                                     |
+| `font_sizes`, `font_families`, `line_heights`              | font values (also from the `font` shorthand)                                                                                                 |
+| `box_shadows`, `text_shadows`, `border_radiuses`           | shadows and radii                                                                                                                            |
+| `durations`, `timing_functions`, `animation_names`         | transitions and animations                                                                                                                   |
+| `units`, `z_indexes`, `displays`, `keywords`, `resets`     | other values                                                                                                                                 |
+| `value_prefixes`, `value_browserhacks`, `value_complexity` | vendor prefixes, hacks, complexity of values                                                                                                 |
+
+Options (all optional): `locations`, `sequence` (numeric series), `contexts` (`colors`, `units`, `border_radiuses`: count per property in `by_context`, which only exists with `contexts: true`), `normalize: 'none'` (keep the authored case), `skip_var` (font sizes, families, line heights).
+
+### Write your own collector
+
+```js
+import { analyze, define_collector, create_counter } from '@projectwallace/css-analyzer'
+
+function important_declarations() {
+	return define_collector(function init() {
+		const counter = create_counter()
+		return {
+			declaration: {
+				enter(node, ctx) {
+					if (ctx.is_important) counter.add(ctx.property, node)
+				},
+			},
+			result() {
+				return counter.result()
+			},
+		}
+	})
+}
+
+analyze(css, { important: important_declarations() })
+```
+
+A collector subscribes to what it needs: `stylesheet`, `rule`, `atrule`, `selector`, `declaration` (`{ properties?, enter }`), `value` (`{ types, properties?, enter }`) and `comment`. The engine walks the CSS once and only dispatches to subscribers. `selector` handlers get the selectors of style rules (not keyframe selectors, nor selectors in at-rule preludes) and no `ctx`: use `rule` when you need `depth` or `atrule_stack`. Collectors must not keep nodes or the `ctx` object after the handler returns.
+`ctx` offers lazy, shared facts: `property`, `raw_property`, `is_important`, `is_custom`, `is_browserhack`, `is_vendor_prefixed`, `value`, `value_text`, `clean_value_text`, `font_shorthand`, `depth`, `atrule_stack` and (in `stylesheet`) `css`. Counters take the node that was found (`counter.add(item, node)`): that is where `locations` come from.
+
+### Utilities
+
+Small functions that work on their own: they accept CSS text or an already parsed node and return plain data.
+
+```js
+import { get_specificity, compare_specificity } from '@projectwallace/css-analyzer/selectors'
+import { is_value_reset, get_value_browserhacks } from '@projectwallace/css-analyzer/values'
+
+get_specificity('a.b > #c') // [[1, 1, 1]]
+is_value_reset('0 0px') // true
+
+// compare_specificity sorts ascending: lowest specificity first
+;[
 	[0, 1, 1],
 	[2, 0, 0],
 	[0, 0, 1],
-].sort((a, b) => compareSpecificity(a, b))
-
-// => result:
-// [
-//   [2,0,0],
-//   [0,1,1],
-//   [0,0,1],
-// ]
-
-const isSpecificityEqual = compareSpecificity([0, 1, 0], [0, 1, 0]) === 0
-// => isSpecificityEqual: true
+].sort(compare_specificity) // [[0, 0, 1], [0, 1, 1], [2, 0, 0]]
+compare_specificity([0, 1, 0], [0, 1, 0]) // 0
 ```
+
+Also: `get_complexity`, `get_vendor_prefixes`, `get_accessibility_selectors`, `get_combinators` (`/selectors`); `destructure_font_shorthand`, `analyze_animation`, `get_prefixed_values`, `named_colors`, `system_colors`, `color_functions`, `keywords` (`/values`); `get_media_browserhacks`, `get_supports_browserhacks` (`/atrules`); `shorthand_properties`, `is_property_hack` (`/properties`); `get_embed_type` (`/stylesheet`).
+
+`DefinedUsed` (track what is defined and what is used, for names like custom properties or keyframes) and `KeywordSet` (a case-insensitive set of keywords) are the building blocks the built-in collectors use. They are exported from `@projectwallace/css-analyzer/utils/collections`.
+
+## Upgrading from 9.x
+
+See [MIGRATION.md](./MIGRATION.md).
 
 ## Acknowledgements
 

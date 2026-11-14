@@ -1,7 +1,7 @@
-import type { Location } from '../collection.ts'
-import { KeywordSet } from '../keyword-set.ts'
+import { KeywordSet } from '../utils/collections/keyword-set.ts'
 import {
 	type CSSNode,
+	type Combinator,
 	SKIP,
 	walk,
 	str_equals,
@@ -13,10 +13,13 @@ import {
 	is_selector,
 	is_nth_selector,
 	is_combinator,
+	type AttributeSelector,
 } from '@projectwallace/css-parser'
-import { unquote } from '../string-utils.ts'
+import { unquote } from '../utils/string-utils.ts'
+import { type SelectorInput, as_selectors } from '../utils/input.ts'
+import type { Location } from '../utils/location.ts'
 
-const PSEUDO_FUNCTIONS = new KeywordSet([
+const pseudo_functions = new KeywordSet([
 	'nth-child',
 	'where',
 	'not',
@@ -28,74 +31,71 @@ const PSEUDO_FUNCTIONS = new KeywordSet([
 	'-moz-any',
 ])
 
-export function isPrefixed(selector: CSSNode, on_selector: (prefix: string) => void): void {
-	walk(selector, function (node) {
-		if (
-			is_pseudo_element_selector(node) ||
-			is_pseudo_class_selector(node) ||
-			is_type_selector(node)
-		) {
-			if (node.is_vendor_prefixed) {
-				let prefix = ''
-				if (is_pseudo_class_selector(node)) {
-					prefix = ':'
-				} else if (is_pseudo_element_selector(node)) {
-					prefix = '::'
+/** Find vendor prefixed pseudo-classes, pseudo-elements and type selectors */
+export function get_vendor_prefixes(input: SelectorInput): string[] {
+	const found: string[] = []
+	for (const selector of as_selectors(input)) {
+		walk(selector, function (node) {
+			if (
+				is_pseudo_element_selector(node) ||
+				is_pseudo_class_selector(node) ||
+				is_type_selector(node)
+			) {
+				if (node.is_vendor_prefixed) {
+					let prefix = ''
+					if (is_pseudo_class_selector(node)) {
+						prefix = ':'
+					} else if (is_pseudo_element_selector(node)) {
+						prefix = '::'
+					}
+					found.push(prefix + node.name)
 				}
-				on_selector(prefix + node.name)
 			}
-		}
-	})
-}
-
-/**
- * Check if a Wallace selector is an accessibility selector (has aria-* or role attribute)
- */
-export function isAccessibility(
-	selector: CSSNode,
-	on_selector: (a11y_selector: string) => void,
-): void {
-	function normalize(node: CSSNode) {
-		const clone = node.clone()
-		// We're intentionally not adding attr_flags here because they don't matter for normalization
-		// Also not lowercasing node.value because that DOES matter for CSS
-		if (clone.value) {
-			return (
-				'[' +
-				clone.name?.toLowerCase() +
-				clone.attr_operator +
-				'"' +
-				unquote(clone.value.toString()) +
-				'"' +
-				']'
-			)
-		}
-		return '[' + clone.name?.toLowerCase() + ']'
+		})
 	}
-
-	walk(selector, function (node) {
-		if (is_attribute_selector(node)) {
-			const name = node.name || ''
-			if (str_equals('role', name) || str_starts_with('aria-', name)) {
-				on_selector(normalize(node))
-			}
-		}
-	})
+	return found
 }
 
-/**
- * Get the Complexity for a Wallace Selector Node
- * @param selector - Wallace CSSNode for a Selector
- * @return The numeric complexity of the Selector
- */
-export function getComplexity(selector: CSSNode): number {
+function normalize_accessibility_selector(node: AttributeSelector) {
+	// // We're intentionally not adding attr_flags here because they don't matter for normalization
+	// // Also not lowercasing node.value because that DOES matter for CSS
+	const name = node.name.toLowerCase()
+	if (node.value) {
+		return `[${name}${node.attr_operator ?? ''}"${unquote(node.value || '')}"]`
+	}
+	return `[${name}]`
+}
+
+/** Find accessibility selectors: attribute selectors for `role` and `aria-*` */
+export function get_accessibility_selectors(input: SelectorInput): string[] {
+	const found: string[] = []
+
+	for (const selector of as_selectors(input)) {
+		walk(selector, function (node) {
+			if (is_attribute_selector(node)) {
+				const name = node.name || ''
+				if (str_equals('role', name) || str_starts_with('aria-', name)) {
+					found.push(normalize_accessibility_selector(node))
+				}
+			}
+		})
+	}
+	return found
+}
+
+/** The complexity of every selector in a selector (list) */
+export function get_complexity(input: SelectorInput): number[] {
+	return as_selectors(input).map((selector) => selector_complexity(selector))
+}
+
+function selector_complexity(selector: CSSNode): number {
 	let complexity = 0
 
 	// Helper function to find all Selector nodes recursively
-	function findSelectors(tree: CSSNode, complexities: number[]): void {
+	function find_selectors(tree: CSSNode, complexities: number[]): void {
 		walk(tree, function (node) {
 			if (is_selector(node)) {
-				complexities.push(getComplexity(node))
+				complexities.push(selector_complexity(node))
 				// getComplexity already counted everything nested inside this selector
 				return SKIP
 			}
@@ -144,24 +144,24 @@ export function getComplexity(selector: CSSNode): number {
 		if (is_pseudo_class_selector(node)) {
 			const name = node.name
 
-			if (PSEUDO_FUNCTIONS.has(name.toLowerCase())) {
+			if (pseudo_functions.has(name)) {
 				// Find child selectors and recursively calculate their complexity
-				const childComplexities: number[] = []
+				const child_complexities: number[] = []
 
 				if (node.has_children) {
 					node.for_each((child) => {
 						if (is_selector(child)) {
-							childComplexities.push(getComplexity(child))
+							child_complexities.push(selector_complexity(child))
 						} else {
 							// Recurse to find nested selectors
-							findSelectors(child, childComplexities)
+							find_selectors(child, child_complexities)
 						}
 					})
 				}
 
 				// If there are child selectors (like in :where(), :is(), etc.), add their complexity
-				if (childComplexities.length > 0) {
-					for (const c of childComplexities) {
+				if (child_complexities.length > 0) {
+					for (const c of child_complexities) {
 						complexity += c
 					}
 					// Skip further processing of children since we already processed them
@@ -177,24 +177,30 @@ export function getComplexity(selector: CSSNode): number {
 	return complexity
 }
 
-/**
- * Walk a selector node and trigger a callback every time a Combinator was found
- */
-export function getCombinators(
-	selector: CSSNode,
-	onMatch: ({ name, loc }: { name: string; loc: Location }) => void,
-): void {
-	walk(selector, function (node) {
-		if (is_combinator(node)) {
-			onMatch({
-				name: node.name.trim() === '' ? ' ' : node.name,
-				loc: {
-					offset: node.start,
-					line: node.line,
-					column: node.column,
-					length: 1,
-				},
-			})
-		}
-	})
+/** A combinator's name; `' '` for the descendant combinator */
+export function combinator_name(node: Combinator): string {
+	return node.name.trim() === '' ? ' ' : node.name
+}
+
+export type CombinatorMatch = { name: string; loc: Location }
+
+/** Find all combinators in a selector (list), with where they were found */
+export function get_combinators(input: SelectorInput): CombinatorMatch[] {
+	const found: CombinatorMatch[] = []
+	for (const selector of as_selectors(input)) {
+		walk(selector, function (node) {
+			if (is_combinator(node)) {
+				found.push({
+					name: combinator_name(node),
+					loc: {
+						offset: node.start,
+						line: node.line,
+						column: node.column,
+						length: 1,
+					},
+				})
+			}
+		})
+	}
+	return found
 }

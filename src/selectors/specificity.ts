@@ -11,21 +11,18 @@ import {
 	PSEUDO_ELEMENT_SELECTOR,
 	TYPE_SELECTOR,
 	type CSSNode,
-	type Selector,
 	type SelectorNode,
 	is_selector_list,
 	is_nth_of_selector,
 	is_selector,
 	is_combinator,
 } from '@projectwallace/css-parser'
-import { parse_selector_list } from '@projectwallace/css-parser/parse-selector'
+import { type SelectorInput, as_selectors } from '../utils/input.ts'
 
-type Specificity = [number, number, number]
+export type Specificity = [number, number, number]
 
-/**
- * @returns 0 if s1 equals s2, a negative number if s1 is lower than s2, or a positive number if s1 higher than s2
- */
-export function compare(s1: Specificity, s2: Specificity): number {
+/** Compare two specificities: negative if `s1` is lower, 0 if equal, positive if `s1` is higher */
+export function compare_specificity(s1: Specificity, s2: Specificity): number {
 	if (s1[0] === s2[0]) {
 		if (s1[1] === s2[1]) {
 			return s1[2] - s2[2]
@@ -35,8 +32,18 @@ export function compare(s1: Specificity, s2: Specificity): number {
 	return s1[0] - s2[0]
 }
 
-function max(list: Specificity[]): Specificity {
-	return list.sort(compare).at(-1)!
+//  Shared result for an empty list: read it, never change it
+const no_specificity: Specificity = [0, 0, 0]
+
+/** The highest specificity of a list (`[0, 0, 0]` for an empty list). Does not change the list. */
+export function max_specificity(list: readonly Specificity[]): Specificity {
+	let highest = list[0] ?? no_specificity
+	for (const specificity of list) {
+		if (compare_specificity(specificity, highest) > 0) {
+			highest = specificity
+		}
+	}
+	return highest
 }
 
 function argument_specificity(node: CSSNode): Specificity {
@@ -48,11 +55,7 @@ function argument_specificity(node: CSSNode): Specificity {
 	return [0, 0, 0]
 }
 
-export function calculateForAST(selectorAST: Selector): Specificity {
-	return parts_specificity(selectorAST.first_child)
-}
-
-/** Specificity of the parts from `first` on; with `until_combinator`, only the compound selector before the first combinator */
+//  Specificity of the parts from `first` on; with `until_combinator`, only the compound selector before the first combinator
 function parts_specificity(first: SelectorNode | null, until_combinator = false): Specificity {
 	// https://www.w3.org/TR/selectors-4/#specificity-rules
 	let a = 0 /* ID Selectors */
@@ -102,10 +105,10 @@ function parts_specificity(first: SelectorNode | null, until_combinator = false)
 					case 'has': {
 						if (current.has_children) {
 							// The first child should be a NODE_SELECTOR_LIST
-							const childSelectorList = current.first_child
-							if (childSelectorList && is_selector_list(childSelectorList)) {
+							const child_selector_list = current.first_child
+							if (child_selector_list && is_selector_list(child_selector_list)) {
 								// Calculate Specificity for all selectors in the list and get max
-								const max1 = max(calculate(childSelectorList))
+								const max1 = max_specificity(get_specificity(child_selector_list))
 
 								add(max1)
 							}
@@ -120,10 +123,10 @@ function parts_specificity(first: SelectorNode | null, until_combinator = false)
 						b += 1
 
 						// Get NODE_SELECTOR_NTH_OF which contains the "of" selector list
-						const nthOf = current.first_child
-						if (nthOf && is_nth_of_selector(nthOf) && nthOf.selector) {
+						const nth_of = current.first_child
+						if (nth_of && is_nth_of_selector(nth_of) && nth_of.selector) {
 							// Use the convenience property to access the selector list directly
-							const max2 = max(calculate(nthOf.selector))
+							const max2 = max_specificity(get_specificity(nth_of.selector))
 
 							add(max2)
 						}
@@ -180,9 +183,10 @@ function parts_specificity(first: SelectorNode | null, until_combinator = false)
 					}
 
 					case 'highlight': {
-						if (current.first_child) {
+						const argument = current.first_child
+						if (argument) {
 							// The specificity of a ::highlight() selector with a * argument is zero.
-							if (current.first_child.text === '*') {
+							if (argument.text === '*') {
 								break
 							}
 							// The specificity of a ::highlight() selector with a <custom-ident> argument
@@ -201,13 +205,14 @@ function parts_specificity(first: SelectorNode | null, until_combinator = false)
 
 			case TYPE_SELECTOR: {
 				// Omit namespace
-				let typeSelector = current.name ?? ''
-				if (typeSelector.includes('|')) {
-					typeSelector = typeSelector.split('|')[1] ?? ''
+				let type_selector = current.name ?? ''
+				const namespace = type_selector.indexOf('|')
+				if (namespace !== -1) {
+					type_selector = type_selector.substring(0, namespace) ?? ''
 				}
 
 				// "Ignore the universal selector"
-				if (typeSelector !== '*') {
+				if (type_selector !== '*') {
 					c += 1
 				}
 				break
@@ -225,26 +230,12 @@ function parts_specificity(first: SelectorNode | null, until_combinator = false)
 	return [a, b, c]
 }
 
-export function calculate(selector: string | CSSNode): Specificity[] {
-	if (!selector) {
+/** The specificity of every selector in a selector (list), as `[a, b, c]` */
+export function get_specificity(input: SelectorInput): Specificity[] {
+	// Quit while you're ahead
+	if (!input) {
 		return []
 	}
 
-	let selector_list: CSSNode
-	if (typeof selector === 'string') {
-		try {
-			selector_list = parse_selector_list(selector)
-		} catch (event) {
-			const message = event instanceof Error ? event.message : String(event)
-			throw new TypeError(
-				`Could not convert passed in source '${selector}' to SelectorList: ${message}`,
-			)
-		}
-	} else if (is_selector_list(selector)) {
-		selector_list = selector
-	} else {
-		throw new TypeError('Passed in source is not a string or a SelectorList AST')
-	}
-
-	return Array.from(selector_list, (node) => calculateForAST(node as Selector))
+	return as_selectors(input).map((selector) => parts_specificity(selector.first_child))
 }

@@ -39,6 +39,18 @@
 			"types": "./dist/index.d.ts",
 			"default": "./dist/index.js"
 		},
+		"./collectors": {
+			"types": "./dist/collectors/index.d.ts",
+			"default": "./dist/collectors/index.js"
+		},
+		"./presets": {
+			"types": "./dist/presets/index.d.ts",
+			"default": "./dist/presets/index.js"
+		},
+		"./utils/collections": {
+			"types": "./dist/utils/collections/index.d.ts",
+			"default": "./dist/utils/collections/index.js"
+		},
 		"./selectors": {
 			"types": "./dist/selectors/index.d.ts",
 			"default": "./dist/selectors/index.js"
@@ -46,6 +58,10 @@
 		"./atrules": {
 			"types": "./dist/atrules/index.d.ts",
 			"default": "./dist/atrules/index.js"
+		},
+		"./stylesheet": {
+			"types": "./dist/stylesheet/index.d.ts",
+			"default": "./dist/stylesheet/index.js"
 		},
 		"./values": {
 			"types": "./dist/values/index.d.ts",
@@ -85,7 +101,7 @@
 		"vitest": "^5.0.5"
 	},
 	"engines": {
-		"node": ">=18.0.0",
+		"node": ">=22.18.0",
 		"pnpm": ">=11.0.0"
 	},
 	"packageManager": "pnpm@11.16.0"

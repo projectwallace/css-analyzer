@@ -1,117 +1,39 @@
-import { test } from 'vitest'
-import { expect } from 'vitest'
-import { analyze } from '../index.ts'
+import { test, expect } from 'vitest'
+import { get_prefixed_values } from './vendor-prefix.ts'
 
-test('finds simple prefixes', () => {
-	const fixture = `
-    value-vendor-prefix-simple {
-      width: -moz-max-content;
-      width: -webkit-max-content;
-      box-shadow: 0 0 0 3px -moz-mac-focusring;
-      position: -webkit-sticky;
-      -webkit-transition: -webkit-transform 0.3s ease-out;
-      -moz-transition: -moz-transform 0.3s ease-out;
-      -o-transition: -o-transform 0.3s ease-out;
-      transition: -o-transform 0.3s ease-out;
-    }
-
-    not-a-prefix {
-      background: var(--test);
-      margin: -0.3em;
-    }
-
-    @supports (position: -webkit-sticky) {
-      thing {
-        position: -webkit-sticky;
-        position: sticky;
-      }
-    }
-  `
-	const actual = analyze(fixture).values.prefixes
-	const expected = {
-		total: 9,
-		totalUnique: 7,
-		unique: {
-			'-moz-max-content': 1,
-			'-webkit-max-content': 1,
-			'-moz-mac-focusring': 1,
-			'-webkit-sticky': 2,
-			'-webkit-transform': 1,
-			'-moz-transform': 1,
-			'-o-transform': 2,
-		},
-		uniquenessRatio: 7 / 9,
-	}
-
-	expect(actual).toEqual(expected)
+test.each([
+	['-webkit-box', ['-webkit-box']],
+	['-webkit-linear-gradient(red, blue)', ['-webkit-linear-gradient']],
+	['-moz-calc(1px + 2px)', ['-moz-calc']],
+	['linear-gradient(-webkit-gradient(red), blue)', ['-webkit-gradient']],
+	['-webkit-box -moz-box', ['-webkit-box', '-moz-box']],
+])('finds the prefixed values in "%s"', (value, expected) => {
+	expect(get_prefixed_values(value)).toEqual(expected)
 })
 
-test('normalizes prefixes', () => {
-	const fixture = `
-    value-vendor-prefix-simple {
-      width: -moz-max-content;
-      WIDTH: -MOZ-MAX-CONTENT;
-    }
-  `
-	const actual = analyze(fixture).values.prefixes
-	const expected = {
-		total: 2,
-		totalUnique: 1,
-		unique: {
-			'-moz-max-content': 2,
-		},
-		uniquenessRatio: 1 / 2,
-	}
+test.each(['flex', '1px solid red', '--custom-property', 'calc(-1 * var(--x))'])(
+	'finds nothing in "%s"',
+	(value) => {
+		expect(get_prefixed_values(value)).toEqual([])
+	},
+)
 
-	expect(actual).toEqual(expected)
-})
+test.each([
+	['-moz-1px', ['-moz-1px']],
+	['-webkit-10px', ['-webkit-10px']],
+	['1px -webkit-', ['-webkit-']],
+	['-webkit-calc(1px)', ['-webkit-calc']],
+	['-moz-element(#x)', ['-moz-element']],
+])(
+	'the parser reads prefixed number-like words as identifiers, so they are found by name: "%s"',
+	(value, expected) => {
+		expect(get_prefixed_values(value)).toEqual(expected)
+	},
+)
 
-test('finds nested prefixes', () => {
-	const fixture = `
-    value-vendor-prefix-nested {
-      background-image: -khtml-linear-gradient(90deg, red, green);
-      background:
-        red,
-        -webkit-linear-gradient(transparent, transparent),
-        -moz-linear-gradient(transparent, transparent),
-        -ms-linear-gradient(transparent, transparent),
-        -o-linear-gradient(transparent, transparent);
-      grid-template-columns: repeat(3, max(-webkit-max-content, 100vw));
-    }
-  `
-	const actual = analyze(fixture).values.prefixes
-	const expected = {
-		total: 6,
-		totalUnique: 6,
-		unique: {
-			'-khtml-linear-gradient': 1,
-			'-webkit-linear-gradient': 1,
-			'-moz-linear-gradient': 1,
-			'-ms-linear-gradient': 1,
-			'-o-linear-gradient': 1,
-			'-webkit-max-content': 1,
-		},
-		uniquenessRatio: 1,
-	}
-
-	expect(actual).toEqual(expected)
-})
-
-test('finds DEEPLY nested prefixes', () => {
-	const fixture = `
-    value-vendor-prefix-deeply-nested {
-      width: var(--test, -webkit-max-content);
-    }
-  `
-	const actual = analyze(fixture).values.prefixes
-	const expected = {
-		total: 1,
-		totalUnique: 1,
-		unique: {
-			'-webkit-max-content': 1,
-		},
-		uniquenessRatio: 1,
-	}
-
-	expect(actual).toEqual(expected)
-})
+test.each(['"-webkit-x"', '#-webkit-x'])(
+	'ignores prefixes inside strings and hashes: %s',
+	(value) => {
+		expect(get_prefixed_values(value)).toEqual([])
+	},
+)

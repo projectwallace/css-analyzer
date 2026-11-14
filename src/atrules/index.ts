@@ -1,1 +1,1 @@
-export { isSupportsBrowserhack, isMediaBrowserhack } from './atrules.ts'
+export { get_supports_browserhacks, get_media_browserhacks } from './atrules.ts'

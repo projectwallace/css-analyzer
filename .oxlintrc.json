@@ -3,5 +3,64 @@
 	"rules": {
 		"no-null": "allow",
 		"max-depth": ["warn", 6]
-	}
+	},
+	// Layering, see "Where does code go?" in CONTRIBUTING.md
+	"overrides": [
+		{
+			// Leaf layers: pure helpers and the public utility modules
+			"files": [
+				"src/utils/**",
+				"src/selectors/**",
+				"src/values/**",
+				"src/atrules/**",
+				"src/properties/**",
+				"src/stylesheet/**"
+			],
+			"rules": {
+				"no-restricted-imports": [
+					"error",
+					{
+						"patterns": [
+							{
+								"group": ["**/engine/**", "**/collectors/**", "**/presets/**", "**/integration/**"],
+								"message": "Utility modules are leaves: they must not import the engine, collectors or presets."
+							}
+						]
+					}
+				]
+			}
+		},
+		{
+			"files": ["src/engine/**"],
+			"rules": {
+				"no-restricted-imports": [
+					"error",
+					{
+						"patterns": [
+							{
+								"group": ["**/collectors/**", "**/presets/**", "**/integration/**"],
+								"message": "The engine must not know about collectors or presets."
+							}
+						]
+					}
+				]
+			}
+		},
+		{
+			"files": ["src/collectors/**"],
+			"rules": {
+				"no-restricted-imports": [
+					"error",
+					{
+						"patterns": [
+							{
+								"group": ["**/presets/**", "**/integration/**"],
+								"message": "Collectors must not import presets."
+							}
+						]
+					}
+				]
+			}
+		}
+	]
 }

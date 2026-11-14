@@ -1,7 +1,7 @@
-import { is_custom, is_vendor_prefixed, property_basename } from '@projectwallace/css-parser'
-import { KeywordSet } from '../keyword-set.ts'
+import { KeywordSet } from '../utils/collections/keyword-set.ts'
+import { is_custom, is_vendor_prefixed } from '@projectwallace/css-parser'
 
-export const shorthand_properties: Set<string> = new Set([
+export const shorthand_properties: ReadonlySet<string> = new Set([
 	'all',
 	'animation',
 	'background',
@@ -51,7 +51,7 @@ export const shorthand_properties: Set<string> = new Set([
 	'vertical-align',
 ])
 
-export const SPACING_RESET_PROPERTIES: Set<string> = new Set([
+export const spacing_reset_properties: ReadonlySet<string> = new Set([
 	'margin',
 	'margin-block',
 	'margin-inline',
@@ -88,10 +88,8 @@ export const border_radius_properties: KeywordSet = new KeywordSet([
 	'border-end-start-radius',
 ])
 
-/**
- * @see https://github.com/csstree/csstree/blob/master/lib/utils/names.js#L69
- */
-export function isHack(property: string): boolean {
+// See https://github.com/csstree/csstree/blob/master/lib/utils/names.js#L69
+export function is_hack(property: string): boolean {
 	if (is_custom(property) || is_vendor_prefixed(property)) {
 		return false
 	}
@@ -108,9 +106,3 @@ export function isHack(property: string): boolean {
 		code === 35
 	) // #
 }
-
-/**
- * Normalized property name: lowercased, without vendor prefix or hack characters.
- * Custom properties are returned as written. Alias of css-parser's `property_basename()`.
- */
-export const basename: (property: string) => string = property_basename

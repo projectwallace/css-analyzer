@@ -8,25 +8,46 @@ import {
 	is_supports_query,
 	is_dimension,
 	is_number,
-	type CSSNode,
+	type AnyNode,
+	str_index_of,
 } from '@projectwallace/css-parser'
+import { type PreludeInput, as_prelude } from '../utils/input.ts'
 
-/**
- * Check if an @supports atRule is a browserhack (Wallace parser version)
- * @param prelude - The Atrule CSSNode from Wallace parser
- */
-export function isSupportsBrowserhack(prelude: CSSNode, on_hack: (hack: string) => void): void {
-	walk(prelude, function (node) {
+function find_hacks(
+	name: string,
+	input: PreludeInput,
+	check: (node: AnyNode, on_hack: (hack: string) => void) => unknown,
+): string[] {
+	const hacks: string[] = []
+	for (const prelude of as_prelude(name, input)) {
+		walk(prelude, function (node) {
+			const result = check(node, (hack) => hacks.push(hack))
+			if (result === BREAK) {
+				return BREAK
+			}
+		})
+		if (hacks.length > 0) {
+			break
+		}
+	}
+	return hacks
+}
+
+const whitespace_regex = /\s+/g
+
+/** Find @supports browserhacks (`-webkit-appearance: none`, `-moz-appearance: meterbar`) */
+export function get_supports_browserhacks(input: PreludeInput): string[] {
+	return find_hacks('supports', input, function (node, on_hack) {
 		// Check SupportsQuery nodes for browserhack patterns
 		if (is_supports_query(node)) {
-			const normalizedPrelude = node.value.toString().toLowerCase().replaceAll(/\s+/g, '')
+			const normalized_prelude = node.value.toString().replaceAll(whitespace_regex, '')
 
 			// Check for known browserhack patterns
-			if (normalizedPrelude.includes('-webkit-appearance:none')) {
+			if (str_index_of('-webkit-appearance:none', normalized_prelude) !== -1) {
 				on_hack('-webkit-appearance: none')
 				return BREAK
 			}
-			if (normalizedPrelude.includes('-moz-appearance:meterbar')) {
+			if (str_index_of('-moz-appearance:meterbar', normalized_prelude) !== -1) {
 				on_hack('-moz-appearance: meterbar')
 				return BREAK
 			}
@@ -34,13 +55,9 @@ export function isSupportsBrowserhack(prelude: CSSNode, on_hack: (hack: string) 
 	})
 }
 
-/**
- * Check if a @media atRule is a browserhack (Wallace parser version)
- * @param prelude - The Atrule CSSNode from Wallace parser
- * @returns true if the atrule is a browserhack
- */
-export function isMediaBrowserhack(prelude: CSSNode, on_hack: (hack: string) => void): void {
-	walk(prelude, function (node) {
+/** Find @media browserhacks (`\\0`, `\\9`, `-ms-high-contrast`, `min-resolution: .001dpcm`, ...) */
+export function get_media_browserhacks(input: PreludeInput): string[] {
+	return find_hacks('media', input, function (node, on_hack) {
 		// Check MediaType nodes for \0 prefix or \9 suffix
 		if (is_media_type(node)) {
 			const text = node.value
