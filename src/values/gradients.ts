@@ -1,3 +1,4 @@
+import { str_equals, strip_vendor_prefix } from '@projectwallace/css-parser'
 import { KeywordSet } from '../utils/collections/keyword-set.ts'
 
 const gradient_functions = new KeywordSet([
@@ -9,7 +10,12 @@ const gradient_functions = new KeywordSet([
 	'repeating-conic-gradient',
 ])
 
-/** Is this the name of a CSS gradient function (`linear-gradient`, `repeating-conic-gradient`, ...)? */
+/** Is this the name of a CSS gradient function (`linear-gradient`, `-webkit-radial-gradient`, ...)? */
 export function is_gradient_function(name: string): boolean {
-	return gradient_functions.has(name)
+	const unprefixed = strip_vendor_prefix(name)
+	// The old `-webkit-gradient(linear, ...)` only exists with a prefix
+	return (
+		gradient_functions.has(unprefixed) ||
+		(unprefixed.length !== name.length && str_equals('gradient', unprefixed))
+	)
 }
