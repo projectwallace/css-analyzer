@@ -7,6 +7,7 @@ import type {
 	CountResult,
 	WithContexts,
 } from '../engine/types.ts'
+import { strip_unit_hack } from '../values/units.ts'
 import { get_context_property } from './shared.ts'
 
 // These are units, not lengths: `s` and `ms` in `transition` and `animation` count too. Only the values
@@ -27,11 +28,11 @@ export function units<O extends ContextCountOptions = {}>(
 					if (skipped_properties.has(ctx.property)) {
 						return
 					}
-					counter.add(
-						(node as Dimension).unit.toLowerCase(),
-						get_context_property(ctx, options?.property),
-						node,
-					)
+					// A unit can carry a browserhack (`10px\9`); a unit that is only a hack (`0\9`) is no unit
+					const unit = strip_unit_hack((node as Dimension).unit).toLowerCase()
+					if (unit !== '') {
+						counter.add(unit, get_context_property(ctx, options?.property), node)
+					}
 				},
 			},
 			result: () => counter.result() as WithContexts<CountResult, O>,

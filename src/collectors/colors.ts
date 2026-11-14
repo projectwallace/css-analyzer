@@ -63,9 +63,10 @@ export function colors<O extends ColorsOptions = {}>(
 						if (!text.startsWith('#')) {
 							return
 						}
-						// Exclude the # and any IE hack (\9, \7) from the hex length
-						const hex_length = strip_value_hack(text).length - 1
-						counter.add(normalize(text), context, node)
+						// Only the color is counted: without the # and without any IE hack (\9, \7)
+						const hex = strip_value_hack(text)
+						const hex_length = hex.length - 1
+						counter.add(normalize(hex), context, node)
 						formats.add('hex' + hex_length, node)
 					} else if (node.type === IDENTIFIER) {
 						// Font names like "Black" are not colors

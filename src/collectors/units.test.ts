@@ -139,3 +139,15 @@ test.each([
 	const result = analyze(`a { ${declaration} }`, { units: units() }).units
 	expect(result.unique.get(unit)?.count).toBeGreaterThan(0)
 })
+
+test('counts the unit of a value with a browserhack and ignores a bare hack', () => {
+	const actual = run(`
+    a {
+      width: 100px\\9;
+      margin: 0\\9;
+      height: 2EM\\0;
+    }
+  `)
+	expect(actual.unique).toEqual({ px: 1, em: 1 })
+	expect(actual.total).toBe(2)
+})
