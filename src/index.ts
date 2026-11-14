@@ -1399,13 +1399,13 @@ function analyzeInternal<T extends boolean>(
 						if (!hashText || !hashText.startsWith('#')) {
 							return SKIP
 						}
-						const hashValue = hashText.toLowerCase()
+						let hashValue = hashText.toLowerCase()
 
-						// Calculate hex length (excluding the # and any IE9 browserhack \9)
-						let hexLength = hashValue.length - 1 // Remove the # from length
+						// Strip any IE9 browserhack (\9 or \7) so only the color remains
 						if (endsWith('\\9', hashValue) || endsWith('\\7', hashValue)) {
-							hexLength = hexLength - 2 // Remove the \9 or \7 from length
+							hashValue = hashValue.slice(0, -2)
 						}
+						const hexLength = hashValue.length - 1 // Remove the # from length
 
 						const hashLoc = toLoc(valueNode)
 						colors.push(hashValue, property, hashLoc)
