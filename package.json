@@ -1,6 +1,6 @@
 {
 	"name": "@projectwallace/css-analyzer",
-	"version": "9.9.8",
+	"version": "9.9.9",
 	"description": "The best CSS analyzer out there. Check design tokens, complexity, specificity, performance and more.",
 	"keywords": [
 		"analytics",
@@ -85,7 +85,7 @@
 		"precommit": "pnpm run test --run && pnpm run check && pnpm run lint && pnpm run knip"
 	},
 	"dependencies": {
-		"@projectwallace/css-parser": "~0.19.9"
+		"@projectwallace/css-parser": "~0.20.0"
 	},
 	"devDependencies": {
 		"@projectwallace/preset-oxlint": "^0.0.13",
