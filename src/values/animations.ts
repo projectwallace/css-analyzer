@@ -8,6 +8,7 @@ import {
 import { KeywordSet } from '../utils/collections/keyword-set.ts'
 import { keywords } from './values.ts'
 import { type ValueInput, as_value } from '../utils/input.ts'
+import { unquote } from '../utils/string-utils.ts'
 
 const timing_keywords = new KeywordSet([
 	'linear',
@@ -40,8 +41,10 @@ const animation_non_name_keywords = new KeywordSet([
 ])
 
 export type AnimationParts = {
-	/** Durations and delays-as-first-dimension, as written */
+	/** The first time of every layer, as written */
 	durations: string[]
+	/** The second time of every layer (the delay), as written */
+	delays: string[]
 	/** Timing function keywords and functions (`ease-in`, `cubic-bezier(...)`) */
 	timing_functions: string[]
 	/** Animation names, as written (quoted names keep their quotes) */
@@ -52,17 +55,27 @@ export type AnimationParts = {
 
 /** Split an `animation` or `transition` value into its parts */
 export function analyze_animation(input: ValueInput): AnimationParts {
-	const parts: AnimationParts = { durations: [], timing_functions: [], names: [], keywords: [] }
+	const parts: AnimationParts = {
+		durations: [],
+		delays: [],
+		timing_functions: [],
+		names: [],
+		keywords: [],
+	}
 	let duration_found = false
 
 	as_value(input).for_each(function (node) {
 		// Right after a ',' we start over again
 		if (is_operator(node)) {
 			duration_found = false
-		} else if (is_dimension(node) && duration_found === false) {
-			// The first Dimension is the duration, the second is the delay
-			duration_found = true
-			parts.durations.push(node.text)
+		} else if (is_dimension(node)) {
+			// The first time is the duration, the second is the delay
+			if (duration_found) {
+				parts.delays.push(node.text)
+			} else {
+				duration_found = true
+				parts.durations.push(node.text)
+			}
 		} else if (is_identifier(node)) {
 			const name = node.name
 			if (timing_keywords.has(name)) {
@@ -81,4 +94,36 @@ export function analyze_animation(input: ValueInput): AnimationParts {
 	})
 
 	return parts
+}
+
+export type TransitionParts = {
+	/** The properties that transition (`opacity`, `all`, `--x`), as written */
+	properties: string[]
+	/** The first time of every layer, as written */
+	durations: string[]
+	/** The second time of every layer (the delay), as written */
+	delays: string[]
+	/** Timing function keywords and functions (`ease-in`, `steps(4)`) */
+	timing_functions: string[]
+	/** Global keywords such as `inherit` or `none` */
+	keywords: string[]
+}
+
+/** Split a `transition` value into its parts: `opacity 200ms ease-in-out 50ms, color 1s` */
+export function analyze_transition(input: ValueInput): TransitionParts {
+	const { names, ...parts } = analyze_animation(input)
+	return { properties: names, ...parts }
+}
+
+/** The names in an `animation-name` value, without quotes; `none` is not a name */
+export function get_animation_names(input: ValueInput): string[] {
+	const names: string[] = []
+	as_value(input).for_each(function (node) {
+		if (is_identifier(node) && !keywords.has(node.name)) {
+			names.push(node.text)
+		} else if (is_string(node)) {
+			names.push(unquote(node.text))
+		}
+	})
+	return names
 }

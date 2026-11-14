@@ -4,7 +4,6 @@ import {
 	type MediaFeature,
 	SKIP,
 	is_atrule_prelude,
-	is_container_query,
 	is_custom,
 	is_declaration,
 	is_function,
@@ -20,11 +19,15 @@ import { create_counter, to_location } from '../engine/counter.ts'
 import { define_collector } from '../engine/define-collector.ts'
 import type { CollectorDef, CountOptions, CountResult, Location } from '../engine/types.ts'
 import { unquote } from '../utils/string-utils.ts'
-import { get_media_browserhacks, get_supports_browserhacks } from '../atrules/atrules.ts'
+import {
+	get_container_query_name,
+	get_media_browserhacks,
+	get_supports_browserhacks,
+} from '../atrules/atrules.ts'
 import { keywords } from '../values/values.ts'
 import { get_atrule_weight } from './complexity.ts'
 import { without_sequence } from './shared.ts'
-import { get_animation_names, get_first_identifier, get_list_items } from './value-helpers.ts'
+import { get_used_animation_names, get_first_identifier, get_list_items } from './value-helpers.ts'
 
 //  Media features (`(min-width: 40em)`) anywhere in an at-rule prelude
 function find_media_features(prelude: CSSNode | null | undefined): MediaFeature[] {
@@ -50,17 +53,6 @@ function get_descriptors(block: Atrule['block']): Record<string, string> {
 		}
 	})
 	return descriptors
-}
-
-//  The container name in `@container name (min-width: 1px)`
-function get_container_name(prelude: CSSNode | null | undefined): string | undefined {
-	if (prelude && is_atrule_prelude(prelude) && is_container_query(prelude.first_child)) {
-		const name = prelude.first_child.first_child
-		if (name && is_identifier(name)) {
-			return name.text
-		}
-	}
-	return undefined
 }
 
 //  `supports(...)` and `layer(...)` in an `@import` prelude
@@ -228,8 +220,8 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 					}
 				} else if (name === 'container') {
 					containers.add(prelude_text, node)
-					const container_name = get_container_name(prelude)
-					if (container_name !== undefined) {
+					const container_name = prelude ? get_container_query_name(prelude) : null
+					if (container_name !== null) {
 						container_names.add(container_name, node)
 						container_tracking.use(container_name)
 					}
@@ -277,7 +269,7 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 							}
 						}
 					} else {
-						for (const animation_name of get_animation_names(ctx)) {
+						for (const animation_name of get_used_animation_names(ctx)) {
 							keyframes_tracking.use(animation_name)
 						}
 					}

@@ -6,7 +6,7 @@ import { colors } from './colors.ts'
 import { gradients } from './gradients.ts'
 import { keywords } from './keywords.ts'
 import { units } from './units.ts'
-import { get_animation_names, get_first_identifier, get_list_items } from './value-helpers.ts'
+import { get_used_animation_names, get_first_identifier, get_list_items } from './value-helpers.ts'
 
 function names_of(css: string): string[][] {
 	const found: string[][] = []
@@ -14,7 +14,7 @@ function names_of(css: string): string[][] {
 		parse: { values: true },
 		declaration: {
 			enter(_node, ctx) {
-				found.push(get_animation_names(ctx))
+				found.push(get_used_animation_names(ctx))
 			},
 		},
 		result: () => found.length,
@@ -32,7 +32,7 @@ test.each([
 	['animation: inherit', []],
 	['color: red', []],
 	['animation-duration: 1s', []],
-])('get_animation_names("%s")', (declaration, expected) => {
+])('get_used_animation_names("%s")', (declaration, expected) => {
 	expect(names_of(`a { ${declaration} }`)).toEqual([expected])
 })
 

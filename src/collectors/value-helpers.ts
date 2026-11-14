@@ -3,13 +3,11 @@ import {
 	type Value,
 	is_identifier,
 	is_operator,
-	is_string,
 	str_index_of,
 } from '@projectwallace/css-parser'
 import type { DeclarationContext } from '../engine/types.ts'
 import { unquote } from '../utils/string-utils.ts'
-import { analyze_animation } from '../values/animations.ts'
-import { keywords } from '../values/values.ts'
+import { analyze_animation, get_animation_names } from '../values/animations.ts'
 
 // Properties whose values are never searched for colors, gradients and keywords inside the value,
 // because their words are names, timings or plain numbers, not what the collectors look for:
@@ -30,26 +28,14 @@ export function lowercase_unless_var(text: string): string {
 }
 
 /** Animation names of an `animation` or `animation-name` declaration (quotes removed) */
-export function get_animation_names(ctx: DeclarationContext): string[] {
+export function get_used_animation_names(ctx: DeclarationContext): string[] {
 	if (ctx.clean_value_text === undefined) {
 		return []
 	}
 	if (ctx.property === 'animation') {
 		return analyze_animation(ctx.value!).names.map((name) => unquote(name))
 	}
-	if (ctx.property !== 'animation-name') {
-		return []
-	}
-
-	const names: string[] = []
-	for (const item of get_list_items(ctx.value!)) {
-		if (is_identifier(item) && !keywords.has(item.name)) {
-			names.push(item.text)
-		} else if (is_string(item)) {
-			names.push(unquote(item.text))
-		}
-	}
-	return names
+	return ctx.property === 'animation-name' ? get_animation_names(ctx.value!) : []
 }
 
 /** The items of a comma/slash separated value, without the separators */

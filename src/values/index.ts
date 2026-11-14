@@ -1,4 +1,12 @@
-export { analyze_animation, type AnimationParts } from './animations.ts'
+export {
+	analyze_animation,
+	analyze_transition,
+	get_animation_names,
+	type AnimationParts,
+	type TransitionParts,
+} from './animations.ts'
+export { get_declared_container_names } from './containers.ts'
+export { is_gradient_function } from './gradients.ts'
 export { get_value_browserhacks } from './browserhacks.ts'
 export { named_colors, system_colors, color_functions, color_keywords } from './colors.ts'
 export { keywords, is_value_reset } from './values.ts'

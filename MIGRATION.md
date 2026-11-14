@@ -99,7 +99,7 @@ All pure utilities now accept CSS text or a parsed node and return plain data. N
 | `isValueBrowserhack(value, cb)`                                  | `get_value_browserhacks(value)` → `string[]`                                                      |
 | `isValuePrefixed(value, cb)`                                     | `get_prefixed_values(value)` → `string[]`                                                         |
 | `isValueReset(value)`                                            | `is_value_reset(value)`                                                                           |
-| `analyzeAnimation(value, cb)`                                    | `analyze_animation(value)` → `{ durations, timing_functions, names, keywords }`                   |
+| `analyzeAnimation(value, cb)`                                    | `analyze_animation(value)` → `{ durations, delays, timing_functions, names, keywords }`           |
 | `destructureFontShorthand(value, cb)`                            | `destructure_font_shorthand(value)` → `{ font_size, line_height, font_family, keywords } \| null` |
 | `isMediaBrowserhack(node, cb)`                                   | `get_media_browserhacks(prelude)` → `string[]`                                                    |
 | `isSupportsBrowserhack(node, cb)`                                | `get_supports_browserhacks(prelude)` → `string[]`                                                 |
@@ -114,3 +114,4 @@ Removed: `isIe9Hack` (use `get_value_browserhacks`), `hasVendorPrefix`, `cssKeyw
 - Your own collectors with `define_collector()`.
 - Presets for design tokens and for everything (`analyze_all`). `design_tokens_collectors(options)` and `all_collectors(options)` are functions; `{ locations: true }` turns locations on for every collector. The keys of the design-token preset are the collector names (`border_radiuses`, `timing_functions`, `text_shadows`, `units`, ...).
 - `by_context` only exists on `colors`, `units` and `border_radiuses` results when `contexts: true` is passed; the types follow the option.
+- Utilities for transitions, animation names, containers and gradients: `analyze_transition()` (`{ properties, durations, delays, timing_functions, keywords }`) and `get_animation_names()` in `/values`, `get_declared_container_names()` and `is_gradient_function()` in `/values`, `get_container_query_name()` in `/atrules`.

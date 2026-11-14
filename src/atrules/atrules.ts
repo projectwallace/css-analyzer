@@ -2,6 +2,8 @@ import {
 	str_equals,
 	walk,
 	BREAK,
+	is_atrule_prelude,
+	is_container_query,
 	is_identifier,
 	is_media_feature,
 	is_media_type,
@@ -128,4 +130,21 @@ export function get_media_browserhacks(input: PreludeInput): string[] {
 			return BREAK
 		}
 	})
+}
+
+/** The container name in a `@container` prelude (`sidebar (min-width: 400px)`), or `null` for an anonymous query */
+export function get_container_query_name(input: PreludeInput): string | null {
+	const first = as_prelude('container', input)[0]
+	if (!first) {
+		return null
+	}
+	// A parsed prelude holds the query; text is parsed into the query itself
+	const query = is_atrule_prelude(first) ? first.first_child : first
+	if (query && is_container_query(query)) {
+		const name = query.first_child
+		if (name && is_identifier(name)) {
+			return name.text
+		}
+	}
+	return null
 }
