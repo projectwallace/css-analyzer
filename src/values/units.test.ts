@@ -1,5 +1,6 @@
 import { test, expect } from 'vitest'
 import { analyze } from '../index.ts'
+import { strip_unit_hack } from './units.ts'
 
 test('analyzes length units', () => {
 	const fixture = `
@@ -117,4 +118,28 @@ test.each([
 ])('counts units in shorthand `%s`', (declaration, unit) => {
 	const result = analyze(`a { ${declaration} }`)
 	expect(result.values.units.unique[unit]).toBeGreaterThan(0)
+})
+
+test.each([
+	['px\\9', 'px'],
+	['px\\0', 'px'],
+	['em\\7', 'em'],
+	['\\9', ''],
+	['px', 'px'],
+	['\\70x', '\\70x'],
+])('strip_unit_hack("%s") -> "%s"', (unit, expected) => {
+	expect(strip_unit_hack(unit)).toBe(expected)
+})
+
+test('counts the unit of a value with a browserhack and ignores a bare hack', () => {
+	const actual = analyze(`
+    a {
+      width: 100px\\9;
+      margin: 0\\9;
+      height: 2EM\\0;
+    }
+  `).values.units
+
+	expect(actual.unique).toEqual({ px: 1, em: 1 })
+	expect(actual.total).toBe(2)
 })

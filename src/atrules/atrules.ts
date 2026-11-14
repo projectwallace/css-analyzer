@@ -99,7 +99,13 @@ export function isMediaBrowserhack(prelude: CSSNode, on_hack: (hack: string) => 
 			}
 		}
 
-		// \0 inside a media feature value (e.g. min-width:0\0) — sibling of the numeric value
+		// \0 inside a media feature value (e.g. min-width:0\0) — a dimension with unit \0
+		if (is_dimension(node) && node.unit === '\\0') {
+			on_hack('\\0')
+			return BREAK
+		}
+
+		// \0 as a separate identifier node
 		if (is_identifier(node) && node.text === '\\0') {
 			on_hack('\\0')
 			return BREAK
