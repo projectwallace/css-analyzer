@@ -2,7 +2,7 @@ import { is_function, FUNCTION } from '@projectwallace/css-parser'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 import { is_gradient_function } from '../values/gradients.ts'
 import { define_counting_collector } from './shared.ts'
-import { no_value_walk } from './value-helpers.ts'
+import { no_value_walk } from '../extract/shared.ts'
 
 /** Every gradient function (see `is_gradient_function()`), as written, including nested ones and `var()` fallbacks */
 export function gradients(options: CountOptions = {}): CollectorDef<CountResult> {

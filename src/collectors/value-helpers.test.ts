@@ -6,7 +6,8 @@ import { colors } from './colors.ts'
 import { gradients } from './gradients.ts'
 import { keywords } from './keywords.ts'
 import { units } from './units.ts'
-import { get_used_animation_names, get_first_identifier, get_list_items } from './value-helpers.ts'
+import { get_list_items } from '../extract/shared.ts'
+import { get_used_animation_names, get_first_identifier } from './value-helpers.ts'
 
 function names_of(css: string): string[][] {
 	const found: string[][] = []

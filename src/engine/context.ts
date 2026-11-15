@@ -7,14 +7,13 @@ import {
 	is_declaration,
 	is_raw,
 	property_basename,
-	strip_value_hack,
 } from '@projectwallace/css-parser'
 import {
 	system_fonts,
 	destructure_font_shorthand,
 	type FontShorthand,
 } from '../values/destructure-font-shorthand.ts'
-import { keywords } from '../values/values.ts'
+import { get_clean_value_text } from '../extract/shared.ts'
 import type { DeclarationContext, StylesheetContext } from './types.ts'
 
 export type ContextController = {
@@ -81,13 +80,7 @@ export function create_context(): ContextController {
 		},
 		get clean_value_text() {
 			if (clean_text_cache === not_computed) {
-				const text = ctx.value_text
-				clean_text_cache =
-					ctx.value && !keywords.has(text)
-						? ctx.is_custom
-							? text
-							: strip_value_hack(text)
-						: undefined
+				clean_text_cache = get_clean_value_text(ctx.value, ctx.is_custom)
 			}
 			return clean_text_cache
 		},

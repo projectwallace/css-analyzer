@@ -28,7 +28,8 @@ import { get_keyframes_name, get_layer_names } from '../atrules/names.ts'
 import { keywords } from '../values/values.ts'
 import { get_atrule_weight } from './complexity.ts'
 import { without_sequence } from './shared.ts'
-import { get_used_animation_names, get_first_identifier, get_list_items } from './value-helpers.ts'
+import { get_list_items } from '../extract/shared.ts'
+import { get_used_animation_names, get_first_identifier } from './value-helpers.ts'
 
 //  Media features (`(min-width: 40em)`) anywhere in an at-rule prelude
 function find_media_features(prelude: CSSNode | null | undefined): MediaFeature[] {

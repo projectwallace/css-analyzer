@@ -2,7 +2,7 @@ import { str_index_of } from '@projectwallace/css-parser'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 import { system_fonts } from '../values/destructure-font-shorthand.ts'
 import { define_counting_collector, type Normalize } from './shared.ts'
-import { lowercase_unless_var } from './value-helpers.ts'
+import { lowercase_unless_var } from '../extract/shared.ts'
 
 export type FontSizesOptions = CountOptions & {
 	/** `lowercase` (default) lowercases the values (`2EM` is `2em`; values with `var()` are kept). `none` keeps them as written. */

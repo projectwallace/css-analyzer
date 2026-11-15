@@ -1,7 +1,7 @@
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 import { analyze_animation } from '../values/animations.ts'
 import { define_counting_collector, type Normalize } from './shared.ts'
-import { get_list_items, lowercase_unless_var } from './value-helpers.ts'
+import { get_list_items, lowercase_unless_var } from '../extract/shared.ts'
 
 export type TimingFunctionsOptions = CountOptions & {
 	/** `lowercase` (default) lowercases the values (`EASE` is `ease`; values with `var()` are kept). `none` keeps them as written. */

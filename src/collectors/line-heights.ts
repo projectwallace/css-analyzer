@@ -1,7 +1,7 @@
 import { str_index_of } from '@projectwallace/css-parser'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 import { define_counting_collector, type Normalize } from './shared.ts'
-import { lowercase_unless_var } from './value-helpers.ts'
+import { lowercase_unless_var } from '../extract/shared.ts'
 
 export type LineHeightsOptions = CountOptions & {
 	/** `lowercase` (default) lowercases the values (values with `var()` are kept). `none` keeps them as written. */

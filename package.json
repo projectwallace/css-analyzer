@@ -67,6 +67,10 @@
 			"types": "./dist/values/index.d.ts",
 			"default": "./dist/values/index.js"
 		},
+		"./extract": {
+			"types": "./dist/extract/index.d.ts",
+			"default": "./dist/extract/index.js"
+		},
 		"./properties": {
 			"types": "./dist/properties/index.d.ts",
 			"default": "./dist/properties/index.js"

@@ -10,6 +10,7 @@
 			// Leaf layers: pure helpers and the public utility modules
 			"files": [
 				"src/utils/**",
+				"src/extract/**",
 				"src/selectors/**",
 				"src/values/**",
 				"src/atrules/**",

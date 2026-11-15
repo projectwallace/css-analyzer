@@ -1,7 +1,7 @@
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 import { keywords as global_keywords } from '../values/values.ts'
 import { define_counting_collector } from './shared.ts'
-import { lowercase_unless_var } from './value-helpers.ts'
+import { lowercase_unless_var } from '../extract/shared.ts'
 
 const properties = new Set(['display'])
 
