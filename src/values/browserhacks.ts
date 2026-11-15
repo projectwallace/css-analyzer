@@ -9,27 +9,29 @@ import {
 } from '@projectwallace/css-parser'
 import { ends_with, unquote } from '../utils/string-utils.ts'
 import { type ValueInput, as_value } from '../utils/input.ts'
+import { type Match, to_match, to_match_in } from '../utils/location.ts'
 
 // Browserhacks sourced from:
 // - https://browserhacks.com/
 // - https://www.alwaystwisted.com/relicss/old-css
 /** Find the browserhacks in a CSS value: `progid:`, `\\9`, `\\7`, `alpha()`, `expression()`, `.htc` */
-export function get_value_browserhacks(input: ValueInput): string[] {
+export function get_value_browserhacks(input: ValueInput): Match[] {
 	const node = as_value(input)
-	const hacks: string[] = []
+	const hacks: Match[] = []
 	const text = node.text
 
 	// filter: progid:DXImageTransform.Microsoft.gradient(...) — plain or within quotes
-	if (str_index_of('progid:', text) !== -1) {
-		hacks.push('progid:')
+	const progid = str_index_of('progid:', text)
+	if (progid !== -1) {
+		hacks.push(to_match_in(node, progid, 7, 'progid:'))
 	}
 
 	if (text.endsWith('\\9')) {
-		hacks.push('\\9')
+		hacks.push(to_match_in(node, text.length - 2, 2, '\\9'))
 	}
 
 	if (text.endsWith('\\7')) {
-		hacks.push('\\7')
+		hacks.push(to_match_in(node, text.length - 2, 2, '\\7'))
 	}
 
 	// alpha(), expression(), and behavior .htc hacks: the first one found ends the search
@@ -42,13 +44,13 @@ export function get_value_browserhacks(input: ValueInput): string[] {
 				if (is_identifier(first_child) && str_equals('from', first_child.name)) {
 					return BREAK
 				}
-				hacks.push('alpha()')
+				hacks.push(to_match(child, 'alpha()'))
 			} else if (str_equals('expression', name)) {
-				hacks.push('expression()')
+				hacks.push(to_match(child, 'expression()'))
 				return BREAK
 			}
 		} else if (is_url(child) && ends_with('.htc', unquote(child.value ?? ''))) {
-			hacks.push('.htc')
+			hacks.push(to_match(child, '.htc'))
 			return BREAK
 		}
 	})

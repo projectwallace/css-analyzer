@@ -1,6 +1,7 @@
 import { test, expect } from 'vitest'
 import { type CSSNode, parse } from '@projectwallace/css-parser'
-import { create_counter, create_context_counter, summarize, to_location } from './counter.ts'
+import { create_counter, create_context_counter, summarize } from './counter.ts'
+import { to_location } from '../utils/location.ts'
 
 // The rule `a{}` on line 2, column 3
 const at = parse('\n  a{}').first_child!

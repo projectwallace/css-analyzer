@@ -30,7 +30,7 @@ export function timing_functions(options: TimingFunctionsOptions = {}): Collecto
 					}
 					const items =
 						ctx.property === 'transition' || ctx.property === 'animation'
-							? analyze_animation(ctx.value!).timing_functions
+							? analyze_animation(ctx.value!).timing_functions.map((match) => match.text)
 							: get_list_items(ctx.value!).map((item) => item.text)
 					for (const item of items) {
 						counter.add(lowercase ? lowercase_unless_var(item) : item, ctx.value!)

@@ -8,13 +8,13 @@ test.each([
 	['linear-gradient(-webkit-gradient(red), blue)', ['-webkit-gradient']],
 	['-webkit-box -moz-box', ['-webkit-box', '-moz-box']],
 ])('finds the prefixed values in "%s"', (value, expected) => {
-	expect(get_prefixed_values(value)).toEqual(expected)
+	expect(get_prefixed_values(value).map((match) => match.text)).toEqual(expected)
 })
 
 test.each(['flex', '1px solid red', '--custom-property', 'calc(-1 * var(--x))'])(
 	'finds nothing in "%s"',
 	(value) => {
-		expect(get_prefixed_values(value)).toEqual([])
+		expect(get_prefixed_values(value).map((match) => match.text)).toEqual([])
 	},
 )
 
@@ -27,13 +27,20 @@ test.each([
 ])(
 	'the parser reads prefixed number-like words as identifiers, so they are found by name: "%s"',
 	(value, expected) => {
-		expect(get_prefixed_values(value)).toEqual(expected)
+		expect(get_prefixed_values(value).map((match) => match.text)).toEqual(expected)
 	},
 )
 
 test.each(['"-webkit-x"', '#-webkit-x'])(
 	'ignores prefixes inside strings and hashes: %s',
 	(value) => {
-		expect(get_prefixed_values(value)).toEqual([])
+		expect(get_prefixed_values(value).map((match) => match.text)).toEqual([])
 	},
 )
+
+test('locates the name of the prefixed value', () => {
+	const value = '1px -webkit-calc(1px + 2px)'
+	const [match] = get_prefixed_values(value)
+	expect(match).toEqual({ text: '-webkit-calc', line: 1, column: 5, offset: 4, length: 12 })
+	expect(value.slice(match!.offset, match!.offset + match!.length)).toBe(match!.text)
+})

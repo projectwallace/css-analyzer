@@ -6,53 +6,73 @@ import {
 	get_supports_browserhacks,
 } from './index.ts'
 
+function texts(matches: { text: string }[]): string[] {
+	return matches.map((match) => match.text)
+}
+
 function prelude_of(css: string) {
 	const atrule = parse(css, { parse_atrule_preludes: true }).first_child as Atrule
 	return atrule.prelude!
 }
 
 test('get_media_browserhacks finds hacks in prelude text and nodes', () => {
-	expect(get_media_browserhacks('\\0screen')).toEqual(['\\0'])
-	expect(get_media_browserhacks('(-ms-high-contrast: none)')).toEqual(['-ms-high-contrast'])
-	expect(get_media_browserhacks('screen and (min-width: 600px)')).toEqual([])
+	expect(texts(get_media_browserhacks('\\0screen'))).toEqual(['\\0'])
+	expect(texts(get_media_browserhacks('(-ms-high-contrast: none)'))).toEqual(['-ms-high-contrast'])
+	expect(texts(get_media_browserhacks('screen and (min-width: 600px)'))).toEqual([])
 
 	const prelude = prelude_of('@media (-ms-high-contrast: none) {}')
-	expect(get_media_browserhacks(prelude)).toEqual(['-ms-high-contrast'])
+	expect(texts(get_media_browserhacks(prelude))).toEqual(['-ms-high-contrast'])
 })
 
 test('get_supports_browserhacks finds hacks in prelude text and nodes', () => {
-	expect(get_supports_browserhacks('(-webkit-appearance: none)')).toEqual([
+	expect(texts(get_supports_browserhacks('(-webkit-appearance: none)'))).toEqual([
 		'-webkit-appearance: none',
 	])
-	expect(get_supports_browserhacks('(display: grid)')).toEqual([])
+	expect(texts(get_supports_browserhacks('(display: grid)'))).toEqual([])
 
 	const prelude = prelude_of('@supports (-moz-appearance: meterbar) {}')
-	expect(get_supports_browserhacks(prelude)).toEqual(['-moz-appearance: meterbar'])
+	expect(texts(get_supports_browserhacks(prelude))).toEqual(['-moz-appearance: meterbar'])
 })
 
 test('get_supports_browserhacks finds hacks in uppercase prelude text and nodes', () => {
-	expect(get_supports_browserhacks('(-WEBKIT-APPEARANCE: NONE)')).toEqual([
+	expect(texts(get_supports_browserhacks('(-WEBKIT-APPEARANCE: NONE)'))).toEqual([
 		'-webkit-appearance: none',
 	])
 
 	const prelude = prelude_of('@supports (-MOZ-APPEARANCE: METERBAR) {}')
-	expect(get_supports_browserhacks(prelude)).toEqual(['-moz-appearance: meterbar'])
+	expect(texts(get_supports_browserhacks(prelude))).toEqual(['-moz-appearance: meterbar'])
 })
 
 test.each([
 	['sidebar (min-width: 400px)', 'sidebar'],
 	['page-layout (block-size > 12em)', 'page-layout'],
 	['--my-container (width > 1px)', '--my-container'],
-	['(min-width: 400px)', null],
-	['style(--responsive: true)', null],
+	['(min-width: 400px)', undefined],
+	['style(--responsive: true)', undefined],
 ])(
-	'get_container_query_name("%s") is %j, for text and for a parsed prelude',
+	'get_container_query_name("%s") is %s, for text and for a parsed prelude',
 	(prelude, expected) => {
-		expect(get_container_query_name(prelude)).toBe(expected)
-		expect(get_container_query_name(prelude_of(`@container ${prelude} {}`))).toBe(expected)
+		expect(get_container_query_name(prelude)?.text).toBe(expected)
+		expect(get_container_query_name(prelude_of(`@container ${prelude} {}`))?.text).toBe(expected)
 	},
 )
 
 test('get_container_query_name is null for an empty prelude', () => {
 	expect(get_container_query_name('')).toBeNull()
+})
+
+test('the browserhack matches say where the hack is', () => {
+	expect(get_media_browserhacks('screen and (-ms-high-contrast: none)')).toMatchObject([
+		{ text: '-ms-high-contrast', line: 1, offset: 11 },
+	])
+})
+
+test('get_container_query_name locates the name', () => {
+	expect(get_container_query_name('sidebar (min-width: 400px)')).toEqual({
+		text: 'sidebar',
+		line: 1,
+		column: 1,
+		offset: 0,
+		length: 7,
+	})
 })

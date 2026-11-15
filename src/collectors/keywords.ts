@@ -21,11 +21,11 @@ export function keywords(options: CountOptions = {}): CollectorDef<CountResult> 
 						counter.add(text.toLowerCase(), ctx.value)
 					} else if (ctx.property === 'font') {
 						for (const keyword of ctx.font_shorthand?.keywords ?? []) {
-							counter.add(keyword.toLowerCase(), ctx.value)
+							counter.add(keyword.text.toLowerCase(), ctx.value)
 						}
 					} else if (ctx.property === 'transition' || ctx.property === 'animation') {
 						for (const keyword of analyze_animation(ctx.value).keywords) {
-							counter.add(keyword.toLowerCase(), ctx.value)
+							counter.add(keyword.text.toLowerCase(), ctx.value)
 						}
 					}
 				},

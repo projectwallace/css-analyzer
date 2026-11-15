@@ -17,7 +17,7 @@ import {
 } from '@projectwallace/css-parser'
 import { unquote } from '../utils/string-utils.ts'
 import { type SelectorInput, as_selectors } from '../utils/input.ts'
-import type { Location } from '../utils/location.ts'
+import { type Location, type Match, to_location, to_match } from '../utils/location.ts'
 
 const pseudo_functions = new KeywordSet([
 	'nth-child',
@@ -32,8 +32,8 @@ const pseudo_functions = new KeywordSet([
 ])
 
 /** Find vendor prefixed pseudo-classes, pseudo-elements and type selectors */
-export function get_vendor_prefixes(input: SelectorInput): string[] {
-	const found: string[] = []
+export function get_vendor_prefixes(input: SelectorInput): Match[] {
+	const found: Match[] = []
 	for (const selector of as_selectors(input)) {
 		walk(selector, function (node) {
 			if (
@@ -48,7 +48,7 @@ export function get_vendor_prefixes(input: SelectorInput): string[] {
 					} else if (is_pseudo_element_selector(node)) {
 						prefix = '::'
 					}
-					found.push(prefix + node.name)
+					found.push(to_match(node, prefix + node.name))
 				}
 			}
 		})
@@ -67,15 +67,15 @@ function normalize_accessibility_selector(node: AttributeSelector) {
 }
 
 /** Find accessibility selectors: attribute selectors for `role` and `aria-*` */
-export function get_accessibility_selectors(input: SelectorInput): string[] {
-	const found: string[] = []
+export function get_accessibility_selectors(input: SelectorInput): Match[] {
+	const found: Match[] = []
 
 	for (const selector of as_selectors(input)) {
 		walk(selector, function (node) {
 			if (is_attribute_selector(node)) {
 				const name = node.name || ''
 				if (str_equals('role', name) || str_starts_with('aria-', name)) {
-					found.push(normalize_accessibility_selector(node))
+					found.push(to_match(node, normalize_accessibility_selector(node)))
 				}
 			}
 		})
@@ -83,9 +83,11 @@ export function get_accessibility_selectors(input: SelectorInput): string[] {
 	return found
 }
 
-/** The complexity of every selector in a selector (list) */
-export function get_complexity(input: SelectorInput): number[] {
-	return as_selectors(input).map((selector) => selector_complexity(selector))
+/** The complexity of every selector in a selector (list), located at the selector */
+export function get_complexity(input: SelectorInput): SelectorComplexity[] {
+	return as_selectors(input).map((selector) =>
+		Object.assign(to_location(selector), { complexity: selector_complexity(selector) }),
+	)
 }
 
 function selector_complexity(selector: CSSNode): number {
@@ -182,23 +184,15 @@ export function combinator_name(node: Combinator): string {
 	return node.name.trim() === '' ? ' ' : node.name
 }
 
-export type CombinatorMatch = { name: string; loc: Location }
+export type SelectorComplexity = Location & { complexity: number }
 
-/** Find all combinators in a selector (list), with where they were found */
-export function get_combinators(input: SelectorInput): CombinatorMatch[] {
-	const found: CombinatorMatch[] = []
+/** Find all combinators in a selector (list). `text` is the name, `' '` for the descendant combinator. */
+export function get_combinators(input: SelectorInput): Match[] {
+	const found: Match[] = []
 	for (const selector of as_selectors(input)) {
 		walk(selector, function (node) {
 			if (is_combinator(node)) {
-				found.push({
-					name: combinator_name(node),
-					loc: {
-						offset: node.start,
-						line: node.line,
-						column: node.column,
-						length: 1,
-					},
-				})
+				found.push(to_match(node, combinator_name(node), 1))
 			}
 		})
 	}

@@ -7,6 +7,7 @@ import {
 } from '@projectwallace/css-parser'
 import { KeywordSet } from '../utils/collections/keyword-set.ts'
 import { type ValueInput, as_value } from '../utils/input.ts'
+import { type Match, to_match } from '../utils/location.ts'
 import { keywords } from './values.ts'
 
 export const system_fonts: KeywordSet = new KeywordSet([
@@ -60,11 +61,12 @@ const pre_size_keywords = new KeywordSet([
 const slash = 47 // '/'.charCodeAt(0)
 
 export type FontShorthand = {
-	font_size?: string
-	line_height?: string
-	font_family?: string | null
+	font_size?: Match
+	line_height?: Match
+	/** Everything after the size and line height, as written */
+	font_family?: Match | null
 	/** Global keywords (inherit, initial, ...) found anywhere in the value */
-	keywords: string[]
+	keywords: Match[]
 }
 
 // Grammar:
@@ -75,7 +77,7 @@ export type FontShorthand = {
 /** Split a `font` shorthand value into font size, line height, family and global keywords; `null` for a lone `var()` */
 export function destructure_font_shorthand(input: ValueInput): FontShorthand | null {
 	const value = as_value(input)
-	const found_keywords: string[] = []
+	const found_keywords: Match[] = []
 	if (!value.has_children) {
 		return null
 	}
@@ -88,13 +90,13 @@ export function destructure_font_shorthand(input: ValueInput): FontShorthand | n
 	// Report global keywords (inherit, initial, …) that appear anywhere in the value.
 	value.for_each((child) => {
 		if (is_identifier(child) && keywords.has(child.name)) {
-			found_keywords.push(child.name!)
+			found_keywords.push(to_match(child))
 		}
 	})
 
 	const children = value.children
-	let font_size: string | undefined
-	let line_height: string | undefined
+	let font_size: Match | undefined
+	let line_height: Match | undefined
 	// Index of the first child node that belongs to font-family (-1 = none found)
 	let font_family_start = -1
 
@@ -134,13 +136,13 @@ export function destructure_font_shorthand(input: ValueInput): FontShorthand | n
 			}
 
 			if (is_dimension(child)) {
-				font_size = child.text
+				font_size = to_match(child)
 				font_family_start = i + 1
 				break
 			}
 
 			if (is_function(child)) {
-				font_size = child.text
+				font_size = to_match(child)
 				font_family_start = i + 1
 				break
 			}
@@ -148,7 +150,7 @@ export function destructure_font_shorthand(input: ValueInput): FontShorthand | n
 			if (is_identifier(child)) {
 				const name = child.name
 				if (size_keywords.has(name)) {
-					font_size = child.text
+					font_size = to_match(child)
 					font_family_start = i + 1
 					break
 				}
@@ -173,11 +175,11 @@ export function destructure_font_shorthand(input: ValueInput): FontShorthand | n
 		// The node immediately after "/" is line-height.
 		// Everything after line-height is font-family.
 		if (slash_index > 0) {
-			font_size = children[slash_index - 1]!.text
+			font_size = to_match(children[slash_index - 1]!)
 		}
 		const after_slash = slash_index + 1
 		if (after_slash < children.length) {
-			line_height = children[after_slash]!.text
+			line_height = to_match(children[after_slash]!)
 			font_family_start = after_slash + 1
 		}
 	}
@@ -185,12 +187,18 @@ export function destructure_font_shorthand(input: ValueInput): FontShorthand | n
 	// -----------------------------------------------------------------
 	// Step 3: extract font-family as a raw substring of the value text.
 	// -----------------------------------------------------------------
-	let font_family: string | null = null
+	let font_family: Match | null = null
 	if (font_family_start >= 0 && font_family_start < children.length) {
 		const first = children[font_family_start]
 		const last = children.at(-1)
 		if (first && last) {
-			font_family = value.text.substring(first.start - value.start, last.end - value.start)
+			font_family = {
+				text: value.text.substring(first.start - value.start, last.end - value.start),
+				line: first.line,
+				column: first.column,
+				offset: first.start,
+				length: last.end - first.start,
+			}
 		}
 	}
 

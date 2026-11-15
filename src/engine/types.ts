@@ -7,12 +7,12 @@ import type {
 	StyleSheet,
 	Value,
 } from '@projectwallace/css-parser'
-import type { Location } from '../utils/location.ts'
+import type { Location, Match } from '../utils/location.ts'
 import type { FontShorthand } from '../values/destructure-font-shorthand.ts'
 
 export type { CSSNode }
 
-export type { Location }
+export type { Location, Match }
 
 /** What the parser has to parse: the engine asks only for what the collectors need */
 export type ParseOptions = {

@@ -15,7 +15,8 @@ import {
 	property_basename,
 } from '@projectwallace/css-parser'
 import { DefinedUsed, type DefinedUsedResult } from '../utils/collections/defined-used.ts'
-import { create_counter, to_location } from '../engine/counter.ts'
+import { create_counter } from '../engine/counter.ts'
+import { to_location } from '../utils/location.ts'
 import { define_collector } from '../engine/define-collector.ts'
 import type { CollectorDef, CountOptions, CountResult, Location } from '../engine/types.ts'
 import { unquote } from '../utils/string-utils.ts'
@@ -181,13 +182,13 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 				if (name === 'media') {
 					medias.add(prelude_text, node)
 					for (const hack of get_media_browserhacks(prelude!)) {
-						media_browserhacks.add(hack, node)
+						media_browserhacks.add(hack.text, node)
 						hacks++
 					}
 				} else if (name === 'supports') {
 					supports.add(prelude_text, node)
 					for (const hack of get_supports_browserhacks(prelude!)) {
-						supports_browserhacks.add(hack, node)
+						supports_browserhacks.add(hack.text, node)
 						hacks++
 					}
 				} else if (name.endsWith('keyframes')) {
@@ -220,7 +221,8 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 					}
 				} else if (name === 'container') {
 					containers.add(prelude_text, node)
-					const container_name = prelude ? get_container_query_name(prelude) : null
+					const container_match = prelude ? get_container_query_name(prelude) : null
+					const container_name = container_match?.text ?? null
 					if (container_name !== null) {
 						container_names.add(container_name, node)
 						container_tracking.use(container_name)

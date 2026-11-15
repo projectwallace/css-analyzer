@@ -19,7 +19,7 @@ export function font_families(options: FontFamiliesOptions = {}): CollectorDef<C
 				properties,
 				enter(_node, ctx) {
 					const text =
-						ctx.property === 'font' ? ctx.font_shorthand?.font_family : ctx.clean_value_text
+						ctx.property === 'font' ? ctx.font_shorthand?.font_family?.text : ctx.clean_value_text
 					if (!text) {
 						return
 					}

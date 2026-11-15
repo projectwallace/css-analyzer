@@ -13,7 +13,7 @@ export function value_prefixes(options: CountOptions = {}): CollectorDef<CountRe
 						return
 					}
 					for (const prefixed of get_prefixed_values(ctx.value!)) {
-						counter.add(prefixed.toLowerCase(), ctx.value!)
+						counter.add(prefixed.text.toLowerCase(), ctx.value!)
 					}
 				},
 			},

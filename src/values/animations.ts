@@ -8,6 +8,7 @@ import {
 import { KeywordSet } from '../utils/collections/keyword-set.ts'
 import { keywords } from './values.ts'
 import { type ValueInput, as_value } from '../utils/input.ts'
+import { type Match, to_match } from '../utils/location.ts'
 import { unquote } from '../utils/string-utils.ts'
 
 const timing_keywords = new KeywordSet([
@@ -42,15 +43,15 @@ const animation_non_name_keywords = new KeywordSet([
 
 export type AnimationParts = {
 	/** The first time of every layer, as written */
-	durations: string[]
+	durations: Match[]
 	/** The second time of every layer (the delay), as written */
-	delays: string[]
+	delays: Match[]
 	/** Timing function keywords and functions (`ease-in`, `cubic-bezier(...)`) */
-	timing_functions: string[]
+	timing_functions: Match[]
 	/** Animation names, as written (quoted names keep their quotes) */
-	names: string[]
+	names: Match[]
 	/** Global keywords such as `inherit` or `none` */
-	keywords: string[]
+	keywords: Match[]
 }
 
 /** Split an `animation` or `transition` value into its parts */
@@ -71,25 +72,25 @@ export function analyze_animation(input: ValueInput): AnimationParts {
 		} else if (is_dimension(node)) {
 			// The first time is the duration, the second is the delay
 			if (duration_found) {
-				parts.delays.push(node.text)
+				parts.delays.push(to_match(node))
 			} else {
 				duration_found = true
-				parts.durations.push(node.text)
+				parts.durations.push(to_match(node))
 			}
 		} else if (is_identifier(node)) {
 			const name = node.name
 			if (timing_keywords.has(name)) {
-				parts.timing_functions.push(node.text)
+				parts.timing_functions.push(to_match(node))
 			} else if (keywords.has(name)) {
-				parts.keywords.push(node.text)
+				parts.keywords.push(to_match(node))
 			} else if (!animation_non_name_keywords.has(name)) {
-				parts.names.push(node.text)
+				parts.names.push(to_match(node))
 			}
 		} else if (is_function(node) && timing_function_values.has(node.name)) {
-			parts.timing_functions.push(node.text)
+			parts.timing_functions.push(to_match(node))
 		} else if (is_string(node)) {
 			// A quoted string is always a valid animation name, even when it's a reserved keyword (e.g. "none" or "infinite")
-			parts.names.push(node.text)
+			parts.names.push(to_match(node))
 		}
 	})
 
@@ -98,15 +99,15 @@ export function analyze_animation(input: ValueInput): AnimationParts {
 
 export type TransitionParts = {
 	/** The properties that transition (`opacity`, `all`, `--x`), as written */
-	properties: string[]
+	properties: Match[]
 	/** The first time of every layer, as written */
-	durations: string[]
+	durations: Match[]
 	/** The second time of every layer (the delay), as written */
-	delays: string[]
+	delays: Match[]
 	/** Timing function keywords and functions (`ease-in`, `steps(4)`) */
-	timing_functions: string[]
+	timing_functions: Match[]
 	/** Global keywords such as `inherit` or `none` */
-	keywords: string[]
+	keywords: Match[]
 }
 
 /** Split a `transition` value into its parts: `opacity 200ms ease-in-out 50ms, color 1s` */
@@ -115,14 +116,14 @@ export function analyze_transition(input: ValueInput): TransitionParts {
 	return { properties: names, ...parts }
 }
 
-/** The names in an `animation-name` value, without quotes; `none` is not a name */
-export function get_animation_names(input: ValueInput): string[] {
-	const names: string[] = []
+/** The names in an `animation-name` value; `none` is not a name. Quoted names have no quotes in `text`. */
+export function get_animation_names(input: ValueInput): Match[] {
+	const names: Match[] = []
 	as_value(input).for_each(function (node) {
 		if (is_identifier(node) && !keywords.has(node.name)) {
-			names.push(node.text)
+			names.push(to_match(node))
 		} else if (is_string(node)) {
-			names.push(unquote(node.text))
+			names.push(to_match(node, unquote(node.text)))
 		}
 	})
 	return names

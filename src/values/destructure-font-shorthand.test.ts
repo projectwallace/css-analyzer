@@ -4,9 +4,14 @@ import { destructure_font_shorthand } from './destructure-font-shorthand.ts'
 
 type Parts = { font_size?: string; line_height?: string; font_family?: string | null }
 
+// The text of the parts that were found
 function parts(value: string): Parts {
-	const { keywords: _keywords, ...rest } = destructure_font_shorthand(value)!
-	return rest
+	const { font_size, line_height, font_family } = destructure_font_shorthand(value)!
+	return {
+		...(font_size && { font_size: font_size.text }),
+		...(line_height && { line_height: line_height.text }),
+		...(font_family !== undefined && { font_family: font_family?.text ?? null }),
+	}
 }
 
 test.each<[string, Parts]>([
@@ -44,8 +49,12 @@ test('a font without a family has no family', () => {
 })
 
 test('global keywords are returned, not called back', () => {
-	expect(destructure_font_shorthand('inherit 12px Arial')?.keywords).toEqual(['inherit'])
-	expect(destructure_font_shorthand('10px/12px Arial inherit')?.keywords).toEqual(['inherit'])
+	expect(destructure_font_shorthand('inherit 12px Arial')?.keywords.map((k) => k.text)).toEqual([
+		'inherit',
+	])
+	expect(
+		destructure_font_shorthand('10px/12px Arial inherit')?.keywords.map((k) => k.text),
+	).toEqual(['inherit'])
 })
 
 test('a lone var() cannot be split', () => {
@@ -74,4 +83,14 @@ test.each<[string, Parts]>([
 
 test('an empty value cannot be split', () => {
 	expect(destructure_font_shorthand('')).toBeNull()
+})
+
+test('locates every part', () => {
+	const value = 'bold 12px/1.5 "My Font", serif'
+	const font = destructure_font_shorthand(value)!
+	for (const match of [font.font_size!, font.line_height!, font.font_family!]) {
+		expect(value.slice(match.offset, match.offset + match.length)).toBe(match.text)
+	}
+	expect(font.font_size).toMatchObject({ text: '12px', line: 1, column: 6, offset: 5 })
+	expect(font.font_family).toMatchObject({ text: '"My Font", serif', column: 15 })
 })

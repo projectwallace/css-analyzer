@@ -79,13 +79,13 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 				const text = node.text
 
 				texts.add(text, node)
-				complexity.add(get_complexity(node)[0]!, node)
+				complexity.add(get_complexity(node)[0]!.complexity, node)
 
 				for (const prefix of get_vendor_prefixes(node)) {
-					prefixed.add(prefix.toLowerCase(), node)
+					prefixed.add(prefix.text.toLowerCase(), node)
 				}
 				for (const item of get_accessibility_selectors(node)) {
-					accessibility.add(item, node)
+					accessibility.add(item.text, node)
 				}
 				walk(node, function (part) {
 					if (is_attribute_selector(part)) {

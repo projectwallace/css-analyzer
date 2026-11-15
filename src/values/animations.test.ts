@@ -3,21 +3,33 @@ import { test } from 'vitest'
 import { expect } from 'vitest'
 import { parse_value } from '@projectwallace/css-parser/parse-value'
 import { analyze_animation, analyze_transition, get_animation_names } from './animations.ts'
+import type { Match } from '../utils/location.ts'
+
+// The text of every part, for readable expectations
+function texts(parts: Record<string, Match[]>): Record<string, string[]> {
+	return Object.fromEntries(
+		Object.entries(parts).map(([key, matches]) => [key, matches.map((match) => match.text)]),
+	)
+}
+
+function names_of(value: string): string[] {
+	return analyze_animation(value).names.map((match) => match.text)
+}
 
 test('emits name for custom animation name identifier', () => {
-	const names = analyze_animation('slide-in 300ms ease-out forwards').names
+	const names = names_of('slide-in 300ms ease-out forwards')
 	expect(names).toEqual(['slide-in'])
 })
 
 test('emits name for each animation in a value list', () => {
-	const names = analyze_animation('slide-in 1s, fade-out 2s').names
+	const names = names_of('slide-in 1s, fade-out 2s')
 	expect(names).toEqual(['slide-in', 'fade-out'])
 })
 
 test('does not emit name for animation direction keywords', () => {
 	const names: string[] = []
 	for (const kw of ['normal', 'reverse', 'alternate', 'alternate-reverse']) {
-		names.push(...analyze_animation(`my-anim 1s ${kw}`).names)
+		names.push(...names_of(`my-anim 1s ${kw}`))
 	}
 	expect(names).toEqual(['my-anim', 'my-anim', 'my-anim', 'my-anim'])
 })
@@ -25,7 +37,7 @@ test('does not emit name for animation direction keywords', () => {
 test('does not emit name for animation fill-mode keywords', () => {
 	const names: string[] = []
 	for (const kw of ['forwards', 'backwards', 'both']) {
-		names.push(...analyze_animation(`my-anim 1s ${kw}`).names)
+		names.push(...names_of(`my-anim 1s ${kw}`))
 	}
 	expect(names).toEqual(['my-anim', 'my-anim', 'my-anim'])
 })
@@ -33,13 +45,13 @@ test('does not emit name for animation fill-mode keywords', () => {
 test('does not emit name for animation play-state keywords', () => {
 	const names: string[] = []
 	for (const kw of ['running', 'paused']) {
-		names.push(...analyze_animation(`my-anim 1s ${kw}`).names)
+		names.push(...names_of(`my-anim 1s ${kw}`))
 	}
 	expect(names).toEqual(['my-anim', 'my-anim'])
 })
 
 test('does not emit name for infinite iteration-count', () => {
-	const names = analyze_animation('my-anim 1s infinite').names
+	const names = names_of('my-anim 1s infinite')
 	expect(names).toEqual(['my-anim'])
 })
 
@@ -54,7 +66,7 @@ test('does not emit name for timing-function keywords', () => {
 		'step-start',
 		'step-end',
 	]) {
-		names.push(...analyze_animation(`my-anim 1s ${kw}`).names)
+		names.push(...names_of(`my-anim 1s ${kw}`))
 	}
 	expect(names).toEqual([
 		'my-anim',
@@ -68,22 +80,22 @@ test('does not emit name for timing-function keywords', () => {
 })
 
 test('does not emit name for none keyword', () => {
-	const names = analyze_animation('none').names
+	const names = names_of('none')
 	expect(names).toEqual([])
 })
 
 test('emits name for dashed-ident animation names', () => {
-	const names = analyze_animation('--my-name 1s ease-in').names
+	const names = names_of('--my-name 1s ease-in')
 	expect(names).toEqual(['--my-name'])
 })
 
 test('emits name for quoted (string) animation names', () => {
-	const names = analyze_animation('"slide in" 300ms ease-out').names
+	const names = names_of('"slide in" 300ms ease-out')
 	expect(names).toEqual(['"slide in"'])
 })
 
 test('emits name for each quoted animation in a value list', () => {
-	const names = analyze_animation('"slide in" 1s, "fade out" 2s').names
+	const names = names_of('"slide in" 1s, "fade out" 2s')
 	expect(names).toEqual(['"slide in"', '"fade out"'])
 })
 
@@ -91,13 +103,13 @@ test('emits name for a quoted keyword used as animation name', () => {
 	// Unlike the bare `none` keyword, a quoted "none" is a valid animation name
 	const names: string[] = []
 	for (const kw of ['none', 'infinite', 'paused', 'alternate', 'linear']) {
-		names.push(...analyze_animation(`"${kw}" 1s ease-in`).names)
+		names.push(...names_of(`"${kw}" 1s ease-in`))
 	}
 	expect(names).toEqual(['"none"', '"infinite"', '"paused"', '"alternate"', '"linear"'])
 })
 
 test('splits a shorthand into plain-data parts', () => {
-	expect(analyze_animation('slide-in 300ms ease-out, none 1s infinite')).toEqual({
+	expect(texts(analyze_animation('slide-in 300ms ease-out, none 1s infinite'))).toEqual({
 		durations: ['300ms', '1s'],
 		delays: [],
 		timing_functions: ['ease-out'],
@@ -112,21 +124,23 @@ test('accepts a parsed node as well as text', () => {
 })
 
 test('splits the delay from the duration, per layer', () => {
-	expect(analyze_animation('spin 2s linear 100ms, fade 1s').delays).toEqual(['100ms'])
-	expect(analyze_animation('spin 2s linear 100ms, fade 1s 3s')).toMatchObject({
+	expect(texts(analyze_animation('spin 2s linear 100ms, fade 1s')).delays).toEqual(['100ms'])
+	expect(texts(analyze_animation('spin 2s linear 100ms, fade 1s 3s'))).toMatchObject({
 		durations: ['2s', '1s'],
 		delays: ['100ms', '3s'],
 	})
 })
 
 test('analyze_transition splits a transition into plain-data parts', () => {
-	expect(analyze_transition('opacity 200ms ease-in-out 0s, transform 300ms linear')).toEqual({
-		properties: ['opacity', 'transform'],
-		durations: ['200ms', '300ms'],
-		delays: ['0s'],
-		timing_functions: ['ease-in-out', 'linear'],
-		keywords: [],
-	})
+	expect(texts(analyze_transition('opacity 200ms ease-in-out 0s, transform 300ms linear'))).toEqual(
+		{
+			properties: ['opacity', 'transform'],
+			durations: ['200ms', '300ms'],
+			delays: ['0s'],
+			timing_functions: ['ease-in-out', 'linear'],
+			keywords: [],
+		},
+	)
 })
 
 test.each([
@@ -135,14 +149,16 @@ test.each([
 	['none', []],
 	['inherit', []],
 ])('analyze_transition("%s") finds the properties %j', (value, properties) => {
-	expect(analyze_transition(value).properties).toEqual(properties)
+	expect(texts(analyze_transition(value)).properties).toEqual(properties)
 })
 
 test('analyze_transition finds timing functions, global keywords and accepts a parsed node', () => {
-	expect(analyze_transition('color 1s cubic-bezier(0, 0, 1, 1), width 2s steps(4)')).toMatchObject({
+	expect(
+		texts(analyze_transition('color 1s cubic-bezier(0, 0, 1, 1), width 2s steps(4)')),
+	).toMatchObject({
 		timing_functions: ['cubic-bezier(0, 0, 1, 1)', 'steps(4)'],
 	})
-	expect(analyze_transition('inherit').keywords).toEqual(['inherit'])
+	expect(texts(analyze_transition('inherit')).keywords).toEqual(['inherit'])
 	const node = parse_value('opacity 1s ease')
 	expect(analyze_transition(node)).toEqual(analyze_transition('opacity 1s ease'))
 })
@@ -154,9 +170,28 @@ test.each([
 	['none', []],
 	['initial', []],
 ])('get_animation_names("%s") is %j', (value, expected) => {
-	expect(get_animation_names(value)).toEqual(expected)
+	expect(get_animation_names(value).map((match) => match.text)).toEqual(expected)
 })
 
 test('get_animation_names accepts a parsed node', () => {
-	expect(get_animation_names(parse_value('a, "b"'))).toEqual(['a', 'b'])
+	expect(get_animation_names(parse_value('a, "b"')).map((match) => match.text)).toEqual(['a', 'b'])
+})
+
+test('locates every part, as written', () => {
+	const value = 'slide-in 300ms ease-out 1s, "my name" 2s'
+	const parts = analyze_animation(value)
+	for (const match of Object.values(parts).flat()) {
+		expect(value.slice(match.offset, match.offset + match.length)).toBe(match.text)
+	}
+	expect(parts.delays[0]).toMatchObject({ text: '1s', line: 1, column: 25, offset: 24, length: 2 })
+})
+
+test('get_animation_names locates the quoted name, without quotes in the text', () => {
+	expect(get_animation_names('a, "b c"')[1]).toEqual({
+		text: 'b c',
+		line: 1,
+		column: 4,
+		offset: 3,
+		length: 5,
+	})
 })

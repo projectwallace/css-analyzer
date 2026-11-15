@@ -196,6 +196,15 @@ is_value_reset('0 0px') // true
 compare_specificity([0, 1, 0], [0, 1, 0]) // 0
 ```
 
+Utilities that find things return `Match`es: `{ text, line, column, offset, length }`, so a tool (a linter, an editor) can point at what was found. `text` is what was found as written, except where the util normalizes it (`get_vendor_prefixes`, `get_accessibility_selectors`, the browserhack utils and unquoted names from `get_animation_names` return the normalized name; the location still points at the source). Offsets are relative to the text that was parsed: the string for text input, the source the node came from for a parsed node.
+
+```js
+import { get_declared_container_names } from '@projectwallace/css-analyzer/values'
+
+get_declared_container_names('sidebar card / size')
+// [{ text: 'sidebar', line: 1, column: 1, offset: 0, length: 7 }, { text: 'card', line: 1, column: 9, offset: 8, length: 4 }]
+```
+
 Also: `get_complexity`, `get_vendor_prefixes`, `get_accessibility_selectors`, `get_combinators` (`/selectors`); `destructure_font_shorthand`, `analyze_animation`, `analyze_transition`, `get_animation_names`, `get_declared_container_names`, `is_gradient_function`, `get_prefixed_values`, `named_colors`, `system_colors`, `color_functions`, `keywords` (`/values`); `get_media_browserhacks`, `get_supports_browserhacks`, `get_container_query_name` (`/atrules`); `is_shorthand_property`, `is_spacing_reset_property`, `is_border_radius_property`, `is_property_hack` (`/properties`); `get_embed_type` (`/stylesheet`).
 
 `DefinedUsed` (track what is defined and what is used, for names like custom properties or keyframes) and `KeywordSet` (a case-insensitive set of keywords) are the building blocks the built-in collectors use. They are exported from `@projectwallace/css-analyzer/utils/collections`.

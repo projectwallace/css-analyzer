@@ -33,9 +33,11 @@ export function get_used_animation_names(ctx: DeclarationContext): string[] {
 		return []
 	}
 	if (ctx.property === 'animation') {
-		return analyze_animation(ctx.value!).names.map((name) => unquote(name))
+		return analyze_animation(ctx.value!).names.map((match) => unquote(match.text))
 	}
-	return ctx.property === 'animation-name' ? get_animation_names(ctx.value!) : []
+	return ctx.property === 'animation-name'
+		? get_animation_names(ctx.value!).map((match) => match.text)
+		: []
 }
 
 /** The items of a comma/slash separated value, without the separators */

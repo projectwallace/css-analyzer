@@ -5,18 +5,8 @@ import type {
 	CountMap,
 	CountOptions,
 	CountResult,
-	Location,
 } from './types.ts'
-
-/** Where `node` is in the source. `length` overrides the node's length (e.g. only the property name). */
-export function to_location(node: CSSNode, length: number = node.length): Location {
-	return {
-		line: node.line,
-		column: node.column,
-		offset: node.start,
-		length,
-	}
-}
+import { to_location } from '../utils/location.ts'
 
 export type Counter<T extends CountItem = string> = {
 	/** Count `item`, found at `node`; the location is only read when locations are enabled */

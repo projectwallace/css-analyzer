@@ -14,16 +14,17 @@ import {
 	str_index_of,
 } from '@projectwallace/css-parser'
 import { type PreludeInput, as_prelude } from '../utils/input.ts'
+import { type Match, to_match } from '../utils/location.ts'
 
 function find_hacks(
 	name: string,
 	input: PreludeInput,
 	check: (node: AnyNode, on_hack: (hack: string) => void) => unknown,
-): string[] {
-	const hacks: string[] = []
+): Match[] {
+	const hacks: Match[] = []
 	for (const prelude of as_prelude(name, input)) {
 		walk(prelude, function (node) {
-			const result = check(node, (hack) => hacks.push(hack))
+			const result = check(node, (hack) => hacks.push(to_match(node, hack)))
 			if (result === BREAK) {
 				return BREAK
 			}
@@ -38,7 +39,7 @@ function find_hacks(
 const whitespace_regex = /\s+/g
 
 /** Find @supports browserhacks (`-webkit-appearance: none`, `-moz-appearance: meterbar`) */
-export function get_supports_browserhacks(input: PreludeInput): string[] {
+export function get_supports_browserhacks(input: PreludeInput): Match[] {
 	return find_hacks('supports', input, function (node, on_hack) {
 		// Check SupportsQuery nodes for browserhack patterns
 		if (is_supports_query(node)) {
@@ -58,7 +59,7 @@ export function get_supports_browserhacks(input: PreludeInput): string[] {
 }
 
 /** Find @media browserhacks (`\\0`, `\\9`, `-ms-high-contrast`, `min-resolution: .001dpcm`, ...) */
-export function get_media_browserhacks(input: PreludeInput): string[] {
+export function get_media_browserhacks(input: PreludeInput): Match[] {
 	return find_hacks('media', input, function (node, on_hack) {
 		// Check MediaType nodes for \0 prefix or \9 suffix
 		if (is_media_type(node)) {
@@ -133,7 +134,7 @@ export function get_media_browserhacks(input: PreludeInput): string[] {
 }
 
 /** The container name in a `@container` prelude (`sidebar (min-width: 400px)`), or `null` for an anonymous query */
-export function get_container_query_name(input: PreludeInput): string | null {
+export function get_container_query_name(input: PreludeInput): Match | null {
 	const first = as_prelude('container', input)[0]
 	if (!first) {
 		return null
@@ -143,7 +144,7 @@ export function get_container_query_name(input: PreludeInput): string | null {
 	if (query && is_container_query(query)) {
 		const name = query.first_child
 		if (name && is_identifier(name)) {
-			return name.text
+			return to_match(name)
 		}
 	}
 	return null

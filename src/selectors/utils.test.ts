@@ -8,6 +8,10 @@ import {
 } from './index.ts'
 import { get_specificity } from './specificity.ts'
 
+function texts(matches: { text: string }[]): string[] {
+	return matches.map((match) => match.text)
+}
+
 const selector = 'a.b > #c:not(.d)::-webkit-scrollbar [aria-hidden="true"]'
 
 test('every util accepts text and nodes with identical output', () => {
@@ -19,28 +23,40 @@ test('every util accepts text and nodes with identical output', () => {
 	expect(get_combinators(node)).toEqual(get_combinators(selector))
 })
 
-test('get_complexity returns one number per selector', () => {
-	expect(get_complexity('a, a.b')).toEqual([1, 2])
+test('get_complexity returns the complexity and location of every selector', () => {
+	expect(get_complexity('a, a.b')).toEqual([
+		{ complexity: 1, line: 1, column: 1, offset: 0, length: 1 },
+		{ complexity: 2, line: 1, column: 4, offset: 3, length: 3 },
+	])
 })
 
-test('get_vendor_prefixes returns plain strings with their colons', () => {
-	expect(get_vendor_prefixes('a::-webkit-scrollbar, :-moz-focusring')).toEqual([
+test('get_vendor_prefixes returns the prefixed names with their colons', () => {
+	expect(texts(get_vendor_prefixes('a::-webkit-scrollbar, :-moz-focusring'))).toEqual([
 		'::-webkit-scrollbar',
 		':-moz-focusring',
 	])
 })
 
 test('get_accessibility_selectors returns normalized attribute selectors', () => {
-	expect(get_accessibility_selectors('[ROLE=button], [aria-hidden=true], [data-x]')).toEqual([
-		'[role="button"]',
-		'[aria-hidden="true"]',
-	])
+	expect(texts(get_accessibility_selectors('[ROLE=button], [aria-hidden=true], [data-x]'))).toEqual(
+		['[role="button"]', '[aria-hidden="true"]'],
+	)
 })
 
 test('get_combinators returns names and locations as data', () => {
 	expect(get_combinators('a > b c')).toEqual([
-		{ name: '>', loc: { offset: 2, line: 1, column: 3, length: 1 } },
-		{ name: ' ', loc: { offset: 5, line: 1, column: 6, length: 1 } },
+		{ text: '>', offset: 2, line: 1, column: 3, length: 1 },
+		{ text: ' ', offset: 5, line: 1, column: 6, length: 1 },
+	])
+})
+
+// Only offsets are checked: the parser's columns are off after a descendant combinator
+test('get_vendor_prefixes and get_accessibility_selectors locate the selector part', () => {
+	expect(get_vendor_prefixes('a ::-ms-clear')).toMatchObject([
+		{ text: '::-ms-clear', offset: 2, length: 11 },
+	])
+	expect(get_accessibility_selectors('a [ROLE=tab]')).toMatchObject([
+		{ text: '[role="tab"]', offset: 2, length: 10 },
 	])
 })
 
@@ -67,16 +83,16 @@ test.each<[string, number]>([
 	['fake-webkit', 1],
 	['.-mt-px', 1],
 ])('complexity of "%s" is %i', (selector, expected) => {
-	expect(get_complexity(selector)).toEqual([expected])
+	expect(get_complexity(selector).map((match) => match.complexity)).toEqual([expected])
 })
 
 test('complexity of a deeply nested :where() adds up its parts', () => {
 	const ids = Array.from({ length: 26 }, (_, i) => `#${String.fromCharCode(97 + i)}`).join(' ')
-	expect(get_complexity(`:where(${ids})`)).toEqual([52])
+	expect(get_complexity(`:where(${ids})`)[0]!.complexity).toBe(52)
 })
 
 test('prefixes of pseudo-classes, pseudo-elements and type selectors', () => {
-	expect(get_vendor_prefixes(':-moz-any(a), ::-ms-clear, no-prefix, fake-webkit')).toEqual([
+	expect(texts(get_vendor_prefixes(':-moz-any(a), ::-ms-clear, no-prefix, fake-webkit'))).toEqual([
 		':-moz-any',
 		'::-ms-clear',
 	])
@@ -84,8 +100,10 @@ test('prefixes of pseudo-classes, pseudo-elements and type selectors', () => {
 
 test('accessibility selectors are normalized and found inside pseudo-classes', () => {
 	expect(
-		get_accessibility_selectors(
-			'[aria-hidden], [ARIA-HIDDEN], [ROLE=tablist], .a:not([role="menu"]), [data-x]',
+		texts(
+			get_accessibility_selectors(
+				'[aria-hidden], [ARIA-HIDDEN], [ROLE=tablist], .a:not([role="menu"]), [data-x]',
+			),
 		),
 	).toEqual(['[aria-hidden]', '[aria-hidden]', '[role="tablist"]', '[role="menu"]'])
 })

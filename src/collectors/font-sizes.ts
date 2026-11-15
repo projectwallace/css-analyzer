@@ -23,7 +23,7 @@ export function font_sizes(options: FontSizesOptions = {}): CollectorDef<CountRe
 				properties,
 				enter(_node, ctx) {
 					const text =
-						ctx.property === 'font' ? ctx.font_shorthand?.font_size : ctx.clean_value_text
+						ctx.property === 'font' ? ctx.font_shorthand?.font_size?.text : ctx.clean_value_text
 					if (text === undefined) {
 						return
 					}
