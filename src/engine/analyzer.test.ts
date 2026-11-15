@@ -306,9 +306,9 @@ test('font_shorthand is split once and is null for everything else', () => {
 	analyze('a { font: 12px/1.5 Arial; color: red; font: caption }', { shorthand })
 	expect(seen[0]).toBe(seen[1])
 	expect(seen[0]).toEqual({
-		font_size: { text: '12px', line: 1, column: 11, offset: 10, length: 4 },
-		line_height: { text: '1.5', line: 1, column: 16, offset: 15, length: 3 },
-		font_family: { text: 'Arial', line: 1, column: 20, offset: 19, length: 5 },
+		font_size: { value: '12px', line: 1, column: 11, offset: 10, length: 4 },
+		line_height: { value: '1.5', line: 1, column: 16, offset: 15, length: 3 },
+		font_family: { value: 'Arial', line: 1, column: 20, offset: 19, length: 5 },
 		keywords: [],
 	})
 	expect(seen[2]).toBeNull()

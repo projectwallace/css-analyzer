@@ -9,10 +9,10 @@ export type Location = {
 }
 
 /**
- * Something a utility found, and where. Offsets are relative to the text that was parsed: the string
+ * Something a utility found (`value`), and where. Offsets are relative to the text that was parsed: the string
  * for text input, the source the node came from for node input.
  */
-export type Match = Location & { text: string }
+export type Match<T = string> = Location & { value: T }
 
 /** Where `node` is in the source. `length` overrides the node's length (e.g. only the property name). */
 export function to_location(node: CSSNode, length: number = node.length): Location {
@@ -24,14 +24,14 @@ export function to_location(node: CSSNode, length: number = node.length): Locati
 	}
 }
 
-/** `node` as a match. `text` and `length` default to those of the node. */
+/** `node` as a match. `value` and `length` default to the text and length of the node. */
 export function to_match(
 	node: CSSNode,
-	text: string = node.text,
+	value: string = node.text,
 	length: number = node.length,
 ): Match {
 	return {
-		text,
+		value,
 		line: node.line,
 		column: node.column,
 		offset: node.start,
@@ -40,7 +40,7 @@ export function to_match(
 }
 
 /** The part of `node` that starts `index` characters into its text, as a match */
-export function to_match_in(node: CSSNode, index: number, length: number, text: string): Match {
+export function to_match_in(node: CSSNode, index: number, length: number, value: string): Match {
 	const source = node.text
 	let line = node.line
 	let column = node.column
@@ -53,5 +53,5 @@ export function to_match_in(node: CSSNode, index: number, length: number, text: 
 			column++
 		}
 	}
-	return { text, line, column, offset: node.start + index, length }
+	return { value, line, column, offset: node.start + index, length }
 }

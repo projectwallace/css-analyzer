@@ -193,7 +193,7 @@ export function destructure_font_shorthand(input: ValueInput): FontShorthand | n
 		const last = children.at(-1)
 		if (first && last) {
 			font_family = {
-				text: value.text.substring(first.start - value.start, last.end - value.start),
+				value: value.text.substring(first.start - value.start, last.end - value.start),
 				line: first.line,
 				column: first.column,
 				offset: first.start,

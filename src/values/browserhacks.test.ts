@@ -13,7 +13,7 @@ test.each([
 	['alpha(opacity=50)\\9', ['\\9', 'alpha()']],
 	['expression(a) alpha(opacity=50)', ['expression()']],
 ])('finds the hacks in "%s"', (value, expected) => {
-	expect(get_value_browserhacks(value).map((match) => match.text)).toEqual(expected)
+	expect(get_value_browserhacks(value).map((match) => match.value)).toEqual(expected)
 })
 
 test.each([
@@ -26,7 +26,7 @@ test.each([
 	'alpha(from var(--my-color) / 80%)',
 	'alpha(from var(--my-color) / calc(alpha * 0.5))',
 ])('finds no hacks in "%s"', (value) => {
-	expect(get_value_browserhacks(value).map((match) => match.text)).toEqual([])
+	expect(get_value_browserhacks(value).map((match) => match.value)).toEqual([])
 })
 
 test.each([
@@ -35,12 +35,12 @@ test.each([
 	['a progid:x(1)', 'progid:', 2],
 	['b alpha(opacity=50)', 'alpha()', 2],
 	['url(hack.htc)', '.htc', 0],
-])('locates the hack in "%s"', (value, text, offset) => {
-	const [match] = get_value_browserhacks(value)
-	expect(match).toMatchObject({ text, offset, line: 1, column: offset + 1 })
+])('locates the hack in "%s"', (input, value, offset) => {
+	const [match] = get_value_browserhacks(input)
+	expect(match).toMatchObject({ value, offset, line: 1, column: offset + 1 })
 })
 
 test('locates a hack on a later line', () => {
 	const [match] = get_value_browserhacks('1px\n  progid:x(1)')
-	expect(match).toMatchObject({ text: 'progid:', line: 2, column: 3, offset: 6, length: 7 })
+	expect(match).toMatchObject({ value: 'progid:', line: 2, column: 3, offset: 6, length: 7 })
 })

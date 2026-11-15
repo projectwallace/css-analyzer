@@ -182,13 +182,13 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 				if (name === 'media') {
 					medias.add(prelude_text, node)
 					for (const hack of get_media_browserhacks(prelude!)) {
-						media_browserhacks.add(hack.text, node)
+						media_browserhacks.add(hack.value, node)
 						hacks++
 					}
 				} else if (name === 'supports') {
 					supports.add(prelude_text, node)
 					for (const hack of get_supports_browserhacks(prelude!)) {
-						supports_browserhacks.add(hack.text, node)
+						supports_browserhacks.add(hack.value, node)
 						hacks++
 					}
 				} else if (name.endsWith('keyframes')) {
@@ -222,7 +222,7 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 				} else if (name === 'container') {
 					containers.add(prelude_text, node)
 					const container_match = prelude ? get_container_query_name(prelude) : null
-					const container_name = container_match?.text ?? null
+					const container_name = container_match?.value ?? null
 					if (container_name !== null) {
 						container_names.add(container_name, node)
 						container_tracking.use(container_name)

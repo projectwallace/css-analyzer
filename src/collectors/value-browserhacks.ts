@@ -20,7 +20,7 @@ export function value_browserhacks(options: CountOptions = {}): CollectorDef<Cou
 						return
 					}
 					for (const hack of get_value_browserhacks(ctx.value)) {
-						counter.add(hack.text, ctx.value)
+						counter.add(hack.value, ctx.value)
 					}
 				},
 			},

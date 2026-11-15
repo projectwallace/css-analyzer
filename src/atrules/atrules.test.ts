@@ -6,8 +6,8 @@ import {
 	get_supports_browserhacks,
 } from './index.ts'
 
-function texts(matches: { text: string }[]): string[] {
-	return matches.map((match) => match.text)
+function texts(matches: { value: string }[]): string[] {
+	return matches.map((match) => match.value)
 }
 
 function prelude_of(css: string) {
@@ -52,8 +52,8 @@ test.each([
 ])(
 	'get_container_query_name("%s") is %s, for text and for a parsed prelude',
 	(prelude, expected) => {
-		expect(get_container_query_name(prelude)?.text).toBe(expected)
-		expect(get_container_query_name(prelude_of(`@container ${prelude} {}`))?.text).toBe(expected)
+		expect(get_container_query_name(prelude)?.value).toBe(expected)
+		expect(get_container_query_name(prelude_of(`@container ${prelude} {}`))?.value).toBe(expected)
 	},
 )
 
@@ -63,13 +63,13 @@ test('get_container_query_name is null for an empty prelude', () => {
 
 test('the browserhack matches say where the hack is', () => {
 	expect(get_media_browserhacks('screen and (-ms-high-contrast: none)')).toMatchObject([
-		{ text: '-ms-high-contrast', line: 1, offset: 11 },
+		{ value: '-ms-high-contrast', line: 1, offset: 11 },
 	])
 })
 
 test('get_container_query_name locates the name', () => {
 	expect(get_container_query_name('sidebar (min-width: 400px)')).toEqual({
-		text: 'sidebar',
+		value: 'sidebar',
 		line: 1,
 		column: 1,
 		offset: 0,

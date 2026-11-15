@@ -8,9 +8,9 @@ type Parts = { font_size?: string; line_height?: string; font_family?: string | 
 function parts(value: string): Parts {
 	const { font_size, line_height, font_family } = destructure_font_shorthand(value)!
 	return {
-		...(font_size && { font_size: font_size.text }),
-		...(line_height && { line_height: line_height.text }),
-		...(font_family !== undefined && { font_family: font_family?.text ?? null }),
+		...(font_size && { font_size: font_size.value }),
+		...(line_height && { line_height: line_height.value }),
+		...(font_family !== undefined && { font_family: font_family?.value ?? null }),
 	}
 }
 
@@ -49,11 +49,11 @@ test('a font without a family has no family', () => {
 })
 
 test('global keywords are returned, not called back', () => {
-	expect(destructure_font_shorthand('inherit 12px Arial')?.keywords.map((k) => k.text)).toEqual([
+	expect(destructure_font_shorthand('inherit 12px Arial')?.keywords.map((k) => k.value)).toEqual([
 		'inherit',
 	])
 	expect(
-		destructure_font_shorthand('10px/12px Arial inherit')?.keywords.map((k) => k.text),
+		destructure_font_shorthand('10px/12px Arial inherit')?.keywords.map((k) => k.value),
 	).toEqual(['inherit'])
 })
 
@@ -89,8 +89,8 @@ test('locates every part', () => {
 	const value = 'bold 12px/1.5 "My Font", serif'
 	const font = destructure_font_shorthand(value)!
 	for (const match of [font.font_size!, font.line_height!, font.font_family!]) {
-		expect(value.slice(match.offset, match.offset + match.length)).toBe(match.text)
+		expect(value.slice(match.offset, match.offset + match.length)).toBe(match.value)
 	}
-	expect(font.font_size).toMatchObject({ text: '12px', line: 1, column: 6, offset: 5 })
-	expect(font.font_family).toMatchObject({ text: '"My Font", serif', column: 15 })
+	expect(font.font_size).toMatchObject({ value: '12px', line: 1, column: 6, offset: 5 })
+	expect(font.font_family).toMatchObject({ value: '"My Font", serif', column: 15 })
 })

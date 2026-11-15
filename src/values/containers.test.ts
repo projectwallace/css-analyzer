@@ -12,12 +12,12 @@ test.each([
 	['initial', []],
 	['/ inline-size', []],
 ])('get_declared_container_names("%s") is %j', (value, expected) => {
-	expect(get_declared_container_names(value).map((match) => match.text)).toEqual(expected)
+	expect(get_declared_container_names(value).map((match) => match.value)).toEqual(expected)
 })
 
 test('get_declared_container_names accepts a parsed node', () => {
 	expect(
-		get_declared_container_names(parse_value('a b / size')).map((match) => match.text),
+		get_declared_container_names(parse_value('a b / size')).map((match) => match.value),
 	).toEqual(['a', 'b'])
 })
 
@@ -28,5 +28,5 @@ test('locates the names', () => {
 		'sidebar',
 		'card',
 	])
-	expect(matches[1]).toMatchObject({ text: 'card', line: 1, column: 9 })
+	expect(matches[1]).toMatchObject({ value: 'card', line: 1, column: 9 })
 })

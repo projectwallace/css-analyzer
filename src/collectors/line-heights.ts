@@ -22,7 +22,7 @@ export function line_heights(options: LineHeightsOptions = {}): CollectorDef<Cou
 				properties,
 				enter(_node, ctx) {
 					const text =
-						ctx.property === 'font' ? ctx.font_shorthand?.line_height?.text : ctx.clean_value_text
+						ctx.property === 'font' ? ctx.font_shorthand?.line_height?.value : ctx.clean_value_text
 					if (text === undefined) {
 						return
 					}

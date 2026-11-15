@@ -17,7 +17,7 @@ import {
 } from '@projectwallace/css-parser'
 import { unquote } from '../utils/string-utils.ts'
 import { type SelectorInput, as_selectors } from '../utils/input.ts'
-import { type Location, type Match, to_location, to_match } from '../utils/location.ts'
+import { type Match, to_location, to_match } from '../utils/location.ts'
 
 const pseudo_functions = new KeywordSet([
 	'nth-child',
@@ -86,7 +86,7 @@ export function get_accessibility_selectors(input: SelectorInput): Match[] {
 /** The complexity of every selector in a selector (list), located at the selector */
 export function get_complexity(input: SelectorInput): SelectorComplexity[] {
 	return as_selectors(input).map((selector) =>
-		Object.assign(to_location(selector), { complexity: selector_complexity(selector) }),
+		Object.assign(to_location(selector), { value: selector_complexity(selector) }),
 	)
 }
 
@@ -184,9 +184,9 @@ export function combinator_name(node: Combinator): string {
 	return node.name.trim() === '' ? ' ' : node.name
 }
 
-export type SelectorComplexity = Location & { complexity: number }
+export type SelectorComplexity = Match<number>
 
-/** Find all combinators in a selector (list). `text` is the name, `' '` for the descendant combinator. */
+/** Find all combinators in a selector (list). `value` is the name, `' '` for the descendant combinator. */
 export function get_combinators(input: SelectorInput): Match[] {
 	const found: Match[] = []
 	for (const selector of as_selectors(input)) {

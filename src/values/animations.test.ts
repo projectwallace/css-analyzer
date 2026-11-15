@@ -8,12 +8,12 @@ import type { Match } from '../utils/location.ts'
 // The text of every part, for readable expectations
 function texts(parts: Record<string, Match[]>): Record<string, string[]> {
 	return Object.fromEntries(
-		Object.entries(parts).map(([key, matches]) => [key, matches.map((match) => match.text)]),
+		Object.entries(parts).map(([key, matches]) => [key, matches.map((match) => match.value)]),
 	)
 }
 
 function names_of(value: string): string[] {
-	return analyze_animation(value).names.map((match) => match.text)
+	return analyze_animation(value).names.map((match) => match.value)
 }
 
 test('emits name for custom animation name identifier', () => {
@@ -170,25 +170,25 @@ test.each([
 	['none', []],
 	['initial', []],
 ])('get_animation_names("%s") is %j', (value, expected) => {
-	expect(get_animation_names(value).map((match) => match.text)).toEqual(expected)
+	expect(get_animation_names(value).map((match) => match.value)).toEqual(expected)
 })
 
 test('get_animation_names accepts a parsed node', () => {
-	expect(get_animation_names(parse_value('a, "b"')).map((match) => match.text)).toEqual(['a', 'b'])
+	expect(get_animation_names(parse_value('a, "b"')).map((match) => match.value)).toEqual(['a', 'b'])
 })
 
 test('locates every part, as written', () => {
 	const value = 'slide-in 300ms ease-out 1s, "my name" 2s'
 	const parts = analyze_animation(value)
 	for (const match of Object.values(parts).flat()) {
-		expect(value.slice(match.offset, match.offset + match.length)).toBe(match.text)
+		expect(value.slice(match.offset, match.offset + match.length)).toBe(match.value)
 	}
-	expect(parts.delays[0]).toMatchObject({ text: '1s', line: 1, column: 25, offset: 24, length: 2 })
+	expect(parts.delays[0]).toMatchObject({ value: '1s', line: 1, column: 25, offset: 24, length: 2 })
 })
 
 test('get_animation_names locates the quoted name, without quotes in the text', () => {
 	expect(get_animation_names('a, "b c"')[1]).toEqual({
-		text: 'b c',
+		value: 'b c',
 		line: 1,
 		column: 4,
 		offset: 3,

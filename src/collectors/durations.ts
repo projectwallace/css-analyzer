@@ -25,7 +25,7 @@ export function durations(options: DurationsOptions = {}): CollectorDef<CountRes
 					}
 					const items =
 						ctx.property === 'transition' || ctx.property === 'animation'
-							? analyze_animation(ctx.value!).durations.map((match) => match.text)
+							? analyze_animation(ctx.value!).durations.map((match) => match.value)
 							: get_list_items(ctx.value!).map((item) => item.text)
 					for (const item of items) {
 						counter.add(lowercase ? lowercase_unless_var(item) : item, ctx.value!)

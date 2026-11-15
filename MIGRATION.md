@@ -92,10 +92,10 @@ All pure utilities now accept CSS text or a parsed node and return plain data. N
 | `calculateSpecificity(sel)`, `getSpecificity`                    | `get_specificity(sel)` → `Specificity[]`                                                                             |
 | `getSpecificityForAST(node)`                                     | `get_specificity(node)[0]`                                                                                           |
 | `compareSpecificity`                                             | `compare_specificity` (ascending, as in `/selectors`)                                                                |
-| `selectorComplexity(node)`                                       | `get_complexity(sel)` → `({ complexity } & Location)[]`                                                              |
+| `selectorComplexity(node)`                                       | `get_complexity(sel)` → `Match<number>[]`                                                                            |
 | `isSelectorPrefixed(node, cb)`                                   | `get_vendor_prefixes(sel)` → `Match[]`                                                                               |
 | `isAccessibilitySelector(node, cb)`                              | `get_accessibility_selectors(sel)` → `Match[]`                                                                       |
-| `getCombinators(node, cb)`                                       | `get_combinators(sel)` → `Match[]` (`text` is the combinator)                                                        |
+| `getCombinators(node, cb)`                                       | `get_combinators(sel)` → `Match[]` (`value` is the combinator)                                                       |
 | `isValueBrowserhack(value, cb)`                                  | `get_value_browserhacks(value)` → `Match[]`                                                                          |
 | `isValuePrefixed(value, cb)`                                     | `get_prefixed_values(value)` → `Match[]`                                                                             |
 | `isValueReset(value)`                                            | `is_value_reset(value)`                                                                                              |
