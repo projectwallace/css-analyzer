@@ -9,7 +9,7 @@ export function resets(options: CountOptions = {}): CollectorDef<CountResult> {
 		return {
 			parse: { values: true },
 			declaration: {
-				properties: spacing_reset_properties,
+				properties: spacing_reset_properties.set,
 				enter(_node, ctx) {
 					if (ctx.clean_value_text === undefined) {
 						return

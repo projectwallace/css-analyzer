@@ -1,7 +1,7 @@
 import { KeywordSet } from '../utils/collections/keyword-set.ts'
-import { is_custom, is_vendor_prefixed } from '@projectwallace/css-parser'
+import { is_custom, is_vendor_prefixed, property_basename } from '@projectwallace/css-parser'
 
-export const shorthand_properties: ReadonlySet<string> = new Set([
+export const shorthand_properties: KeywordSet = new KeywordSet([
 	'all',
 	'animation',
 	'background',
@@ -51,14 +51,14 @@ export const shorthand_properties: ReadonlySet<string> = new Set([
 	'vertical-align',
 ])
 
-export const spacing_reset_properties: ReadonlySet<string> = new Set([
+export const spacing_reset_properties: KeywordSet = new KeywordSet([
 	'margin',
 	'margin-block',
 	'margin-inline',
 	'margin-top',
 	'margin-block-start',
 	'margin-block-end',
-	'margin-inline-end',
+	'margin-inline-start',
 	'margin-inline-end',
 	'margin-right',
 	'margin-bottom',
@@ -87,6 +87,22 @@ export const border_radius_properties: KeywordSet = new KeywordSet([
 	'border-end-end-radius',
 	'border-end-start-radius',
 ])
+
+// The predicates ignore case, vendor prefixes and browserhacks (`*margin`, `-webkit-border-radius`)
+/** Is this a shorthand property, like `margin` or `font`? */
+export function is_shorthand_property(property: string): boolean {
+	return shorthand_properties.has(property_basename(property))
+}
+
+/** Is this a margin or padding property? */
+export function is_spacing_reset_property(property: string): boolean {
+	return spacing_reset_properties.has(property_basename(property))
+}
+
+/** Is this `border-radius` or one of its longhands? */
+export function is_border_radius_property(property: string): boolean {
+	return border_radius_properties.has(property_basename(property))
+}
 
 // See https://github.com/csstree/csstree/blob/master/lib/utils/names.js#L69
 export function is_hack(property: string): boolean {
