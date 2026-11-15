@@ -13,7 +13,6 @@ import { color_functions, color_keywords, named_colors, system_colors } from '..
 import { no_value_walk } from './shared.ts'
 
 export type ColorMatch = Match & {
-	/** `hex3`, `hex6`, `named`, `system`, `transparent`, `rgb`, `oklch`, ... */
 	format: string
 }
 
@@ -61,10 +60,7 @@ export function color_text(node: CSSNode): string {
 	return is_hash(node) ? strip_value_hack(text) : text
 }
 
-/**
- * The colors in a value of `property`: hex, named, system and keyword colors and color functions, each
- * with its `format`. `value` is the color as written, and for a hex color without its browserhack.
- */
+/** The colors in a value, each with its `format` */
 export function extract_colors(property: string, input: ValueInput): ColorMatch[] {
 	const name = property_basename(property)
 	const found: ColorMatch[] = []

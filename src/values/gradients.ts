@@ -10,7 +10,7 @@ const gradient_functions = new KeywordSet([
 	'repeating-conic-gradient',
 ])
 
-/** Is this the name of a CSS gradient function (`linear-gradient`, `-webkit-radial-gradient`, ...)? */
+/** Is this a gradient function name? */
 export function is_gradient_function(name: string): boolean {
 	const unprefixed = strip_vendor_prefix(name)
 	// The old `-webkit-gradient(linear, ...)` only exists with a prefix

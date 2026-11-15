@@ -4,11 +4,10 @@ import { font_family, font_family_properties } from '../extract/fonts.ts'
 import { define_counting_collector } from './shared.ts'
 
 export type FontFamiliesOptions = CountOptions & {
-	/** Leave out values that use `var()` */
 	skip_var?: boolean
 }
 
-/** Font families are counted as written (case and quotes are kept) */
+/** Font families as written */
 export function font_families(options: FontFamiliesOptions = {}): CollectorDef<CountResult> {
 	return define_counting_collector(options, function setup(counter) {
 		return {

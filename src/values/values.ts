@@ -12,9 +12,6 @@ export const keywords: KeywordSet = new KeywordSet([
 	'revert-layer',
 ])
 
-/**
- * Test whether a value is a reset (0, 0px, -0.0e0 etc.)
- */
 export function is_value_reset(input: ValueInput): boolean {
 	let is_reset = true
 	as_value(input).for_each(function (node) {

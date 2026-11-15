@@ -21,27 +21,20 @@ import {
 import { get_specificity } from '../selectors/specificity.ts'
 
 export type SelectorsResult = CountResult & {
-	/** Items are numbers */
 	complexity: CountResult<number>
-	/** Items are numbers */
 	nesting: CountResult<number>
-	/** Selectors that contain an ID, counted by selector text */
 	ids: CountResult
 	pseudo_classes: CountResult
 	pseudo_elements: CountResult
-	/** `[role]` and `[aria-*]` attribute selectors */
 	accessibility: CountResult
 	attributes: CountResult
-	/** Type selectors with a dash: `my-element` */
 	custom_elements: CountResult
-	/** Keyframe selectors: `from`, `50%`, `to` */
 	keyframes: CountResult
-	/** Vendor prefixed pseudo-classes, pseudo-elements and type selectors */
 	prefixed: CountResult
 	combinators: CountResult
 }
 
-/** Selectors, counted by text, with complexity, nesting and a breakdown per kind */
+/** Selectors by text, with complexity, nesting and a breakdown per kind */
 export function selectors(options: CountOptions = {}): CollectorDef<SelectorsResult> {
 	return define_collector<SelectorsResult>(function init() {
 		const texts = create_counter(without_sequence(options))

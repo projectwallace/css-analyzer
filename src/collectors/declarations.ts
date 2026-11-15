@@ -5,15 +5,13 @@ import { define_collector } from '../engine/define-collector.ts'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 
 export type DeclarationsResult = CountResult & {
-	/** `!important` declarations: how many, and how many of those are inside `@keyframes` (where they are ignored) */
+	/** `in_keyframes`: ignored by browsers */
 	importants: { total: number; in_keyframes: number }
-	/** 1, plus 1 for `!important`, plus 1 more inside keyframes. Items are numbers. */
 	complexity: CountResult<number>
-	/** How deep the declaration is nested. Items are numbers. */
 	nesting: CountResult<number>
 }
 
-/** Every declaration (counted by its text), `!important` usage, complexity and nesting */
+/** Every declaration, `!important` usage, complexity and nesting */
 export function declarations(options: CountOptions = {}): CollectorDef<DeclarationsResult> {
 	return define_collector<DeclarationsResult>(function init() {
 		const texts = create_counter(without_sequence(options))

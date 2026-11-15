@@ -3,7 +3,7 @@ import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts
 import { get_value_browserhacks } from '../values/browserhacks.ts'
 import { define_counting_collector } from './shared.ts'
 
-/** Value browserhacks: `progid:`, `\9`, `\7`, `alpha()`, `expression()`, `.htc` and `!ie` */
+/** Value browserhacks and `!ie` */
 export function value_browserhacks(options: CountOptions = {}): CollectorDef<CountResult> {
 	return define_counting_collector(options, function setup(counter) {
 		return {

@@ -15,14 +15,13 @@ import { type PreludeInput, as_prelude } from '../utils/input.ts'
 import { type Match, to_location } from '../utils/location.ts'
 
 export type FeatureBound = Match<number> & {
-	/** The feature without `min-` or `max-`, lowercased: `width`. A vendor prefix stays: `-webkit-device-pixel-ratio`. */
+	/** Without `min-` or `max-`, lowercased; a vendor prefix stays */
 	feature: string
 	direction: 'min' | 'max' | 'equal'
-	/** `px`, `em`, `dppx`, ...; empty for a number without unit */
 	unit: string
-	/** `true` for `min-width: 1px` and `width >= 1px`, `false` for `width > 1px` */
+	/** `false` for `width > 1px` */
 	inclusive: boolean
-	/** Which of the comma separated queries of the prelude the bound is in, starting at 0 */
+	/** Index of the comma separated query */
 	query: number
 }
 
@@ -106,13 +105,7 @@ function bounds_of_range(node: FeatureRange, query: number): FeatureBound[] {
 	return bounds
 }
 
-/**
- * The numeric bounds in a `@media` or `@container` prelude, in source order: `(min-width: 400px)`,
- * `(width >= 400px)`, `(400px < width)` and `(50px <= width <= 100px)` (two bounds). Each is located at its
- * whole feature, so both bounds of a double range share a location. Features without a number
- * (`orientation: landscape`, a ratio, `calc()`) are left out. `or` and `not` are not interpreted: check
- * `query` to tell the comma separated queries apart. The prelude has to be text or a parsed prelude.
- */
+/** The numeric bounds of a `@media` or `@container` prelude, each at its whole feature. `or` and `not` are not interpreted: `query` tells comma separated queries apart. */
 export function get_feature_bounds(
 	input: PreludeInput,
 	name: 'media' | 'container' = 'media',

@@ -14,7 +14,7 @@ import { type Match, to_match, to_match_in } from '../utils/location.ts'
 // Browserhacks sourced from:
 // - https://browserhacks.com/
 // - https://www.alwaystwisted.com/relicss/old-css
-/** Find the browserhacks in a CSS value: `progid:`, `\\9`, `\\7`, `alpha()`, `expression()`, `.htc` */
+/** Find the browserhacks in a CSS value */
 export function get_value_browserhacks(input: ValueInput): Match[] {
 	const node = as_value(input)
 	const hacks: Match[] = []

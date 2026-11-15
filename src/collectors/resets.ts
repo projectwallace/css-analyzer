@@ -3,7 +3,7 @@ import { spacing_reset_properties } from '../properties/property-utils.ts'
 import { is_value_reset } from '../values/values.ts'
 import { define_counting_collector } from './shared.ts'
 
-/** Spacing properties that are reset to 0 (`margin: 0`), counted by property */
+/** Spacing properties reset to 0 (`margin: 0`), by property */
 export function resets(options: CountOptions = {}): CollectorDef<CountResult> {
 	return define_counting_collector(options, function setup(counter) {
 		return {

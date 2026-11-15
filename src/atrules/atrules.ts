@@ -38,7 +38,7 @@ function find_hacks(
 
 const whitespace_regex = /\s+/g
 
-/** Find @supports browserhacks (`-webkit-appearance: none`, `-moz-appearance: meterbar`) */
+/** Find @supports browserhacks */
 export function get_supports_browserhacks(input: PreludeInput): Match[] {
 	return find_hacks('supports', input, function (node, on_hack) {
 		// Check SupportsQuery nodes for browserhack patterns
@@ -58,7 +58,7 @@ export function get_supports_browserhacks(input: PreludeInput): Match[] {
 	})
 }
 
-/** Find @media browserhacks (`\\0`, `\\9`, `-ms-high-contrast`, `min-resolution: .001dpcm`, ...) */
+/** Find @media browserhacks */
 export function get_media_browserhacks(input: PreludeInput): Match[] {
 	return find_hacks('media', input, function (node, on_hack) {
 		// Check MediaType nodes for \0 prefix or \9 suffix
@@ -133,7 +133,7 @@ export function get_media_browserhacks(input: PreludeInput): Match[] {
 	})
 }
 
-/** The container name in a `@container` prelude (`sidebar (min-width: 400px)`), or `null` for an anonymous query */
+/** The container name of a `@container` prelude, or `null` */
 export function get_container_query_name(input: PreludeInput): Match | null {
 	const first = as_prelude('container', input)[0]
 	if (!first) {

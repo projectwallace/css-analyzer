@@ -22,7 +22,6 @@ export function unit_of(node: CSSNode, property: string): string {
 	return strip_unit_hack(node.unit)
 }
 
-/** The units of the dimensions in a value (`px`, `em`, `s`, ...), located at the dimension */
 export function extract_units(property: string, input: ValueInput): Match[] {
 	const name = property_basename(property)
 	const found: Match[] = []

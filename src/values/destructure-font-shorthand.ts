@@ -63,9 +63,7 @@ const slash = 47 // '/'.charCodeAt(0)
 export type FontShorthand = {
 	font_size?: Match
 	line_height?: Match
-	/** Everything after the size and line height, as written */
 	font_family?: Match | null
-	/** Global keywords (inherit, initial, ...) found anywhere in the value */
 	keywords: Match[]
 }
 
@@ -74,7 +72,7 @@ export type FontShorthand = {
 //         <font-size>[/<line-height>]? <font-family>
 //
 // System fonts (caption, icon, menu, ...) are not handled: check system_fonts first.
-/** Split a `font` shorthand value into font size, line height, family and global keywords; `null` for a lone `var()` */
+/** Split a `font` shorthand into size, line height, family and keywords */
 export function destructure_font_shorthand(input: ValueInput): FontShorthand | null {
 	const value = as_value(input)
 	const found_keywords: Match[] = []

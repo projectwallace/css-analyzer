@@ -9,14 +9,12 @@ import type {
 import { to_location } from '../utils/location.ts'
 
 export type Counter<T extends CountItem = string> = {
-	/** Count `item`, found at `node`; the location is only read when locations are enabled */
 	add(item: T, node: CSSNode, length?: number): void
 	result(): CountResult<T>
 }
 
 export type ContextCounter<T extends CountItem = string> = {
 	add(item: T, context: string, node: CSSNode, length?: number): void
-	/** `by_context` is only there when the counter was created with `{ contexts: true }` */
 	result(): CountResult<T> & { by_context?: Map<string, CountResult<T>> }
 }
 
@@ -52,7 +50,6 @@ function to_result<T extends CountItem>(map: CountMap<T>, total: number): CountR
 	return { total, total_unique: unique.size, unique }
 }
 
-/** Count strings (the default) or numbers: `create_counter<number>()` */
 export function create_counter<T extends CountItem = string>(
 	options: CountOptions = {},
 ): Counter<T> {
@@ -119,7 +116,7 @@ export function create_context_counter<T extends CountItem = string>(
 	return { add, result }
 }
 
-/** Derived numbers for a count result. Kept out of the core so unused stats cost nothing. */
+/** Derived numbers for a count result */
 export function summarize(counts: CountResult<CountItem>): {
 	uniqueness_ratio: number
 } {

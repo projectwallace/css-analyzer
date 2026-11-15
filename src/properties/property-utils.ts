@@ -89,17 +89,14 @@ export const border_radius_properties: KeywordSet = new KeywordSet([
 ])
 
 // The predicates ignore case, vendor prefixes and browserhacks (`*margin`, `-webkit-border-radius`)
-/** Is this a shorthand property, like `margin` or `font`? */
 export function is_shorthand_property(property: string): boolean {
 	return shorthand_properties.has(property_basename(property))
 }
 
-/** Is this a margin or padding property? */
 export function is_spacing_reset_property(property: string): boolean {
 	return spacing_reset_properties.has(property_basename(property))
 }
 
-/** Is this `border-radius` or one of its longhands? */
 export function is_border_radius_property(property: string): boolean {
 	return border_radius_properties.has(property_basename(property))
 }

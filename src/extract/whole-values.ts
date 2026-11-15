@@ -21,22 +21,18 @@ function whole_value(input: ValueInput, property: string, properties: KeywordSet
 	return text === undefined ? [] : [to_match(value, text)]
 }
 
-/** The value of a `z-index` declaration, as written */
 export function extract_z_indexes(property: string, input: ValueInput): Match[] {
 	return whole_value(input, property, z_index_properties)
 }
 
-/** The whole value of a `box-shadow` declaration (vendor prefixed property included), as written */
 export function extract_box_shadows(property: string, input: ValueInput): Match[] {
 	return whole_value(input, property, box_shadow_properties)
 }
 
-/** The whole value of a `text-shadow` declaration, as written */
 export function extract_text_shadows(property: string, input: ValueInput): Match[] {
 	return whole_value(input, property, text_shadow_properties)
 }
 
-/** The value of `border-radius` and its longhands, as written */
 export function extract_border_radiuses(property: string, input: ValueInput): Match[] {
 	return whole_value(input, property, border_radius_properties)
 }

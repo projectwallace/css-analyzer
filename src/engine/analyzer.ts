@@ -30,11 +30,7 @@ type ValueSubscription = Omit<NonNullable<CollectorInstance<unknown>['value']>, 
 // Handlers receive a shared context object (see `create_context()`): a flyweight whose facts are
 // computed lazily and memoized per node, so the first collector that asks pays and the others read
 // the cached result. It is only valid during the handler call it is passed to.
-/**
- * Run collectors over a stylesheet. The keys of `collectors` become the keys of the result.
- * @example
- * analyze('a { color: red }', { colors: colors(), z: z_indexes() }).colors.unique.get('red') // { count: 1 }
- */
+/** Run collectors over a stylesheet; the keys of `collectors` are the keys of the result */
 export function analyze<C extends CollectorMap>(input: string, collectors: C): ResultOf<C> {
 	const keys = Object.keys(collectors)
 	const instances: CollectorInstance<unknown>[] = keys.map((key) => collectors[key]!.create())

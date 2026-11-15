@@ -5,7 +5,6 @@ import { keywords as global_keywords } from '../values/values.ts'
 import { define_counting_collector } from './shared.ts'
 import { no_value_walk } from '../extract/shared.ts'
 
-/** Global keywords (`inherit`, `none`, `auto`, ...) used as values, lowercased */
 export function keywords(options: CountOptions = {}): CollectorDef<CountResult> {
 	return define_counting_collector(options, function setup(counter) {
 		return {

@@ -8,26 +8,20 @@ import { get_anchor_names } from '../values/anchors.ts'
 import { get_property_weight } from './complexity.ts'
 import { get_first_identifier } from './value-helpers.ts'
 
-/** Counted by normalized property name; the keys below break the same declarations down by kind */
 export type PropertiesResult = CountResult & {
-	/** Vendor prefixed properties, as written */
 	prefixed: CountResult
 	custom: CountResult &
 		DefinedUsedResult & {
-			/** Custom properties with `!important`, as written */
 			importants: CountResult
 		}
-	/** Shorthand properties, as written */
 	shorthands: CountResult
-	/** The hack character (`*`, `_`, ...) of property hacks */
+	/** The hack character (`*`, `_`, ...) */
 	browserhacks: CountResult
-	/** 1, 2 for prefixed/hacked/custom, 3 for important custom properties. Items are numbers. */
 	complexity: CountResult<number>
-	/** `anchor-name` / `position-anchor` names, defined and used */
 	anchor_names: DefinedUsedResult
 }
 
-/** Properties (normalized: `-webkit-transition` is `transition`), prefixes, custom properties, shorthands, hacks and anchor names */
+/** Properties, prefixes, custom properties, shorthands, hacks and anchor names */
 export function properties(options: CountOptions = {}): CollectorDef<PropertiesResult> {
 	return define_collector<PropertiesResult>(function init() {
 		const names = create_counter(options)

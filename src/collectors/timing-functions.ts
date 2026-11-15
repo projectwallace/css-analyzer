@@ -4,11 +4,11 @@ import { define_counting_collector, type Normalize } from './shared.ts'
 import { lowercase_unless_var } from '../extract/shared.ts'
 
 export type TimingFunctionsOptions = CountOptions & {
-	/** `lowercase` (default) lowercases the values (`EASE` is `ease`; values with `var()` are kept). `none` keeps them as written. */
+	/** `none` keeps the case as written */
 	normalize?: Normalize
 }
 
-/** Keywords and functions (`ease-in`, `cubic-bezier()`, `steps()`) of transitions and animations */
+/** Timing functions of transitions and animations */
 export function timing_functions(options: TimingFunctionsOptions = {}): CollectorDef<CountResult> {
 	const lowercase = options.normalize !== 'none'
 

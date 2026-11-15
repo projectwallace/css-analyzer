@@ -5,7 +5,6 @@ import { lowercase_unless_var } from '../extract/shared.ts'
 
 const properties = new Set(['display'])
 
-/** Values of `display`, lowercased (values with `var()` are kept as written) */
 export function displays(options: CountOptions = {}): CollectorDef<CountResult> {
 	return define_counting_collector(options, function setup(counter) {
 		return {

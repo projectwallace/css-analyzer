@@ -1,6 +1,5 @@
 import type { CSSNode } from '@projectwallace/css-parser'
 
-/** Where something is in the source */
 export type Location = {
 	line: number
 	column: number
@@ -8,10 +7,7 @@ export type Location = {
 	length: number
 }
 
-/**
- * Something a utility found (`value`), and where. Offsets are relative to the text that was parsed: the string
- * for text input, the source the node came from for node input.
- */
+/** A found `value` and where; offsets are relative to the parsed text */
 export type Match<T = string> = Location & { value: T }
 
 /** Where `node` is in the source. `length` overrides the node's length (e.g. only the property name). */

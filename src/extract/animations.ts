@@ -44,12 +44,10 @@ export function timing_functions_of(property: string, value: Value): Match[] {
 	return animation_items(property, value, timing_function_properties, 'timing_functions')
 }
 
-/** The durations of `transition` and `animation` (and their `-duration` longhands). Delays are not included. */
 export function extract_durations(property: string, input: ValueInput): Match[] {
 	return durations_of(property_basename(property), as_value(input))
 }
 
-/** The timing functions (`ease-in`, `cubic-bezier()`, `steps()`) of transitions and animations */
 export function extract_timing_functions(property: string, input: ValueInput): Match[] {
 	return timing_functions_of(property_basename(property), as_value(input))
 }

@@ -42,19 +42,14 @@ const animation_non_name_keywords = new KeywordSet([
 ])
 
 export type AnimationParts = {
-	/** The first time of every layer, as written */
 	durations: Match[]
-	/** The second time of every layer (the delay), as written */
 	delays: Match[]
-	/** Timing function keywords and functions (`ease-in`, `cubic-bezier(...)`) */
 	timing_functions: Match[]
-	/** Animation names, as written (quoted names keep their quotes) */
 	names: Match[]
-	/** Global keywords such as `inherit` or `none` */
 	keywords: Match[]
 }
 
-/** Split an `animation` or `transition` value into its parts */
+/** Split an `animation` value into its parts */
 export function analyze_animation(input: ValueInput): AnimationParts {
 	const parts: AnimationParts = {
 		durations: [],
@@ -98,25 +93,20 @@ export function analyze_animation(input: ValueInput): AnimationParts {
 }
 
 export type TransitionParts = {
-	/** The properties that transition (`opacity`, `all`, `--x`), as written */
 	properties: Match[]
-	/** The first time of every layer, as written */
 	durations: Match[]
-	/** The second time of every layer (the delay), as written */
 	delays: Match[]
-	/** Timing function keywords and functions (`ease-in`, `steps(4)`) */
 	timing_functions: Match[]
-	/** Global keywords such as `inherit` or `none` */
 	keywords: Match[]
 }
 
-/** Split a `transition` value into its parts: `opacity 200ms ease-in-out 50ms, color 1s` */
+/** Split a `transition` value into its parts */
 export function analyze_transition(input: ValueInput): TransitionParts {
 	const { names, ...parts } = analyze_animation(input)
 	return { properties: names, ...parts }
 }
 
-/** The names in an `animation-name` value; `none` is not a name. Quoted names have no quotes in `text`. */
+/** The names in an `animation-name` value */
 export function get_animation_names(input: ValueInput): Match[] {
 	const names: Match[] = []
 	as_value(input).for_each(function (node) {

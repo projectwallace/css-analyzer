@@ -12,13 +12,13 @@ import {
 } from '@projectwallace/css-parser'
 import { parse_selector_list } from '@projectwallace/css-parser/parse-selector'
 
-/** CSS text, or a value that was already parsed (e.g. by a collector) */
+/** Text or a parsed value */
 export type ValueInput = string | Value
 
-/** CSS text, or a selector or selector list that was already parsed */
+/** Text or a parsed selector (list) */
 export type SelectorInput = string | Selector | SelectorList
 
-/** CSS text, or an at-rule prelude that was already parsed (`Raw` when preludes were not parsed) */
+/** Text or a parsed prelude (`Raw` when preludes were not parsed) */
 export type PreludeInput = string | AtrulePrelude | Raw
 
 export function as_value(input: ValueInput): Value {

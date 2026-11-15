@@ -59,10 +59,9 @@ export type AllCollectors = {
 	resets: ReturnType<typeof resets>
 }
 
-/** Options for the whole set, passed on to every collector */
 export type AllOptions = Pick<CountOptions, 'locations'>
 
-/** Every collector, with per-property counts for colors, border radiuses and units */
+/** Every collector, with per-property counts */
 export function all_collectors(options: AllOptions = {}): AllCollectors {
 	const { locations } = options
 	return {
@@ -97,7 +96,6 @@ export function all_collectors(options: AllOptions = {}): AllCollectors {
 
 export type AllResult = ResultOf<AllCollectors>
 
-/** Run every collector; the result has one key per collector */
 export function analyze_all(input: string, options?: AllOptions): AllResult {
 	return analyze(input, all_collectors(options))
 }

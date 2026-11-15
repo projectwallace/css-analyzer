@@ -72,20 +72,15 @@ function as_list(match: Match | undefined): Match[] {
 	return match ? [match] : []
 }
 
-/** The font size of a `font-size` or `font` declaration, as written. System fonts and keywords have none. */
 export function extract_font_sizes(property: string, input: ValueInput): Match[] {
 	return as_list(font_size(property_basename(property), as_value(input)))
 }
 
-/** The line height of a `line-height` or `font` declaration, as written */
 export function extract_line_heights(property: string, input: ValueInput): Match[] {
 	return as_list(line_height(property_basename(property), as_value(input)))
 }
 
-/**
- * The whole font family list of a `font-family` or `font` declaration, as written (`"Noto Sans", serif` is
- * one match): what a collector counts. Use `get_font_families()` for one match per family.
- */
+/** The whole list as written; see `get_font_families()` for one match per family */
 export function extract_font_families(property: string, input: ValueInput): Match[] {
 	return as_list(font_family(property_basename(property), as_value(input)))
 }

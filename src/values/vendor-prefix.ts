@@ -2,7 +2,7 @@ import { is_function, is_identifier, walk_values } from '@projectwallace/css-par
 import { type ValueInput, as_value } from '../utils/input.ts'
 import { type Match, to_match } from '../utils/location.ts'
 
-/** Find vendor prefixed identifiers and functions in a CSS value */
+/** Find vendor prefixed identifiers and functions */
 export function get_prefixed_values(input: ValueInput): Match[] {
 	const found: Match[] = []
 	walk_values(as_value(input), function (node) {

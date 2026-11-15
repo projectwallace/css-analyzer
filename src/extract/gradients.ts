@@ -15,7 +15,6 @@ export function is_gradient(node: CSSNode, property: string): boolean {
 	return !no_value_walk.has(property) && is_function(node) && is_gradient_function(node.name)
 }
 
-/** The gradient functions in a value, as written: nested ones and the ones in `var()` fallbacks too */
 export function extract_gradients(property: string, input: ValueInput): Match[] {
 	const name = property_basename(property)
 	const found: Match[] = []

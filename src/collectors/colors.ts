@@ -12,13 +12,12 @@ import { color_format, color_text } from '../extract/colors.ts'
 import { get_context_property, type Normalize } from './shared.ts'
 
 export type ColorsOptions = ContextCountOptions & {
-	/** `lowercase` (default) lowercases hex colors and color names. Color functions are always kept as written. */
+	/** `none` keeps the case as written */
 	normalize?: Normalize
 }
 
-/** The result with `{ contexts: true }`. Without `contexts` there is no `by_context`. */
 export type ColorsResult = ContextCountResult & {
-	/** `hex3`, `hex6`, `named`, `system`, `transparent`, `rgb`, `oklch`, ... */
+	/** `hex3`, `named`, `rgb`, ... */
 	formats: CountResult
 }
 
@@ -26,7 +25,7 @@ export type ColorsResult = ContextCountResult & {
 // `animation-name` and `z-index` are skipped (`animation-name: red` is not a color), and so are
 // the words in a `font` shorthand (`font: 12px Black`). Colors in custom properties (`--brand: red`)
 // and in properties the collector does not know (`unknown: blue`) are counted.
-/** Colors in values: hex, named, system and keyword colors and color functions, with their `formats` */
+/** Hex, named, system and keyword colors and color functions */
 export function colors<O extends ColorsOptions = {}>(
 	options?: O,
 ): CollectorDef<WithContexts<CountResult & { formats: CountResult }, O>> {

@@ -3,7 +3,7 @@ import { type PreludeInput, as_prelude } from '../utils/input.ts'
 import { type Match, to_match, to_match_in_source } from '../utils/location.ts'
 import { unquote } from '../utils/string-utils.ts'
 
-/** The name in a `@keyframes` prelude, without quotes (`"my fade"` is `my fade`); `null` for an empty prelude */
+/** The name in a `@keyframes` prelude, without quotes */
 export function get_keyframes_name(input: PreludeInput): Match | null {
 	if (typeof input === 'string') {
 		const name = input.trim()
@@ -16,7 +16,7 @@ export function get_keyframes_name(input: PreludeInput): Match | null {
 	return text === '' ? null : to_match(input, unquote(text))
 }
 
-/** The names in a `@layer` prelude (`a, b.c`): `@layer a, b;`, `@layer a { }` or the `layer(a)` of an import */
+/** The names in a `@layer` prelude */
 export function get_layer_names(input: PreludeInput): Match[] {
 	const names: Match[] = []
 	for (const node of as_prelude('layer', input)) {

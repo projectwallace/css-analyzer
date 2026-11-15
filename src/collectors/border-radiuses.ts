@@ -9,7 +9,7 @@ import type {
 import { get_context_property } from './shared.ts'
 import { border_radius_properties } from '../extract/whole-values.ts'
 
-/** Values of `border-radius` and its longhands; with `contexts` also counted per property */
+/** Values of `border-radius` and its longhands */
 export function border_radiuses<O extends ContextCountOptions = {}>(
 	options?: O,
 ): CollectorDef<WithContexts<CountResult, O>> {

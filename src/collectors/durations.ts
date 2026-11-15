@@ -4,11 +4,11 @@ import { define_counting_collector, type Normalize } from './shared.ts'
 import { lowercase_unless_var } from '../extract/shared.ts'
 
 export type DurationsOptions = CountOptions & {
-	/** `lowercase` (default) lowercases the values (`1S` is `1s`; values with `var()` are kept). `none` keeps them as written. */
+	/** `none` keeps the case as written */
 	normalize?: Normalize
 }
 
-/** Durations of `transition` and `animation` (and their `-duration` longhands). Delays are not counted. */
+/** Durations of `transition` and `animation`; delays are not counted */
 export function durations(options: DurationsOptions = {}): CollectorDef<CountResult> {
 	const lowercase = options.normalize !== 'none'
 

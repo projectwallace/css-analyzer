@@ -7,7 +7,6 @@ export type NumberSummary = {
 	range: number
 	sum: number
 	mean: number
-	/** The most common value; the mean of the values that tie for most common */
 	mode: number
 	median: number
 }
@@ -23,7 +22,6 @@ const empty_summary: NumberSummary = {
 	median: 0,
 }
 
-/** Statistics for numbers that were counted as `value -> how often` */
 export function summarize_frequencies(frequencies: ReadonlyMap<number, number>): NumberSummary {
 	const values = [...frequencies.keys()].sort((a, b) => a - b)
 	if (values.length === 0) {
@@ -80,7 +78,7 @@ export function summarize_frequencies(frequencies: ReadonlyMap<number, number>):
 	}
 }
 
-/** Statistics for a count result whose items are numbers (e.g. nesting depths, complexities) */
+/** Statistics for a count result with numbers */
 export function summarize_numbers(counts: CountResult<number>): NumberSummary {
 	const frequencies = new Map<number, number>()
 	for (const [item, { count }] of counts.unique) {

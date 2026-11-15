@@ -10,11 +10,7 @@ import { type Match, to_match } from '../utils/location.ts'
 import { unquote } from '../utils/string-utils.ts'
 import { destructure_font_shorthand, system_fonts } from './destructure-font-shorthand.ts'
 
-/**
- * The font families in a `font-family` value, one match per family: `Source Code Pro, "Noto Sans"` has
- * two. Quoted names have no quotes in `value`; names of several words keep the spacing as written.
- * Pass `'font'` as the property to read the families of a `font` shorthand.
- */
+/** One match per font family; pass `'font'` as property to read a shorthand */
 export function get_font_families(input: ValueInput, property: string = 'font-family'): Match[] {
 	const value = as_value(input)
 	// Only what starts here belongs to the family list

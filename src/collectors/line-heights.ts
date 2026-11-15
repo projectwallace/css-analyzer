@@ -5,9 +5,8 @@ import { lowercase_unless_var } from '../extract/shared.ts'
 import { define_counting_collector, type Normalize } from './shared.ts'
 
 export type LineHeightsOptions = CountOptions & {
-	/** `lowercase` (default) lowercases the values (values with `var()` are kept). `none` keeps them as written. */
+	/** `none` keeps the case as written */
 	normalize?: Normalize
-	/** Leave out values that use `var()` */
 	skip_var?: boolean
 }
 

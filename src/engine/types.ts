@@ -14,7 +14,6 @@ export type { CSSNode }
 
 export type { Location, Match }
 
-/** What the parser has to parse: the engine asks only for what the collectors need */
 export type ParseOptions = {
 	selectors: boolean
 	values: boolean
@@ -23,22 +22,20 @@ export type ParseOptions = {
 
 export type CountEntry = {
 	count: number
-	/** Only present if the collector was created with `{ locations: true }` */
+	/** Only with `locations: true` */
 	locations?: Location[]
 }
 
-/** Unique items with how often (and where) each was found */
 export type CountMap<T extends CountItem = string> = Map<T, CountEntry>
 
-/** What can be counted: text (properties, selectors, values) or numbers (complexity, nesting). Never both. */
+/** Text or numbers, never both */
 export type CountItem = string | number
 
-/** The one and only way counted things are reported */
 export type CountResult<T extends CountItem = string> = {
 	total: number
 	total_unique: number
 	unique: CountMap<T>
-	/** Every counted item in the order it was found. Only present with `{ sequence: true }`. */
+	/** Only with `sequence: true` */
 	sequence?: T[]
 }
 
@@ -48,7 +45,7 @@ export type ContextCountResult<T extends CountItem = string> = CountResult<T> & 
 
 type ByContext = Pick<ContextCountResult, 'by_context'>
 
-/** `by_context` exists exactly when `contexts` is `true`, and is optional when that is only known to be a boolean */
+/** `by_context` exists when `contexts` is `true` */
 export type WithContexts<
 	R extends CountResult<CountItem>,
 	O extends ContextCountOptions,
@@ -61,80 +58,66 @@ export type WithContexts<
 	: R
 
 export type CountOptions = {
-	/** Also keep where every item was found (`unique.get(item).locations`). Costs memory; off by default. */
 	locations?: boolean
-	/** Also keep every counted item in order (`result.sequence`). Costs memory; off by default. */
 	sequence?: boolean
 }
 
 export type ContextCountOptions = CountOptions & {
-	/** Also count per context (e.g. per property) in `by_context`. Without it there is no `by_context`. */
+	/** Also count per context (e.g. per property) in `by_context` */
 	contexts?: boolean
-	/** `normalized` (default: lowercase, no vendor prefix or hack character) or `as_written` */
+	/** `normalized` (default) or `as_written` */
 	property?: 'normalized' | 'as_written'
 }
 
-/** Facts and structure about the node that is currently visited */
 export type Context = {
-	/** Number of enclosing rules/at-rules */
 	readonly depth: number
-	/** Lowercased, unprefixed names of the enclosing at-rules, outermost first */
+	/** Lowercased, unprefixed, outermost first */
 	readonly atrule_stack: readonly string[]
 }
 
 export type StylesheetContext = Context & {
-	/** Full source text of the stylesheet */
 	readonly css: string
 }
 
 export type DeclarationContext = Context & {
-	/** Normalized property: lowercased, without vendor prefix or hack character (custom properties untouched) */
+	/** Lowercased, without vendor prefix or hack character */
 	readonly property: string
-	/** Property as written (`-WEBKIT-Transition`) */
 	readonly raw_property: string
 	readonly is_custom: boolean
 	readonly is_important: boolean
 	readonly is_browserhack: boolean
 	readonly is_vendor_prefixed: boolean
-	/** Raw value text, also available when values are not parsed */
 	readonly value_text: string
-	/** Parsed value node, `undefined` when values are not parsed (see `parse.values`) */
+	/** `undefined` when values are not parsed */
 	readonly value: Value | undefined
-	/** Value text without a trailing IE hack (`\\9`, `\\7`); `undefined` for unparsed values and global keywords */
+	/** Without a trailing IE hack; `undefined` for global keywords */
 	readonly clean_value_text: string | undefined
-	/** The `font` shorthand split into size, line-height and family; `null` for other properties, system fonts, global keywords and `var()` */
+	/** `null` for other properties, system fonts and keywords */
 	readonly font_shorthand: FontShorthand | null
 }
 
 type DeclarationHandler = (node: Declaration, ctx: DeclarationContext) => void
 
-/**
- * What a collector subscribes to. The `ctx` that handlers receive is one shared object that the engine
- * reuses for every node: read what you need right away and never store `ctx` or a node.
- */
+/** The `ctx` is shared: never store it or a node */
 export type CollectorInstance<T> = {
-	/** Extra parsing this collector needs. Selectors/values are implied by `selector`/`value` subscriptions. */
 	parse?: Partial<ParseOptions>
 	stylesheet?: (node: StyleSheet, ctx: StylesheetContext) => void
 	rule?: (node: Rule, ctx: Context) => void
 	atrule?: (node: Atrule, ctx: Context) => void
-	/** Selectors of style rules, not keyframe selectors or selectors in at-rule preludes. Gets no `ctx`: use `rule` for `depth` or `atrule_stack` */
+	/** Style rule selectors only; no `ctx` */
 	selector?: (node: Selector) => void
 	declaration?: {
-		/** Normalized property names; the handler is skipped for other declarations */
+		/** Normalized names; other declarations are skipped */
 		properties?: ReadonlySet<string>
 		enter: DeclarationHandler
 	}
-	/** Subscribe to nodes inside declaration values; the engine walks each value once for all collectors */
 	value?: {
-		/** Parser node types, e.g. `[HASH, FUNCTION]` */
 		types: readonly number[]
 		properties?: ReadonlySet<string>
 		enter: (node: CSSNode, ctx: DeclarationContext) => void
 	}
-	/** Called for every comment */
 	comment?: (loc: Location) => void
-	/** Build the result. Keep it separate from internal state; it can be called repeatedly. */
+	/** Can be called repeatedly */
 	result(): T
 }
 

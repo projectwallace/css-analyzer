@@ -10,7 +10,7 @@ import type {
 import { unit_of } from '../extract/units.ts'
 import { get_context_property } from './shared.ts'
 
-/** Units of every dimension (`px`, `em`, `s`, ...), lowercased; with `contexts` also per property */
+/** Units of every dimension (`px`, `s`, ...), lowercased */
 export function units<O extends ContextCountOptions = {}>(
 	options?: O,
 ): CollectorDef<WithContexts<CountResult, O>> {
