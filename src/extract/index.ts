@@ -9,3 +9,13 @@ export {
 	line_height_properties,
 	font_family_properties,
 } from './fonts.ts'
+export {
+	extract_z_indexes,
+	extract_box_shadows,
+	extract_text_shadows,
+	extract_border_radiuses,
+	z_index_properties,
+	box_shadow_properties,
+	text_shadow_properties,
+	border_radius_properties,
+} from './whole-values.ts'

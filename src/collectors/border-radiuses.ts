@@ -7,7 +7,7 @@ import type {
 	WithContexts,
 } from '../engine/types.ts'
 import { get_context_property } from './shared.ts'
-import { border_radius_properties } from '../properties/property-utils.ts'
+import { border_radius_properties } from '../extract/whole-values.ts'
 
 /** Values of `border-radius` and its longhands; with `contexts` also counted per property */
 export function border_radiuses<O extends ContextCountOptions = {}>(

@@ -1,7 +1,6 @@
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
+import { box_shadow_properties } from '../extract/whole-values.ts'
 import { define_counting_collector } from './shared.ts'
-
-const properties = new Set(['box-shadow'])
 
 /** The whole `box-shadow` value, as written (vendor prefixed properties included) */
 export function box_shadows(options: CountOptions = {}): CollectorDef<CountResult> {
@@ -9,7 +8,7 @@ export function box_shadows(options: CountOptions = {}): CollectorDef<CountResul
 		return {
 			parse: { values: true },
 			declaration: {
-				properties,
+				properties: box_shadow_properties.set,
 				enter(_node, ctx) {
 					const text = ctx.clean_value_text
 					if (text === undefined) {
