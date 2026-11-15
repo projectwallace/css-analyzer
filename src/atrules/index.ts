@@ -4,3 +4,4 @@ export {
 	get_container_query_name,
 } from './atrules.ts'
 export { get_keyframes_name, get_layer_names } from './names.ts'
+export { get_feature_bounds, type FeatureBound } from './feature-bounds.ts'
