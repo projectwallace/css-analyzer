@@ -226,6 +226,23 @@ const { unknown } = keyframes.analyze() // ['fade']
 const { usages } = keyframes.payloads() // usages.get('fade') is the Match of `fade`
 ```
 
+### Extractors
+
+For tools that already have the CSS in hand, like a linter or an editor: the logic of the collectors, per declaration. Pass the property and the value (text or parsed) and get the matches, with where they are. Collectors use the same code, so a tool and the analyzer never disagree about what a color or a font size is.
+
+```js
+import { extract_colors, extract_font_sizes } from '@projectwallace/css-analyzer/extract'
+
+extract_colors('border', '1px solid RED')
+// [{ value: 'RED', format: 'named', line: 1, column: 11, offset: 10, length: 3 }]
+extract_font_sizes('font', 'bold 12px/1.5 serif') // [{ value: '12px', ... }]
+extract_font_sizes('color', 'red') // []
+```
+
+`extract_colors`, `extract_gradients`, `extract_units`, `extract_font_sizes`, `extract_line_heights`, `extract_font_families` (the whole list as written; `get_font_families()` splits it), `extract_z_indexes`, `extract_box_shadows`, `extract_text_shadows`, `extract_border_radiuses`, `extract_durations` and `extract_timing_functions` all return `Match[]` and an empty array for properties they do not handle. Extractors that look at a fixed set of properties also export that set as a `KeywordSet` (`font_size_properties`, `z_index_properties`, ...), so you can skip declarations early. Values are as written (a hex color loses its browserhack); normalizing (lowercasing, `skip_var`) is up to you or the collector options.
+
+`get_feature_bounds()` (`/atrules`) lists the numeric bounds of a `@media` or `@container` prelude: `(min-width: 400px)`, `(width >= 400px)` and `(50px <= width <= 100px)` become `{ feature, direction, value, unit, inclusive, query }` plus a location. `or` and `not` are not interpreted, and `query` tells the comma separated queries apart.
+
 ## Upgrading from 9.x
 
 See [MIGRATION.md](./MIGRATION.md).

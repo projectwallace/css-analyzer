@@ -31,6 +31,7 @@ src/
   presets/       ready-made collector sets (analyze_all, analyze_design_tokens)
   selectors/ values/ atrules/ properties/ stylesheet/
                  public utilities: plain functions on text or parsed nodes, one subpath export each
+  extract/       what the collectors look for, per declaration or node, as `Match`es: the logic collectors and tools share
   utils/         shared helpers (string-utils, input, location); utils/collections is public
   integration/   tests that run several collectors together
   test/          test helpers
@@ -39,7 +40,11 @@ src/
 Imports only go downwards: `presets` -> `collectors` -> `engine` -> utility modules and `utils`.
 Utility modules and `utils` never import `engine`, `collectors` or `presets`; the engine never imports `collectors` or `presets`; collectors never import `presets`. `pnpm lint` enforces this (`no-restricted-imports` in `.oxlintrc.json`).
 
-Every public subpath of the package (`/collectors`, `/presets`, `/selectors`, `/values`, `/atrules`, `/properties`, `/stylesheet`, `/utils/collections`) is a folder with an `index.ts`, an entry in `exports` in `package.json` and an entry in `tsdown.config.ts` (`src/*/index.ts` covers all of them except `utils/collections`, which is listed on its own). A new public function needs a test next to it and a line in the readme; a new collector also needs an entry in `collectors/index.ts`, in `presets/all.ts` and in the collectors table of the readme.
+Every public subpath of the package (`/collectors`, `/presets`, `/selectors`, `/values`, `/atrules`, `/properties`, `/stylesheet`, `/extract`, `/utils/collections`) is a folder with an `index.ts`, an entry in `exports` in `package.json` and an entry in `tsdown.config.ts` (`src/*/index.ts` covers all of them except `utils/collections`, which is listed on its own). A new public function needs a test next to it and a line in the readme; a new collector also needs an entry in `collectors/index.ts`, in `presets/all.ts` and in the collectors table of the readme.
+
+## Extractors
+
+The logic that decides what is a color, a font size, a duration, ... lives in `src/extract/`, not in the collector. A collector subscribes to the engine, calls that logic and counts the result; `extract_*()` calls the same logic on one declaration and returns `Match`es, so tools like linters get the same answer. Per-node logic (colors, gradients, units) is a small function the collector calls from its own value subscription, which allocates nothing. A change to what counts as a color is a change in `src/extract/colors.ts`, and its test goes there.
 
 ## Tests
 
