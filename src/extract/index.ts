@@ -19,3 +19,9 @@ export {
 	text_shadow_properties,
 	border_radius_properties,
 } from './whole-values.ts'
+export {
+	extract_durations,
+	extract_timing_functions,
+	duration_properties,
+	timing_function_properties,
+} from './animations.ts'
