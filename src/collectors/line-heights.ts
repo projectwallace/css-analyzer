@@ -1,7 +1,8 @@
 import { str_index_of } from '@projectwallace/css-parser'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
-import { define_counting_collector, type Normalize } from './shared.ts'
+import { line_height, line_height_properties } from '../extract/fonts.ts'
 import { lowercase_unless_var } from '../extract/shared.ts'
+import { define_counting_collector, type Normalize } from './shared.ts'
 
 export type LineHeightsOptions = CountOptions & {
 	/** `lowercase` (default) lowercases the values (values with `var()` are kept). `none` keeps them as written. */
@@ -10,8 +11,6 @@ export type LineHeightsOptions = CountOptions & {
 	skip_var?: boolean
 }
 
-const properties = new Set(['line-height', 'font'])
-
 export function line_heights(options: LineHeightsOptions = {}): CollectorDef<CountResult> {
 	const lowercase = options.normalize !== 'none'
 
@@ -19,17 +18,18 @@ export function line_heights(options: LineHeightsOptions = {}): CollectorDef<Cou
 		return {
 			parse: { values: true },
 			declaration: {
-				properties,
+				properties: line_height_properties.set,
 				enter(_node, ctx) {
-					const text =
-						ctx.property === 'font' ? ctx.font_shorthand?.line_height?.value : ctx.clean_value_text
-					if (text === undefined) {
+					const value = ctx.value
+					const match = value && line_height(ctx.property, value, ctx.font_shorthand)
+					if (!match) {
 						return
 					}
+					const text = match.value
 					if (options.skip_var && str_index_of('var(', text) !== -1) {
 						return
 					}
-					counter.add(lowercase ? lowercase_unless_var(text) : text, ctx.value!)
+					counter.add(lowercase ? lowercase_unless_var(text) : text, value)
 				},
 			},
 		}

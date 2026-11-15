@@ -1,6 +1,6 @@
 import { str_index_of } from '@projectwallace/css-parser'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
-import { system_fonts } from '../values/destructure-font-shorthand.ts'
+import { font_family, font_family_properties } from '../extract/fonts.ts'
 import { define_counting_collector } from './shared.ts'
 
 export type FontFamiliesOptions = CountOptions & {
@@ -8,28 +8,24 @@ export type FontFamiliesOptions = CountOptions & {
 	skip_var?: boolean
 }
 
-const properties = new Set(['font-family', 'font'])
-
 /** Font families are counted as written (case and quotes are kept) */
 export function font_families(options: FontFamiliesOptions = {}): CollectorDef<CountResult> {
 	return define_counting_collector(options, function setup(counter) {
 		return {
 			parse: { values: true },
 			declaration: {
-				properties,
+				properties: font_family_properties.set,
 				enter(_node, ctx) {
-					const text =
-						ctx.property === 'font' ? ctx.font_shorthand?.font_family?.value : ctx.clean_value_text
-					if (!text) {
+					const value = ctx.value
+					const match = value && font_family(ctx.property, value, ctx.font_shorthand)
+					if (!match) {
 						return
 					}
-					if (ctx.property === 'font-family' && system_fonts.has(text)) {
-						return
-					}
+					const text = match.value
 					if (options.skip_var && str_index_of('var(', text) !== -1) {
 						return
 					}
-					counter.add(text, ctx.value!)
+					counter.add(text, value)
 				},
 			},
 		}
