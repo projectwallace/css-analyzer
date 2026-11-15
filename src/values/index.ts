@@ -12,3 +12,5 @@ export { named_colors, system_colors, color_functions, color_keywords } from './
 export { keywords, is_value_reset } from './values.ts'
 export { destructure_font_shorthand, type FontShorthand } from './destructure-font-shorthand.ts'
 export { get_prefixed_values } from './vendor-prefix.ts'
+export { get_font_families } from './font-families.ts'
+export { get_anchor_names } from './anchors.ts'

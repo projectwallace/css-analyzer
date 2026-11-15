@@ -19,12 +19,12 @@ import { create_counter } from '../engine/counter.ts'
 import { to_location } from '../utils/location.ts'
 import { define_collector } from '../engine/define-collector.ts'
 import type { CollectorDef, CountOptions, CountResult, Location } from '../engine/types.ts'
-import { unquote } from '../utils/string-utils.ts'
 import {
 	get_container_query_name,
 	get_media_browserhacks,
 	get_supports_browserhacks,
 } from '../atrules/atrules.ts'
+import { get_keyframes_name, get_layer_names } from '../atrules/names.ts'
 import { keywords } from '../values/values.ts'
 import { get_atrule_weight } from './complexity.ts'
 import { without_sequence } from './shared.ts'
@@ -192,14 +192,14 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 						hacks++
 					}
 				} else if (name.endsWith('keyframes')) {
-					const keyframes_name = unquote(prelude_text)
+					const keyframes_name = get_keyframes_name(prelude!)?.value ?? ''
 					keyframes.add(keyframes_name, node)
 					keyframes_tracking.define(keyframes_name)
 					if (node.is_vendor_prefixed) {
 						prefixed_keyframes.add(`@${raw_name.toLowerCase()} ${prelude_text}`, node)
 					}
 				} else if (name === 'layer') {
-					for (const layer of prelude_text.split(',').map((part) => part.trim())) {
+					for (const { value: layer } of get_layer_names(prelude!)) {
 						layers.add(layer, node)
 						// `@layer name { }` places CSS into a layer (use); `@layer a, b;` orders layers (define)
 						if (block) {

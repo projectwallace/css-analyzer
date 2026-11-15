@@ -1,0 +1,47 @@
+import { test, expect } from 'vitest'
+import { parse_value } from '@projectwallace/css-parser/parse-value'
+import { get_font_families } from './index.ts'
+
+function families(value: string, property?: string): string[] {
+	return get_font_families(value, property).map((match) => match.value)
+}
+
+test.each([
+	['Arial', ['Arial']],
+	['Arial, sans-serif', ['Arial', 'sans-serif']],
+	['"Noto Sans", serif', ['Noto Sans', 'serif']],
+	["'Noto Sans'", ['Noto Sans']],
+	['Source Code Pro, Menlo, monospace', ['Source Code Pro', 'Menlo', 'monospace']],
+	['var(--font), Arial', ['Arial']],
+	['', []],
+])('get_font_families("%s") is %j', (value, expected) => {
+	expect(families(value)).toEqual(expected)
+})
+
+test.each([
+	['12px Arial', ['Arial']],
+	['bold 12px/1.5 "Noto Sans", Source Code Pro, serif', ['Noto Sans', 'Source Code Pro', 'serif']],
+	['italic small-caps 700 1rem serif', ['serif']],
+	['12px', []],
+	['caption', []],
+	['inherit', []],
+])('the families of font: %s are %j', (value, expected) => {
+	expect(families(value, 'font')).toEqual(expected)
+	expect(families(value, 'FONT')).toEqual(expected)
+})
+
+test('accepts a parsed node as well as text', () => {
+	expect(get_font_families(parse_value('"A", B C'))).toEqual(get_font_families('"A", B C'))
+})
+
+test('points at every family, quotes included', () => {
+	const value = '12px/1 "Noto Sans",  Source Code  Pro, serif'
+	const found = get_font_families(value, 'font')
+	expect(found.map((match) => value.slice(match.offset, match.offset + match.length))).toEqual([
+		'"Noto Sans"',
+		'Source Code  Pro',
+		'serif',
+	])
+	expect(found.map((match) => match.value)).toEqual(['Noto Sans', 'Source Code  Pro', 'serif'])
+	expect(found[0]).toMatchObject({ line: 1, column: 8, offset: 7, length: 11 })
+})

@@ -205,9 +205,26 @@ get_declared_container_names('sidebar card / size')
 // [{ value: 'sidebar', line: 1, column: 1, offset: 0, length: 7 }, { value: 'card', line: 1, column: 9, offset: 8, length: 4 }]
 ```
 
-Also: `get_complexity`, `get_vendor_prefixes`, `get_accessibility_selectors`, `get_combinators` (`/selectors`); `destructure_font_shorthand`, `analyze_animation`, `analyze_transition`, `get_animation_names`, `get_declared_container_names`, `is_gradient_function`, `get_prefixed_values`, `named_colors`, `system_colors`, `color_functions`, `keywords` (`/values`); `get_media_browserhacks`, `get_supports_browserhacks`, `get_container_query_name` (`/atrules`); `is_shorthand_property`, `is_spacing_reset_property`, `is_border_radius_property`, `is_property_hack` (`/properties`); `get_embed_type` (`/stylesheet`).
+Also: `get_complexity`, `get_vendor_prefixes`, `get_accessibility_selectors`, `get_combinators` (`/selectors`); `destructure_font_shorthand`, `analyze_animation`, `analyze_transition`, `get_animation_names`, `get_declared_container_names`, `get_font_families`, `get_anchor_names`, `is_gradient_function`, `get_prefixed_values`, `named_colors`, `system_colors`, `color_functions`, `keywords` (`/values`); `get_media_browserhacks`, `get_supports_browserhacks`, `get_container_query_name`, `get_keyframes_name`, `get_layer_names` (`/atrules`); `is_shorthand_property`, `is_spacing_reset_property`, `is_border_radius_property`, `is_property_hack` (`/properties`); `get_embed_type` (`/stylesheet`).
 
 `DefinedUsed` (track what is defined and what is used, for names like custom properties or keyframes) and `KeywordSet` (a case-insensitive set of keywords) are the building blocks the built-in collectors use. They are exported from `@projectwallace/css-analyzer/utils/collections`.
+
+`DefinedUsed` can keep something with every name, so you can point at it later: a node, or a `Match` from the name utilities (`get_keyframes_name`, `get_layer_names`, `get_font_families`, `get_anchor_names`, `get_declared_container_names`, `get_animation_names`).
+
+```js
+import { DefinedUsed } from '@projectwallace/css-analyzer/utils/collections'
+import { get_animation_names } from '@projectwallace/css-analyzer/values'
+import { get_keyframes_name } from '@projectwallace/css-analyzer/atrules'
+
+const keyframes = new DefinedUsed()
+const spin = get_keyframes_name("spin")!
+keyframes.define(spin.value, spin)
+for (const name of get_animation_names('fade 1s, spin 2s')) {
+	keyframes.use(name.value, name)
+}
+const { unknown } = keyframes.analyze() // ['fade']
+const { usages } = keyframes.payloads() // usages.get('fade') is the Match of `fade`
+```
 
 ## Upgrading from 9.x
 

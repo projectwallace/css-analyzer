@@ -77,6 +77,53 @@ describe('DefinedUsed class', () => {
 	})
 })
 
+describe('payloads', () => {
+	test('come back per name, for every definition and use', () => {
+		const tracker = new DefinedUsed<{ line: number }>()
+		tracker.define('a', { line: 1 })
+		tracker.define('a', { line: 5 })
+		tracker.use('a', { line: 9 })
+		tracker.use('b', { line: 12 })
+		tracker.define('c', { line: 20 })
+		expect(tracker.payloads()).toEqual({
+			definitions: new Map([
+				['a', [{ line: 1 }, { line: 5 }]],
+				['c', [{ line: 20 }]],
+			]),
+			usages: new Map([
+				['a', [{ line: 9 }]],
+				['b', [{ line: 12 }]],
+			]),
+		})
+	})
+
+	test('find the place of an unused and an unknown name', () => {
+		const tracker = new DefinedUsed<string>()
+		tracker.define('a', 'defined here')
+		tracker.use('b', 'used here')
+		const { unused, unknown } = tracker.analyze()
+		const { definitions, usages } = tracker.payloads()
+		expect(unused.map((name) => definitions.get(name))).toEqual([['defined here']])
+		expect(unknown.map((name) => usages.get(name))).toEqual([['used here']])
+	})
+
+	test('are not kept for names without a payload, and analyze() does not change', () => {
+		const tracker = new DefinedUsed<string>()
+		tracker.define('a')
+		tracker.use('a')
+		expect(tracker.payloads()).toEqual({ definitions: new Map(), usages: new Map() })
+		expect(tracker.analyze()).toEqual({ defined: ['a'], used: ['a'], unused: [], unknown: [] })
+	})
+
+	test('are copies: later changes do not show up in an earlier result', () => {
+		const tracker = new DefinedUsed<number>()
+		tracker.define('a', 1)
+		const before = tracker.payloads()
+		tracker.define('a', 2)
+		expect(before.definitions.get('a')).toEqual([1])
+	})
+})
+
 describe('Public API exports', () => {
 	test('exports DefinedUsed class', () => {
 		expect(typeof DefinedUsed).toBe('function')

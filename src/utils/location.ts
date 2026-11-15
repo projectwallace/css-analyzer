@@ -55,3 +55,23 @@ export function to_match_in(node: CSSNode, index: number, length: number, value:
 	}
 	return { value, line, column, offset: node.start + index, length }
 }
+
+/** A match inside `source`, for text that was not parsed into nodes. Line and column start at 1. */
+export function to_match_in_source(
+	source: string,
+	index: number,
+	length: number,
+	value: string,
+): Match {
+	let line = 1
+	let column = 1
+	for (let i = 0; i < index; i++) {
+		if (source.charCodeAt(i) === 10) {
+			line++
+			column = 1
+		} else {
+			column++
+		}
+	}
+	return { value, line, column, offset: index, length }
+}

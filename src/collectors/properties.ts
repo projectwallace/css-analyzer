@@ -1,17 +1,12 @@
-import {
-	is_function,
-	is_identifier,
-	FUNCTION,
-	property_basename,
-	is_custom,
-} from '@projectwallace/css-parser'
+import { is_function, FUNCTION, property_basename, is_custom } from '@projectwallace/css-parser'
 import { DefinedUsed, type DefinedUsedResult } from '../utils/collections/defined-used.ts'
 import { create_counter } from '../engine/counter.ts'
 import { define_collector } from '../engine/define-collector.ts'
 import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts'
 import { shorthand_properties } from '../properties/property-utils.ts'
+import { get_anchor_names } from '../values/anchors.ts'
 import { get_property_weight } from './complexity.ts'
-import { get_first_identifier, get_list_items } from './value-helpers.ts'
+import { get_first_identifier } from './value-helpers.ts'
 
 /** Counted by normalized property name; the keys below break the same declarations down by kind */
 export type PropertiesResult = CountResult & {
@@ -85,16 +80,12 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 						return
 					}
 					if (ctx.property === 'anchor-name') {
-						for (const item of get_list_items(ctx.value!)) {
-							const text = is_identifier(item) ? item.text : undefined
-							if (text !== undefined && is_custom(text)) {
-								anchor_tracking.define(text)
-							}
+						for (const anchor of get_anchor_names(ctx.value!)) {
+							anchor_tracking.define(anchor.value)
 						}
 					} else if (ctx.property === 'position-anchor') {
-						const name = get_first_identifier(ctx.value!)
-						if (name !== undefined && is_custom(name)) {
-							anchor_tracking.use(name)
+						for (const anchor of get_anchor_names(ctx.value!)) {
+							anchor_tracking.use(anchor.value)
 						}
 					}
 				},
