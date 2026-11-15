@@ -217,7 +217,7 @@ import { get_animation_names } from '@projectwallace/css-analyzer/values'
 import { get_keyframes_name } from '@projectwallace/css-analyzer/atrules'
 
 const keyframes = new DefinedUsed()
-const spin = get_keyframes_name("spin")!
+const spin = get_keyframes_name('spin')!
 keyframes.define(spin.value, spin)
 for (const name of get_animation_names('fade 1s, spin 2s')) {
 	keyframes.use(name.value, name)
