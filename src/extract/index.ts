@@ -14,7 +14,7 @@ export {
 	extract_box_shadows,
 	extract_text_shadows,
 	extract_border_radiuses,
-	get_invalid_z_indexes,
+	is_valid_z_index,
 	z_index_properties,
 	box_shadow_properties,
 	text_shadow_properties,

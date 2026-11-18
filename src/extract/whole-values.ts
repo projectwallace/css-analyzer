@@ -1,4 +1,10 @@
-import { type Value, is_number, property_basename, walk_values } from '@projectwallace/css-parser'
+import {
+	type Value,
+	is_number,
+	property_basename,
+	walk_values,
+	BREAK,
+} from '@projectwallace/css-parser'
 import { KeywordSet } from '../utils/collections/keyword-set.ts'
 import { type ValueInput, as_value } from '../utils/input.ts'
 import { type Match, to_match } from '../utils/location.ts'
@@ -40,23 +46,20 @@ export function extract_border_radiuses(property: string, input: ValueInput): Ma
 const int32_min = -2147483648
 const int32_max = 2147483647
 
-/** The numbers in a `z-index` that are not an integer that fits in 32 bits. `value` is the number. */
-export function get_invalid_z_indexes(property: string, input: ValueInput): Match<number>[] {
-	if (!z_index_properties.has(property_basename(property))) {
-		return []
-	}
-	const found: Match<number>[] = []
+/** `false` when a value has a number that is not an integer that fits in 32 bits. Keywords, `var()` and other values are not judged. */
+export function is_valid_z_index(input: ValueInput): boolean {
+	let valid = true
 	walk_values(as_value(input), function (node) {
-		if (!is_number(node)) {
-			return
-		}
-		const number = node.value
-		if (
-			number !== null &&
-			(!Number.isInteger(number) || number < int32_min || number > int32_max)
-		) {
-			found.push({ ...to_match(node), value: number })
+		if (is_number(node)) {
+			const number = node.value
+			if (
+				number !== null &&
+				(!Number.isInteger(number) || number < int32_min || number > int32_max)
+			) {
+				valid = false
+				return BREAK
+			}
 		}
 	})
-	return found
+	return valid
 }

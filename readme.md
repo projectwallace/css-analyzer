@@ -241,7 +241,7 @@ extract_font_sizes('color', 'red') // []
 
 `extract_colors`, `extract_gradients`, `extract_units`, `extract_font_sizes`, `extract_line_heights`, `extract_font_families` (the whole list as written; `get_font_families()` splits it), `extract_z_indexes`, `extract_box_shadows`, `extract_text_shadows`, `extract_border_radiuses`, `extract_durations` and `extract_timing_functions` all return `Match[]` and an empty array for properties they do not handle. Extractors that look at a fixed set of properties also export that set as a `KeywordSet` (`font_size_properties`, `z_index_properties`, ...), so you can skip declarations early. Values are as written (a hex color loses its browserhack); normalizing (lowercasing, `skip_var`) is up to you or the collector options.
 
-`get_invalid_z_indexes()` lists the `z-index` numbers that are not 32-bit integers.
+`is_valid_z_index()` is `false` for a `z-index` value with a number that is not a 32-bit integer.
 
 `get_feature_bounds()` (`/atrules`) lists the numeric bounds of a `@media` or `@container` prelude: `(min-width: 400px)`, `(width >= 400px)` and `(50px <= width <= 100px)` become `{ feature, direction, value, unit, inclusive, query }` plus a location. `or` and `not` are not interpreted, and `query` tells the comma separated queries apart.
 
