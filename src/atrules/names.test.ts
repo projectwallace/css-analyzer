@@ -103,3 +103,11 @@ test('get_import_layer is null without a layer', () => {
 	expect(get_import_layer('url("a.css")')).toBeNull()
 	expect(get_import_layer(atrule_of('@import url("a.css");').prelude!)).toBeNull()
 })
+
+test('get_import_layer reads a prelude that was not parsed', () => {
+	expect(
+		get_import_layer(atrule_of('@import url(a.css) layer(base);', false).prelude!),
+	).toMatchObject({
+		value: 'base',
+	})
+})

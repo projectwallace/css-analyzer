@@ -22,3 +22,4 @@ export {
 	validate_property_registration,
 	type PropertyRegistrationIssue,
 } from './property-registration.ts'
+export { get_atrule_descriptors } from './descriptors.ts'

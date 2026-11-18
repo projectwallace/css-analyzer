@@ -1,11 +1,9 @@
 import {
-	type Atrule,
 	type CSSNode,
 	type MediaFeature,
 	SKIP,
 	is_atrule_prelude,
 	is_custom,
-	is_declaration,
 	is_function,
 	is_identifier,
 	is_media_feature,
@@ -24,6 +22,7 @@ import {
 	get_media_browserhacks,
 	get_supports_browserhacks,
 } from '../atrules/atrules.ts'
+import { get_atrule_descriptors } from '../atrules/descriptors.ts'
 import { get_keyframes_name, get_layer_names } from '../atrules/names.ts'
 import { keywords } from '../values/values.ts'
 import { get_atrule_weight } from './complexity.ts'
@@ -44,17 +43,6 @@ function find_media_features(prelude: CSSNode | null | undefined): MediaFeature[
 		}
 	})
 	return found
-}
-
-//  `property: value` descriptors inside an at-rule block (e.g. `@font-face`)
-function get_descriptors(block: Atrule['block']): Record<string, string> {
-	const descriptors: Record<string, string> = Object.create(null)
-	block?.for_each(function (child) {
-		if (is_declaration(child) && child.value) {
-			descriptors[child.property] = child.value.text
-		}
-	})
-	return descriptors
 }
 
 //  `supports(...)` and `layer(...)` in an `@import` prelude
@@ -153,7 +141,7 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 
 				if (name === 'font-face') {
 					font_faces.total++
-					font_faces.items.push({ ...get_descriptors(block) })
+					font_faces.items.push(get_atrule_descriptors(node))
 					font_faces.locations?.push(to_location(node))
 				}
 

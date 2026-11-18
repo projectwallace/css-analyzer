@@ -80,7 +80,10 @@ export function get_import_layer(input: PreludeInput): Match | null {
 		}
 	}
 	for (const node of as_prelude('import', input)) {
-		if (is_atrule_prelude(node)) {
+		if (is_raw(node)) {
+			// The prelude was not parsed
+			found ??= get_import_layer(node.text)
+		} else if (is_atrule_prelude(node)) {
 			node.for_each(read)
 		} else {
 			read(node)
