@@ -12,58 +12,15 @@ import {
 	walk_values,
 	BREAK,
 } from '@projectwallace/css-parser'
-import { KeywordSet } from '../utils/collections/keyword-set.ts'
+import type { KeywordSet } from '../utils/collections/keyword-set.ts'
+import {
+	angle_units,
+	flex_units,
+	length_units,
+	resolution_units,
+	time_units,
+} from '../values/units.ts'
 import { unquote } from '../utils/string-utils.ts'
-
-export const length_units: KeywordSet = new KeywordSet([
-	'px',
-	'em',
-	'rem',
-	'ex',
-	'rex',
-	'cap',
-	'rcap',
-	'ch',
-	'rch',
-	'ic',
-	'ric',
-	'lh',
-	'rlh',
-	'vw',
-	'vh',
-	'vmin',
-	'vmax',
-	'vi',
-	'vb',
-	'svw',
-	'svh',
-	'svi',
-	'svb',
-	'lvw',
-	'lvh',
-	'lvi',
-	'lvb',
-	'dvw',
-	'dvh',
-	'dvi',
-	'dvb',
-	'cm',
-	'mm',
-	'q',
-	'in',
-	'pt',
-	'pc',
-	'cqw',
-	'cqh',
-	'cqi',
-	'cqb',
-	'cqmin',
-	'cqmax',
-])
-export const angle_units: KeywordSet = new KeywordSet(['deg', 'grad', 'rad', 'turn'])
-export const time_units: KeywordSet = new KeywordSet(['s', 'ms'])
-export const flex_units: KeywordSet = new KeywordSet(['fr'])
-export const resolution_units: KeywordSet = new KeywordSet(['dpi', 'dpcm', 'dppx', 'x'])
 
 function is_dimension_of(node: CSSNode, units: KeywordSet): boolean {
 	return is_dimension(node) && units.has(node.unit)

@@ -14,3 +14,4 @@ export { destructure_font_shorthand, type FontShorthand } from './destructure-fo
 export { get_prefixed_values } from './vendor-prefix.ts'
 export { get_font_families } from './font-families.ts'
 export { get_anchor_names } from './anchors.ts'
+export { length_units, angle_units, time_units, flex_units, resolution_units } from './units.ts'

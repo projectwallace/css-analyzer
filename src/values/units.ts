@@ -1,3 +1,55 @@
+import { KeywordSet } from '../utils/collections/keyword-set.ts'
+
+export const length_units: KeywordSet = new KeywordSet([
+	'px',
+	'em',
+	'rem',
+	'ex',
+	'rex',
+	'cap',
+	'rcap',
+	'ch',
+	'rch',
+	'ic',
+	'ric',
+	'lh',
+	'rlh',
+	'vw',
+	'vh',
+	'vmin',
+	'vmax',
+	'vi',
+	'vb',
+	'svw',
+	'svh',
+	'svi',
+	'svb',
+	'lvw',
+	'lvh',
+	'lvi',
+	'lvb',
+	'dvw',
+	'dvh',
+	'dvi',
+	'dvb',
+	'cm',
+	'mm',
+	'q',
+	'in',
+	'pt',
+	'pc',
+	'cqw',
+	'cqh',
+	'cqi',
+	'cqb',
+	'cqmin',
+	'cqmax',
+])
+export const angle_units: KeywordSet = new KeywordSet(['deg', 'grad', 'rad', 'turn'])
+export const time_units: KeywordSet = new KeywordSet(['s', 'ms'])
+export const flex_units: KeywordSet = new KeywordSet(['fr'])
+export const resolution_units: KeywordSet = new KeywordSet(['dpi', 'dpcm', 'dppx', 'x'])
+
 // Remove a trailing browserhack escape (`\9`, `\0` or `\7`) from a dimension unit: `px\9` is `px`.
 // A unit that is only a hack (`\9`, from `0\9`) becomes ''.
 export function strip_unit_hack(unit: string): string {
