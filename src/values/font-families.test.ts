@@ -47,18 +47,15 @@ test('points at every family, quotes included', () => {
 })
 
 test.each([
-	['var(--font, Inter), serif', ['--font', 'Inter', 'serif']],
-	['var(--font, "Open Sans", Arial)', ['--font', 'Open Sans', 'Arial']],
-	['var(--a, var(--b, Inter Tight))', ['--a', '--b', 'Inter Tight']],
-	['var(--font)', ['--font']],
-])(
-	'get_font_families("%s", "font-family", { deep: true }) is %j (custom property names are names too)',
-	(value, expected) => {
-		expect(get_font_families(value, 'font-family', { deep: true }).map((m) => m.value)).toEqual(
-			expected,
-		)
-	},
-)
+	['var(--font, Inter), serif', ['Inter', 'serif']],
+	['var(--font, "Open Sans", Arial)', ['Open Sans', 'Arial']],
+	['var(--a, var(--b, Inter Tight))', ['Inter Tight']],
+	['var(--font)', []],
+])('get_font_families("%s", "font-family", { deep: true }) is %j', (value, expected) => {
+	expect(get_font_families(value, 'font-family', { deep: true }).map((m) => m.value)).toEqual(
+		expected,
+	)
+})
 
 test('get_font_families leaves function arguments out without deep', () => {
 	expect(get_font_families('var(--font, Inter), serif').map((m) => m.value)).toEqual(['serif'])

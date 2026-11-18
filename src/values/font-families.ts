@@ -1,5 +1,6 @@
 import {
 	type CSSNode,
+	is_custom,
 	is_function,
 	is_identifier,
 	is_string,
@@ -55,7 +56,8 @@ export function get_font_families(
 		if (node.start < from) {
 			return
 		}
-		if (is_identifier(node)) {
+		// `var(--font, Inter)`: the custom property is not a family
+		if (is_identifier(node) && !(options.deep && is_custom(node.text))) {
 			first ??= node
 			last = node
 		} else {

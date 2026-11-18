@@ -12,7 +12,6 @@ export {
 	type Contradiction,
 } from './conditions.ts'
 export { get_feature_bounds, type FeatureBound } from './feature-bounds.ts'
-export { get_font_face_key, type FontFaceKey } from './font-face.ts'
 export {
 	validate_property_registration,
 	type PropertyRegistrationIssue,

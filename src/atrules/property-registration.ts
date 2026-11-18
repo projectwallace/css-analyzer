@@ -10,10 +10,12 @@ import {
 	str_equals,
 	str_index_of,
 	walk_values,
+	BREAK,
 } from '@projectwallace/css-parser'
+import { KeywordSet } from '../utils/collections/keyword-set.ts'
 import { unquote } from '../utils/string-utils.ts'
 
-const length_units = new Set([
+const length_units = new KeywordSet([
 	'px',
 	'em',
 	'rem',
@@ -58,12 +60,13 @@ const length_units = new Set([
 	'cqmin',
 	'cqmax',
 ])
-const angle_units = new Set(['deg', 'grad', 'rad', 'turn'])
-const time_units = new Set(['s', 'ms'])
-const resolution_units = new Set(['dpi', 'dpcm', 'dppx', 'x'])
+const angle_units = new KeywordSet(['deg', 'grad', 'rad', 'turn'])
+const time_units = new KeywordSet(['s', 'ms'])
+const flex_units = new KeywordSet(['fr'])
+const resolution_units = new KeywordSet(['dpi', 'dpcm', 'dppx', 'x'])
 
-function is_dimension_of(node: CSSNode, units: Set<string>): boolean {
-	return is_dimension(node) && units.has(node.unit.toLowerCase())
+function is_dimension_of(node: CSSNode, units: KeywordSet): boolean {
+	return is_dimension(node) && units.has(node.unit)
 }
 
 function is_zero(node: CSSNode): boolean {
@@ -94,7 +97,7 @@ const matchers: Record<string, Matcher> = {
 	'<angle>': (node) => is_dimension_of(node, angle_units) || is_zero(node),
 	'<time>': (node) => is_dimension_of(node, time_units),
 	'<resolution>': (node) => is_dimension_of(node, resolution_units),
-	'<flex>': (node) => is_dimension_of(node, new Set(['fr'])),
+	'<flex>': (node) => is_dimension_of(node, flex_units),
 	// A color is never a bare number, dimension or percentage
 	'<color>': (node) => !(is_number(node) || is_dimension(node)),
 }
@@ -189,6 +192,7 @@ function uses_var(value: CSSNode): boolean {
 	walk_values(value, function (node) {
 		if (is_function(node) && str_equals('var', node.name)) {
 			found = true
+			return BREAK
 		}
 	})
 	return found

@@ -130,12 +130,11 @@ function pick_tightest(bounds: FeatureBound[], lower: boolean): FeatureBound {
 export function find_contradiction(bounds: FeatureBound[]): Contradiction | null {
 	const by_feature = new Map<string, FeatureBound[]>()
 	for (const bound of bounds) {
-		const key = bound.feature.toLowerCase()
-		const list = by_feature.get(key)
+		const list = by_feature.get(bound.feature)
 		if (list) {
 			list.push(bound)
 		} else {
-			by_feature.set(key, [bound])
+			by_feature.set(bound.feature, [bound])
 		}
 	}
 
