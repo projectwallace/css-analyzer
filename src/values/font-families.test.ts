@@ -45,3 +45,21 @@ test('points at every family, quotes included', () => {
 	expect(found.map((match) => match.value)).toEqual(['Noto Sans', 'Source Code  Pro', 'serif'])
 	expect(found[0]).toMatchObject({ line: 1, column: 8, offset: 7, length: 11 })
 })
+
+test.each([
+	['var(--font, Inter), serif', ['--font', 'Inter', 'serif']],
+	['var(--font, "Open Sans", Arial)', ['--font', 'Open Sans', 'Arial']],
+	['var(--a, var(--b, Inter Tight))', ['--a', '--b', 'Inter Tight']],
+	['var(--font)', ['--font']],
+])(
+	'get_font_families("%s", "font-family", { deep: true }) is %j (custom property names are names too)',
+	(value, expected) => {
+		expect(get_font_families(value, 'font-family', { deep: true }).map((m) => m.value)).toEqual(
+			expected,
+		)
+	},
+)
+
+test('get_font_families leaves function arguments out without deep', () => {
+	expect(get_font_families('var(--font, Inter), serif').map((m) => m.value)).toEqual(['serif'])
+})
