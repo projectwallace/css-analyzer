@@ -1,14 +1,8 @@
-import {
-	is_selector_list,
-	is_url,
-	property_basename,
-	str_starts_with,
-	URL,
-} from '@projectwallace/css-parser'
+import { is_selector_list, property_basename, URL } from '@projectwallace/css-parser'
 import { create_counter } from '../engine/counter.ts'
 import { define_collector } from '../engine/define-collector.ts'
 import type { CollectorDef, CountResult } from '../engine/types.ts'
-import { unquote } from '../utils/string-utils.ts'
+import { get_data_url } from '../values/data-urls.ts'
 import { get_embed_type } from '../stylesheet/stylesheet.ts'
 import { get_media_browserhacks, get_supports_browserhacks } from '../atrules/atrules.ts'
 import { get_complexity } from '../selectors/utils.ts'
@@ -105,11 +99,8 @@ export function stylesheet(options: StylesheetOptions = {}): CollectorDef<Styles
 			value: {
 				types: [URL],
 				enter(node) {
-					if (!is_url(node)) {
-						return
-					}
-					const embed = unquote(node.value ?? '')
-					if (!str_starts_with('data:', embed)) {
+					const embed = get_data_url(node)
+					if (embed === undefined) {
 						return
 					}
 					embedded_size += embed.length

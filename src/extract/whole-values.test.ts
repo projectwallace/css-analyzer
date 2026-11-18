@@ -5,6 +5,7 @@ import {
 	extract_box_shadows,
 	extract_text_shadows,
 	extract_z_indexes,
+	get_invalid_z_indexes,
 } from './index.ts'
 
 function values(matches: { value: string }[]): string[] {
@@ -57,4 +58,19 @@ test('accept a parsed value, and point at the whole value', () => {
 	expect(extract_box_shadows('box-shadow', '0 0 red')).toEqual([
 		{ value: '0 0 red', line: 1, column: 1, offset: 0, length: 7 },
 	])
+})
+
+test.each([
+	['z-index', '1', []],
+	['z-index', '-5', []],
+	['z-index', '1.5', [1.5]],
+	['z-index', '2147483648', [2147483648]],
+	['z-index', '-2147483649', [-2147483649]],
+	['z-index', 'auto', []],
+	['top', '1.5', []],
+])('get_invalid_z_indexes("%s", "%s") is %j', (property, value, expected) => {
+	expect(get_invalid_z_indexes(property, value).map((match) => match.value)).toEqual(expected)
+	expect(get_invalid_z_indexes(property, parse_value(value)).map((match) => match.value)).toEqual(
+		expected,
+	)
 })

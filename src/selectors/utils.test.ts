@@ -5,6 +5,7 @@ import {
 	get_vendor_prefixes,
 	get_accessibility_selectors,
 	get_combinators,
+	get_pseudo_elements_in_is_where,
 } from './index.ts'
 import { get_specificity } from './specificity.ts'
 
@@ -106,4 +107,21 @@ test('accessibility selectors are normalized and found inside pseudo-classes', (
 			),
 		),
 	).toEqual(['[aria-hidden]', '[aria-hidden]', '[role="tablist"]', '[role="menu"]'])
+})
+
+test.each([
+	[':is(a::before)', ['::before']],
+	[':where(a, b::after)', ['::after']],
+	[':IS(a::before, b::after)', ['::before', '::after']],
+	[':is(:not(a::before))', ['::before']],
+	['a::before', []],
+	[':not(a::before)', []],
+	[':is(a)', []],
+])('get_pseudo_elements_in_is_where(%j) is %j', (selector, expected) => {
+	expect(get_pseudo_elements_in_is_where(selector).map((match) => match.value)).toEqual(expected)
+})
+
+test('get_pseudo_elements_in_is_where says which pseudo-class it is in', () => {
+	const [match] = get_pseudo_elements_in_is_where('a:where(b::after)')
+	expect(match).toMatchObject({ pseudo_class: 'where', offset: 9, length: 7 })
 })
