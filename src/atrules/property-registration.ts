@@ -15,7 +15,7 @@ import {
 import { KeywordSet } from '../utils/collections/keyword-set.ts'
 import { unquote } from '../utils/string-utils.ts'
 
-const length_units = new KeywordSet([
+export const length_units: KeywordSet = new KeywordSet([
 	'px',
 	'em',
 	'rem',
@@ -60,10 +60,10 @@ const length_units = new KeywordSet([
 	'cqmin',
 	'cqmax',
 ])
-const angle_units = new KeywordSet(['deg', 'grad', 'rad', 'turn'])
-const time_units = new KeywordSet(['s', 'ms'])
-const flex_units = new KeywordSet(['fr'])
-const resolution_units = new KeywordSet(['dpi', 'dpcm', 'dppx', 'x'])
+export const angle_units: KeywordSet = new KeywordSet(['deg', 'grad', 'rad', 'turn'])
+export const time_units: KeywordSet = new KeywordSet(['s', 'ms'])
+export const flex_units: KeywordSet = new KeywordSet(['fr'])
+export const resolution_units: KeywordSet = new KeywordSet(['dpi', 'dpcm', 'dppx', 'x'])
 
 function is_dimension_of(node: CSSNode, units: KeywordSet): boolean {
 	return is_dimension(node) && units.has(node.unit)

@@ -13,6 +13,11 @@ export {
 } from './conditions.ts'
 export { get_feature_bounds, type FeatureBound } from './feature-bounds.ts'
 export {
+	length_units,
+	angle_units,
+	time_units,
+	flex_units,
+	resolution_units,
 	validate_property_registration,
 	type PropertyRegistrationIssue,
 } from './property-registration.ts'
