@@ -49,6 +49,19 @@ export class DefinedUsed<T = never> {
 		}
 	}
 
+	get defined_size(): number {
+		return this.#defined.size
+	}
+
+	/** The defined names that are not used, each with the payload of its first definition */
+	unused_definitions(): [string, T | undefined][] {
+		const unused: [string, T | undefined][] = []
+		for (const name of this.#unused) {
+			unused.push([name, this.#definitions.get(name)?.[0]])
+		}
+		return unused
+	}
+
 	analyze(): DefinedUsedResult {
 		return {
 			defined: [...this.#defined],
