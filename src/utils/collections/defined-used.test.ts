@@ -130,3 +130,20 @@ describe('Public API exports', () => {
 		expect(new DefinedUsed().constructor.name).toBe('DefinedUsed')
 	})
 })
+
+describe('unused_definitions', () => {
+	test('lists unused names with the payload of their first definition', () => {
+		const tracker = new DefinedUsed<string>()
+		tracker.define('a', 'first a')
+		tracker.define('a', 'second a')
+		tracker.define('b', 'b')
+		tracker.define('c')
+		tracker.use('b')
+		tracker.use('unknown')
+		expect(tracker.unused_definitions()).toEqual([
+			['a', 'first a'],
+			['c', undefined],
+		])
+		expect(tracker.defined_size).toBe(3)
+	})
+})

@@ -1,5 +1,7 @@
 import {
 	type CSSNode,
+	is_custom,
+	is_function,
 	is_identifier,
 	is_string,
 	property_basename,
@@ -10,8 +12,12 @@ import { type Match, to_match } from '../utils/location.ts'
 import { unquote } from '../utils/string-utils.ts'
 import { destructure_font_shorthand, system_fonts } from './destructure-font-shorthand.ts'
 
-/** One match per font family; pass `'font'` as property to read a shorthand */
-export function get_font_families(input: ValueInput, property: string = 'font-family'): Match[] {
+/** One match per font family; pass `'font'` as property to read a shorthand. With `deep`, the names inside functions (`var(--font, Inter)`) are found too. */
+export function get_font_families(
+	input: ValueInput,
+	property: string = 'font-family',
+	options: { deep?: boolean } = {},
+): Match[] {
 	const value = as_value(input)
 	// Only what starts here belongs to the family list
 	let from = value.start
@@ -46,11 +52,12 @@ export function get_font_families(input: ValueInput, property: string = 'font-fa
 		last = undefined
 	}
 
-	value.for_each(function (node) {
+	function read(node: CSSNode): void {
 		if (node.start < from) {
 			return
 		}
-		if (is_identifier(node)) {
+		// `var(--font, Inter)`: the custom property is not a family
+		if (is_identifier(node) && !(options.deep && is_custom(node.text))) {
 			first ??= node
 			last = node
 		} else {
@@ -58,9 +65,14 @@ export function get_font_families(input: ValueInput, property: string = 'font-fa
 			// Commas end a family; anything else that is not a name (var()) is left out
 			if (is_string(node)) {
 				families.push(to_match(node, unquote(node.text)))
+			} else if (options.deep && is_function(node)) {
+				node.for_each(read)
+				end_family()
 			}
 		}
-	})
+	}
+
+	value.for_each(read)
 	end_family()
 
 	return families
