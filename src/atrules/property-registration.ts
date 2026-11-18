@@ -1,5 +1,4 @@
 import {
-	type Atrule,
 	type CSSNode,
 	is_custom,
 	is_dimension,
@@ -12,7 +11,6 @@ import {
 	str_index_of,
 	walk_values,
 } from '@projectwallace/css-parser'
-import { get_atrule_descriptors } from './descriptors.ts'
 import { unquote } from '../utils/string-utils.ts'
 
 const length_units = new Set([
@@ -111,15 +109,14 @@ export type PropertyRegistrationIssue =
 	| { type: 'mismatched_initial_value'; value: string; syntax: string }
 
 /**
- * What is wrong with an `@property` registration, in the order it is found. `input` is the `@property` node, or its descriptors with the
+ * What is wrong with an `@property` registration, in the order it is found. `descriptors` has the
  * lowercased names (`syntax`, `inherits`, `initial-value`) with their value as written.
  * Syntaxes that are not a single data type (`<length> | auto`, `*`) are not checked against the initial value.
  */
 export function validate_property_registration(
 	name: string,
-	input: Atrule | Record<string, string | undefined>,
+	descriptors: Record<string, string | undefined>,
 ): PropertyRegistrationIssue[] {
-	const descriptors = 'type_name' in input ? get_atrule_descriptors(input as Atrule) : input
 	const issues: PropertyRegistrationIssue[] = []
 	if (!is_custom(name)) {
 		issues.push({ type: 'invalid_name' })

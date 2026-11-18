@@ -205,7 +205,7 @@ get_declared_container_names('sidebar card / size')
 // [{ value: 'sidebar', line: 1, column: 1, offset: 0, length: 7 }, { value: 'card', line: 1, column: 9, offset: 8, length: 4 }]
 ```
 
-Also: `get_complexity`, `get_vendor_prefixes`, `get_accessibility_selectors`, `get_combinators`, `get_pseudo_elements_in_is_where` (`/selectors`); `destructure_font_shorthand`, `analyze_animation`, `analyze_transition`, `get_animation_names`, `get_declared_container_names`, `get_font_families`, `get_anchor_names`, `get_var_references`, `get_if_functions`, `get_data_url`, `get_data_urls`, `is_gradient_function`, `get_prefixed_values`, `named_colors`, `system_colors`, `color_functions`, `keywords` (`/values`); `get_media_browserhacks`, `get_supports_browserhacks`, `get_container_query_name`, `get_keyframes_name`, `get_layer_names`, `get_property_name`, `get_import_layer`, `get_static_features`, `get_query_bounds`, `find_contradiction`, `get_font_face_key`, `validate_property_registration` (`/atrules`); `is_shorthand_property`, `is_spacing_reset_property`, `is_border_radius_property`, `is_property_hack` (`/properties`); `get_embed_type` (`/stylesheet`).
+Also: `get_complexity`, `get_vendor_prefixes`, `get_accessibility_selectors`, `get_combinators` (`/selectors`); `destructure_font_shorthand`, `analyze_animation`, `analyze_transition`, `get_animation_names`, `get_declared_container_names`, `get_font_families`, `get_anchor_names`, `is_gradient_function`, `get_prefixed_values`, `named_colors`, `system_colors`, `color_functions`, `keywords` (`/values`); `get_media_browserhacks`, `get_supports_browserhacks`, `get_container_query_name`, `get_keyframes_name`, `get_layer_names`, `get_static_features`, `get_query_bounds`, `find_contradiction`, `get_font_face_key`, `validate_property_registration` (`/atrules`); `is_shorthand_property`, `is_spacing_reset_property`, `is_border_radius_property`, `is_property_hack` (`/properties`); `get_embed_type` (`/stylesheet`).
 
 `DefinedUsed` (track what is defined and what is used, for names like custom properties or keyframes) and `KeywordSet` (a case-insensitive set of keywords) are the building blocks the built-in collectors use. They are exported from `@projectwallace/css-analyzer/utils/collections`.
 
@@ -240,8 +240,6 @@ extract_font_sizes('color', 'red') // []
 ```
 
 `extract_colors`, `extract_gradients`, `extract_units`, `extract_font_sizes`, `extract_line_heights`, `extract_font_families` (the whole list as written; `get_font_families()` splits it), `extract_z_indexes`, `extract_box_shadows`, `extract_text_shadows`, `extract_border_radiuses`, `extract_durations` and `extract_timing_functions` all return `Match[]` and an empty array for properties they do not handle. Extractors that look at a fixed set of properties also export that set as a `KeywordSet` (`font_size_properties`, `z_index_properties`, ...), so you can skip declarations early. Values are as written (a hex color loses its browserhack); normalizing (lowercasing, `skip_var`) is up to you or the collector options.
-
-`is_valid_z_index()` is `false` for a `z-index` value with a number that is not a 32-bit integer.
 
 `get_feature_bounds()` (`/atrules`) lists the numeric bounds of a `@media` or `@container` prelude: `(min-width: 400px)`, `(width >= 400px)` and `(50px <= width <= 100px)` become `{ feature, direction, value, unit, inclusive, query }` plus a location. `or` and `not` are not interpreted, and `query` tells the comma separated queries apart.
 

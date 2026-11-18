@@ -1,5 +1,4 @@
 import { test, expect } from 'vitest'
-import { type Atrule, parse } from '@projectwallace/css-parser'
 import { validate_property_registration } from './property-registration.ts'
 
 const valid = { syntax: '"<length>"', inherits: 'false', 'initial-value': '0px' }
@@ -70,12 +69,4 @@ test.each([
 		'initial-value': initial,
 	})
 	expect(issues.length === 0).toBe(ok)
-})
-
-test('validate_property_registration reads a parsed @property', () => {
-	const rule = parse('@property --x { syntax: "<length>"; inherits: maybe }').first_child as Atrule
-	expect(validate_property_registration('--x', rule).map((issue) => issue.type)).toEqual([
-		'invalid_inherits',
-		'missing_initial_value',
-	])
 })

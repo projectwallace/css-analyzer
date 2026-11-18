@@ -1,11 +1,6 @@
 import { test, expect } from 'vitest'
 import { type Atrule, parse } from '@projectwallace/css-parser'
-import {
-	get_import_layer,
-	get_keyframes_name,
-	get_layer_names,
-	get_property_name,
-} from './index.ts'
+import { get_keyframes_name, get_layer_names } from './index.ts'
 
 function atrule_of(css: string, parse_atrule_preludes = true) {
 	return parse(css, { parse_atrule_preludes }).first_child as Atrule
@@ -68,46 +63,4 @@ test('get_layer_names reads a prelude that was not parsed', () => {
 		{ value: 'base', line: 1, offset: 7, length: 4 },
 		{ value: 'theme', line: 2, offset: 15, length: 5 },
 	])
-})
-
-test.each([
-	['--my-prop', '--my-prop'],
-	['  --my-prop  ', '--my-prop'],
-	['not-custom', 'not-custom'],
-])('get_property_name("%s") is %j', (prelude, expected) => {
-	expect(get_property_name(prelude)?.value).toBe(expected)
-	expect(get_property_name(atrule_of(`@property ${prelude} {}`).prelude!)?.value).toBe(expected)
-})
-
-test('get_property_name finds nothing in an empty prelude and points at the name', () => {
-	expect(get_property_name('  ')).toBeNull()
-	const prelude = '  --x'
-	const match = get_property_name(prelude)!
-	expect(prelude.slice(match.offset, match.offset + match.length)).toBe('--x')
-})
-
-test.each([
-	['url("a.css") layer(base)', 'base'],
-	['url("a.css") layer(base.sub)', 'base.sub'],
-	['url("a.css") layer', ''],
-	['url("a.css") layer()', ''],
-	['url("a.css") layer(base) supports(display: grid)', 'base'],
-])('get_import_layer(%j) is %j', (prelude, expected) => {
-	expect(get_import_layer(prelude)).toMatchObject({ value: expected })
-	expect(get_import_layer(atrule_of(`@import ${prelude};`).prelude!)).toMatchObject({
-		value: expected,
-	})
-})
-
-test('get_import_layer is null without a layer', () => {
-	expect(get_import_layer('url("a.css")')).toBeNull()
-	expect(get_import_layer(atrule_of('@import url("a.css");').prelude!)).toBeNull()
-})
-
-test('get_import_layer reads a prelude that was not parsed', () => {
-	expect(
-		get_import_layer(atrule_of('@import url(a.css) layer(base);', false).prelude!),
-	).toMatchObject({
-		value: 'base',
-	})
 })

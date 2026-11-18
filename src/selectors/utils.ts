@@ -195,31 +195,3 @@ export function get_combinators(input: SelectorInput): Match[] {
 	}
 	return found
 }
-
-export type PseudoElementInIsWhere = Match & {
-	/** `is` or `where` */
-	pseudo_class: string
-}
-
-/** The pseudo-elements inside `:is()` and `:where()`, like `:is(a::before)`: those never match. `value` is `::name`. */
-export function get_pseudo_elements_in_is_where(input: SelectorInput): PseudoElementInIsWhere[] {
-	const found: PseudoElementInIsWhere[] = []
-	for (const selector of as_selectors(input)) {
-		walk(selector, function (node) {
-			if (!is_pseudo_class_selector(node)) {
-				return
-			}
-			const name = node.name.toLowerCase()
-			if (name !== 'is' && name !== 'where') {
-				return SKIP
-			}
-			walk(node, function (child) {
-				if (is_pseudo_element_selector(child)) {
-					found.push({ ...to_match(child, '::' + child.name), pseudo_class: name })
-				}
-			})
-			return SKIP
-		})
-	}
-	return found
-}

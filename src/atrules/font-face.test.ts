@@ -1,5 +1,4 @@
 import { test, expect } from 'vitest'
-import { type Atrule, parse } from '@projectwallace/css-parser'
 import { get_font_face_key } from './font-face.ts'
 
 test('get_font_face_key is null without a font-family', () => {
@@ -13,7 +12,7 @@ test('get_font_face_key fills in defaults and normalizes keywords', () => {
 		style: 'normal',
 		key: 'inter|400|normal|100%|',
 	})
-	expect(get_font_face_key({ 'FONT-FAMILY': "'Inter'", 'font-weight': 'BOLD' })?.weight).toBe('700')
+	expect(get_font_face_key({ 'font-family': "'Inter'", 'font-weight': 'BOLD' })?.weight).toBe('700')
 })
 
 test('get_font_face_key is the same for the same face', () => {
@@ -24,11 +23,4 @@ test('get_font_face_key is the same for the same face', () => {
 	const d = get_font_face_key({ 'font-family': 'Inter', 'unicode-range': 'U+0000-00FF,U+0131' })
 	expect(c?.key).toBe(d?.key)
 	expect(c?.key).not.toBe(a?.key)
-})
-
-test('get_font_face_key reads a parsed @font-face', () => {
-	const rule = parse('@font-face { FONT-FAMILY: "Inter"; font-weight: bold }').first_child as Atrule
-	expect(get_font_face_key(rule)).toEqual(
-		get_font_face_key({ 'font-family': 'Inter', 'font-weight': '700' }),
-	)
 })

@@ -4,7 +4,5 @@ export {
 	get_vendor_prefixes,
 	get_accessibility_selectors,
 	get_combinators,
-	get_pseudo_elements_in_is_where,
-	type PseudoElementInIsWhere,
 	type SelectorComplexity,
 } from './utils.ts'
