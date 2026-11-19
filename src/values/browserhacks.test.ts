@@ -37,10 +37,17 @@ test.each([
 	['url(hack.htc)', '.htc', 0],
 ])('locates the hack in "%s"', (input, value, offset) => {
 	const [match] = get_value_browserhacks(input)
-	expect(match).toMatchObject({ value, offset, line: 1, column: offset + 1 })
+	expect(match).toMatchObject({ value, start_offset: offset, line: 1, column: offset + 1 })
 })
 
 test('locates a hack on a later line', () => {
 	const [match] = get_value_browserhacks('1px\n  progid:x(1)')
-	expect(match).toMatchObject({ value: 'progid:', line: 2, column: 3, offset: 6, length: 7 })
+	expect(match).toMatchObject({
+		value: 'progid:',
+		line: 2,
+		column: 3,
+		start_offset: 6,
+		end_offset: 13,
+		length: 7,
+	})
 })

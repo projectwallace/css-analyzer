@@ -5,7 +5,10 @@ const NEWLINE = 10
 export type Location = {
 	line: number
 	column: number
-	offset: number
+	/** Where it starts, as an offset into the parsed text */
+	start_offset: number
+	/** Where it ends (exclusive); `end_offset - start_offset` is `length` */
+	end_offset: number
 	length: number
 }
 
@@ -17,7 +20,8 @@ export function to_location(node: CSSNode, length: number = node.length): Locati
 	return {
 		line: node.line,
 		column: node.column,
-		offset: node.start,
+		start_offset: node.start,
+		end_offset: node.start + length,
 		length,
 	}
 }
@@ -32,7 +36,8 @@ export function to_match(
 		value,
 		line: node.line,
 		column: node.column,
-		offset: node.start,
+		start_offset: node.start,
+		end_offset: node.start + length,
 		length,
 	}
 }
@@ -51,7 +56,8 @@ export function to_match_in(node: CSSNode, index: number, length: number, value:
 			column++
 		}
 	}
-	return { value, line, column, offset: node.start + index, length }
+	const start_offset = node.start + index
+	return { value, line, column, start_offset, end_offset: start_offset + length, length }
 }
 
 /** A match inside `source`, for text that was not parsed into nodes. Line and column start at 1. */
@@ -71,5 +77,5 @@ export function to_match_in_source(
 			column++
 		}
 	}
-	return { value, line, column, offset: index, length }
+	return { value, line, column, start_offset: index, end_offset: index + length, length }
 }

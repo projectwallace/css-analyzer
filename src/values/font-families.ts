@@ -28,7 +28,7 @@ export function get_font_families(
 		if (!family) {
 			return []
 		}
-		from = family.offset
+		from = family.start_offset
 	}
 
 	const families: Match[] = []
@@ -44,7 +44,8 @@ export function get_font_families(
 				value: value.text.substring(start, start + length),
 				line: first.line,
 				column: first.column,
-				offset: first.start,
+				start_offset: first.start,
+				end_offset: first.start + length,
 				length,
 			})
 		}

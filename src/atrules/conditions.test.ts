@@ -23,7 +23,7 @@ test.each([
 test('get_static_features locates the whole feature', () => {
 	const prelude = 'screen and (width: 300px)'
 	const [match] = get_static_features(prelude)
-	expect(prelude.slice(match!.offset, match!.offset + match!.length)).toBe('(width: 300px)')
+	expect(prelude.slice(match!.start_offset, match!.end_offset)).toBe('(width: 300px)')
 })
 
 test('get_query_bounds gives one entry per query, and null for not/or', () => {

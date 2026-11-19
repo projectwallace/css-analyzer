@@ -51,9 +51,16 @@ test('accepts a parsed value as well as text', () => {
 test('points at every color', () => {
 	const value = '1px solid red, 0 0 #00F'
 	const found = extract_colors('border', value)
-	expect(found.map((match) => value.slice(match.offset, match.offset + match.length))).toEqual([
+	expect(found.map((match) => value.slice(match.start_offset, match.end_offset))).toEqual([
 		'red',
 		'#00F',
 	])
-	expect(found[1]).toMatchObject({ value: '#00F', line: 1, column: 20, offset: 19, length: 4 })
+	expect(found[1]).toMatchObject({
+		value: '#00F',
+		line: 1,
+		column: 20,
+		start_offset: 19,
+		end_offset: 23,
+		length: 4,
+	})
 })

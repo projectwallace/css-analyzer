@@ -3,8 +3,8 @@ import { analyze } from '../engine/analyzer.ts'
 import { atrules, colors, properties, selectors, stylesheet } from '../collectors/index.ts'
 
 /** The text a location points at */
-function text_at(css: string, loc: { offset: number; length: number }): string {
-	return css.slice(loc.offset, loc.offset + loc.length)
+function text_at(css: string, loc: { start_offset: number; end_offset: number }): string {
+	return css.slice(loc.start_offset, loc.end_offset)
 }
 
 test('colors list where they were found', () => {
@@ -19,14 +19,14 @@ test('colors list where they were found', () => {
 	const { colors: result } = analyze(css, { colors: colors({ locations: true }) })
 
 	expect(result.unique.get('red')?.locations).toEqual([
-		{ line: 3, column: 14, offset: 26, length: 3 },
-		{ line: 6, column: 25, offset: 103, length: 3 },
+		{ line: 3, column: 14, start_offset: 26, end_offset: 29, length: 3 },
+		{ line: 6, column: 25, start_offset: 103, end_offset: 106, length: 3 },
 	])
 	expect(result.unique.get('#f00')?.locations).toEqual([
-		{ line: 4, column: 14, offset: 44, length: 4 },
+		{ line: 4, column: 14, start_offset: 44, end_offset: 48, length: 4 },
 	])
 	expect(result.unique.get('rgb(255, 0, 0)')?.locations).toEqual([
-		{ line: 5, column: 14, offset: 63, length: 14 },
+		{ line: 5, column: 14, start_offset: 63, end_offset: 77, length: 14 },
 	])
 })
 
@@ -38,7 +38,7 @@ test('properties point at the property name', () => {
   `
 	const { properties: result } = analyze(css, { properties: properties({ locations: true }) })
 	expect(result.unique.get('margin')?.locations).toEqual([
-		{ offset: 24, length: 6, column: 7, line: 3 },
+		{ start_offset: 24, end_offset: 30, length: 6, column: 7, line: 3 },
 	])
 })
 
@@ -95,12 +95,12 @@ test('combinators point at the combinator, also when it is a line break', () => 
 	const child = result.combinators.unique.get('>')?.locations
 
 	expect(descendant).toEqual([
-		{ line: 2, column: 6, offset: 6, length: 1 },
-		{ line: 4, column: 6, offset: 26, length: 1 },
-		{ line: 6, column: 13, offset: 48, length: 1 },
-		{ line: 7, column: 12, offset: 63, length: 1 },
+		{ line: 2, column: 6, start_offset: 6, end_offset: 7, length: 1 },
+		{ line: 4, column: 6, start_offset: 26, end_offset: 27, length: 1 },
+		{ line: 6, column: 13, start_offset: 48, end_offset: 49, length: 1 },
+		{ line: 7, column: 12, start_offset: 63, end_offset: 64, length: 1 },
 	])
-	expect(child).toEqual([{ line: 3, column: 7, offset: 16, length: 1 }])
+	expect(child).toEqual([{ line: 3, column: 7, start_offset: 16, end_offset: 17, length: 1 }])
 	expect(descendant?.map((loc) => text_at(css, loc))).toEqual([' ', '\n', ' ', ' '])
 })
 
@@ -111,10 +111,10 @@ test('selector kinds point at the whole selector that holds them', () => {
 	const { selectors: result } = analyze(css, { selectors: selectors({ locations: true }) })
 
 	expect(result.pseudo_classes.unique.get('hover')?.locations).toEqual([
-		{ line: 2, column: 4, offset: 4, length: 7 },
+		{ line: 2, column: 4, start_offset: 4, end_offset: 11, length: 7 },
 	])
 	expect(result.pseudo_classes.unique.get('lang')?.locations).toEqual([
-		{ line: 3, column: 4, offset: 16, length: 10 },
+		{ line: 3, column: 4, start_offset: 16, end_offset: 26, length: 10 },
 	])
 })
 
@@ -136,7 +136,7 @@ test('selector complexity lists the selectors per value, however deep they are n
   `
 	const { selectors: result } = analyze(css, { selectors: selectors({ locations: true }) })
 	expect(result.complexity.unique.get(1)?.locations).toEqual([
-		{ line: 2, column: 5, offset: 5, length: 4 },
-		{ line: 9, column: 11, offset: 139, length: 12 },
+		{ line: 2, column: 5, start_offset: 5, end_offset: 9, length: 4 },
+		{ line: 9, column: 11, start_offset: 139, end_offset: 151, length: 12 },
 	])
 })

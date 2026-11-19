@@ -173,7 +173,8 @@ export function analyze<C extends CollectorMap>(input: string, collectors: C): R
 						const loc = {
 							line: comment.line,
 							column: comment.column,
-							offset: comment.start,
+							start_offset: comment.start,
+							end_offset: comment.start + comment.length,
 							length: comment.length,
 						}
 						for (const handler of comment_handlers) {

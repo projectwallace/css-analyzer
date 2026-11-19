@@ -75,13 +75,13 @@ test('a font shorthand points at the part, other properties at the whole value',
 	const [size] = extract_font_sizes('font', value)
 	const [height] = extract_line_heights('font', value)
 	const [family] = extract_font_families('font', value)
-	expect([size, height, family].map((m) => value.slice(m!.offset, m!.offset + m!.length))).toEqual([
+	expect([size, height, family].map((m) => value.slice(m!.start_offset, m!.end_offset))).toEqual([
 		'12px',
 		'1.5',
 		'"My Font", serif',
 	])
 	expect(extract_font_sizes('font-size', '1rem')).toEqual([
-		{ value: '1rem', line: 1, column: 1, offset: 0, length: 4 },
+		{ value: '1rem', line: 1, column: 1, start_offset: 0, end_offset: 4, length: 4 },
 	])
 })
 

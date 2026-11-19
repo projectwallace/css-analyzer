@@ -63,7 +63,7 @@ test('get_container_query_name is null for an empty prelude', () => {
 
 test('the browserhack matches say where the hack is', () => {
 	expect(get_media_browserhacks('screen and (-ms-high-contrast: none)')).toMatchObject([
-		{ value: '-ms-high-contrast', line: 1, offset: 11 },
+		{ value: '-ms-high-contrast', line: 1, start_offset: 11 },
 	])
 })
 
@@ -72,7 +72,8 @@ test('get_container_query_name locates the name', () => {
 		value: 'sidebar',
 		line: 1,
 		column: 1,
-		offset: 0,
+		start_offset: 0,
+		end_offset: 7,
 		length: 7,
 	})
 })

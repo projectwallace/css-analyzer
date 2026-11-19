@@ -181,9 +181,16 @@ test('locates every part, as written', () => {
 	const value = 'slide-in 300ms ease-out 1s, "my name" 2s'
 	const parts = analyze_animation(value)
 	for (const match of Object.values(parts).flat()) {
-		expect(value.slice(match.offset, match.offset + match.length)).toBe(match.value)
+		expect(value.slice(match.start_offset, match.end_offset)).toBe(match.value)
 	}
-	expect(parts.delays[0]).toMatchObject({ value: '1s', line: 1, column: 25, offset: 24, length: 2 })
+	expect(parts.delays[0]).toMatchObject({
+		value: '1s',
+		line: 1,
+		column: 25,
+		start_offset: 24,
+		end_offset: 26,
+		length: 2,
+	})
 })
 
 test('get_animation_names locates the quoted name, without quotes in the text', () => {
@@ -191,7 +198,8 @@ test('get_animation_names locates the quoted name, without quotes in the text', 
 		value: 'b c',
 		line: 1,
 		column: 4,
-		offset: 3,
+		start_offset: 3,
+		end_offset: 8,
 		length: 5,
 	})
 })

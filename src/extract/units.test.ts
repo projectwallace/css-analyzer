@@ -28,7 +28,7 @@ test('points at the dimension', () => {
 	const value = '1px 22em'
 	const found = extract_units('margin', value)
 	expect(found).toMatchObject([
-		{ value: 'px', line: 1, column: 1, offset: 0, length: 3 },
-		{ value: 'em', line: 1, column: 5, offset: 4, length: 4 },
+		{ value: 'px', line: 1, column: 1, start_offset: 0, end_offset: 3, length: 3 },
+		{ value: 'em', line: 1, column: 5, start_offset: 4, end_offset: 8, length: 4 },
 	])
 })

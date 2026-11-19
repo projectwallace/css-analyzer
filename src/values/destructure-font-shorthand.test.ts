@@ -89,8 +89,8 @@ test('locates every part', () => {
 	const value = 'bold 12px/1.5 "My Font", serif'
 	const font = destructure_font_shorthand(value)!
 	for (const match of [font.font_size!, font.line_height!, font.font_family!]) {
-		expect(value.slice(match.offset, match.offset + match.length)).toBe(match.value)
+		expect(value.slice(match.start_offset, match.end_offset)).toBe(match.value)
 	}
-	expect(font.font_size).toMatchObject({ value: '12px', line: 1, column: 6, offset: 5 })
+	expect(font.font_size).toMatchObject({ value: '12px', line: 1, column: 6, start_offset: 5 })
 	expect(font.font_family).toMatchObject({ value: '"My Font", serif', column: 15 })
 })

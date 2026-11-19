@@ -27,10 +27,23 @@ test('get_keyframes_name points at the name, quotes included', () => {
 		get_keyframes_name('  "my fade"'),
 		get_keyframes_name(atrule_of(css).prelude!),
 	]
-	expect(match).toEqual({ value: 'my fade', line: 1, column: 3, offset: 2, length: 9 })
+	expect(match).toEqual({
+		value: 'my fade',
+		line: 1,
+		column: 3,
+		start_offset: 2,
+		end_offset: 11,
+		length: 9,
+	})
 	// The parser's column inside an at-rule prelude is not reliable (it says 1): only offsets are checked
-	expect(from_node).toMatchObject({ value: 'my fade', line: 1, offset: 11, length: 9 })
-	expect(css.slice(from_node!.offset, from_node!.offset + from_node!.length)).toBe('"my fade"')
+	expect(from_node).toMatchObject({
+		value: 'my fade',
+		line: 1,
+		start_offset: 11,
+		end_offset: 20,
+		length: 9,
+	})
+	expect(css.slice(from_node!.start_offset, from_node!.end_offset)).toBe('"my fade"')
 })
 
 test.each([
@@ -49,18 +62,24 @@ test('get_layer_names finds nothing in an empty prelude', () => {
 test('get_layer_names points at every name', () => {
 	const css = '@layer base, components.buttons;'
 	const names = get_layer_names(atrule_of(css).prelude!)
-	expect(names.map((match) => css.slice(match.offset, match.offset + match.length))).toEqual([
+	expect(names.map((match) => css.slice(match.start_offset, match.end_offset))).toEqual([
 		'base',
 		'components.buttons',
 	])
-	expect(names[1]).toMatchObject({ value: 'components.buttons', line: 1, offset: 13, length: 18 })
+	expect(names[1]).toMatchObject({
+		value: 'components.buttons',
+		line: 1,
+		start_offset: 13,
+		end_offset: 31,
+		length: 18,
+	})
 })
 
 test('get_layer_names reads a prelude that was not parsed', () => {
 	const css = '@layer base,\n  theme;'
 	const names = get_layer_names(atrule_of(css, false).prelude!)
 	expect(names).toMatchObject([
-		{ value: 'base', line: 1, offset: 7, length: 4 },
-		{ value: 'theme', line: 2, offset: 15, length: 5 },
+		{ value: 'base', line: 1, start_offset: 7, end_offset: 11, length: 4 },
+		{ value: 'theme', line: 2, start_offset: 15, end_offset: 20, length: 5 },
 	])
 })

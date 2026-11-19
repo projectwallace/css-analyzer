@@ -5,7 +5,7 @@ import { to_location } from '../utils/location.ts'
 
 // The rule `a{}` on line 2, column 3
 const at = parse('\n  a{}').first_child!
-const loc = { line: 2, column: 3, offset: 3, length: 3 }
+const loc = { line: 2, column: 3, start_offset: 3, end_offset: 6, length: 3 }
 
 test('counts totals and uniques in one shape', () => {
 	const counter = create_counter()
@@ -26,7 +26,9 @@ test('counts totals and uniques in one shape', () => {
 test('length overrides the location length', () => {
 	const counter = create_counter({ locations: true })
 	counter.add('a', at, 1)
-	expect(counter.result().unique.get('a')!.locations).toEqual([{ ...loc, length: 1 }])
+	expect(counter.result().unique.get('a')!.locations).toEqual([
+		{ ...loc, end_offset: loc.start_offset + 1, length: 1 },
+	])
 	expect(to_location(at)).toEqual(loc)
 })
 

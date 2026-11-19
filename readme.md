@@ -76,7 +76,7 @@ Locations are opt-in per collector:
 
 ```js
 const { colors: result } = analyze(css, { colors: colors({ locations: true }) })
-result.unique.get('red').locations // [{ line: 3, column: 14, offset: 26, length: 3 }, ...]
+result.unique.get('red').locations // [{ line: 3, column: 14, start_offset: 26, end_offset: 29, length: 3 }, ...]
 ```
 
 ### Ordered numbers (for charts)
@@ -196,13 +196,13 @@ is_value_reset('0 0px') // true
 compare_specificity([0, 1, 0], [0, 1, 0]) // 0
 ```
 
-Utilities that find things return `Match`es: `{ value, line, column, offset, length }`, so a tool (a linter, an editor) can point at what was found. `value` is what was found as written, except where the util normalizes it (`get_vendor_prefixes`, `get_accessibility_selectors`, the browserhack utils and unquoted names from `get_animation_names` return the normalized name; the location still points at the source). Offsets are relative to the text that was parsed: the string for text input, the source the node came from for a parsed node.
+Utilities that find things return `Match`es: `{ value, line, column, start_offset, end_offset, length }`, so a tool (a linter, an editor) can point at what was found. `value` is what was found as written, except where the util normalizes it (`get_vendor_prefixes`, `get_accessibility_selectors`, the browserhack utils and unquoted names from `get_animation_names` return the normalized name; the location still points at the source). Offsets (`start_offset`, and `end_offset` which is exclusive) are relative to the text that was parsed: the string for text input, the source the node came from for a parsed node.
 
 ```js
 import { get_declared_container_names } from '@projectwallace/css-analyzer/values'
 
 get_declared_container_names('sidebar card / size')
-// [{ value: 'sidebar', line: 1, column: 1, offset: 0, length: 7 }, { value: 'card', line: 1, column: 9, offset: 8, length: 4 }]
+// [{ value: 'sidebar', line: 1, column: 1, start_offset: 0, end_offset: 7, length: 7 }, { value: 'card', line: 1, column: 9, start_offset: 8, end_offset: 12, length: 4 }]
 ```
 
 Also: `get_complexity`, `get_vendor_prefixes`, `get_accessibility_selectors`, `get_combinators` (`/selectors`); `destructure_font_shorthand`, `analyze_animation`, `analyze_transition`, `get_animation_names`, `get_declared_container_names`, `get_font_families`, `get_anchor_names`, `is_gradient_function`, `get_prefixed_values`, `named_colors`, `system_colors`, `color_functions`, `keywords` (`/values`); `get_media_browserhacks`, `get_supports_browserhacks`, `get_container_query_name`, `get_keyframes_name`, `get_layer_names`, `get_static_features`, `get_query_bounds`, `find_contradiction`, `validate_property_registration` (`/atrules`); `is_shorthand_property`, `is_spacing_reset_property`, `is_border_radius_property`, `is_property_hack` (`/properties`); `get_embed_type` (`/stylesheet`).
@@ -234,7 +234,7 @@ For tools that already have the CSS in hand, like a linter or an editor: the log
 import { extract_colors, extract_font_sizes } from '@projectwallace/css-analyzer/extract'
 
 extract_colors('border', '1px solid RED')
-// [{ value: 'RED', format: 'named', line: 1, column: 11, offset: 10, length: 3 }]
+// [{ value: 'RED', format: 'named', line: 1, column: 11, start_offset: 10, end_offset: 13, length: 3 }]
 extract_font_sizes('font', 'bold 12px/1.5 serif') // [{ value: '12px', ... }]
 extract_font_sizes('color', 'red') // []
 ```

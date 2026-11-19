@@ -37,13 +37,19 @@ test('accepts a parsed node as well as text', () => {
 test('points at every family, quotes included', () => {
 	const value = '12px/1 "Noto Sans",  Source Code  Pro, serif'
 	const found = get_font_families(value, 'font')
-	expect(found.map((match) => value.slice(match.offset, match.offset + match.length))).toEqual([
+	expect(found.map((match) => value.slice(match.start_offset, match.end_offset))).toEqual([
 		'"Noto Sans"',
 		'Source Code  Pro',
 		'serif',
 	])
 	expect(found.map((match) => match.value)).toEqual(['Noto Sans', 'Source Code  Pro', 'serif'])
-	expect(found[0]).toMatchObject({ line: 1, column: 8, offset: 7, length: 11 })
+	expect(found[0]).toMatchObject({
+		line: 1,
+		column: 8,
+		start_offset: 7,
+		end_offset: 18,
+		length: 11,
+	})
 })
 
 test.each([

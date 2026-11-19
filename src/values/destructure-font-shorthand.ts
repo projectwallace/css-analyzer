@@ -194,7 +194,8 @@ export function destructure_font_shorthand(input: ValueInput): FontShorthand | n
 				value: value.text.substring(first.start - value.start, last.end - value.start),
 				line: first.line,
 				column: first.column,
-				offset: first.start,
+				start_offset: first.start,
+				end_offset: last.end,
 				length: last.end - first.start,
 			}
 		}

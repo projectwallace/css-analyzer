@@ -29,7 +29,8 @@ export function get_layer_names(input: PreludeInput): Match[] {
 					value: name.value,
 					line: node.line + name.line - 1,
 					column: name.line === 1 ? node.column + name.column - 1 : name.column,
-					offset: node.start + name.offset,
+					start_offset: node.start + name.start_offset,
+					end_offset: node.start + name.end_offset,
 					length: name.length,
 				})
 			}

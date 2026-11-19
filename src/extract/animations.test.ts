@@ -52,9 +52,15 @@ test('point at every item', () => {
 	const durations = extract_durations('transition', value)
 	const functions = extract_timing_functions('transition', value)
 	expect(
-		[...durations, ...functions].map((m) => value.slice(m.offset, m.offset + m.length)),
+		[...durations, ...functions].map((m) => value.slice(m.start_offset, m.end_offset)),
 	).toEqual(['200ms', '1s', 'ease', 'linear'])
-	expect(durations[1]).toMatchObject({ line: 1, column: 27, offset: 26, length: 2 })
+	expect(durations[1]).toMatchObject({
+		line: 1,
+		column: 27,
+		start_offset: 26,
+		end_offset: 28,
+		length: 2,
+	})
 })
 
 test('the property filters know the shorthands and the longhands', () => {

@@ -104,7 +104,7 @@ test('or and not are not interpreted: their bounds are reported as they come', (
 test('a bound is located at its whole feature, and both bounds of a range share it', () => {
 	const css = 'screen and (min-width: 400px), (50px <= height <= 100px)'
 	const bounds = get_feature_bounds(css)
-	expect(bounds.map((bound) => css.slice(bound.offset, bound.offset + bound.length))).toEqual([
+	expect(bounds.map((bound) => css.slice(bound.start_offset, bound.end_offset))).toEqual([
 		'(min-width: 400px)',
 		'(50px <= height <= 100px)',
 		'(50px <= height <= 100px)',
@@ -115,5 +115,5 @@ test('a bound is located at its whole feature, and both bounds of a range share 
 test('offsets of a parsed prelude are relative to its source', () => {
 	const css = '@media (min-width: 400px) {}'
 	const [bound] = get_feature_bounds(prelude_of(css))
-	expect(css.slice(bound!.offset, bound!.offset + bound!.length)).toBe('(min-width: 400px)')
+	expect(css.slice(bound!.start_offset, bound!.end_offset)).toBe('(min-width: 400px)')
 })

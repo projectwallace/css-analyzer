@@ -24,7 +24,7 @@ test('get_declared_container_names accepts a parsed node', () => {
 test('locates the names', () => {
 	const value = 'sidebar card / size'
 	const matches = get_declared_container_names(value)
-	expect(matches.map((match) => value.slice(match.offset, match.offset + match.length))).toEqual([
+	expect(matches.map((match) => value.slice(match.start_offset, match.end_offset))).toEqual([
 		'sidebar',
 		'card',
 	])

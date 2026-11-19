@@ -41,6 +41,13 @@ test.each(['"-webkit-x"', '#-webkit-x'])(
 test('locates the name of the prefixed value', () => {
 	const value = '1px -webkit-calc(1px + 2px)'
 	const [match] = get_prefixed_values(value)
-	expect(match).toEqual({ value: '-webkit-calc', line: 1, column: 5, offset: 4, length: 12 })
-	expect(value.slice(match!.offset, match!.offset + match!.length)).toBe(match!.value)
+	expect(match).toEqual({
+		value: '-webkit-calc',
+		line: 1,
+		column: 5,
+		start_offset: 4,
+		end_offset: 16,
+		length: 12,
+	})
+	expect(value.slice(match!.start_offset, match!.end_offset)).toBe(match!.value)
 })

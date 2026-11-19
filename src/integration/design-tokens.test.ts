@@ -28,13 +28,14 @@ describe('options', () => {
 		})
 
 		expect(result.font_sizes.unique.get('12px')?.locations).toEqual([
-			{ line: 1, column: 28, offset: 27, length: 4 },
+			{ line: 1, column: 28, start_offset: 27, end_offset: 31, length: 4 },
 		])
 		expect(result.colors.unique.get('red')?.locations).toHaveLength(2)
 		expect(result.gradients.unique.get('linear-gradient(red, blue)')?.locations?.[0]).toEqual({
 			line: 1,
 			column: 46,
-			offset: 45,
+			start_offset: 45,
+			end_offset: 71,
 			length: 26,
 		})
 	})

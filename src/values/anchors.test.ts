@@ -13,7 +13,7 @@ test.each([
 
 test('points at every name', () => {
 	expect(get_anchor_names('--a, --bc')).toEqual([
-		{ value: '--a', line: 1, column: 1, offset: 0, length: 3 },
-		{ value: '--bc', line: 1, column: 6, offset: 5, length: 4 },
+		{ value: '--a', line: 1, column: 1, start_offset: 0, end_offset: 3, length: 3 },
+		{ value: '--bc', line: 1, column: 6, start_offset: 5, end_offset: 9, length: 4 },
 	])
 })

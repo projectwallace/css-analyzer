@@ -53,9 +53,9 @@ test('Derived numbers are separate functions', () => {
 test('Locations', () => {
 	const { colors: result } = analyze(css, { colors: colors({ locations: true }) })
 	expect(result.unique.get('red')?.locations).toEqual([
-		{ line: 2, column: 13, offset: 13, length: 3 },
-		{ line: 3, column: 13, offset: 60, length: 3 },
-		{ line: 4, column: 18, offset: 113, length: 3 },
+		{ line: 2, column: 13, start_offset: 13, end_offset: 16, length: 3 },
+		{ line: 3, column: 13, start_offset: 60, end_offset: 63, length: 3 },
+		{ line: 4, column: 18, start_offset: 113, end_offset: 116, length: 3 },
 	])
 })
 

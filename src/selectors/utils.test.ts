@@ -25,8 +25,8 @@ test('every util accepts text and nodes with identical output', () => {
 
 test('get_complexity returns the complexity (as value) and location of every selector', () => {
 	expect(get_complexity('a, a.b')).toEqual([
-		{ value: 1, line: 1, column: 1, offset: 0, length: 1 },
-		{ value: 2, line: 1, column: 4, offset: 3, length: 3 },
+		{ value: 1, line: 1, column: 1, start_offset: 0, end_offset: 1, length: 1 },
+		{ value: 2, line: 1, column: 4, start_offset: 3, end_offset: 6, length: 3 },
 	])
 })
 
@@ -45,18 +45,18 @@ test('get_accessibility_selectors returns normalized attribute selectors', () =>
 
 test('get_combinators returns names and locations as data', () => {
 	expect(get_combinators('a > b c')).toEqual([
-		{ value: '>', offset: 2, line: 1, column: 3, length: 1 },
-		{ value: ' ', offset: 5, line: 1, column: 6, length: 1 },
+		{ value: '>', start_offset: 2, end_offset: 3, line: 1, column: 3, length: 1 },
+		{ value: ' ', start_offset: 5, end_offset: 6, line: 1, column: 6, length: 1 },
 	])
 })
 
 // Only offsets are checked: the parser's columns are off after a descendant combinator
 test('get_vendor_prefixes and get_accessibility_selectors locate the selector part', () => {
 	expect(get_vendor_prefixes('a ::-ms-clear')).toMatchObject([
-		{ value: '::-ms-clear', offset: 2, length: 11 },
+		{ value: '::-ms-clear', start_offset: 2, end_offset: 13, length: 11 },
 	])
 	expect(get_accessibility_selectors('a [ROLE=tab]')).toMatchObject([
-		{ value: '[role="tab"]', offset: 2, length: 10 },
+		{ value: '[role="tab"]', start_offset: 2, end_offset: 12, length: 10 },
 	])
 })
 
