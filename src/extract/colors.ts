@@ -1,3 +1,4 @@
+import type { Value } from '@projectwallace/css-parser'
 import {
 	type CSSNode,
 	is_function,
@@ -7,7 +8,6 @@ import {
 	strip_value_hack,
 	walk_values,
 } from '@projectwallace/css-parser'
-import { type ValueInput, as_value } from '../utils/input.ts'
 import { type Match, to_match } from '../utils/location.ts'
 import { color_functions, color_keywords, named_colors, system_colors } from '../values/colors.ts'
 import { no_value_walk } from './shared.ts'
@@ -61,10 +61,10 @@ export function color_text(node: CSSNode): string {
 }
 
 /** The colors in a value, each with its `format` */
-export function extract_colors(property: string, input: ValueInput): ColorMatch[] {
+export function extract_colors(property: string, input: Value): ColorMatch[] {
 	const name = property_basename(property)
 	const found: ColorMatch[] = []
-	walk_values(as_value(input), function (node) {
+	walk_values(input, function (node) {
 		const format = color_format(node, name)
 		if (format !== undefined) {
 			found.push({ ...to_match(node, color_text(node)), format })

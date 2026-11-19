@@ -13,7 +13,7 @@ function texts(parts: Record<string, Match[]>): Record<string, string[]> {
 }
 
 function names_of(value: string): string[] {
-	return analyze_animation(value).names.map((match) => match.value)
+	return analyze_animation(parse_value(value)).names.map((match) => match.value)
 }
 
 test('emits name for custom animation name identifier', () => {
@@ -109,7 +109,9 @@ test('emits name for a quoted keyword used as animation name', () => {
 })
 
 test('splits a shorthand into plain-data parts', () => {
-	expect(texts(analyze_animation('slide-in 300ms ease-out, none 1s infinite'))).toEqual({
+	expect(
+		texts(analyze_animation(parse_value('slide-in 300ms ease-out, none 1s infinite'))),
+	).toEqual({
 		durations: ['300ms', '1s'],
 		delays: [],
 		timing_functions: ['ease-out'],
@@ -118,29 +120,26 @@ test('splits a shorthand into plain-data parts', () => {
 	})
 })
 
-test('accepts a parsed node as well as text', () => {
-	const node = parse_value('fade 1s cubic-bezier(0, 0, 1, 1)')
-	expect(analyze_animation(node)).toEqual(analyze_animation('fade 1s cubic-bezier(0, 0, 1, 1)'))
-})
-
 test('splits the delay from the duration, per layer', () => {
-	expect(texts(analyze_animation('spin 2s linear 100ms, fade 1s')).delays).toEqual(['100ms'])
-	expect(texts(analyze_animation('spin 2s linear 100ms, fade 1s 3s'))).toMatchObject({
+	expect(texts(analyze_animation(parse_value('spin 2s linear 100ms, fade 1s'))).delays).toEqual([
+		'100ms',
+	])
+	expect(texts(analyze_animation(parse_value('spin 2s linear 100ms, fade 1s 3s')))).toMatchObject({
 		durations: ['2s', '1s'],
 		delays: ['100ms', '3s'],
 	})
 })
 
 test('analyze_transition splits a transition into plain-data parts', () => {
-	expect(texts(analyze_transition('opacity 200ms ease-in-out 0s, transform 300ms linear'))).toEqual(
-		{
-			properties: ['opacity', 'transform'],
-			durations: ['200ms', '300ms'],
-			delays: ['0s'],
-			timing_functions: ['ease-in-out', 'linear'],
-			keywords: [],
-		},
-	)
+	expect(
+		texts(analyze_transition(parse_value('opacity 200ms ease-in-out 0s, transform 300ms linear'))),
+	).toEqual({
+		properties: ['opacity', 'transform'],
+		durations: ['200ms', '300ms'],
+		delays: ['0s'],
+		timing_functions: ['ease-in-out', 'linear'],
+		keywords: [],
+	})
 })
 
 test.each([
@@ -149,18 +148,16 @@ test.each([
 	['none', []],
 	['inherit', []],
 ])('analyze_transition("%s") finds the properties %j', (value, properties) => {
-	expect(texts(analyze_transition(value)).properties).toEqual(properties)
+	expect(texts(analyze_transition(parse_value(value))).properties).toEqual(properties)
 })
 
 test('analyze_transition finds timing functions, global keywords and accepts a parsed node', () => {
 	expect(
-		texts(analyze_transition('color 1s cubic-bezier(0, 0, 1, 1), width 2s steps(4)')),
+		texts(analyze_transition(parse_value('color 1s cubic-bezier(0, 0, 1, 1), width 2s steps(4)'))),
 	).toMatchObject({
 		timing_functions: ['cubic-bezier(0, 0, 1, 1)', 'steps(4)'],
 	})
-	expect(texts(analyze_transition('inherit')).keywords).toEqual(['inherit'])
-	const node = parse_value('opacity 1s ease')
-	expect(analyze_transition(node)).toEqual(analyze_transition('opacity 1s ease'))
+	expect(texts(analyze_transition(parse_value('inherit'))).keywords).toEqual(['inherit'])
 })
 
 test.each([
@@ -170,7 +167,7 @@ test.each([
 	['none', []],
 	['initial', []],
 ])('get_animation_names("%s") is %j', (value, expected) => {
-	expect(get_animation_names(value).map((match) => match.value)).toEqual(expected)
+	expect(get_animation_names(parse_value(value)).map((match) => match.value)).toEqual(expected)
 })
 
 test('get_animation_names accepts a parsed node', () => {
@@ -179,7 +176,7 @@ test('get_animation_names accepts a parsed node', () => {
 
 test('locates every part, as written', () => {
 	const value = 'slide-in 300ms ease-out 1s, "my name" 2s'
-	const parts = analyze_animation(value)
+	const parts = analyze_animation(parse_value(value))
 	for (const match of Object.values(parts).flat()) {
 		expect(value.slice(match.start_offset, match.end_offset)).toBe(match.value)
 	}
@@ -193,7 +190,7 @@ test('locates every part, as written', () => {
 })
 
 test('get_animation_names locates the quoted name, without quotes in the text', () => {
-	expect(get_animation_names('a, "b c"')[1]).toEqual({
+	expect(get_animation_names(parse_value('a, "b c"'))[1]).toEqual({
 		value: 'b c',
 		line: 1,
 		column: 4,

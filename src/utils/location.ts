@@ -56,23 +56,3 @@ export function to_match_in(node: CSSNode, index: number, length: number, value:
 	const start_offset = node.start + index
 	return { value, line, column, start_offset, end_offset: start_offset + length }
 }
-
-/** A match inside `source`, for text that was not parsed into nodes. Line and column start at 1. */
-export function to_match_in_source(
-	source: string,
-	index: number,
-	length: number,
-	value: string,
-): Match {
-	let line = 1
-	let column = 1
-	for (let i = 0; i < index; i++) {
-		if (source.charCodeAt(i) === NEWLINE) {
-			line++
-			column = 1
-		} else {
-			column++
-		}
-	}
-	return { value, line, column, start_offset: index, end_offset: index + length }
-}

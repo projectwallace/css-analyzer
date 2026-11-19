@@ -1,5 +1,6 @@
 import { test, expect } from 'vitest'
 import { get_prefixed_values } from './vendor-prefix.ts'
+import { parse_value } from '@projectwallace/css-parser'
 
 test.each([
 	['-webkit-box', ['-webkit-box']],
@@ -8,13 +9,13 @@ test.each([
 	['linear-gradient(-webkit-gradient(red), blue)', ['-webkit-gradient']],
 	['-webkit-box -moz-box', ['-webkit-box', '-moz-box']],
 ])('finds the prefixed values in "%s"', (value, expected) => {
-	expect(get_prefixed_values(value).map((match) => match.value)).toEqual(expected)
+	expect(get_prefixed_values(parse_value(value)).map((match) => match.value)).toEqual(expected)
 })
 
 test.each(['flex', '1px solid red', '--custom-property', 'calc(-1 * var(--x))'])(
 	'finds nothing in "%s"',
 	(value) => {
-		expect(get_prefixed_values(value).map((match) => match.value)).toEqual([])
+		expect(get_prefixed_values(parse_value(value)).map((match) => match.value)).toEqual([])
 	},
 )
 
@@ -27,20 +28,20 @@ test.each([
 ])(
 	'the parser reads prefixed number-like words as identifiers, so they are found by name: "%s"',
 	(value, expected) => {
-		expect(get_prefixed_values(value).map((match) => match.value)).toEqual(expected)
+		expect(get_prefixed_values(parse_value(value)).map((match) => match.value)).toEqual(expected)
 	},
 )
 
 test.each(['"-webkit-x"', '#-webkit-x'])(
 	'ignores prefixes inside strings and hashes: %s',
 	(value) => {
-		expect(get_prefixed_values(value).map((match) => match.value)).toEqual([])
+		expect(get_prefixed_values(parse_value(value)).map((match) => match.value)).toEqual([])
 	},
 )
 
 test('locates the name of the prefixed value', () => {
 	const value = '1px -webkit-calc(1px + 2px)'
-	const [match] = get_prefixed_values(value)
+	const [match] = get_prefixed_values(parse_value(value))
 	expect(match).toEqual({
 		value: '-webkit-calc',
 		line: 1,

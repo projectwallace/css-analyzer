@@ -1,46 +1,31 @@
 import { test, expect } from 'vitest'
-import { type Atrule, parse } from '@projectwallace/css-parser'
 import {
 	get_container_query_name,
 	get_media_browserhacks,
 	get_supports_browserhacks,
 } from './index.ts'
+import { parse_prelude } from '../test/test-utils.ts'
 
 function texts(matches: { value: string }[]): string[] {
 	return matches.map((match) => match.value)
 }
 
-function prelude_of(css: string) {
-	const atrule = parse(css, { parse_atrule_preludes: true }).first_child as Atrule
-	return atrule.prelude!
-}
-
-test('get_media_browserhacks finds hacks in prelude text and nodes', () => {
-	expect(texts(get_media_browserhacks('\\0screen'))).toEqual(['\\0'])
-	expect(texts(get_media_browserhacks('(-ms-high-contrast: none)'))).toEqual(['-ms-high-contrast'])
-	expect(texts(get_media_browserhacks('screen and (min-width: 600px)'))).toEqual([])
-
-	const prelude = prelude_of('@media (-ms-high-contrast: none) {}')
-	expect(texts(get_media_browserhacks(prelude))).toEqual(['-ms-high-contrast'])
+test.each([
+	['\\0screen', ['\\0']],
+	['(-ms-high-contrast: none)', ['-ms-high-contrast']],
+	['screen and (min-width: 600px)', []],
+])('get_media_browserhacks("%s") is %j', (prelude, expected) => {
+	expect(texts(get_media_browserhacks(parse_prelude('media', prelude)))).toEqual(expected)
 })
 
-test('get_supports_browserhacks finds hacks in prelude text and nodes', () => {
-	expect(texts(get_supports_browserhacks('(-webkit-appearance: none)'))).toEqual([
-		'-webkit-appearance: none',
-	])
-	expect(texts(get_supports_browserhacks('(display: grid)'))).toEqual([])
-
-	const prelude = prelude_of('@supports (-moz-appearance: meterbar) {}')
-	expect(texts(get_supports_browserhacks(prelude))).toEqual(['-moz-appearance: meterbar'])
-})
-
-test('get_supports_browserhacks finds hacks in uppercase prelude text and nodes', () => {
-	expect(texts(get_supports_browserhacks('(-WEBKIT-APPEARANCE: NONE)'))).toEqual([
-		'-webkit-appearance: none',
-	])
-
-	const prelude = prelude_of('@supports (-MOZ-APPEARANCE: METERBAR) {}')
-	expect(texts(get_supports_browserhacks(prelude))).toEqual(['-moz-appearance: meterbar'])
+test.each([
+	['(-webkit-appearance: none)', ['-webkit-appearance: none']],
+	['(-moz-appearance: meterbar)', ['-moz-appearance: meterbar']],
+	['(-WEBKIT-APPEARANCE: NONE)', ['-webkit-appearance: none']],
+	['(-MOZ-APPEARANCE: METERBAR)', ['-moz-appearance: meterbar']],
+	['(display: grid)', []],
+])('get_supports_browserhacks("%s") is %j', (prelude, expected) => {
+	expect(texts(get_supports_browserhacks(parse_prelude('supports', prelude)))).toEqual(expected)
 })
 
 test.each([
@@ -49,30 +34,20 @@ test.each([
 	['--my-container (width > 1px)', '--my-container'],
 	['(min-width: 400px)', undefined],
 	['style(--responsive: true)', undefined],
-])(
-	'get_container_query_name("%s") is %s, for text and for a parsed prelude',
-	(prelude, expected) => {
-		expect(get_container_query_name(prelude)?.value).toBe(expected)
-		expect(get_container_query_name(prelude_of(`@container ${prelude} {}`))?.value).toBe(expected)
-	},
-)
-
-test('get_container_query_name is null for an empty prelude', () => {
-	expect(get_container_query_name('')).toBeNull()
+])('get_container_query_name("%s") is %s', (prelude, expected) => {
+	expect(get_container_query_name(parse_prelude('container', prelude))?.value).toBe(expected)
 })
 
 test('the browserhack matches say where the hack is', () => {
-	expect(get_media_browserhacks('screen and (-ms-high-contrast: none)')).toMatchObject([
-		{ value: '-ms-high-contrast', line: 1, start_offset: 11 },
-	])
+	// Offsets are relative to `@media screen and (-ms-high-contrast: none) {}`
+	expect(
+		get_media_browserhacks(parse_prelude('media', 'screen and (-ms-high-contrast: none)')),
+	).toMatchObject([{ value: '-ms-high-contrast', line: 1, start_offset: 18, end_offset: 43 }])
 })
 
 test('get_container_query_name locates the name', () => {
-	expect(get_container_query_name('sidebar (min-width: 400px)')).toEqual({
-		value: 'sidebar',
-		line: 1,
-		column: 1,
-		start_offset: 0,
-		end_offset: 7,
-	})
+	// Offsets are relative to `@container sidebar (min-width: 400px) {}`
+	expect(
+		get_container_query_name(parse_prelude('container', 'sidebar (min-width: 400px)')),
+	).toMatchObject({ value: 'sidebar', line: 1, start_offset: 11, end_offset: 18 })
 })

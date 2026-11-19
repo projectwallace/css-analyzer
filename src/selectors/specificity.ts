@@ -12,12 +12,14 @@ import {
 	TYPE_SELECTOR,
 	type CSSNode,
 	type SelectorNode,
+	type Selector,
+	type SelectorList,
 	is_selector_list,
 	is_nth_of_selector,
 	is_selector,
 	is_combinator,
 } from '@projectwallace/css-parser'
-import { type SelectorInput, as_selectors } from '../utils/input.ts'
+import { as_selectors } from '../utils/input.ts'
 
 export type Specificity = [number, number, number]
 
@@ -229,7 +231,7 @@ function parts_specificity(first: SelectorNode | null, until_combinator = false)
 	return [a, b, c]
 }
 
-export function get_specificity(input: SelectorInput): Specificity[] {
+export function get_specificity(input: Selector | SelectorList): Specificity[] {
 	// Quit while you're ahead
 	if (!input) {
 		return []

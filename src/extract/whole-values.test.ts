@@ -19,7 +19,7 @@ test.each([
 	['z-index', '5\\9', ['5']],
 	['position', '10', []],
 ])('extract_z_indexes("%s", "%s") is %j', (property, value, expected) => {
-	expect(values(extract_z_indexes(property, value))).toEqual(expected)
+	expect(values(extract_z_indexes(property, parse_value(value)))).toEqual(expected)
 })
 
 test.each([
@@ -28,7 +28,7 @@ test.each([
 	['box-shadow', 'none', []],
 	['text-shadow', '0 0 1px red', []],
 ])('extract_box_shadows("%s", "%s") is %j', (property, value, expected) => {
-	expect(values(extract_box_shadows(property, value))).toEqual(expected)
+	expect(values(extract_box_shadows(property, parse_value(value)))).toEqual(expected)
 })
 
 test.each([
@@ -36,7 +36,7 @@ test.each([
 	['text-shadow', 'none', []],
 	['box-shadow', '1px 1px 2px black', []],
 ])('extract_text_shadows("%s", "%s") is %j', (property, value, expected) => {
-	expect(values(extract_text_shadows(property, value))).toEqual(expected)
+	expect(values(extract_text_shadows(property, parse_value(value)))).toEqual(expected)
 })
 
 test.each([
@@ -47,14 +47,14 @@ test.each([
 	['border-radius', 'inherit', []],
 	['border', '1px solid', []],
 ])('extract_border_radiuses("%s", "%s") is %j', (property, value, expected) => {
-	expect(values(extract_border_radiuses(property, value))).toEqual(expected)
+	expect(values(extract_border_radiuses(property, parse_value(value)))).toEqual(expected)
 })
 
 test('accept a parsed value, and point at the whole value', () => {
 	expect(extract_z_indexes('z-index', parse_value('10'))).toEqual(
-		extract_z_indexes('z-index', '10'),
+		extract_z_indexes('z-index', parse_value('10')),
 	)
-	expect(extract_box_shadows('box-shadow', '0 0 red')).toEqual([
+	expect(extract_box_shadows('box-shadow', parse_value('0 0 red'))).toEqual([
 		{ value: '0 0 red', line: 1, column: 1, start_offset: 0, end_offset: 7 },
 	])
 })

@@ -142,6 +142,8 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 				const raw_name = node.name
 				const name = property_basename(raw_name)
 				const prelude = node.has_prelude ? node.prelude : undefined
+				// The utilities read a parsed prelude; `atrule_preludes: true` above makes sure it is one
+				const parsed = prelude && is_atrule_prelude(prelude) ? prelude : undefined
 				const prelude_text = prelude?.text
 				const block = node.block
 				names.add(name, node)
@@ -172,25 +174,25 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 				let hacks = 0
 				if (name === 'media') {
 					medias.add(prelude_text, node)
-					for (const hack of get_media_browserhacks(prelude!)) {
+					for (const hack of parsed ? get_media_browserhacks(parsed) : []) {
 						media_browserhacks.add(hack.value, node)
 						hacks++
 					}
 				} else if (name === 'supports') {
 					supports.add(prelude_text, node)
-					for (const hack of get_supports_browserhacks(prelude!)) {
+					for (const hack of parsed ? get_supports_browserhacks(parsed) : []) {
 						supports_browserhacks.add(hack.value, node)
 						hacks++
 					}
 				} else if (name.endsWith('keyframes')) {
-					const keyframes_name = get_keyframes_name(prelude!)?.value ?? ''
+					const keyframes_name = (prelude && get_keyframes_name(prelude)?.value) || ''
 					keyframes.add(keyframes_name, node)
 					keyframes_tracking.define(keyframes_name)
 					if (node.is_vendor_prefixed) {
 						prefixed_keyframes.add(`@${raw_name.toLowerCase()} ${prelude_text}`, node)
 					}
 				} else if (name === 'layer') {
-					for (const { value: layer } of get_layer_names(prelude!)) {
+					for (const { value: layer } of parsed ? get_layer_names(parsed) : []) {
 						layers.add(layer, node)
 						// `@layer name { }` places CSS into a layer (use); `@layer a, b;` orders layers (define)
 						if (block) {
@@ -212,7 +214,7 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 					}
 				} else if (name === 'container') {
 					containers.add(prelude_text, node)
-					const container_match = prelude ? get_container_query_name(prelude) : null
+					const container_match = parsed ? get_container_query_name(parsed) : null
 					const container_name = container_match?.value ?? null
 					if (container_name !== null) {
 						container_names.add(container_name, node)

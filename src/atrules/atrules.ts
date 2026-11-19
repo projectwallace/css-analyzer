@@ -2,7 +2,6 @@ import {
 	str_equals,
 	walk,
 	BREAK,
-	is_atrule_prelude,
 	is_container_query,
 	is_identifier,
 	is_media_feature,
@@ -11,36 +10,30 @@ import {
 	is_dimension,
 	is_number,
 	type AnyNode,
+	type AtrulePrelude,
 	str_index_of,
 } from '@projectwallace/css-parser'
-import { type PreludeInput, as_prelude } from '../utils/input.ts'
 import { type Match, to_match } from '../utils/location.ts'
 
 function find_hacks(
-	name: string,
-	input: PreludeInput,
+	prelude: AtrulePrelude,
 	check: (node: AnyNode, on_hack: (hack: string) => void) => unknown,
 ): Match[] {
 	const hacks: Match[] = []
-	for (const prelude of as_prelude(name, input)) {
-		walk(prelude, function (node) {
-			const result = check(node, (hack) => hacks.push(to_match(node, hack)))
-			if (result === BREAK) {
-				return BREAK
-			}
-		})
-		if (hacks.length > 0) {
-			break
+	walk(prelude, function (node) {
+		const result = check(node, (hack) => hacks.push(to_match(node, hack)))
+		if (result === BREAK) {
+			return BREAK
 		}
-	}
+	})
 	return hacks
 }
 
 const whitespace_regex = /\s+/g
 
 /** Find @supports browserhacks */
-export function get_supports_browserhacks(input: PreludeInput): Match[] {
-	return find_hacks('supports', input, function (node, on_hack) {
+export function get_supports_browserhacks(prelude: AtrulePrelude): Match[] {
+	return find_hacks(prelude, function (node, on_hack) {
 		// Check SupportsQuery nodes for browserhack patterns
 		if (is_supports_query(node)) {
 			const normalized_prelude = node.value.toString().replaceAll(whitespace_regex, '')
@@ -59,8 +52,8 @@ export function get_supports_browserhacks(input: PreludeInput): Match[] {
 }
 
 /** Find @media browserhacks */
-export function get_media_browserhacks(input: PreludeInput): Match[] {
-	return find_hacks('media', input, function (node, on_hack) {
+export function get_media_browserhacks(prelude: AtrulePrelude): Match[] {
+	return find_hacks(prelude, function (node, on_hack) {
 		// Check MediaType nodes for \0 prefix or \9 suffix
 		if (is_media_type(node)) {
 			const text = node.value
@@ -134,13 +127,8 @@ export function get_media_browserhacks(input: PreludeInput): Match[] {
 }
 
 /** The container name of a `@container` prelude, or `null` */
-export function get_container_query_name(input: PreludeInput): Match | null {
-	const first = as_prelude('container', input)[0]
-	if (!first) {
-		return null
-	}
-	// A parsed prelude holds the query; text is parsed into the query itself
-	const query = is_atrule_prelude(first) ? first.first_child : first
+export function get_container_query_name(prelude: AtrulePrelude): Match | null {
+	const query = prelude.first_child
 	if (query && is_container_query(query)) {
 		const name = query.first_child
 		if (name && is_identifier(name)) {

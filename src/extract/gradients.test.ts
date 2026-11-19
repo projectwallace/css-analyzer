@@ -27,18 +27,20 @@ test.each([
 	['animation', 'linear-gradient(red, blue)', []],
 	['z-index', 'linear-gradient(red, blue)', []],
 ])('extract_gradients("%s", "%s")', (property, value, expected) => {
-	expect(extract_gradients(property, value).map((match) => match.value)).toEqual(expected)
+	expect(extract_gradients(property, parse_value(value)).map((match) => match.value)).toEqual(
+		expected,
+	)
 })
 
 test('accepts a parsed value as well as text', () => {
 	expect(extract_gradients('background', parse_value('linear-gradient(red, blue)'))).toEqual(
-		extract_gradients('background', 'linear-gradient(red, blue)'),
+		extract_gradients('background', parse_value('linear-gradient(red, blue)')),
 	)
 })
 
 test('points at the gradient', () => {
 	const value = 'url(a.png), linear-gradient(red, blue)'
-	const [match] = extract_gradients('background', value)
+	const [match] = extract_gradients('background', parse_value(value))
 	expect(match).toMatchObject({ line: 1, column: 13, start_offset: 12, end_offset: 38 })
 	expect(value.slice(match!.start_offset, match!.end_offset)).toBe(match!.value)
 })

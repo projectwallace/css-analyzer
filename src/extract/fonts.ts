@@ -1,6 +1,5 @@
 import { type Value, property_basename } from '@projectwallace/css-parser'
 import { KeywordSet } from '../utils/collections/keyword-set.ts'
-import { type ValueInput, as_value } from '../utils/input.ts'
 import { type Match, to_match } from '../utils/location.ts'
 import {
 	type FontShorthand,
@@ -72,15 +71,15 @@ function as_list(match: Match | undefined): Match[] {
 	return match ? [match] : []
 }
 
-export function extract_font_sizes(property: string, input: ValueInput): Match[] {
-	return as_list(font_size(property_basename(property), as_value(input)))
+export function extract_font_sizes(property: string, input: Value): Match[] {
+	return as_list(font_size(property_basename(property), input))
 }
 
-export function extract_line_heights(property: string, input: ValueInput): Match[] {
-	return as_list(line_height(property_basename(property), as_value(input)))
+export function extract_line_heights(property: string, input: Value): Match[] {
+	return as_list(line_height(property_basename(property), input))
 }
 
 /** The whole list as written; see `get_font_families()` for one match per family */
-export function extract_font_families(property: string, input: ValueInput): Match[] {
-	return as_list(font_family(property_basename(property), as_value(input)))
+export function extract_font_families(property: string, input: Value): Match[] {
+	return as_list(font_family(property_basename(property), input))
 }

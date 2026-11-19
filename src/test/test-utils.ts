@@ -1,3 +1,4 @@
+import { type Atrule, type AtrulePrelude, parse } from '@projectwallace/css-parser'
 import { summarize_numbers } from '../engine/summary.ts'
 import type { CountItem, CountResult } from '../engine/types.ts'
 
@@ -61,4 +62,13 @@ export function series(result: CountResult<number>): Series {
 		items: result.sequence ?? [],
 		...plain(result),
 	}
+}
+
+/**
+ * The parsed prelude of `@name css {}`. Offsets are relative to that at-rule, so they are
+ * `name.length + 2` further than in `css`.
+ */
+export function parse_prelude(name: string, css: string): AtrulePrelude {
+	const atrule = parse(`@${name} ${css} {}`).first_child as Atrule
+	return atrule.prelude as AtrulePrelude
 }

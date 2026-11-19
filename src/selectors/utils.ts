@@ -14,9 +14,11 @@ import {
 	is_nth_selector,
 	is_combinator,
 	type AttributeSelector,
+	type Selector,
+	type SelectorList,
 } from '@projectwallace/css-parser'
 import { unquote } from '../utils/string-utils.ts'
-import { type SelectorInput, as_selectors } from '../utils/input.ts'
+import { as_selectors } from '../utils/input.ts'
 import { type Match, to_location, to_match } from '../utils/location.ts'
 
 const pseudo_functions = new KeywordSet([
@@ -31,7 +33,7 @@ const pseudo_functions = new KeywordSet([
 	'-moz-any',
 ])
 
-export function get_vendor_prefixes(input: SelectorInput): Match[] {
+export function get_vendor_prefixes(input: Selector | SelectorList): Match[] {
 	const found: Match[] = []
 	for (const selector of as_selectors(input)) {
 		walk(selector, function (node) {
@@ -65,7 +67,7 @@ function normalize_accessibility_selector(node: AttributeSelector) {
 	return `[${name}]`
 }
 
-export function get_accessibility_selectors(input: SelectorInput): Match[] {
+export function get_accessibility_selectors(input: Selector | SelectorList): Match[] {
 	const found: Match[] = []
 
 	for (const selector of as_selectors(input)) {
@@ -81,7 +83,7 @@ export function get_accessibility_selectors(input: SelectorInput): Match[] {
 	return found
 }
 
-export function get_complexity(input: SelectorInput): SelectorComplexity[] {
+export function get_complexity(input: Selector | SelectorList): SelectorComplexity[] {
 	return as_selectors(input).map((selector) =>
 		Object.assign(to_location(selector), { value: selector_complexity(selector) }),
 	)
@@ -184,7 +186,7 @@ export function combinator_name(node: Combinator): string {
 export type SelectorComplexity = Match<number>
 
 /** Find all combinators; `value` is `' '` for the descendant combinator */
-export function get_combinators(input: SelectorInput): Match[] {
+export function get_combinators(input: Selector | SelectorList): Match[] {
 	const found: Match[] = []
 	for (const selector of as_selectors(input)) {
 		walk(selector, function (node) {

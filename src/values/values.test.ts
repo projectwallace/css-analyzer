@@ -5,14 +5,14 @@ import { is_value_reset, keywords } from './values.ts'
 test.each(['0', '0px', '-0', '+0', '-0.0e0', '0 0px 0em 0pc 0vw', '0px 0dvh 0rem 0in'])(
 	'"%s" is a reset',
 	(value) => {
-		expect(is_value_reset(value)).toBe(true)
+		expect(is_value_reset(parse_value(value))).toBe(true)
 	},
 )
 
 test.each(['1', '0 1px', '10px 10px', 'auto 10px', '10px auto', '1e-1', 'var(--x)'])(
 	'"%s" is not a reset',
 	(value) => {
-		expect(is_value_reset(value)).toBe(false)
+		expect(is_value_reset(parse_value(value))).toBe(false)
 	},
 )
 

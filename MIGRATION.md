@@ -86,7 +86,7 @@ Rules of thumb:
 
 ## Utilities
 
-All pure utilities now accept CSS text or a parsed node and return plain data. No callbacks, no parser nodes in results, `snake_case` names:
+All pure utilities now take a parsed node (`Value`, `Selector`/`SelectorList` or an at-rule `AtrulePrelude`) and return plain data. Parse the CSS yourself with `@projectwallace/css-parser`: `parse_value()`, `parse_selector_list()`, or `parse()` for an at-rule prelude. No callbacks, no parser nodes in results, `snake_case` names:
 
 | 9.x                                                              | 10                                                                                                                   |
 | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |

@@ -1,3 +1,4 @@
+import type { Value } from '@projectwallace/css-parser'
 import {
 	is_identifier,
 	is_operator,
@@ -7,7 +8,6 @@ import {
 } from '@projectwallace/css-parser'
 import { KeywordSet } from '../utils/collections/keyword-set.ts'
 import { keywords } from './values.ts'
-import { type ValueInput, as_value } from '../utils/input.ts'
 import { type Match, to_match } from '../utils/location.ts'
 import { unquote } from '../utils/string-utils.ts'
 
@@ -50,7 +50,7 @@ export type AnimationParts = {
 }
 
 /** Split an `animation` value into its parts */
-export function analyze_animation(input: ValueInput): AnimationParts {
+export function analyze_animation(input: Value): AnimationParts {
 	const parts: AnimationParts = {
 		durations: [],
 		delays: [],
@@ -60,7 +60,7 @@ export function analyze_animation(input: ValueInput): AnimationParts {
 	}
 	let duration_found = false
 
-	as_value(input).for_each(function (node) {
+	input.for_each(function (node) {
 		// Right after a ',' we start over again
 		if (is_operator(node)) {
 			duration_found = false
@@ -101,15 +101,15 @@ export type TransitionParts = {
 }
 
 /** Split a `transition` value into its parts */
-export function analyze_transition(input: ValueInput): TransitionParts {
+export function analyze_transition(input: Value): TransitionParts {
 	const { names, ...parts } = analyze_animation(input)
 	return { properties: names, ...parts }
 }
 
 /** The names in an `animation-name` value */
-export function get_animation_names(input: ValueInput): Match[] {
+export function get_animation_names(input: Value): Match[] {
 	const names: Match[] = []
-	as_value(input).for_each(function (node) {
+	input.for_each(function (node) {
 		if (is_identifier(node) && !keywords.has(node.name)) {
 			names.push(to_match(node))
 		} else if (is_string(node)) {

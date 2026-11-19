@@ -1,8 +1,8 @@
 import {
 	type CSSNode,
+	type AtrulePrelude,
 	type FeatureRange,
 	type MediaFeature,
-	is_atrule_prelude,
 	is_dimension,
 	is_feature_range,
 	is_media_feature,
@@ -11,7 +11,6 @@ import {
 	strip_vendor_prefix,
 	walk,
 } from '@projectwallace/css-parser'
-import { type PreludeInput, as_prelude } from '../utils/input.ts'
 import { type Match, to_location } from '../utils/location.ts'
 
 export type FeatureBound = Match<number> & {
@@ -106,30 +105,25 @@ function bounds_of_range(node: FeatureRange, query: number): FeatureBound[] {
 }
 
 /** The numeric bounds of a `@media` or `@container` prelude, each at its whole feature. `or` and `not` are not interpreted: `query` tells comma separated queries apart. */
-export function get_feature_bounds(
-	input: PreludeInput,
-	name: 'media' | 'container' = 'media',
-): FeatureBound[] {
-	const queries: CSSNode[] = []
-	for (const node of as_prelude(name, input)) {
-		if (is_atrule_prelude(node)) {
-			node.for_each(function (child) {
-				queries.push(child)
-			})
-		} else {
-			queries.push(node)
-		}
-	}
-
+export function get_feature_bounds(prelude: AtrulePrelude): FeatureBound[] {
 	const bounds: FeatureBound[] = []
-	queries.forEach(function (query_node, query) {
-		walk(query_node, function (node) {
-			if (is_media_feature(node)) {
-				bounds.push(...bounds_of_feature(node, query))
-			} else if (is_feature_range(node)) {
-				bounds.push(...bounds_of_range(node, query))
-			}
-		})
+	let query = 0
+	prelude.for_each(function (query_node) {
+		bounds.push(...get_query_feature_bounds(query_node, query))
+		query++
+	})
+	return bounds
+}
+
+/** The bounds of one query node (a media query or a container query); `query` is its index */
+export function get_query_feature_bounds(query_node: CSSNode, query: number = 0): FeatureBound[] {
+	const bounds: FeatureBound[] = []
+	walk(query_node, function (node) {
+		if (is_media_feature(node)) {
+			bounds.push(...bounds_of_feature(node, query))
+		} else if (is_feature_range(node)) {
+			bounds.push(...bounds_of_range(node, query))
+		}
 	})
 	return bounds
 }

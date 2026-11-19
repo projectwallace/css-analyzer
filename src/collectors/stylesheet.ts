@@ -1,6 +1,7 @@
 import {
 	is_selector_list,
 	is_url,
+	is_atrule_prelude,
 	property_basename,
 	str_starts_with,
 	URL,
@@ -62,7 +63,7 @@ export function stylesheet(options: StylesheetOptions = {}): CollectorDef<Styles
 				const name = property_basename(node.name)
 				const prelude = node.has_prelude ? node.prelude : undefined
 				let hacks = 0
-				if (prelude) {
+				if (prelude && is_atrule_prelude(prelude)) {
 					if (name === 'media') {
 						hacks = get_media_browserhacks(prelude).length
 					} else if (name === 'supports') {

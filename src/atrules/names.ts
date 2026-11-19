@@ -1,45 +1,20 @@
-import { is_atrule_prelude, is_layer_name, is_raw } from '@projectwallace/css-parser'
-import { type PreludeInput, as_prelude } from '../utils/input.ts'
-import { type Match, to_match, to_match_in_source } from '../utils/location.ts'
+import { type AtrulePrelude, type Raw, is_layer_name } from '@projectwallace/css-parser'
+import { type Match, to_match } from '../utils/location.ts'
 import { unquote } from '../utils/string-utils.ts'
 
-/** The name in a `@keyframes` prelude, without quotes */
-export function get_keyframes_name(input: PreludeInput): Match | null {
-	if (typeof input === 'string') {
-		const name = input.trim()
-		if (name === '') {
-			return null
-		}
-		return to_match_in_source(input, input.indexOf(name), name.length, unquote(name))
-	}
-	const text = input.text
-	return text === '' ? null : to_match(input, unquote(text))
+/** The name in a `@keyframes` prelude, without quotes. The parser leaves a quoted name as a `Raw` node. */
+export function get_keyframes_name(prelude: AtrulePrelude | Raw): Match | null {
+	const text = prelude.text
+	return text === '' ? null : to_match(prelude, unquote(text))
 }
 
 /** The names in a `@layer` prelude */
-export function get_layer_names(input: PreludeInput): Match[] {
+export function get_layer_names(prelude: AtrulePrelude): Match[] {
 	const names: Match[] = []
-	for (const node of as_prelude('layer', input)) {
-		if (is_layer_name(node)) {
-			names.push(to_match(node))
-		} else if (is_raw(node)) {
-			// The prelude was not parsed: read the names from its text, and move them to where the text is
-			for (const name of get_layer_names(node.text)) {
-				names.push({
-					value: name.value,
-					line: node.line + name.line - 1,
-					column: name.line === 1 ? node.column + name.column - 1 : name.column,
-					start_offset: node.start + name.start_offset,
-					end_offset: node.start + name.end_offset,
-				})
-			}
-		} else if (is_atrule_prelude(node)) {
-			node.for_each(function (child) {
-				if (is_layer_name(child)) {
-					names.push(to_match(child))
-				}
-			})
+	prelude.for_each(function (child) {
+		if (is_layer_name(child)) {
+			names.push(to_match(child))
 		}
-	}
+	})
 	return names
 }

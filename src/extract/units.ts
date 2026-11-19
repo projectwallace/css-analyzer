@@ -1,10 +1,10 @@
+import type { Value } from '@projectwallace/css-parser'
 import {
 	type CSSNode,
 	is_dimension,
 	property_basename,
 	walk_values,
 } from '@projectwallace/css-parser'
-import { type ValueInput, as_value } from '../utils/input.ts'
 import { type Match, to_match } from '../utils/location.ts'
 import { strip_unit_hack } from '../values/units.ts'
 
@@ -22,10 +22,10 @@ export function unit_of(node: CSSNode, property: string): string {
 	return strip_unit_hack(node.unit)
 }
 
-export function extract_units(property: string, input: ValueInput): Match[] {
+export function extract_units(property: string, input: Value): Match[] {
 	const name = property_basename(property)
 	const found: Match[] = []
-	walk_values(as_value(input), function (node) {
+	walk_values(input, function (node) {
 		const unit = unit_of(node, name)
 		if (unit !== '') {
 			found.push(to_match(node, unit))

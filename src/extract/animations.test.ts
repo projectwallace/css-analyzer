@@ -23,7 +23,7 @@ test.each([
 	['transition-delay', '1s', []],
 	['width', '1s', []],
 ])('extract_durations("%s", "%s") is %j', (property, value, expected) => {
-	expect(values(extract_durations(property, value))).toEqual(expected)
+	expect(values(extract_durations(property, parse_value(value)))).toEqual(expected)
 })
 
 test.each([
@@ -34,23 +34,23 @@ test.each([
 	['transition', 'inherit', []],
 	['transition-duration', '1s', []],
 ])('extract_timing_functions("%s", "%s") is %j', (property, value, expected) => {
-	expect(values(extract_timing_functions(property, value))).toEqual(expected)
+	expect(values(extract_timing_functions(property, parse_value(value)))).toEqual(expected)
 })
 
 test('accept a parsed value as well as text', () => {
 	const value = 'opacity 1s ease'
 	expect(extract_durations('transition', parse_value(value))).toEqual(
-		extract_durations('transition', value),
+		extract_durations('transition', parse_value(value)),
 	)
 	expect(extract_timing_functions('transition', parse_value(value))).toEqual(
-		extract_timing_functions('transition', value),
+		extract_timing_functions('transition', parse_value(value)),
 	)
 })
 
 test('point at every item', () => {
 	const value = 'opacity 200ms ease, color 1s linear'
-	const durations = extract_durations('transition', value)
-	const functions = extract_timing_functions('transition', value)
+	const durations = extract_durations('transition', parse_value(value))
+	const functions = extract_timing_functions('transition', parse_value(value))
 	expect(
 		[...durations, ...functions].map((m) => value.slice(m.start_offset, m.end_offset)),
 	).toEqual(['200ms', '1s', 'ease', 'linear'])

@@ -17,16 +17,18 @@ test.each([
 	['font-family', 'Arial 10px', []],
 	['z-index', '10px', []],
 ])('extract_units("%s", "%s") is %j', (property, value, expected) => {
-	expect(extract_units(property, value).map((match) => match.value)).toEqual(expected)
+	expect(extract_units(property, parse_value(value)).map((match) => match.value)).toEqual(expected)
 })
 
 test('accepts a parsed value as well as text', () => {
-	expect(extract_units('width', parse_value('10px'))).toEqual(extract_units('width', '10px'))
+	expect(extract_units('width', parse_value('10px'))).toEqual(
+		extract_units('width', parse_value('10px')),
+	)
 })
 
 test('points at the dimension', () => {
 	const value = '1px 22em'
-	const found = extract_units('margin', value)
+	const found = extract_units('margin', parse_value(value))
 	expect(found).toMatchObject([
 		{ value: 'px', line: 1, column: 1, start_offset: 0, end_offset: 3 },
 		{ value: 'em', line: 1, column: 5, start_offset: 4, end_offset: 8 },

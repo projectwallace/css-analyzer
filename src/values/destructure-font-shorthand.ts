@@ -1,3 +1,4 @@
+import type { Value } from '@projectwallace/css-parser'
 import {
 	is_dimension,
 	is_function,
@@ -6,7 +7,6 @@ import {
 	is_string,
 } from '@projectwallace/css-parser'
 import { KeywordSet } from '../utils/collections/keyword-set.ts'
-import { type ValueInput, as_value } from '../utils/input.ts'
 import { type Match, to_match } from '../utils/location.ts'
 import { keywords } from './values.ts'
 
@@ -73,8 +73,8 @@ export type FontShorthand = {
 //
 // System fonts (caption, icon, menu, ...) are not handled: check system_fonts first.
 /** Split a `font` shorthand into size, line height, family and keywords */
-export function destructure_font_shorthand(input: ValueInput): FontShorthand | null {
-	const value = as_value(input)
+export function destructure_font_shorthand(input: Value): FontShorthand | null {
+	const value = input
 	const found_keywords: Match[] = []
 	if (!value.has_children) {
 		return null

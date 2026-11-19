@@ -1,6 +1,5 @@
 import { type Value, property_basename } from '@projectwallace/css-parser'
 import { KeywordSet } from '../utils/collections/keyword-set.ts'
-import { type ValueInput, as_value } from '../utils/input.ts'
 import { type Match, to_match } from '../utils/location.ts'
 import { analyze_animation } from '../values/animations.ts'
 import { get_clean_value_text, get_list_items } from './shared.ts'
@@ -44,10 +43,10 @@ export function timing_functions_of(property: string, value: Value): Match[] {
 	return animation_items(property, value, timing_function_properties, 'timing_functions')
 }
 
-export function extract_durations(property: string, input: ValueInput): Match[] {
-	return durations_of(property_basename(property), as_value(input))
+export function extract_durations(property: string, input: Value): Match[] {
+	return durations_of(property_basename(property), input)
 }
 
-export function extract_timing_functions(property: string, input: ValueInput): Match[] {
-	return timing_functions_of(property_basename(property), as_value(input))
+export function extract_timing_functions(property: string, input: Value): Match[] {
+	return timing_functions_of(property_basename(property), input)
 }

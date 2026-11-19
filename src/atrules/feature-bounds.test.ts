@@ -1,22 +1,18 @@
 import { test, expect } from 'vitest'
-import { type Atrule, parse } from '@projectwallace/css-parser'
 import { get_feature_bounds } from './index.ts'
+import { parse_prelude } from '../test/test-utils.ts'
 
 type Short = [feature: string, direction: string, value: number, unit: string, inclusive: boolean]
 
 // The bounds without their location
-function short(input: Parameters<typeof get_feature_bounds>[0], name?: 'media' | 'container') {
-	return get_feature_bounds(input, name).map((bound): Short => [
+function short(name: 'media' | 'container', css: string) {
+	return get_feature_bounds(parse_prelude(name, css)).map((bound): Short => [
 		bound.feature,
 		bound.direction,
 		bound.value,
 		bound.unit,
 		bound.inclusive,
 	])
-}
-
-function prelude_of(css: string) {
-	return (parse(css, { parse_atrule_preludes: true }).first_child as Atrule).prelude!
 }
 
 test.each<[string, Short[]]>([
@@ -61,12 +57,7 @@ test.each<[string, Short[]]>([
 	['(min-width: calc(1px + 1px))', []],
 	['screen', []],
 ])('get_feature_bounds("%s")', (prelude, expected) => {
-	expect(short(prelude)).toEqual(expected)
-	expect(short(prelude_of(`@media ${prelude} {}`))).toEqual(expected)
-})
-
-test('an empty prelude has no bounds', () => {
-	expect(get_feature_bounds('')).toEqual([])
+	expect(short('media', prelude)).toEqual(expected)
 })
 
 test.each<[string, Short[]]>([
@@ -81,39 +72,33 @@ test.each<[string, Short[]]>([
 	],
 	['style(--responsive: true)', []],
 ])('get_feature_bounds("%s", "container")', (prelude, expected) => {
-	expect(short(prelude, 'container')).toEqual(expected)
-	expect(short(prelude_of(`@container ${prelude} {}`), 'container')).toEqual(expected)
+	expect(short('container', prelude)).toEqual(expected)
 })
 
 test('the bounds of comma separated queries have their own query number', () => {
 	const css = '(min-width: 1px) and (max-width: 9px), (width > 5px)'
-	expect(get_feature_bounds(css).map((bound) => bound.query)).toEqual([0, 0, 1])
-	expect(get_feature_bounds(prelude_of(`@media ${css} {}`)).map((bound) => bound.query)).toEqual([
+	expect(get_feature_bounds(parse_prelude('media', css)).map((bound) => bound.query)).toEqual([
 		0, 0, 1,
 	])
 })
 
 test('or and not are not interpreted: their bounds are reported as they come', () => {
-	expect(short('(min-width: 1px) or (max-width: 9px)')).toEqual([
+	expect(short('media', '(min-width: 1px) or (max-width: 9px)')).toEqual([
 		['width', 'min', 1, 'px', true],
 		['width', 'max', 9, 'px', true],
 	])
-	expect(short('not all and (min-width: 1px)')).toEqual([['width', 'min', 1, 'px', true]])
+	expect(short('media', 'not all and (min-width: 1px)')).toEqual([['width', 'min', 1, 'px', true]])
 })
 
 test('a bound is located at its whole feature, and both bounds of a range share it', () => {
-	const css = 'screen and (min-width: 400px), (50px <= height <= 100px)'
-	const bounds = get_feature_bounds(css)
+	const css = '@media screen and (min-width: 400px), (50px <= height <= 100px) {}'
+	const bounds = get_feature_bounds(
+		parse_prelude('media', 'screen and (min-width: 400px), (50px <= height <= 100px)'),
+	)
 	expect(bounds.map((bound) => css.slice(bound.start_offset, bound.end_offset))).toEqual([
 		'(min-width: 400px)',
 		'(50px <= height <= 100px)',
 		'(50px <= height <= 100px)',
 	])
 	expect(bounds[0]).toMatchObject({ value: 400, line: 1 })
-})
-
-test('offsets of a parsed prelude are relative to its source', () => {
-	const css = '@media (min-width: 400px) {}'
-	const [bound] = get_feature_bounds(prelude_of(css))
-	expect(css.slice(bound!.start_offset, bound!.end_offset)).toBe('(min-width: 400px)')
 })

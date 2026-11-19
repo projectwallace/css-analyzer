@@ -8,12 +8,12 @@ import {
 } from './specificity.ts'
 
 test('get_specificity returns one tuple per selector in the list', () => {
-	expect(get_specificity('a, .b, #c')).toEqual([
+	expect(get_specificity(parse_selector_list('a, .b, #c'))).toEqual([
 		[0, 0, 1],
 		[0, 1, 0],
 		[1, 0, 0],
 	])
-	expect(get_specificity('')).toEqual([])
+	expect(get_specificity(parse_selector_list(''))).toEqual([])
 })
 
 test('get_specificity accepts a single parsed Selector node', () => {
@@ -79,7 +79,7 @@ test.each<[string, [number, number, number]]>([
 	['ns|a', [0, 0, 1]],
 	['*|a', [0, 0, 1]],
 ])('specificity of "%s"', (selector, expected) => {
-	expect(get_specificity(selector)).toEqual([expected])
+	expect(get_specificity(parse_selector_list(selector))).toEqual([expected])
 })
 
 describe('max_specificity', () => {

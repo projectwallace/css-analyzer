@@ -1,5 +1,5 @@
+import type { Value } from '@projectwallace/css-parser'
 import { is_number, is_dimension } from '@projectwallace/css-parser'
-import { type ValueInput, as_value } from '../utils/input.ts'
 import { KeywordSet } from '../utils/collections/keyword-set.ts'
 
 export const keywords: KeywordSet = new KeywordSet([
@@ -12,9 +12,9 @@ export const keywords: KeywordSet = new KeywordSet([
 	'revert-layer',
 ])
 
-export function is_value_reset(input: ValueInput): boolean {
+export function is_value_reset(input: Value): boolean {
 	let is_reset = true
-	as_value(input).for_each(function (node) {
+	input.for_each(function (node) {
 		if ((is_number(node) || is_dimension(node)) && node.value === 0) {
 			return
 		}

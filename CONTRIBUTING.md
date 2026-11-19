@@ -30,7 +30,7 @@ src/
   collectors/    one file per collector, built on the engine
   presets/       ready-made collector sets (analyze_all, analyze_design_tokens)
   selectors/ values/ atrules/ properties/ stylesheet/
-                 public utilities: plain functions on text or parsed nodes, one subpath export each
+                 public utilities: plain functions on parsed nodes, one subpath export each
   extract/       what the collectors look for, per declaration or node, as `Match`es: the logic collectors and tools share
   utils/         shared helpers (string-utils, input, location); utils/collections is public
   integration/   tests that run several collectors together
@@ -52,7 +52,7 @@ Write unit tests: small, fast and next to the code they test.
 
 - `src/foo/bar.ts` has its tests in `src/foo/bar.test.ts`. That goes for every public function.
 - Test a collector on its own: `analyze(css, { result: colors() }).result`. Do not use the `analyze_all` preset for it, it runs every collector.
-- Test a utility by calling it directly, with text (and with a parsed node when that matters). Prefer `test.each` tables over long fixtures.
+- Test a utility by calling it directly with a parsed node (`parse_value()`, `parse_selector_list()` or `parse_prelude()` from `src/test/test-utils.ts`). Prefer `test.each` tables over long fixtures.
 - Use `plain()` and `series()` from `src/test/test-utils.ts` to compare count results with `toEqual()`.
 - Integration tests are few. Tests of the presets live in `src/presets/presets.test.ts`; tests that run several collectors together live in `src/integration/`.
 

@@ -25,9 +25,9 @@ test.each<[string, string, [string, string][]]>([
 	['-webkit-box-shadow', '0 0 red', [['red', 'named']]],
 	['color', '#fff\\9', [['#fff', 'hex3']]],
 ])('extract_colors("%s", "%s")', (property, value, expected) => {
-	expect(extract_colors(property, value).map((match) => [match.value, match.format])).toEqual(
-		expected,
-	)
+	expect(
+		extract_colors(property, parse_value(value)).map((match) => [match.value, match.format]),
+	).toEqual(expected)
 })
 
 test.each([
@@ -41,16 +41,18 @@ test.each([
 	['color', 'inherit'],
 	['color', 'ab'],
 ])('extract_colors finds nothing in %s: %s', (property, value) => {
-	expect(extract_colors(property, value)).toEqual([])
+	expect(extract_colors(property, parse_value(value))).toEqual([])
 })
 
 test('accepts a parsed value as well as text', () => {
-	expect(extract_colors('color', parse_value('red'))).toEqual(extract_colors('color', 'red'))
+	expect(extract_colors('color', parse_value('red'))).toEqual(
+		extract_colors('color', parse_value('red')),
+	)
 })
 
 test('points at every color', () => {
 	const value = '1px solid red, 0 0 #00F'
-	const found = extract_colors('border', value)
+	const found = extract_colors('border', parse_value(value))
 	expect(found.map((match) => value.slice(match.start_offset, match.end_offset))).toEqual([
 		'red',
 		'#00F',

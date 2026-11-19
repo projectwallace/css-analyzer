@@ -1,3 +1,4 @@
+import type { Value } from '@projectwallace/css-parser'
 import {
 	BREAK,
 	is_function,
@@ -8,15 +9,14 @@ import {
 	walk_values,
 } from '@projectwallace/css-parser'
 import { ends_with, unquote } from '../utils/string-utils.ts'
-import { type ValueInput, as_value } from '../utils/input.ts'
 import { type Match, to_match, to_match_in } from '../utils/location.ts'
 
 // Browserhacks sourced from:
 // - https://browserhacks.com/
 // - https://www.alwaystwisted.com/relicss/old-css
 /** Find the browserhacks in a CSS value */
-export function get_value_browserhacks(input: ValueInput): Match[] {
-	const node = as_value(input)
+export function get_value_browserhacks(input: Value): Match[] {
+	const node = input
 	const hacks: Match[] = []
 	const text = node.text
 

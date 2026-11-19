@@ -1,3 +1,4 @@
+import type { Value } from '@projectwallace/css-parser'
 import {
 	type CSSNode,
 	is_custom,
@@ -7,18 +8,17 @@ import {
 	property_basename,
 	str_equals,
 } from '@projectwallace/css-parser'
-import { type ValueInput, as_value } from '../utils/input.ts'
 import { type Match, to_match } from '../utils/location.ts'
 import { unquote } from '../utils/string-utils.ts'
 import { destructure_font_shorthand, system_fonts } from './destructure-font-shorthand.ts'
 
 /** One match per font family; pass `'font'` as property to read a shorthand. With `deep`, the names inside functions (`var(--font, Inter)`) are found too. */
 export function get_font_families(
-	input: ValueInput,
+	input: Value,
 	property: string = 'font-family',
 	options: { deep?: boolean } = {},
 ): Match[] {
-	const value = as_value(input)
+	const value = input
 	// Only what starts here belongs to the family list
 	let from = value.start
 	if (str_equals('font', property_basename(property))) {

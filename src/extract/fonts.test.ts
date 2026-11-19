@@ -29,7 +29,7 @@ test.each([
 	['font-family', '12px', []],
 	['line-height', '1.5', []],
 ])('extract_font_sizes("%s", "%s") is %j', (property, value, expected) => {
-	expect(values(extract_font_sizes(property, value))).toEqual(expected)
+	expect(values(extract_font_sizes(property, parse_value(value)))).toEqual(expected)
 })
 
 test.each([
@@ -41,7 +41,7 @@ test.each([
 	['font', 'caption', []],
 	['font-size', '12px', []],
 ])('extract_line_heights("%s", "%s") is %j', (property, value, expected) => {
-	expect(values(extract_line_heights(property, value))).toEqual(expected)
+	expect(values(extract_line_heights(property, parse_value(value)))).toEqual(expected)
 })
 
 test.each([
@@ -56,31 +56,33 @@ test.each([
 	['font', 'caption', []],
 	['font-size', '12px', []],
 ])('extract_font_families("%s", "%s") is %j', (property, value, expected) => {
-	expect(values(extract_font_families(property, value))).toEqual(expected)
+	expect(values(extract_font_families(property, parse_value(value)))).toEqual(expected)
 })
 
 test('accept a parsed value as well as text', () => {
 	const value = '12px/1.5 Arial'
-	expect(extract_font_sizes('font', parse_value(value))).toEqual(extract_font_sizes('font', value))
+	expect(extract_font_sizes('font', parse_value(value))).toEqual(
+		extract_font_sizes('font', parse_value(value)),
+	)
 	expect(extract_line_heights('font', parse_value(value))).toEqual(
-		extract_line_heights('font', value),
+		extract_line_heights('font', parse_value(value)),
 	)
 	expect(extract_font_families('font', parse_value(value))).toEqual(
-		extract_font_families('font', value),
+		extract_font_families('font', parse_value(value)),
 	)
 })
 
 test('a font shorthand points at the part, other properties at the whole value', () => {
 	const value = 'bold 12px/1.5 "My Font", serif'
-	const [size] = extract_font_sizes('font', value)
-	const [height] = extract_line_heights('font', value)
-	const [family] = extract_font_families('font', value)
+	const [size] = extract_font_sizes('font', parse_value(value))
+	const [height] = extract_line_heights('font', parse_value(value))
+	const [family] = extract_font_families('font', parse_value(value))
 	expect([size, height, family].map((m) => value.slice(m!.start_offset, m!.end_offset))).toEqual([
 		'12px',
 		'1.5',
 		'"My Font", serif',
 	])
-	expect(extract_font_sizes('font-size', '1rem')).toEqual([
+	expect(extract_font_sizes('font-size', parse_value('1rem'))).toEqual([
 		{ value: '1rem', line: 1, column: 1, start_offset: 0, end_offset: 4 },
 	])
 })

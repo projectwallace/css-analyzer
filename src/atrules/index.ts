@@ -8,7 +8,6 @@ export {
 	get_static_features,
 	get_query_bounds,
 	find_contradiction,
-	type ConditionName,
 	type Contradiction,
 } from './conditions.ts'
 export { get_feature_bounds, type FeatureBound } from './feature-bounds.ts'

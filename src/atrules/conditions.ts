@@ -1,7 +1,6 @@
 import {
 	type AtrulePrelude,
 	type CSSNode,
-	is_atrule_prelude,
 	is_container_query,
 	is_dimension,
 	is_media_feature,
@@ -13,12 +12,8 @@ import {
 	BREAK,
 	walk,
 } from '@projectwallace/css-parser'
-import { type PreludeInput, as_prelude } from '../utils/input.ts'
 import { type Match, to_match } from '../utils/location.ts'
-import { type FeatureBound, get_feature_bounds } from './feature-bounds.ts'
-
-/** The at-rule whose prelude is read: `@import` carries a media query list too */
-export type ConditionName = 'media' | 'container' | 'import'
+import { type FeatureBound, get_query_feature_bounds } from './feature-bounds.ts'
 
 export type Contradiction = {
 	/** Lowercased */
@@ -28,20 +23,13 @@ export type Contradiction = {
 }
 
 // The queries of a prelude: one per comma separated media query or container query
-function get_queries(input: PreludeInput, name: ConditionName): CSSNode[] {
+function get_queries(prelude: AtrulePrelude): CSSNode[] {
 	const queries: CSSNode[] = []
-	function add(node: CSSNode): void {
+	prelude.for_each(function (node) {
 		if (is_media_query(node) || is_container_query(node)) {
 			queries.push(node)
 		}
-	}
-	for (const node of as_prelude(name, input)) {
-		if (is_atrule_prelude(node)) {
-			node.for_each(add)
-		} else {
-			add(node)
-		}
-	}
+	})
 	return queries
 }
 
@@ -64,9 +52,9 @@ function has_not_or(query: CSSNode): boolean {
  * The features that are fixed to one exact value, like `(width: 300px)`: no `min-` or `max-`, no range.
  * That almost never matches. `value` is the feature name; the match covers the whole feature.
  */
-export function get_static_features(input: PreludeInput, name: ConditionName = 'media'): Match[] {
+export function get_static_features(prelude: AtrulePrelude): Match[] {
 	const found: Match[] = []
-	for (const query of get_queries(input, name)) {
+	for (const query of get_queries(prelude)) {
 		if (has_not_or(query)) {
 			continue
 		}
@@ -102,14 +90,10 @@ export function get_static_features(input: PreludeInput, name: ConditionName = '
  * The numeric bounds of each comma separated query of a `@media`, `@container` or `@import` prelude,
  * as `get_feature_bounds()` reads them. A query with `not` or `or` is `null`: it cannot be interpreted.
  */
-export function get_query_bounds(
-	input: PreludeInput,
-	name: ConditionName = 'media',
-): (FeatureBound[] | null)[] {
-	const bounds_name = str_equals('container', name) ? 'container' : 'media'
-	return get_queries(input, name).map(function (query) {
+export function get_query_bounds(prelude: AtrulePrelude): (FeatureBound[] | null)[] {
+	return get_queries(prelude).map(function (query) {
 		// A query is read like a prelude of one query
-		return has_not_or(query) ? null : get_feature_bounds(query as AtrulePrelude, bounds_name)
+		return has_not_or(query) ? null : get_query_feature_bounds(query)
 	})
 }
 

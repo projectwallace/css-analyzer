@@ -178,14 +178,15 @@ A collector subscribes to what it needs: `stylesheet`, `rule`, `atrule`, `select
 
 ### Utilities
 
-Small functions that work on their own: they accept CSS text or an already parsed node and return plain data.
+Small functions that work on their own: they take a parsed node and return plain data. Parsing the CSS is up to you, with `@projectwallace/css-parser`: `parse_value()` for a value, `parse_selector_list()` for a selector, and the `prelude` of an at-rule from `parse()` for an at-rule prelude. Only names (a property, a function name) are text.
 
 ```js
+import { parse_selector_list, parse_value } from '@projectwallace/css-parser'
 import { get_specificity, compare_specificity } from '@projectwallace/css-analyzer/selectors'
 import { is_value_reset, get_value_browserhacks } from '@projectwallace/css-analyzer/values'
 
-get_specificity('a.b > #c') // [[1, 1, 1]]
-is_value_reset('0 0px') // true
+get_specificity(parse_selector_list('a.b > #c')) // [[1, 1, 1]]
+is_value_reset(parse_value('0 0px')) // true
 
 // compare_specificity sorts ascending: lowest specificity first
 ;[
@@ -196,12 +197,13 @@ is_value_reset('0 0px') // true
 compare_specificity([0, 1, 0], [0, 1, 0]) // 0
 ```
 
-Utilities that find things return `Match`es: `{ value, line, column, start_offset, end_offset }`, so a tool (a linter, an editor) can point at what was found. `value` is what was found as written, except where the util normalizes it (`get_vendor_prefixes`, `get_accessibility_selectors`, the browserhack utils and unquoted names from `get_animation_names` return the normalized name; the location still points at the source). Offsets (`start_offset`, and `end_offset` which is exclusive) are relative to the text that was parsed: the string for text input, the source the node came from for a parsed node.
+Utilities that find things return `Match`es: `{ value, line, column, start_offset, end_offset }`, so a tool (a linter, an editor) can point at what was found. `value` is what was found as written, except where the util normalizes it (`get_vendor_prefixes`, `get_accessibility_selectors`, the browserhack utils and unquoted names from `get_animation_names` return the normalized name; the location still points at the source). Offsets (`start_offset`, and `end_offset` which is exclusive) are relative to the source the node came from: for `parse_value('a b')` that is `'a b'`, for an at-rule prelude it is the whole stylesheet that was parsed.
 
 ```js
+import { parse_value } from '@projectwallace/css-parser'
 import { get_declared_container_names } from '@projectwallace/css-analyzer/values'
 
-get_declared_container_names('sidebar card / size')
+get_declared_container_names(parse_value('sidebar card / size'))
 // [{ value: 'sidebar', line: 1, column: 1, start_offset: 0, end_offset: 7 }, { value: 'card', line: 1, column: 9, start_offset: 8, end_offset: 12 }]
 ```
 
@@ -212,14 +214,16 @@ Also: `get_complexity`, `get_vendor_prefixes`, `get_accessibility_selectors`, `g
 `DefinedUsed` can keep something with every name, so you can point at it later: a node, or a `Match` from the name utilities (`get_keyframes_name`, `get_layer_names`, `get_font_families`, `get_anchor_names`, `get_declared_container_names`, `get_animation_names`).
 
 ```js
+import { parse, parse_value } from '@projectwallace/css-parser'
 import { DefinedUsed } from '@projectwallace/css-analyzer/utils/collections'
 import { get_animation_names } from '@projectwallace/css-analyzer/values'
 import { get_keyframes_name } from '@projectwallace/css-analyzer/atrules'
 
 const keyframes = new DefinedUsed()
-const spin = get_keyframes_name('spin')!
+const sheet = parse('@keyframes spin {} a { animation: fade 1s, spin 2s }')
+const spin = get_keyframes_name(sheet.first_child.prelude)!
 keyframes.define(spin.value, spin)
-for (const name of get_animation_names('fade 1s, spin 2s')) {
+for (const name of get_animation_names(parse_value('fade 1s, spin 2s'))) {
 	keyframes.use(name.value, name)
 }
 const { unknown } = keyframes.analyze() // ['fade']
@@ -228,20 +232,21 @@ const { usages } = keyframes.payloads() // usages.get('fade') is the Match of `f
 
 ### Extractors
 
-For tools that already have the CSS in hand, like a linter or an editor: the logic of the collectors, per declaration. Pass the property and the value (text or parsed) and get the matches, with where they are. Collectors use the same code, so a tool and the analyzer never disagree about what a color or a font size is.
+For tools that already have the CSS in hand, like a linter or an editor: the logic of the collectors, per declaration. Pass the property and the parsed value and get the matches, with where they are. Collectors use the same code, so a tool and the analyzer never disagree about what a color or a font size is.
 
 ```js
+import { parse_value } from '@projectwallace/css-parser'
 import { extract_colors, extract_font_sizes } from '@projectwallace/css-analyzer/extract'
 
-extract_colors('border', '1px solid RED')
+extract_colors('border', parse_value('1px solid RED'))
 // [{ value: 'RED', format: 'named', line: 1, column: 11, start_offset: 10, end_offset: 13 }]
-extract_font_sizes('font', 'bold 12px/1.5 serif') // [{ value: '12px', ... }]
-extract_font_sizes('color', 'red') // []
+extract_font_sizes('font', parse_value('bold 12px/1.5 serif')) // [{ value: '12px', ... }]
+extract_font_sizes('color', parse_value('red')) // []
 ```
 
 `extract_colors`, `extract_gradients`, `extract_units`, `extract_font_sizes`, `extract_line_heights`, `extract_font_families` (the whole list as written; `get_font_families()` splits it), `extract_z_indexes`, `extract_box_shadows`, `extract_text_shadows`, `extract_border_radiuses`, `extract_durations` and `extract_timing_functions` all return `Match[]` and an empty array for properties they do not handle. Extractors that look at a fixed set of properties also export that set as a `KeywordSet` (`font_size_properties`, `z_index_properties`, ...), so you can skip declarations early. Values are as written (a hex color loses its browserhack); normalizing (lowercasing, `skip_var`) is up to you or the collector options.
 
-`get_feature_bounds()` (`/atrules`) lists the numeric bounds of a `@media` or `@container` prelude: `(min-width: 400px)`, `(width >= 400px)` and `(50px <= width <= 100px)` become `{ feature, direction, value, unit, inclusive, query }` plus a location. `or` and `not` are not interpreted, and `query` tells the comma separated queries apart.
+`get_feature_bounds()` (`/atrules`) lists the numeric bounds of the parsed prelude of a `@media` or `@container` at-rule: `(min-width: 400px)`, `(width >= 400px)` and `(50px <= width <= 100px)` become `{ feature, direction, value, unit, inclusive, query }` plus a location. `or` and `not` are not interpreted, and `query` tells the comma separated queries apart.
 
 ## Upgrading from 9.x
 
