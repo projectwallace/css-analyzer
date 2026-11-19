@@ -6,8 +6,8 @@ import {
 } from './index.ts'
 import { parse_prelude } from '../test/test-utils.ts'
 
-function texts(matches: { value: string }[]): string[] {
-	return matches.map((match) => match.value)
+function hacks(matches: { hack: string }[]): string[] {
+	return matches.map((match) => match.hack)
 }
 
 test.each([
@@ -15,7 +15,7 @@ test.each([
 	['(-ms-high-contrast: none)', ['-ms-high-contrast']],
 	['screen and (min-width: 600px)', []],
 ])('get_media_browserhacks("%s") is %j', (prelude, expected) => {
-	expect(texts(get_media_browserhacks(parse_prelude('media', prelude)))).toEqual(expected)
+	expect(hacks(get_media_browserhacks(parse_prelude('media', prelude)))).toEqual(expected)
 })
 
 test.each([
@@ -25,7 +25,7 @@ test.each([
 	['(-MOZ-APPEARANCE: METERBAR)', ['-moz-appearance: meterbar']],
 	['(display: grid)', []],
 ])('get_supports_browserhacks("%s") is %j', (prelude, expected) => {
-	expect(texts(get_supports_browserhacks(parse_prelude('supports', prelude)))).toEqual(expected)
+	expect(hacks(get_supports_browserhacks(parse_prelude('supports', prelude)))).toEqual(expected)
 })
 
 test.each([
@@ -42,7 +42,15 @@ test('the browserhack matches say where the hack is', () => {
 	// Offsets are relative to `@media screen and (-ms-high-contrast: none) {}`
 	expect(
 		get_media_browserhacks(parse_prelude('media', 'screen and (-ms-high-contrast: none)')),
-	).toMatchObject([{ value: '-ms-high-contrast', line: 1, start_offset: 18, end_offset: 43 }])
+	).toMatchObject([
+		{
+			value: '(-ms-high-contrast: none)',
+			hack: '-ms-high-contrast',
+			line: 1,
+			start_offset: 18,
+			end_offset: 43,
+		},
+	])
 })
 
 test('get_container_query_name locates the name', () => {

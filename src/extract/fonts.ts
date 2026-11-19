@@ -1,6 +1,6 @@
 import { type Value, property_basename } from '@projectwallace/css-parser'
 import { KeywordSet } from '../utils/collections/keyword-set.ts'
-import { type Match, to_match } from '../utils/location.ts'
+import { type TextMatch, to_match } from '../utils/location.ts'
 import {
 	type FontShorthand,
 	destructure_font_shorthand,
@@ -29,9 +29,10 @@ function font_part(
 	own_property: string,
 	part: 'font_size' | 'line_height' | 'font_family',
 	font: FontShorthand | null | undefined,
-): Match | undefined {
+): TextMatch | undefined {
 	if (property === 'font') {
-		return (font === undefined ? font_shorthand_of(value) : font)?.[part] ?? undefined
+		const found = (font === undefined ? font_shorthand_of(value) : font)?.[part]
+		return found ? { ...found, text: found.value } : undefined
 	}
 	if (property !== own_property) {
 		return undefined
@@ -40,14 +41,14 @@ function font_part(
 	if (text === undefined || (part !== 'line_height' && system_fonts.has(text))) {
 		return undefined
 	}
-	return to_match(value, text)
+	return { ...to_match(value), text }
 }
 
 export function font_size(
 	property: string,
 	value: Value,
 	font?: FontShorthand | null,
-): Match | undefined {
+): TextMatch | undefined {
 	return font_part(property, value, 'font-size', 'font_size', font)
 }
 
@@ -55,7 +56,7 @@ export function line_height(
 	property: string,
 	value: Value,
 	font?: FontShorthand | null,
-): Match | undefined {
+): TextMatch | undefined {
 	return font_part(property, value, 'line-height', 'line_height', font)
 }
 
@@ -63,23 +64,23 @@ export function font_family(
 	property: string,
 	value: Value,
 	font?: FontShorthand | null,
-): Match | undefined {
+): TextMatch | undefined {
 	return font_part(property, value, 'font-family', 'font_family', font)
 }
 
-function as_list(match: Match | undefined): Match[] {
+function as_list(match: TextMatch | undefined): TextMatch[] {
 	return match ? [match] : []
 }
 
-export function extract_font_sizes(property: string, input: Value): Match[] {
+export function extract_font_sizes(property: string, input: Value): TextMatch[] {
 	return as_list(font_size(property_basename(property), input))
 }
 
-export function extract_line_heights(property: string, input: Value): Match[] {
+export function extract_line_heights(property: string, input: Value): TextMatch[] {
 	return as_list(line_height(property_basename(property), input))
 }
 
-/** The whole list as written; see `get_font_families()` for one match per family */
-export function extract_font_families(property: string, input: Value): Match[] {
+/** The whole `font-family` list as one match, which is what is counted; `get_font_families()` has one match per family, which is what is defined and used */
+export function extract_font_families(property: string, input: Value): TextMatch[] {
 	return as_list(font_family(property_basename(property), input))
 }

@@ -24,7 +24,7 @@ export function line_heights(options: LineHeightsOptions = {}): CollectorDef<Cou
 					if (!match) {
 						return
 					}
-					const text = match.value
+					const text = match.text
 					if (options.skip_var && str_index_of('var(', text) !== -1) {
 						return
 					}

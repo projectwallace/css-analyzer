@@ -8,7 +8,7 @@ import {
 } from '@projectwallace/css-parser'
 import { KeywordSet } from '../utils/collections/keyword-set.ts'
 import { keywords } from './values.ts'
-import { type Match, to_match } from '../utils/location.ts'
+import { type Match, type NamedMatch, to_match } from '../utils/location.ts'
 import { unquote } from '../utils/string-utils.ts'
 
 const timing_keywords = new KeywordSet([
@@ -107,13 +107,13 @@ export function analyze_transition(input: Value): TransitionParts {
 }
 
 /** The names in an `animation-name` value */
-export function get_animation_names(input: Value): Match[] {
-	const names: Match[] = []
+export function get_animation_names(input: Value): NamedMatch[] {
+	const names: NamedMatch[] = []
 	input.for_each(function (node) {
 		if (is_identifier(node) && !keywords.has(node.name)) {
-			names.push(to_match(node))
+			names.push({ ...to_match(node), name: node.text })
 		} else if (is_string(node)) {
-			names.push(to_match(node, unquote(node.text)))
+			names.push({ ...to_match(node), name: unquote(node.text) })
 		}
 	})
 	return names

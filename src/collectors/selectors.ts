@@ -75,10 +75,10 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 				complexity.add(get_complexity(node), node)
 
 				for (const prefix of get_vendor_prefixes(node)) {
-					prefixed.add(prefix.value.toLowerCase(), node)
+					prefixed.add(prefix.name.toLowerCase(), node)
 				}
 				for (const item of get_accessibility_selectors(node)) {
-					accessibility.add(item.value, node)
+					accessibility.add(item.selector, node)
 				}
 				walk(node, function (part) {
 					if (is_attribute_selector(part)) {
@@ -93,7 +93,7 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 					} else if (is_pseudo_element_selector(part)) {
 						pseudo_elements.add(part.name.toLowerCase(), node)
 					} else if (is_combinator(part)) {
-						combinators.add(combinator_name(part), part, 1)
+						combinators.add(combinator_name(part), part, { length: 1 })
 					}
 				})
 				if (get_specificity(node)[0] > 0) {

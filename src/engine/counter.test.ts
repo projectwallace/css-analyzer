@@ -25,7 +25,7 @@ test('counts totals and uniques in one shape', () => {
 
 test('length overrides the location length', () => {
 	const counter = create_counter({ locations: true })
-	counter.add('a', at, 1)
+	counter.add('a', at, { length: 1 })
 	expect(counter.result().unique.get('a')!.locations).toEqual([
 		{ ...loc, end_offset: loc.start_offset + 1 },
 	])

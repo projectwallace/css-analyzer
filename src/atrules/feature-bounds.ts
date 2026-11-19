@@ -11,9 +11,11 @@ import {
 	strip_vendor_prefix,
 	walk,
 } from '@projectwallace/css-parser'
-import { type Match, to_location } from '../utils/location.ts'
+import { type Location, to_location } from '../utils/location.ts'
 
-export type FeatureBound = Match<number> & {
+export type FeatureBound = Location & {
+	/** The number of the bound */
+	value: number
 	/** Without `min-` or `max-`, lowercased; a vendor prefix stays */
 	feature: string
 	direction: 'min' | 'max' | 'equal'

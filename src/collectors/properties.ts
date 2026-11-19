@@ -50,23 +50,23 @@ export function properties(options: CountOptions = {}): CollectorDef<PropertiesR
 					}
 					// The location of the property name, not the whole declaration
 					const length = raw.length
-					names.add(ctx.property, node, length)
+					names.add(ctx.property, node, { length })
 
-					complexity.add(get_property_weight(ctx), node, length)
+					complexity.add(get_property_weight(ctx), node, { length })
 					if (ctx.is_vendor_prefixed) {
-						prefixed.add(raw, node, length)
+						prefixed.add(raw, node, { length })
 					} else if (ctx.is_custom) {
-						custom.add(raw, node, length)
+						custom.add(raw, node, { length })
 						custom_tracking.define(raw)
 						if (ctx.is_important) {
-							custom_importants.add(raw, node, length)
+							custom_importants.add(raw, node, { length })
 						}
 					} else if (ctx.is_browserhack) {
-						browserhacks.add(raw.charAt(0), node, length)
+						browserhacks.add(raw.charAt(0), node, { length })
 					}
 
 					if (shorthand_properties.has(ctx.property)) {
-						shorthands.add(raw, node, length)
+						shorthands.add(raw, node, { length })
 					}
 
 					// Anchor names live in values

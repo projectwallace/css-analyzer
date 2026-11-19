@@ -175,17 +175,17 @@ export function atrules(options: CountOptions = {}): CollectorDef<AtrulesResult>
 				if (name === 'media') {
 					medias.add(prelude_text, node)
 					for (const hack of parsed ? get_media_browserhacks(parsed) : []) {
-						media_browserhacks.add(hack.value, node)
+						media_browserhacks.add(hack.hack, node)
 						hacks++
 					}
 				} else if (name === 'supports') {
 					supports.add(prelude_text, node)
 					for (const hack of parsed ? get_supports_browserhacks(parsed) : []) {
-						supports_browserhacks.add(hack.value, node)
+						supports_browserhacks.add(hack.hack, node)
 						hacks++
 					}
 				} else if (name.endsWith('keyframes')) {
-					const keyframes_name = (prelude && get_keyframes_name(prelude)?.value) || ''
+					const keyframes_name = (prelude && get_keyframes_name(prelude)?.name) || ''
 					keyframes.add(keyframes_name, node)
 					keyframes_tracking.define(keyframes_name)
 					if (node.is_vendor_prefixed) {

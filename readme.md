@@ -197,7 +197,7 @@ is_value_reset(parse_value('0 0px')) // true
 compare_specificity([0, 1, 0], [0, 1, 0]) // 0
 ```
 
-Utilities that find things return `Match`es: `{ value, line, column, start_offset, end_offset }`, so a tool (a linter, an editor) can point at what was found. `value` is what was found as written, except where the util normalizes it (`get_vendor_prefixes`, `get_accessibility_selectors`, the browserhack utils and unquoted names from `get_animation_names` return the normalized name; the location still points at the source). Offsets (`start_offset`, and `end_offset` which is exclusive) are relative to the source the node came from: for `parse_value('a b')` that is `'a b'`, for an at-rule prelude it is the whole stylesheet that was parsed.
+Utilities that find things return `Match`es: `{ value, line, column, start_offset, end_offset }`, so a tool (a linter, an editor) can point at what was found. `value` is always the source text at that location. What a util derives from it comes in a field with its own name: `hack` (browserhack utils), `name` (`get_vendor_prefixes`, `get_combinators`, and the unquoted names of `get_font_families`, `get_animation_names` and `get_keyframes_name`), `selector` (`get_accessibility_selectors`, normalized), `feature` (`get_static_features`), `unit` (`extract_units`) and `text` (the `extract_*` utils: the counted text, without a browserhack). Offsets (`start_offset`, and `end_offset` which is exclusive) are relative to the source the node came from: for `parse_value('a b')` that is `'a b'`, for an at-rule prelude it is the whole stylesheet that was parsed.
 
 ```js
 import { parse_value } from '@projectwallace/css-parser'
@@ -239,14 +239,14 @@ import { parse_value } from '@projectwallace/css-parser'
 import { extract_colors, extract_font_sizes } from '@projectwallace/css-analyzer/extract'
 
 extract_colors('border', parse_value('1px solid RED'))
-// [{ value: 'RED', format: 'named', line: 1, column: 11, start_offset: 10, end_offset: 13 }]
-extract_font_sizes('font', parse_value('bold 12px/1.5 serif')) // [{ value: '12px', ... }]
+// [{ value: 'RED', text: 'RED', format: 'named', line: 1, column: 11, start_offset: 10, end_offset: 13 }]
+extract_font_sizes('font', parse_value('bold 12px/1.5 serif')) // [{ value: '12px', text: '12px', ... }]
 extract_font_sizes('color', parse_value('red')) // []
 ```
 
-`extract_colors`, `extract_gradients`, `extract_units`, `extract_font_sizes`, `extract_line_heights`, `extract_font_families` (the whole list as written; `get_font_families()` splits it), `extract_z_indexes`, `extract_box_shadows`, `extract_text_shadows`, `extract_border_radiuses`, `extract_durations` and `extract_timing_functions` all return `Match[]` and an empty array for properties they do not handle. Extractors that look at a fixed set of properties also export that set as a `KeywordSet` (`font_size_properties`, `z_index_properties`, ...), so you can skip declarations early. Values are as written (a hex color loses its browserhack); normalizing (lowercasing, `skip_var`) is up to you or the collector options.
+`extract_colors`, `extract_gradients`, `extract_units`, `extract_font_sizes`, `extract_line_heights`, `extract_font_families` (the whole list as one match, which is what is counted; `get_font_families()` has one match per family, which is what is defined and used), `extract_z_indexes`, `extract_box_shadows`, `extract_text_shadows`, `extract_border_radiuses`, `extract_durations` and `extract_timing_functions` all return `Match[]`. The property decides how a value is read (the `font` shorthand, a `transition` against `transition-duration`), not whether: the extractors for one fixed property (`extract_z_indexes`, `extract_box_shadows`, `extract_text_shadows`, `extract_border_radiuses`) only take the value, and you choose the declarations with the property sets below. Extractors that look at a fixed set of properties export that set as a `KeywordSet` (`font_size_properties`, `z_index_properties`, ...), so you can skip declarations early. Values are as written (a hex color loses its browserhack); normalizing (lowercasing, `skip_var`) is up to you or the collector options.
 
-`get_feature_bounds()` (`/atrules`) lists the numeric bounds of the parsed prelude of a `@media` or `@container` at-rule: `(min-width: 400px)`, `(width >= 400px)` and `(50px <= width <= 100px)` become `{ feature, direction, value, unit, inclusive, query }` plus a location. `or` and `not` are not interpreted, and `query` tells the comma separated queries apart.
+`get_feature_bounds()` (`/atrules`) lists the numeric bounds of the parsed prelude of a `@media` or `@container` at-rule: `(min-width: 400px)`, `(width >= 400px)` and `(50px <= width <= 100px)` become `{ feature, direction, value, unit, inclusive, query }` plus a location. `or` and `not` are not interpreted, and `query` tells the comma separated queries apart. `get_query_bounds()` gives the bounds per query with `complex: true` for a query that has `not` or `or`, and `get_static_features()` marks the features in such a query the same way: you decide what to do with them.
 
 ## Upgrading from 9.x
 

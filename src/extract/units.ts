@@ -22,13 +22,16 @@ export function unit_of(node: CSSNode, property: string): string {
 	return strip_unit_hack(node.unit)
 }
 
-export function extract_units(property: string, input: Value): Match[] {
+/** A dimension: `value` is the text, `unit` the unit without a browserhack */
+export type UnitMatch = Match & { unit: string }
+
+export function extract_units(property: string, input: Value): UnitMatch[] {
 	const name = property_basename(property)
-	const found: Match[] = []
+	const found: UnitMatch[] = []
 	walk_values(input, function (node) {
 		const unit = unit_of(node, name)
 		if (unit !== '') {
-			found.push(to_match(node, unit))
+			found.push({ ...to_match(node), unit })
 		}
 	})
 	return found

@@ -9,7 +9,7 @@ export function get_prefixed_values(input: Value): Match[] {
 		// Identifiers and functions are the only vendor prefixed nodes a value can hold
 		// (declarations, at-rules and pseudo selectors never appear in a value)
 		if (node.is_vendor_prefixed && (is_identifier(node) || is_function(node))) {
-			found.push(to_match(node, node.name, node.name.length))
+			found.push(to_match(node, { length: node.name.length }))
 		}
 	})
 	return found

@@ -12,7 +12,7 @@ export function get_used_animation_names(ctx: DeclarationContext): string[] {
 		return analyze_animation(ctx.value!).names.map((match) => unquote(match.value))
 	}
 	return ctx.property === 'animation-name'
-		? get_animation_names(ctx.value!).map((match) => match.value)
+		? get_animation_names(ctx.value!).map((match) => match.name)
 		: []
 }
 

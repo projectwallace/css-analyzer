@@ -20,7 +20,7 @@ export function font_families(options: FontFamiliesOptions = {}): CollectorDef<C
 					if (!match) {
 						return
 					}
-					const text = match.value
+					const text = match.text
 					if (options.skip_var && str_index_of('var(', text) !== -1) {
 						return
 					}

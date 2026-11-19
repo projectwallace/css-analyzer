@@ -11,11 +11,23 @@ export type Location = {
 	end_offset: number
 }
 
-/** A found `value` and where; offsets are relative to the parsed text */
-export type Match<T = string> = Location & { value: T }
+/** A found `value` and where: the source text at that location. Offsets are relative to the parsed text. */
+export type Match = Location & { value: string }
 
-/** Where `node` is in the source. `length` overrides the node's length (e.g. only the property name). */
-export function to_location(node: CSSNode, length: number = node.length): Location {
+export type LocationOptions = { length?: number }
+
+/** A match with a name that is derived from the text: unquoted, without prefix, normalized, ... */
+export type NamedMatch = Match & { name: string }
+
+/** A match of a value part: `value` is the source text, `text` the text that is counted (without a browserhack) */
+export type TextMatch = Match & { text: string }
+
+/** A browserhack and where it is: `value` is the text, `hack` says which hack it is */
+export type HackMatch = Match & { hack: string }
+
+/** Where `node` is in the source. `length` limits it to the start of the node (e.g. only the property name). */
+export function to_location(node: CSSNode, options: LocationOptions = {}): Location {
+	const length = options.length ?? node.length
 	return {
 		line: node.line,
 		column: node.column,
@@ -24,23 +36,19 @@ export function to_location(node: CSSNode, length: number = node.length): Locati
 	}
 }
 
-/** `node` as a match. `value` and `length` default to the text and length of the node. */
-export function to_match(
-	node: CSSNode,
-	value: string = node.text,
-	length: number = node.length,
-): Match {
+/** `node` as a match: its source text, or the first `length` characters of it */
+export function to_match(node: CSSNode, options: LocationOptions = {}): Match {
+	const text = node.text
+	const length = options.length ?? node.length
 	return {
-		value,
-		line: node.line,
-		column: node.column,
-		start_offset: node.start,
-		end_offset: node.start + length,
+		value: length === text.length ? text : text.substring(0, length),
+		...to_location(node, { length }),
 	}
 }
 
 /** The part of `node` that starts `index` characters into its text, as a match */
-export function to_match_in(node: CSSNode, index: number, length: number, value: string): Match {
+export function to_match_in(node: CSSNode, part: { index: number; length: number }): Match {
+	const { index, length } = part
 	const source = node.text
 	let line = node.line
 	let column = node.column
@@ -54,5 +62,11 @@ export function to_match_in(node: CSSNode, index: number, length: number, value:
 		}
 	}
 	const start_offset = node.start + index
-	return { value, line, column, start_offset, end_offset: start_offset + length }
+	return {
+		value: source.substring(index, index + length),
+		line,
+		column,
+		start_offset,
+		end_offset: start_offset + length,
+	}
 }

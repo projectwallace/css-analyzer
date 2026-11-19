@@ -13,15 +13,15 @@ import {
 	type AtrulePrelude,
 	str_index_of,
 } from '@projectwallace/css-parser'
-import { type Match, to_match } from '../utils/location.ts'
+import { type HackMatch, type Match, to_match } from '../utils/location.ts'
 
 function find_hacks(
 	prelude: AtrulePrelude,
 	check: (node: AnyNode, on_hack: (hack: string) => void) => unknown,
-): Match[] {
-	const hacks: Match[] = []
+): HackMatch[] {
+	const hacks: HackMatch[] = []
 	walk(prelude, function (node) {
-		const result = check(node, (hack) => hacks.push(to_match(node, hack)))
+		const result = check(node, (hack) => hacks.push({ ...to_match(node), hack }))
 		if (result === BREAK) {
 			return BREAK
 		}
@@ -32,7 +32,7 @@ function find_hacks(
 const whitespace_regex = /\s+/g
 
 /** Find @supports browserhacks */
-export function get_supports_browserhacks(prelude: AtrulePrelude): Match[] {
+export function get_supports_browserhacks(prelude: AtrulePrelude): HackMatch[] {
 	return find_hacks(prelude, function (node, on_hack) {
 		// Check SupportsQuery nodes for browserhack patterns
 		if (is_supports_query(node)) {
@@ -52,7 +52,7 @@ export function get_supports_browserhacks(prelude: AtrulePrelude): Match[] {
 }
 
 /** Find @media browserhacks */
-export function get_media_browserhacks(prelude: AtrulePrelude): Match[] {
+export function get_media_browserhacks(prelude: AtrulePrelude): HackMatch[] {
 	return find_hacks(prelude, function (node, on_hack) {
 		// Check MediaType nodes for \0 prefix or \9 suffix
 		if (is_media_type(node)) {

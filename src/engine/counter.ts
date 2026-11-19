@@ -6,15 +6,15 @@ import type {
 	CountOptions,
 	CountResult,
 } from './types.ts'
-import { to_location } from '../utils/location.ts'
+import { type LocationOptions, to_location } from '../utils/location.ts'
 
 export type Counter<T extends CountItem = string> = {
-	add(item: T, node: CSSNode, length?: number): void
+	add(item: T, node: CSSNode, options?: LocationOptions): void
 	result(): CountResult<T>
 }
 
 export type ContextCounter<T extends CountItem = string> = {
-	add(item: T, context: string, node: CSSNode, length?: number): void
+	add(item: T, context: string, node: CSSNode, options?: LocationOptions): void
 	result(): CountResult<T> & { by_context?: Map<string, CountResult<T>> }
 }
 
@@ -22,18 +22,18 @@ function add_to<T extends CountItem>(
 	map: CountMap<T>,
 	item: T,
 	node: CSSNode,
-	length: number | undefined,
+	options: LocationOptions | undefined,
 	locations: boolean,
 ): void {
 	const entry = map.get(item)
 	if (entry) {
 		entry.count++
 		if (locations) {
-			entry.locations!.push(to_location(node, length))
+			entry.locations!.push(to_location(node, options))
 		}
 		return
 	}
-	map.set(item, locations ? { count: 1, locations: [to_location(node, length)] } : { count: 1 })
+	map.set(item, locations ? { count: 1, locations: [to_location(node, options)] } : { count: 1 })
 }
 
 function to_result<T extends CountItem>(map: CountMap<T>, total: number): CountResult<T> {
@@ -58,10 +58,10 @@ export function create_counter<T extends CountItem = string>(
 	const map: CountMap<T> = new Map()
 	let total = 0
 
-	function add(item: T, node: CSSNode, length?: number): void {
+	function add(item: T, node: CSSNode, options?: LocationOptions): void {
 		total++
 		sequence?.push(item)
-		add_to(map, item, node, length, locations)
+		add_to(map, item, node, options, locations)
 	}
 
 	function result(): CountResult<T> {
@@ -84,9 +84,9 @@ export function create_context_counter<T extends CountItem = string>(
 	const contexts = new Map<string, { map: CountMap<T>; total: number }>()
 	let total = 0
 
-	function add(item: T, context: string, node: CSSNode, length?: number): void {
+	function add(item: T, context: string, node: CSSNode, options?: LocationOptions): void {
 		total++
-		add_to(map, item, node, length, locations)
+		add_to(map, item, node, options, locations)
 		if (!track_contexts) {
 			return
 		}
@@ -96,7 +96,7 @@ export function create_context_counter<T extends CountItem = string>(
 			contexts.set(context, scoped)
 		}
 		scoped.total++
-		add_to(scoped.map, item, node, length, locations)
+		add_to(scoped.map, item, node, options, locations)
 	}
 
 	function result(): CountResult<T> & {

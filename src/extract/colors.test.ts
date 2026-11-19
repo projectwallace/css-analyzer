@@ -26,7 +26,7 @@ test.each<[string, string, [string, string][]]>([
 	['color', '#fff\\9', [['#fff', 'hex3']]],
 ])('extract_colors("%s", "%s")', (property, value, expected) => {
 	expect(
-		extract_colors(property, parse_value(value)).map((match) => [match.value, match.format]),
+		extract_colors(property, parse_value(value)).map((match) => [match.text, match.format]),
 	).toEqual(expected)
 })
 

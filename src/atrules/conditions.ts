@@ -49,15 +49,20 @@ function has_not_or(query: CSSNode): boolean {
 }
 
 /**
- * The features that are fixed to one exact value, like `(width: 300px)`: no `min-` or `max-`, no range.
- * That almost never matches. `value` is the feature name; the match covers the whole feature.
+ * A feature that is fixed to one exact value: `value` is the source text of the whole feature,
+ * `feature` its name, and `complex` says that its query has `not` or `or`.
  */
-export function get_static_features(prelude: AtrulePrelude): Match[] {
-	const found: Match[] = []
+export type StaticFeature = Match & { feature: string; complex: boolean }
+
+/**
+ * The features that are fixed to one exact value, like `(width: 300px)`: no `min-` or `max-`, no range.
+ * That almost never matches. In a query with `not` or `or` the feature may still be fine: such features
+ * are `complex`, it is up to you what to do with them.
+ */
+export function get_static_features(prelude: AtrulePrelude): StaticFeature[] {
+	const found: StaticFeature[] = []
 	for (const query of get_queries(prelude)) {
-		if (has_not_or(query)) {
-			continue
-		}
+		const complex = has_not_or(query)
 		walk(query, function (node) {
 			if (!is_media_feature(node)) {
 				return
@@ -79,21 +84,24 @@ export function get_static_features(prelude: AtrulePrelude): Match[] {
 				(is_dimension(child) || is_number(child)) &&
 				!Number.isNaN(child.value)
 			) {
-				found.push(to_match(node, property))
+				found.push({ ...to_match(node), feature: property, complex })
 			}
 		})
 	}
 	return found
 }
 
+/** The numeric bounds of one comma separated query, and whether it has `not` or `or` (`complex`) */
+export type QueryBounds = { bounds: FeatureBound[]; complex: boolean }
+
 /**
  * The numeric bounds of each comma separated query of a `@media`, `@container` or `@import` prelude,
- * as `get_feature_bounds()` reads them. A query with `not` or `or` is `null`: it cannot be interpreted.
+ * as `get_feature_bounds()` reads them. A query with `not` or `or` cannot be interpreted safely: it is
+ * `complex`, and its bounds are only reported as they come.
  */
-export function get_query_bounds(prelude: AtrulePrelude): (FeatureBound[] | null)[] {
+export function get_query_bounds(prelude: AtrulePrelude): QueryBounds[] {
 	return get_queries(prelude).map(function (query) {
-		// A query is read like a prelude of one query
-		return has_not_or(query) ? null : get_query_feature_bounds(query)
+		return { bounds: get_query_feature_bounds(query), complex: has_not_or(query) }
 	})
 }
 

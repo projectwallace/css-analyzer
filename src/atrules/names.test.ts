@@ -7,14 +7,20 @@ test.each([
 	['"my fade"', 'my fade'],
 	['--my-name', '--my-name'],
 ])('get_keyframes_name("%s") is "%s"', (prelude, expected) => {
-	expect(get_keyframes_name(parse_prelude('keyframes', prelude))?.value).toBe(expected)
+	expect(get_keyframes_name(parse_prelude('keyframes', prelude))?.name).toBe(expected)
 })
 
 test('get_keyframes_name points at the name, quotes included', () => {
 	const css = '@keyframes "my fade" {}'
 	const match = get_keyframes_name(parse_prelude('keyframes', '"my fade"'))
 	// The parser's column inside an at-rule prelude is not reliable: only offsets are checked
-	expect(match).toMatchObject({ value: 'my fade', line: 1, start_offset: 11, end_offset: 20 })
+	expect(match).toMatchObject({
+		value: '"my fade"',
+		name: 'my fade',
+		line: 1,
+		start_offset: 11,
+		end_offset: 20,
+	})
 	expect(css.slice(match!.start_offset, match!.end_offset)).toBe('"my fade"')
 })
 

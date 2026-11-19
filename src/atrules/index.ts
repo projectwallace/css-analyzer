@@ -7,6 +7,8 @@ export { get_keyframes_name, get_layer_names } from './names.ts'
 export {
 	get_static_features,
 	get_query_bounds,
+	type StaticFeature,
+	type QueryBounds,
 	find_contradiction,
 	type Contradiction,
 } from './conditions.ts'

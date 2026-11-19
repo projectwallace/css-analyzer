@@ -3,7 +3,7 @@ import { parse_value } from '@projectwallace/css-parser/parse-value'
 import { get_font_families } from './index.ts'
 
 function families(value: string, property?: string): string[] {
-	return get_font_families(parse_value(value), property).map((match) => match.value)
+	return get_font_families(parse_value(value), property).map((match) => match.name)
 }
 
 test.each([
@@ -30,12 +30,6 @@ test.each([
 	expect(families(value, 'FONT')).toEqual(expected)
 })
 
-test('accepts a parsed node as well as text', () => {
-	expect(get_font_families(parse_value('"A", B C'))).toEqual(
-		get_font_families(parse_value('"A", B C')),
-	)
-})
-
 test('points at every family, quotes included', () => {
 	const value = '12px/1 "Noto Sans",  Source Code  Pro, serif'
 	const found = get_font_families(parse_value(value), 'font')
@@ -44,7 +38,9 @@ test('points at every family, quotes included', () => {
 		'Source Code  Pro',
 		'serif',
 	])
-	expect(found.map((match) => match.value)).toEqual(['Noto Sans', 'Source Code  Pro', 'serif'])
+	expect(found.map((match) => match.name)).toEqual(['Noto Sans', 'Source Code  Pro', 'serif'])
+	// `value` is the text at the location, quotes included
+	expect(found.map((match) => match.value)).toEqual(['"Noto Sans"', 'Source Code  Pro', 'serif'])
 	expect(found[0]).toMatchObject({
 		line: 1,
 		column: 8,
@@ -60,12 +56,12 @@ test.each([
 	['var(--font)', []],
 ])('get_font_families("%s", "font-family", { deep: true }) is %j', (value, expected) => {
 	expect(
-		get_font_families(parse_value(value), 'font-family', { deep: true }).map((m) => m.value),
+		get_font_families(parse_value(value), 'font-family', { deep: true }).map((m) => m.name),
 	).toEqual(expected)
 })
 
 test('get_font_families leaves function arguments out without deep', () => {
-	expect(get_font_families(parse_value('var(--font, Inter), serif')).map((m) => m.value)).toEqual([
+	expect(get_font_families(parse_value('var(--font, Inter), serif')).map((m) => m.name)).toEqual([
 		'serif',
 	])
 })

@@ -9,29 +9,29 @@ import {
 	walk_values,
 } from '@projectwallace/css-parser'
 import { ends_with, unquote } from '../utils/string-utils.ts'
-import { type Match, to_match, to_match_in } from '../utils/location.ts'
+import { type HackMatch, to_match, to_match_in } from '../utils/location.ts'
 
 // Browserhacks sourced from:
 // - https://browserhacks.com/
 // - https://www.alwaystwisted.com/relicss/old-css
 /** Find the browserhacks in a CSS value */
-export function get_value_browserhacks(input: Value): Match[] {
+export function get_value_browserhacks(input: Value): HackMatch[] {
 	const node = input
-	const hacks: Match[] = []
+	const hacks: HackMatch[] = []
 	const text = node.text
 
 	// filter: progid:DXImageTransform.Microsoft.gradient(...) — plain or within quotes
 	const progid = str_index_of('progid:', text)
 	if (progid !== -1) {
-		hacks.push(to_match_in(node, progid, 7, 'progid:'))
+		hacks.push({ ...to_match_in(node, { index: progid, length: 7 }), hack: 'progid:' })
 	}
 
 	if (text.endsWith('\\9')) {
-		hacks.push(to_match_in(node, text.length - 2, 2, '\\9'))
+		hacks.push({ ...to_match_in(node, { index: text.length - 2, length: 2 }), hack: '\\9' })
 	}
 
 	if (text.endsWith('\\7')) {
-		hacks.push(to_match_in(node, text.length - 2, 2, '\\7'))
+		hacks.push({ ...to_match_in(node, { index: text.length - 2, length: 2 }), hack: '\\7' })
 	}
 
 	// alpha(), expression(), and behavior .htc hacks: the first one found ends the search
@@ -44,13 +44,13 @@ export function get_value_browserhacks(input: Value): Match[] {
 				if (is_identifier(first_child) && str_equals('from', first_child.name)) {
 					return BREAK
 				}
-				hacks.push(to_match(child, 'alpha()'))
+				hacks.push({ ...to_match(child), hack: 'alpha()' })
 			} else if (str_equals('expression', name)) {
-				hacks.push(to_match(child, 'expression()'))
+				hacks.push({ ...to_match(child), hack: 'expression()' })
 				return BREAK
 			}
 		} else if (is_url(child) && ends_with('.htc', unquote(child.value ?? ''))) {
-			hacks.push(to_match(child, '.htc'))
+			hacks.push({ ...to_match(child), hack: '.htc' })
 			return BREAK
 		}
 	})

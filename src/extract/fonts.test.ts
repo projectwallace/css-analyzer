@@ -9,8 +9,8 @@ import {
 	line_height_properties,
 } from './index.ts'
 
-function values(matches: { value: string }[]): string[] {
-	return matches.map((match) => match.value)
+function values(matches: { text: string }[]): string[] {
+	return matches.map((match) => match.text)
 }
 
 test.each([
@@ -83,7 +83,7 @@ test('a font shorthand points at the part, other properties at the whole value',
 		'"My Font", serif',
 	])
 	expect(extract_font_sizes('font-size', parse_value('1rem'))).toEqual([
-		{ value: '1rem', line: 1, column: 1, start_offset: 0, end_offset: 4 },
+		{ value: '1rem', text: '1rem', line: 1, column: 1, start_offset: 0, end_offset: 4 },
 	])
 })
 

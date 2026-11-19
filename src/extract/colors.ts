@@ -8,11 +8,11 @@ import {
 	strip_value_hack,
 	walk_values,
 } from '@projectwallace/css-parser'
-import { type Match, to_match } from '../utils/location.ts'
+import { type TextMatch, to_match } from '../utils/location.ts'
 import { color_functions, color_keywords, named_colors, system_colors } from '../values/colors.ts'
 import { no_value_walk } from './shared.ts'
 
-export type ColorMatch = Match & {
+export type ColorMatch = TextMatch & {
 	format: string
 }
 
@@ -67,7 +67,7 @@ export function extract_colors(property: string, input: Value): ColorMatch[] {
 	walk_values(input, function (node) {
 		const format = color_format(node, name)
 		if (format !== undefined) {
-			found.push({ ...to_match(node, color_text(node)), format })
+			found.push({ ...to_match(node), text: color_text(node), format })
 		}
 	})
 	return found

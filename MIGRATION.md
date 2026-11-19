@@ -96,7 +96,7 @@ All pure utilities now take a parsed node (`Value`, one `Selector` or an at-rule
 | `selectorComplexity(node)`                                       | `get_complexity(sel)` → `number` (one selector)                                                                      |
 | `isSelectorPrefixed(node, cb)`                                   | `get_vendor_prefixes(sel)` → `Match[]`                                                                               |
 | `isAccessibilitySelector(node, cb)`                              | `get_accessibility_selectors(sel)` → `Match[]`                                                                       |
-| `getCombinators(node, cb)`                                       | `get_combinators(sel)` → `Match[]` (`value` is the combinator)                                                       |
+| `getCombinators(node, cb)`                                       | `get_combinators(sel)` → `Match[]` (`value` is the source, `name` the combinator)                                    |
 | `isValueBrowserhack(value, cb)`                                  | `get_value_browserhacks(value)` → `Match[]`                                                                          |
 | `isValuePrefixed(value, cb)`                                     | `get_prefixed_values(value)` → `Match[]`                                                                             |
 | `isValueReset(value)`                                            | `is_value_reset(value)`                                                                                              |

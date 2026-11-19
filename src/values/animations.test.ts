@@ -167,11 +167,7 @@ test.each([
 	['none', []],
 	['initial', []],
 ])('get_animation_names("%s") is %j', (value, expected) => {
-	expect(get_animation_names(parse_value(value)).map((match) => match.value)).toEqual(expected)
-})
-
-test('get_animation_names accepts a parsed node', () => {
-	expect(get_animation_names(parse_value('a, "b"')).map((match) => match.value)).toEqual(['a', 'b'])
+	expect(get_animation_names(parse_value(value)).map((match) => match.name)).toEqual(expected)
 })
 
 test('locates every part, as written', () => {
@@ -189,9 +185,10 @@ test('locates every part, as written', () => {
 	})
 })
 
-test('get_animation_names locates the quoted name, without quotes in the text', () => {
+test('get_animation_names locates the quoted name, and names it without quotes', () => {
 	expect(get_animation_names(parse_value('a, "b c"'))[1]).toEqual({
-		value: 'b c',
+		value: '"b c"',
+		name: 'b c',
 		line: 1,
 		column: 4,
 		start_offset: 3,

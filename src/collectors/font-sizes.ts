@@ -24,7 +24,7 @@ export function font_sizes(options: FontSizesOptions = {}): CollectorDef<CountRe
 					if (!match) {
 						return
 					}
-					const text = match.value
+					const text = match.text
 					if (options.skip_var && str_index_of('var(', text) !== -1) {
 						return
 					}

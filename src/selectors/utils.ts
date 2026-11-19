@@ -17,7 +17,7 @@ import {
 	type Selector,
 } from '@projectwallace/css-parser'
 import { unquote } from '../utils/string-utils.ts'
-import { type Match, to_match } from '../utils/location.ts'
+import { type Match, type NamedMatch, to_match } from '../utils/location.ts'
 
 const pseudo_functions = new KeywordSet([
 	'nth-child',
@@ -31,8 +31,11 @@ const pseudo_functions = new KeywordSet([
 	'-moz-any',
 ])
 
-export function get_vendor_prefixes(selector: Selector): Match[] {
-	const found: Match[] = []
+/** An attribute selector for `role` or `aria-*`: `value` is the source text, `selector` the normalized selector */
+export type AccessibilityMatch = Match & { selector: string }
+
+export function get_vendor_prefixes(selector: Selector): NamedMatch[] {
+	const found: NamedMatch[] = []
 	walk(selector, function (node) {
 		if (
 			is_pseudo_element_selector(node) ||
@@ -46,7 +49,7 @@ export function get_vendor_prefixes(selector: Selector): Match[] {
 				} else if (is_pseudo_element_selector(node)) {
 					prefix = '::'
 				}
-				found.push(to_match(node, prefix + node.name))
+				found.push({ ...to_match(node), name: prefix + node.name })
 			}
 		}
 	})
@@ -63,14 +66,14 @@ function normalize_accessibility_selector(node: AttributeSelector) {
 	return `[${name}]`
 }
 
-export function get_accessibility_selectors(selector: Selector): Match[] {
-	const found: Match[] = []
+export function get_accessibility_selectors(selector: Selector): AccessibilityMatch[] {
+	const found: AccessibilityMatch[] = []
 
 	walk(selector, function (node) {
 		if (is_attribute_selector(node)) {
 			const name = node.name || ''
 			if (str_equals('role', name) || str_starts_with('aria-', name)) {
-				found.push(to_match(node, normalize_accessibility_selector(node)))
+				found.push({ ...to_match(node), selector: normalize_accessibility_selector(node) })
 			}
 		}
 	})
@@ -176,11 +179,11 @@ export function combinator_name(node: Combinator): string {
 }
 
 /** Find all combinators; `value` is `' '` for the descendant combinator */
-export function get_combinators(selector: Selector): Match[] {
-	const found: Match[] = []
+export function get_combinators(selector: Selector): NamedMatch[] {
+	const found: NamedMatch[] = []
 	walk(selector, function (node) {
 		if (is_combinator(node)) {
-			found.push(to_match(node, combinator_name(node), 1))
+			found.push({ ...to_match(node, { length: 1 }), name: combinator_name(node) })
 		}
 	})
 	return found
