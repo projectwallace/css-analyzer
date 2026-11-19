@@ -84,7 +84,7 @@ export function stylesheet(options: StylesheetOptions = {}): CollectorDef<Styles
 			},
 			selector(node) {
 				statements++
-				complexity += get_complexity(node).value
+				complexity += get_complexity(node)
 			},
 			declaration: {
 				enter(_node, ctx) {

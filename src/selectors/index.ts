@@ -4,5 +4,4 @@ export {
 	get_vendor_prefixes,
 	get_accessibility_selectors,
 	get_combinators,
-	type SelectorComplexity,
 } from './utils.ts'

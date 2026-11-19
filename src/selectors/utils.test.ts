@@ -11,21 +11,9 @@ function texts(matches: { value: string }[]): string[] {
 	return matches.map((match) => match.value)
 }
 
-test('get_complexity returns the complexity (as value) and location of the selector', () => {
-	expect(get_complexity(parse_selector('a'))).toEqual({
-		value: 1,
-		line: 1,
-		column: 1,
-		start_offset: 0,
-		end_offset: 1,
-	})
-	expect(get_complexity(parse_selector('a.b'))).toEqual({
-		value: 2,
-		line: 1,
-		column: 1,
-		start_offset: 0,
-		end_offset: 3,
-	})
+test('get_complexity returns the complexity of one selector', () => {
+	expect(get_complexity(parse_selector('a'))).toBe(1)
+	expect(get_complexity(parse_selector('a.b'))).toBe(2)
 })
 
 test('get_vendor_prefixes returns the prefixed names with their colons', () => {
@@ -80,12 +68,12 @@ test.each<[string, number]>([
 	['fake-webkit', 1],
 	['.-mt-px', 1],
 ])('complexity of "%s" is %i', (selector, expected) => {
-	expect(get_complexity(parse_selector(selector)).value).toBe(expected)
+	expect(get_complexity(parse_selector(selector))).toBe(expected)
 })
 
 test('complexity of a deeply nested :where() adds up its parts', () => {
 	const ids = Array.from({ length: 26 }, (_, i) => `#${String.fromCharCode(97 + i)}`).join(' ')
-	expect(get_complexity(parse_selector(`:where(${ids})`)).value).toBe(52)
+	expect(get_complexity(parse_selector(`:where(${ids})`))).toBe(52)
 })
 
 test('prefixes of pseudo-classes, pseudo-elements and type selectors', () => {

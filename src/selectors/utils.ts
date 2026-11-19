@@ -17,7 +17,7 @@ import {
 	type Selector,
 } from '@projectwallace/css-parser'
 import { unquote } from '../utils/string-utils.ts'
-import { type Match, to_location, to_match } from '../utils/location.ts'
+import { type Match, to_match } from '../utils/location.ts'
 
 const pseudo_functions = new KeywordSet([
 	'nth-child',
@@ -77,8 +77,8 @@ export function get_accessibility_selectors(selector: Selector): Match[] {
 	return found
 }
 
-export function get_complexity(selector: Selector): SelectorComplexity {
-	return Object.assign(to_location(selector), { value: selector_complexity(selector) })
+export function get_complexity(selector: Selector): number {
+	return selector_complexity(selector)
 }
 
 function selector_complexity(selector: CSSNode): number {
@@ -174,8 +174,6 @@ function selector_complexity(selector: CSSNode): number {
 export function combinator_name(node: Combinator): string {
 	return node.name.trim() === '' ? ' ' : node.name
 }
-
-export type SelectorComplexity = Match<number>
 
 /** Find all combinators; `value` is `' '` for the descendant combinator */
 export function get_combinators(selector: Selector): Match[] {

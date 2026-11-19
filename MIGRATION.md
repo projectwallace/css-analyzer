@@ -93,7 +93,7 @@ All pure utilities now take a parsed node (`Value`, one `Selector` or an at-rule
 | `calculateSpecificity(sel)`, `getSpecificity`                    | `get_specificity(sel)` → `Specificity` (one selector)                                                                |
 | `getSpecificityForAST(node)`                                     | `get_specificity(node)`                                                                                              |
 | `compareSpecificity`                                             | `compare_specificity` (ascending, as in `/selectors`)                                                                |
-| `selectorComplexity(node)`                                       | `get_complexity(sel)` → `Match<number>` (one selector)                                                               |
+| `selectorComplexity(node)`                                       | `get_complexity(sel)` → `number` (one selector)                                                                      |
 | `isSelectorPrefixed(node, cb)`                                   | `get_vendor_prefixes(sel)` → `Match[]`                                                                               |
 | `isAccessibilitySelector(node, cb)`                              | `get_accessibility_selectors(sel)` → `Match[]`                                                                       |
 | `getCombinators(node, cb)`                                       | `get_combinators(sel)` → `Match[]` (`value` is the combinator)                                                       |

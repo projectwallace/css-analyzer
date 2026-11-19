@@ -72,7 +72,7 @@ export function selectors(options: CountOptions = {}): CollectorDef<SelectorsRes
 				const text = node.text
 
 				texts.add(text, node)
-				complexity.add(get_complexity(node).value, node)
+				complexity.add(get_complexity(node), node)
 
 				for (const prefix of get_vendor_prefixes(node)) {
 					prefixed.add(prefix.value.toLowerCase(), node)
