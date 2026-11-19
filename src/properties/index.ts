@@ -1,7 +1,6 @@
 export {
-	shorthand_properties,
-	SPACING_RESET_PROPERTIES as spacing_reset_properties,
-	border_radius_properties,
-	basename,
-	isHack as is_property_hack,
+	is_shorthand_property,
+	is_spacing_reset_property,
+	is_border_radius_property,
+	is_hack as is_property_hack,
 } from './property-utils.ts'

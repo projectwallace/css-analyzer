@@ -1,0 +1,1027 @@
+import { test, expect, expectTypeOf } from 'vitest'
+import { analyze } from '../engine/analyzer.ts'
+import { plain } from '../test/test-utils.ts'
+import { colors, type ColorsResult } from './colors.ts'
+import type { CollectorDef, CountResult } from '../engine/types.ts'
+
+function run(css: string) {
+	return plain(analyze(css, { result: colors({ contexts: true, property: 'as_written' }) }).result)
+}
+
+test('finds hex colors', () => {
+	const actual = run(`
+    test {
+      color: #000;
+      color: #1111;
+      color: #222222;
+      color: #33333333;
+    }
+
+    test-bg {
+      background: linear-gradient(90deg, #444 0, #444 100%);
+    }
+
+    test-box-shadow {
+      box-shadow: 0 0 0 #555;
+    }
+
+    test-outline-color {
+      outline-color: #666;
+    }
+
+    test-custom-property {
+      test: #777;
+    }
+
+    test-hex-casing {
+      casing: #AaBbCc;
+    }
+
+    #not-a-color {
+      margin: 0;
+    }
+  `)
+
+	const expected = {
+		total: 10,
+		total_unique: 9,
+		unique: {
+			'#000': 1,
+			'#1111': 1,
+			'#222222': 1,
+			'#33333333': 1,
+			'#444': 2,
+			'#555': 1,
+			'#666': 1,
+			'#777': 1,
+			'#aabbcc': 1,
+		},
+		by_context: {
+			color: {
+				total: 4,
+				total_unique: 4,
+				unique: {
+					'#000': 1,
+					'#1111': 1,
+					'#222222': 1,
+					'#33333333': 1,
+				},
+			},
+			background: {
+				total: 2,
+				total_unique: 1,
+				unique: {
+					'#444': 2,
+				},
+			},
+			'box-shadow': {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					'#555': 1,
+				},
+			},
+			'outline-color': {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					'#666': 1,
+				},
+			},
+			test: {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					'#777': 1,
+				},
+			},
+			casing: {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					'#aabbcc': 1,
+				},
+			},
+		},
+		formats: {
+			total: 10,
+			total_unique: 4,
+			unique: {
+				hex3: 6,
+				hex4: 1,
+				hex6: 2,
+				hex8: 1,
+			},
+		},
+	}
+	expect(actual).toEqual(expected)
+})
+
+test('Counts hex format correctly when combined with a browserhack', () => {
+	const actual = run(`
+    a {
+      color: #000\\9;
+    }
+  `)
+	const expected = {
+		total: 1,
+		total_unique: 1,
+		unique: {
+			'#000': 1,
+		},
+		by_context: {
+			color: {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					'#000': 1,
+				},
+			},
+		},
+		formats: {
+			total: 1,
+			total_unique: 1,
+			unique: {
+				hex3: 1,
+			},
+		},
+	}
+	expect(actual).toEqual(expected)
+})
+
+test('finds hsl(a) colors', () => {
+	const actual = run(`
+    test {
+      color: hsl(1, 20%, 30%);
+      color: hsl(1 20% 30% / 1);
+      color: Hsla(2, 20%, 30%, 0.5);
+    }
+
+    test-bg {
+      background: linear-gradient(90deg, hsl(3, 20%, 30%) 0, hsl(3, 20%, 30%) 100%);
+    }
+
+    test-box-shadow {
+      box-shadow: 0 0 0 hsl(4, 20%, 30%);
+    }
+
+    test-outline-color {
+      outline-color: hsl(5, 20%, 30%);
+    }
+
+    test-custom-property {
+      test: hsl(6, 20%, 30%);
+    }
+
+    test-notations {
+      color: hsl(30, 100%, 50%, 0.6);
+      color: hsla(30, 100%, 50%, 0.6);
+      color: hsl(30 100% 50% / 0.6);
+      color: hsla(30 100% 50% / 0.6);
+      color: hsl(30.0 100% 50% / 60%);
+      color: hsla(30.2 100% 50% / 60%);
+
+      /* Source: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#hsl_syntax_variations */
+      /* These examples all specify the same color: a lavender. */
+      color: hsl(270,60%,70%);
+      color: hsl(270, 60%, 70%);
+      color: hsl(270 60% 70%);
+      color: hsl(270deg, 60%, 70%);
+      color: hsl(4.71239rad, 60%, 70%);
+      color: hsl(.75turn, 60%, 70%);
+
+      /* These examples all specify the same color: a lavender that is 15% opaque. */
+      color: hsl(270, 60%, 50%, .15);
+      color: hsl(270, 60%, 50%, 15%);
+      color: hsl(270 60% 50% / .15);
+      color: hsl(270 60% 50% / 15%);
+    }
+  `)
+
+	const expected = {
+		total: 24,
+		total_unique: 23,
+		unique: {
+			'hsl(1, 20%, 30%)': 1,
+			'hsl(1 20% 30% / 1)': 1,
+			'Hsla(2, 20%, 30%, 0.5)': 1,
+			'hsl(3, 20%, 30%)': 2,
+			'hsl(4, 20%, 30%)': 1,
+			'hsl(5, 20%, 30%)': 1,
+			'hsl(6, 20%, 30%)': 1,
+			'hsl(30, 100%, 50%, 0.6)': 1,
+			'hsla(30, 100%, 50%, 0.6)': 1,
+			'hsl(30 100% 50% / 0.6)': 1,
+			'hsla(30 100% 50% / 0.6)': 1,
+			'hsl(30.0 100% 50% / 60%)': 1,
+			'hsla(30.2 100% 50% / 60%)': 1,
+			'hsl(270,60%,70%)': 1,
+			'hsl(270, 60%, 70%)': 1,
+			'hsl(270 60% 70%)': 1,
+			'hsl(270deg, 60%, 70%)': 1,
+			'hsl(4.71239rad, 60%, 70%)': 1,
+			'hsl(.75turn, 60%, 70%)': 1,
+			'hsl(270, 60%, 50%, .15)': 1,
+			'hsl(270, 60%, 50%, 15%)': 1,
+			'hsl(270 60% 50% / .15)': 1,
+			'hsl(270 60% 50% / 15%)': 1,
+		},
+		by_context: {
+			color: {
+				total: 19,
+				total_unique: 19,
+				unique: {
+					'hsl(1, 20%, 30%)': 1,
+					'hsl(1 20% 30% / 1)': 1,
+					'Hsla(2, 20%, 30%, 0.5)': 1,
+					'hsl(30, 100%, 50%, 0.6)': 1,
+					'hsla(30, 100%, 50%, 0.6)': 1,
+					'hsl(30 100% 50% / 0.6)': 1,
+					'hsla(30 100% 50% / 0.6)': 1,
+					'hsl(30.0 100% 50% / 60%)': 1,
+					'hsla(30.2 100% 50% / 60%)': 1,
+					'hsl(270,60%,70%)': 1,
+					'hsl(270, 60%, 70%)': 1,
+					'hsl(270 60% 70%)': 1,
+					'hsl(270deg, 60%, 70%)': 1,
+					'hsl(4.71239rad, 60%, 70%)': 1,
+					'hsl(.75turn, 60%, 70%)': 1,
+					'hsl(270, 60%, 50%, .15)': 1,
+					'hsl(270, 60%, 50%, 15%)': 1,
+					'hsl(270 60% 50% / .15)': 1,
+					'hsl(270 60% 50% / 15%)': 1,
+				},
+			},
+			background: {
+				total: 2,
+				total_unique: 1,
+				unique: {
+					'hsl(3, 20%, 30%)': 2,
+				},
+			},
+			'box-shadow': {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					'hsl(4, 20%, 30%)': 1,
+				},
+			},
+			'outline-color': {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					'hsl(5, 20%, 30%)': 1,
+				},
+			},
+			test: {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					'hsl(6, 20%, 30%)': 1,
+				},
+			},
+		},
+		formats: {
+			total: 24,
+			total_unique: 2,
+			unique: {
+				hsl: 20,
+				hsla: 4,
+			},
+		},
+	}
+	expect(actual).toEqual(expected)
+})
+
+test('finds rgb(a) colors', () => {
+	const actual = run(`
+    test {
+      color: rgb(1, 1, 1);
+      color: rgba(2, 2, 2, 0.2);
+      color: RGBA(3, 3, 3, .3);
+      color: rgba(4,4,4,.4)
+    }
+
+    test-bg {
+      background: linear-gradient(90deg, rgb(5, 5, 5) 0, rgb(5, 5, 5) 100%);
+    }
+
+    test-box-shadow {
+      box-shadow: 0 0 0 rgb(6,6,6);
+    }
+
+    test-outline-color {
+      outline-color: rgb(7,7,7);
+    }
+
+    test-custom-property {
+      test: rgb(8,8,8);
+    }
+
+    /* Source: https://developer.mozilla.org/en-US/docs/Web/CSS/color */
+    test-notations {
+      color: rgb(34, 12, 64, 0.6);
+      color: rgba(34, 12, 64, 0.6);
+      color: rgb(34 12 64 / 0.6);
+      color: rgba(34 12 64 / 0.3);
+      color: rgb(34.0 12 64 / 60%);
+      color: rgba(34.6 12 64 / 30%);
+      color: rgba(255, 0, 153.6, 1);
+    }
+
+    /* https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#rgb_transparency_variations */
+    test-exotic-numbers {
+      color: rgba(1e2, .5e1, .5e0, +.25e2%);
+    }
+  `)
+
+	const expected = {
+		total: 17,
+		total_unique: 16,
+		unique: {
+			'rgb(1, 1, 1)': 1,
+			'rgba(2, 2, 2, 0.2)': 1,
+			'RGBA(3, 3, 3, .3)': 1,
+			'rgba(4,4,4,.4)': 1,
+			'rgb(5, 5, 5)': 2,
+			'rgb(6,6,6)': 1,
+			'rgb(7,7,7)': 1,
+			'rgb(8,8,8)': 1,
+			'rgb(34, 12, 64, 0.6)': 1,
+			'rgba(34, 12, 64, 0.6)': 1,
+			'rgb(34 12 64 / 0.6)': 1,
+			'rgba(34 12 64 / 0.3)': 1,
+			'rgb(34.0 12 64 / 60%)': 1,
+			'rgba(34.6 12 64 / 30%)': 1,
+			'rgba(255, 0, 153.6, 1)': 1,
+			'rgba(1e2, .5e1, .5e0, +.25e2%)': 1,
+		},
+		by_context: {
+			color: {
+				total: 12,
+				total_unique: 12,
+				unique: {
+					'rgb(1, 1, 1)': 1,
+					'rgba(2, 2, 2, 0.2)': 1,
+					'RGBA(3, 3, 3, .3)': 1,
+					'rgba(4,4,4,.4)': 1,
+					'rgb(34, 12, 64, 0.6)': 1,
+					'rgba(34, 12, 64, 0.6)': 1,
+					'rgb(34 12 64 / 0.6)': 1,
+					'rgba(34 12 64 / 0.3)': 1,
+					'rgb(34.0 12 64 / 60%)': 1,
+					'rgba(34.6 12 64 / 30%)': 1,
+					'rgba(255, 0, 153.6, 1)': 1,
+					'rgba(1e2, .5e1, .5e0, +.25e2%)': 1,
+				},
+			},
+			background: {
+				total: 2,
+				total_unique: 1,
+				unique: {
+					'rgb(5, 5, 5)': 2,
+				},
+			},
+			'box-shadow': {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					'rgb(6,6,6)': 1,
+				},
+			},
+			'outline-color': {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					'rgb(7,7,7)': 1,
+				},
+			},
+			test: {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					'rgb(8,8,8)': 1,
+				},
+			},
+		},
+		formats: {
+			total: 17,
+			total_unique: 2,
+			unique: {
+				rgb: 9,
+				rgba: 8,
+			},
+		},
+	}
+	expect(actual).toEqual(expected)
+})
+
+test('finds LCH() colors', () => {
+	const actual = run(`
+    .lch {
+      /* Source: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/lch() */
+      color: lch(29.2345% 44.2 27);
+      color: lch(52.2345% 72.2 56.2);
+
+      /* Capitalisation */
+      color: LCH(29.2345% 44.2 27);
+      color: Lch(29.2345% 44.2 27);
+
+      /* Opacity notations */
+      color: lch(52.2345% 72.2 56.2 / 1);
+      color: lch(52.2345% 72.2 56.2 / .5);
+      color: lch(52.2345% 72.2 56.2 / 0.5);
+      color: lch(52.2345% 72.2 56.2 / 50%);
+    }
+  `)
+	const expected = {
+		total: 8,
+		total_unique: 8,
+		unique: {
+			'lch(29.2345% 44.2 27)': 1,
+			'lch(52.2345% 72.2 56.2)': 1,
+
+			/* Capitalisation */
+			'LCH(29.2345% 44.2 27)': 1,
+			'Lch(29.2345% 44.2 27)': 1,
+
+			/* Opacity notations */
+			'lch(52.2345% 72.2 56.2 / 1)': 1,
+			'lch(52.2345% 72.2 56.2 / .5)': 1,
+			'lch(52.2345% 72.2 56.2 / 0.5)': 1,
+			'lch(52.2345% 72.2 56.2 / 50%)': 1,
+		},
+		by_context: {
+			color: {
+				total: 8,
+				total_unique: 8,
+				unique: {
+					'lch(29.2345% 44.2 27)': 1,
+					'lch(52.2345% 72.2 56.2)': 1,
+					'LCH(29.2345% 44.2 27)': 1,
+					'Lch(29.2345% 44.2 27)': 1,
+					'lch(52.2345% 72.2 56.2 / 1)': 1,
+					'lch(52.2345% 72.2 56.2 / .5)': 1,
+					'lch(52.2345% 72.2 56.2 / 0.5)': 1,
+					'lch(52.2345% 72.2 56.2 / 50%)': 1,
+				},
+			},
+		},
+		formats: {
+			total: 8,
+			total_unique: 1,
+			unique: {
+				lch: 8,
+			},
+		},
+	}
+
+	expect(actual).toEqual(expected)
+})
+
+test('finds LAB() colors', () => {
+	const actual = run(`
+    .lch {
+      /* Source: https://drafts.csswg.org/css-color/#specifying-lab-lch */
+      color: lab(52.2345% 40.1645 59.9971);
+      color: lab(60.2345% -5.3654 58.956);
+      color: lab(62.2345% -34.9638 47.7721);
+      color: lab(67.5345% -8.6911 -41.6019);
+
+      /* Capitalisation */
+      color: lab(29.2345% 39.3825 20.0664);
+      color: Lab(29.2345% 39.3825 20.0664);
+      color: LAB(29.2345% 39.3825 20.0664);
+
+      /* Opacity notations */
+      color: lab(52.2345% 40.1645 59.9971 / 0);
+      color: lab(52.2345% 40.1645 59.9971 / .5);
+      color: lab(52.2345% 40.1645 59.9971 / 0.5);
+      color: lab(52.2345% 40.1645 59.9971 / 50%);
+    }
+  `)
+	const expected = {
+		total: 11,
+		total_unique: 11,
+		unique: {
+			'lab(52.2345% 40.1645 59.9971)': 1,
+			'lab(60.2345% -5.3654 58.956)': 1,
+			'lab(62.2345% -34.9638 47.7721)': 1,
+			'lab(67.5345% -8.6911 -41.6019)': 1,
+
+			/* Capitalisation */
+			'lab(29.2345% 39.3825 20.0664)': 1,
+			'Lab(29.2345% 39.3825 20.0664)': 1,
+			'LAB(29.2345% 39.3825 20.0664)': 1,
+
+			/* Opacity notations */
+			'lab(52.2345% 40.1645 59.9971 / 0)': 1,
+			'lab(52.2345% 40.1645 59.9971 / .5)': 1,
+			'lab(52.2345% 40.1645 59.9971 / 0.5)': 1,
+			'lab(52.2345% 40.1645 59.9971 / 50%)': 1,
+		},
+		by_context: {
+			color: {
+				total: 11,
+				total_unique: 11,
+				unique: {
+					'lab(52.2345% 40.1645 59.9971)': 1,
+					'lab(60.2345% -5.3654 58.956)': 1,
+					'lab(62.2345% -34.9638 47.7721)': 1,
+					'lab(67.5345% -8.6911 -41.6019)': 1,
+					'lab(29.2345% 39.3825 20.0664)': 1,
+					'Lab(29.2345% 39.3825 20.0664)': 1,
+					'LAB(29.2345% 39.3825 20.0664)': 1,
+					'lab(52.2345% 40.1645 59.9971 / 0)': 1,
+					'lab(52.2345% 40.1645 59.9971 / .5)': 1,
+					'lab(52.2345% 40.1645 59.9971 / 0.5)': 1,
+					'lab(52.2345% 40.1645 59.9971 / 50%)': 1,
+				},
+			},
+		},
+		formats: {
+			total: 11,
+			total_unique: 1,
+			unique: {
+				lab: 11,
+			},
+		},
+	}
+
+	expect(actual).toEqual(expected)
+})
+
+test('finds hwb() colors', () => {
+	const actual = run(`
+    .hwb {
+      color: hwb(194 0% 0%);
+      color: hwb(194, 0%, 0%);
+
+      color: Hwb(194 0% 0%);
+      color: HWB(194 0% 0%);
+
+      color: hwb(194 0% 0% / .5);
+      color: hwb(194 0% 0% / 0.5);
+      color: hwb(194 0% 0% / 50%);
+    }
+  `)
+	const expected = {
+		total: 7,
+		total_unique: 7,
+		unique: {
+			'hwb(194 0% 0%)': 1,
+			'hwb(194, 0%, 0%)': 1,
+
+			'Hwb(194 0% 0%)': 1,
+			'HWB(194 0% 0%)': 1,
+
+			'hwb(194 0% 0% / .5)': 1,
+			'hwb(194 0% 0% / 0.5)': 1,
+			'hwb(194 0% 0% / 50%)': 1,
+		},
+		by_context: {
+			color: {
+				total: 7,
+				total_unique: 7,
+				unique: {
+					'hwb(194 0% 0%)': 1,
+					'hwb(194, 0%, 0%)': 1,
+					'Hwb(194 0% 0%)': 1,
+					'HWB(194 0% 0%)': 1,
+					'hwb(194 0% 0% / .5)': 1,
+					'hwb(194 0% 0% / 0.5)': 1,
+					'hwb(194 0% 0% / 50%)': 1,
+				},
+			},
+		},
+		formats: {
+			total: 7,
+			total_unique: 1,
+			unique: {
+				hwb: 7,
+			},
+		},
+	}
+
+	expect(actual).toEqual(expected)
+})
+
+test('finds color() colors', () => {
+	const actual = run(`
+    .colors {
+      color: color(rec2020 0.42053 0.979780 0.00579);
+      color: color(display-p3 -0.6112 1.0079 -0.2192);
+      color: color(profoto-rgb 0.4835 0.9167 0.2188);
+      color: color(xyz-d50 0.2005 0.14089 0.4472);
+    }
+  `)
+	const expected = {
+		total: 4,
+		total_unique: 4,
+		unique: {
+			'color(rec2020 0.42053 0.979780 0.00579)': 1,
+			'color(display-p3 -0.6112 1.0079 -0.2192)': 1,
+			'color(profoto-rgb 0.4835 0.9167 0.2188)': 1,
+			'color(xyz-d50 0.2005 0.14089 0.4472)': 1,
+		},
+		by_context: {
+			color: {
+				total: 4,
+				total_unique: 4,
+				unique: {
+					'color(rec2020 0.42053 0.979780 0.00579)': 1,
+					'color(display-p3 -0.6112 1.0079 -0.2192)': 1,
+					'color(profoto-rgb 0.4835 0.9167 0.2188)': 1,
+					'color(xyz-d50 0.2005 0.14089 0.4472)': 1,
+				},
+			},
+		},
+		formats: {
+			total: 4,
+			total_unique: 1,
+			unique: {
+				color: 4,
+			},
+		},
+	}
+
+	expect(actual).toEqual(expected)
+})
+
+test('finds color keywords', () => {
+	const actual = run(`
+    test {
+      outline: 1px solid tomato;
+      border-color: Aqua;
+      outline-color: whitesmoke;
+      background: linear-gradient(90deg, purple 0, purple 100%);
+    }
+  `)
+	const expected = {
+		total: 5,
+		total_unique: 4,
+		unique: {
+			tomato: 1,
+			aqua: 1,
+			whitesmoke: 1,
+			purple: 2,
+		},
+		by_context: {
+			outline: {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					tomato: 1,
+				},
+			},
+			'border-color': {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					aqua: 1,
+				},
+			},
+			'outline-color': {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					whitesmoke: 1,
+				},
+			},
+			background: {
+				total: 2,
+				total_unique: 1,
+				unique: {
+					purple: 2,
+				},
+			},
+		},
+		formats: {
+			total: 5,
+			total_unique: 1,
+			unique: {
+				named: 5,
+			},
+		},
+	}
+	expect(actual).toEqual(expected)
+})
+
+test('does not report false positives for color keywords', () => {
+	const actual = run(`
+    test {
+      /* Not a blue keyword */
+      background: url(icon-blue.png), url(blue-icon.png), url(blue_icon.png), url(icon_blue.png);
+
+      /* Not a hex color */
+      background-image: url(#footer-logo-text-linear-gradient);
+
+      /* Not the white color keyword */
+      white-space: nowrap;
+
+      /* Not the linen color keyword */
+      counter-increment: lineNo;
+
+      /* Not the gray keyword */
+      -moz-osx-font-smoothing: grayscale;
+
+      /* Not the black color keyword */
+      font-family: Arial Black, Arial Bold, Gadget, sans-serif;
+      font: 1em/1 Black;
+
+      /* not a color keyword */
+      -ms-overflow-style: scrollbar;
+    }
+  `)
+	const expected = {
+		total: 0,
+		total_unique: 0,
+		unique: {},
+		formats: {
+			total: 0,
+			total_unique: 0,
+			unique: {},
+		},
+	}
+
+	expect(actual).toEqual(expected)
+})
+
+test('does not count animation names as colors', () => {
+	const fixture = `
+    test {
+      animation: red; /* an animation name */
+      animation-name: red, blue;
+      animation: 1s ease-in blue;
+    }
+  `
+	const actual = run(fixture)
+	const expected = {
+		total: 0,
+		total_unique: 0,
+		unique: {},
+		formats: {
+			total: 0,
+			total_unique: 0,
+			unique: {},
+		},
+	}
+
+	expect(actual).toEqual(expected)
+})
+
+test('counts color names in unknown properties', () => {
+	const actual = run('test { unknown-property: blue }')
+	expect(actual.unique).toEqual({ blue: 1 })
+})
+
+test('finds colors in var() as fallback values', () => {
+	const fixture = `
+    test {
+      --main: #aaa;
+      color: var(--main, #eee);
+
+      /* from github */
+      box-shadow: 0 3px 12px var(--color-fade-black-15), 0 0 1px rgba(27, 31, 35, .2);
+      text-shadow: 0 0 var(--main, var(--sec, #000));
+    }
+  `
+	const result = run(fixture)
+	const actual = result
+	const expected = {
+		total: 4,
+		total_unique: 4,
+		unique: {
+			'#aaa': 1,
+			'#eee': 1,
+			'rgba(27, 31, 35, .2)': 1,
+			'#000': 1,
+		},
+		by_context: {
+			'--main': {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					'#aaa': 1,
+				},
+			},
+			color: {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					'#eee': 1,
+				},
+			},
+			'box-shadow': {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					'rgba(27, 31, 35, .2)': 1,
+				},
+			},
+			'text-shadow': {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					'#000': 1,
+				},
+			},
+		},
+		formats: {
+			total: 4,
+			total_unique: 2,
+			unique: {
+				hex3: 3,
+				rgba: 1,
+			},
+		},
+	}
+
+	expect(actual).toEqual(expected)
+})
+
+test('ignores CSS keywords', () => {
+	const fixture = `
+    testColorKeywords {
+      color: currentColor;
+      color: currentcolor;
+      color: inherit;
+      color: unset;
+      color: initial;
+      color: transparent;
+      color: revert;
+      color: revert-layer;
+      background: none;
+    }
+
+    positive {
+      background: none 0px 0px repeat scroll rgb(0, 0, 0);
+    }
+  `
+	const actual = run(fixture)
+	const expected = {
+		total: 4,
+		total_unique: 3,
+		unique: {
+			currentcolor: 2,
+			transparent: 1,
+			'rgb(0, 0, 0)': 1,
+		},
+		by_context: {
+			color: {
+				total: 3,
+				total_unique: 2,
+				unique: {
+					currentcolor: 2,
+					transparent: 1,
+				},
+			},
+			background: {
+				total: 1,
+				total_unique: 1,
+				unique: {
+					'rgb(0, 0, 0)': 1,
+				},
+			},
+		},
+		formats: {
+			total: 4,
+			total_unique: 3,
+			unique: {
+				currentcolor: 2,
+				transparent: 1,
+				rgb: 1,
+			},
+		},
+	}
+
+	expect(actual).toEqual(expected)
+})
+
+// https://drafts.csswg.org/css-color/#css-system-colors
+test('finds System Colors', () => {
+	const fixture = `
+    color: test-system-colors {
+      color: Canvas;
+      color: CanvasText;
+      color: Linktext;
+      color: VisitedText;
+      color: ActiveText;
+      color: ButtonFace;
+      color: ButtonText;
+      color: ButtonBorder;
+      color: Field;
+      color: FieldText;
+      color: Highlight;
+      color: HighlightText;
+      color: SelectedItem;
+      color: SelectedItemText;
+      color: Mark;
+      color: MarkText;
+      color: GrayText;
+    }
+
+    test-false-positives {
+      color: RandomWord;
+    }
+  `
+	const result = run(fixture)
+	const actual = result
+	const expected = {
+		total: 17,
+		total_unique: 17,
+		unique: {
+			canvas: 1,
+			canvastext: 1,
+			linktext: 1,
+			visitedtext: 1,
+			activetext: 1,
+			buttonface: 1,
+			buttontext: 1,
+			buttonborder: 1,
+			field: 1,
+			fieldtext: 1,
+			highlight: 1,
+			highlighttext: 1,
+			selecteditem: 1,
+			selecteditemtext: 1,
+			mark: 1,
+			marktext: 1,
+			graytext: 1,
+		},
+		by_context: {
+			color: {
+				total: 17,
+				total_unique: 17,
+				unique: {
+					canvas: 1,
+					canvastext: 1,
+					linktext: 1,
+					visitedtext: 1,
+					activetext: 1,
+					buttonface: 1,
+					buttontext: 1,
+					buttonborder: 1,
+					field: 1,
+					fieldtext: 1,
+					highlight: 1,
+					highlighttext: 1,
+					selecteditem: 1,
+					selecteditemtext: 1,
+					mark: 1,
+					marktext: 1,
+					graytext: 1,
+				},
+			},
+		},
+		formats: {
+			total: 17,
+			total_unique: 1,
+			unique: {
+				system: 17,
+			},
+		},
+	}
+
+	expect(actual).toEqual(expected)
+})
+
+test('insane color mode', () => {
+	const fixture = `
+    .color-insanity {
+      color: #7654CD;
+      color: rgb(46.27% 32.94% 80.39%);
+      color: lab(44.36% 36.05 -58.99);
+      color: color(xyz-d50 0.2005 0.14089 0.4472);
+    }
+  `
+
+	expect(() => run(fixture)).not.toThrow()
+})
+
+test('by_context only exists with `contexts: true`', () => {
+	const css = 'a { color: red }'
+	const without = analyze(css, { colors: colors() }).colors
+	const with_contexts = analyze(css, { colors: colors({ contexts: true }) }).colors
+
+	expect('by_context' in without).toBe(false)
+	expect(with_contexts.by_context.get('color')?.total).toBe(1)
+
+	expectTypeOf(without).not.toHaveProperty('by_context')
+	expectTypeOf(with_contexts.by_context).toEqualTypeOf<Map<string, CountResult>>()
+	expectTypeOf(with_contexts.formats).toEqualTypeOf<CountResult>()
+})
+
+test('by_context is optional when `contexts` is only known to be a boolean', () => {
+	function create(contexts: boolean) {
+		return colors({ contexts })
+	}
+	type Result = ReturnType<typeof create> extends CollectorDef<infer T> ? T : never
+	expectTypeOf<Result['by_context']>().toEqualTypeOf<Map<string, CountResult> | undefined>()
+})
+
+test('the collector type can be written without helper types', () => {
+	expectTypeOf<ReturnType<typeof colors<{ contexts: true }>>>().toEqualTypeOf<
+		CollectorDef<ColorsResult>
+	>()
+})

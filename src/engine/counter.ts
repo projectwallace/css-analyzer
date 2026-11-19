@@ -1,0 +1,126 @@
+import type { CSSNode } from '@projectwallace/css-parser'
+import type {
+	ContextCountOptions,
+	CountItem,
+	CountMap,
+	CountOptions,
+	CountResult,
+} from './types.ts'
+import { type LocationOptions, to_location } from '../utils/location.ts'
+
+export type Counter<T extends CountItem = string> = {
+	add(item: T, node: CSSNode, options?: LocationOptions): void
+	result(): CountResult<T>
+}
+
+export type ContextCounter<T extends CountItem = string> = {
+	add(item: T, context: string, node: CSSNode, options?: LocationOptions): void
+	result(): CountResult<T> & { by_context?: Map<string, CountResult<T>> }
+}
+
+function add_to<T extends CountItem>(
+	map: CountMap<T>,
+	item: T,
+	node: CSSNode,
+	options: LocationOptions | undefined,
+	locations: boolean,
+): void {
+	const entry = map.get(item)
+	if (entry) {
+		entry.count++
+		if (locations) {
+			entry.locations!.push(to_location(node, options))
+		}
+		return
+	}
+	map.set(item, locations ? { count: 1, locations: [to_location(node, options)] } : { count: 1 })
+}
+
+function to_result<T extends CountItem>(map: CountMap<T>, total: number): CountResult<T> {
+	// Copy so that results stay stable if more input is added afterwards
+	const unique: CountMap<T> = new Map()
+	for (const [item, entry] of map) {
+		unique.set(
+			item,
+			entry.locations
+				? { count: entry.count, locations: entry.locations.slice() }
+				: { count: entry.count },
+		)
+	}
+	return { total, total_unique: unique.size, unique }
+}
+
+export function create_counter<T extends CountItem = string>(
+	options: CountOptions = {},
+): Counter<T> {
+	const locations = options.locations === true
+	const sequence: T[] | undefined = options.sequence === true ? [] : undefined
+	const map: CountMap<T> = new Map()
+	let total = 0
+
+	function add(item: T, node: CSSNode, options?: LocationOptions): void {
+		total++
+		sequence?.push(item)
+		add_to(map, item, node, options, locations)
+	}
+
+	function result(): CountResult<T> {
+		const counted = to_result(map, total)
+		if (sequence) {
+			counted.sequence = sequence.slice()
+		}
+		return counted
+	}
+
+	return { add, result }
+}
+
+export function create_context_counter<T extends CountItem = string>(
+	options: ContextCountOptions = {},
+): ContextCounter<T> {
+	const locations = options.locations === true
+	const track_contexts = options.contexts === true
+	const map: CountMap<T> = new Map()
+	const contexts = new Map<string, { map: CountMap<T>; total: number }>()
+	let total = 0
+
+	function add(item: T, context: string, node: CSSNode, options?: LocationOptions): void {
+		total++
+		add_to(map, item, node, options, locations)
+		if (!track_contexts) {
+			return
+		}
+		let scoped = contexts.get(context)
+		if (!scoped) {
+			scoped = { map: new Map(), total: 0 }
+			contexts.set(context, scoped)
+		}
+		scoped.total++
+		add_to(scoped.map, item, node, options, locations)
+	}
+
+	function result(): CountResult<T> & {
+		by_context?: Map<string, CountResult<T>>
+	} {
+		const counted = to_result(map, total)
+		if (!track_contexts) {
+			return counted
+		}
+		const by_context = new Map<string, CountResult<T>>()
+		for (const [context, scoped] of contexts) {
+			by_context.set(context, to_result(scoped.map, scoped.total))
+		}
+		return { ...counted, by_context }
+	}
+
+	return { add, result }
+}
+
+/** Derived numbers for a count result */
+export function summarize(counts: CountResult<CountItem>): {
+	uniqueness_ratio: number
+} {
+	return {
+		uniqueness_ratio: counts.total === 0 ? 0 : counts.total_unique / counts.total,
+	}
+}

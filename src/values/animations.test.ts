@@ -1,271 +1,35 @@
 // oxlint-disable vitest/no-conditional-in-test
 import { test } from 'vitest'
 import { expect } from 'vitest'
-import { analyze } from '../index.ts'
 import { parse_value } from '@projectwallace/css-parser/parse-value'
-import { analyzeAnimation } from './animations.ts'
+import { analyze_animation, analyze_transition, get_animation_names } from './animations.ts'
+import type { Match } from '../utils/location.ts'
 
-test('finds simple durations', () => {
-	const fixture = `
-    durations {
-      animation-duration: 1s;
-      animation-duration: 2ms;
-      transition-duration: 300ms;
-      --my-transition-duration: 0s;
-    }
-  `
-	const actual = analyze(fixture).values.animations.durations
-	const expected = {
-		total: 3,
-		totalUnique: 3,
-		unique: {
-			'1s': 1,
-			'2ms': 1,
-			'300ms': 1,
-		},
-		uniquenessRatio: 3 / 3,
-	}
-	expect(actual).toEqual(expected)
-})
+// The text of every part, for readable expectations
+function texts(parts: Record<string, Match[]>): Record<string, string[]> {
+	return Object.fromEntries(
+		Object.entries(parts).map(([key, matches]) => [key, matches.map((match) => match.value)]),
+	)
+}
 
-test('finds duration lists', () => {
-	const fixture = `
-    durations {
-      animation-duration: 1s, 1s;
-      transition-duration: 300ms, 400ms;
-    }
-  `
-	const actual = analyze(fixture).values.animations.durations
-	const expected = {
-		total: 4,
-		totalUnique: 3,
-		unique: {
-			'1s': 2,
-			'300ms': 1,
-			'400ms': 1,
-		},
-		uniquenessRatio: 3 / 4,
-	}
-	expect(actual).toEqual(expected)
-})
-
-test('normalizes durations', () => {
-	const fixture = `
-    durations {
-      animation-duration: 1S, 1s;
-      transition-duration: 300ms, 300MS;
-      animation-duration: var(--myDur);
-    }
-  `
-	const actual = analyze(fixture).values.animations.durations
-	const expected = {
-		total: 5,
-		totalUnique: 3,
-		unique: {
-			'1s': 2,
-			'300ms': 2,
-			'var(--myDur)': 1,
-		},
-		uniquenessRatio: 3 / 5,
-	}
-	expect(actual).toEqual(expected)
-})
-
-test('finds simple timing functions', () => {
-	const fixture = `
-    timings {
-      animation-timing-function: linear;
-      animation-timing-function: cubic-bezier(0, 1, 0, 1);
-
-      transition-timing-function: steps(3);
-      transition-timing-function: cubic-bezier(0, 1, 0, 1);
-
-      --my-animation-timing-function: invalid;
-      --my-transition-timing-function: invalid;
-    }
-  `
-	const actual = analyze(fixture).values.animations.timingFunctions
-	const expected = {
-		total: 4,
-		totalUnique: 3,
-		unique: {
-			linear: 1,
-			'cubic-bezier(0, 1, 0, 1)': 2,
-			'steps(3)': 1,
-		},
-		uniquenessRatio: 3 / 4,
-	}
-	expect(actual).toEqual(expected)
-})
-
-test('finds timing functions in value lists', () => {
-	const fixture = `
-    timings {
-      animation-timing-function: ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1);
-    }
-  `
-	const actual = analyze(fixture).values.animations.timingFunctions
-	const expected = {
-		total: 3,
-		totalUnique: 3,
-		unique: {
-			ease: 1,
-			'step-start': 1,
-			'cubic-bezier(0.1, 0.7, 1, 0.1)': 1,
-		},
-		uniquenessRatio: 1,
-	}
-	expect(actual).toEqual(expected)
-})
-
-test('finds shorthand durations', () => {
-	const fixture = `
-    durations {
-      animation: 1s ANIMATION_NAME linear;
-      animation: 2s ANIMATION_NAME cubic-bezier(0,1,0,1);
-      animation: 2S ANIMATION_NAME cubic-bezier(0,1,0,1);
-
-      transition: all 3s;
-      transition: all 4s cubic-bezier(0,1,0,1);
-      transition: all 5s linear 5000ms;
-      transition: all 5S linear 5000ms;
-
-      --my-animation: invalid;
-      --my-transition: invalid;
-    }
-  `
-	const actual = analyze(fixture).values.animations.durations
-	const expected = {
-		total: 7,
-		totalUnique: 5,
-		unique: {
-			'1s': 1,
-			'2s': 2,
-			'3s': 1,
-			'4s': 1,
-			'5s': 2,
-		},
-		uniquenessRatio: 5 / 7,
-	}
-	expect(actual).toEqual(expected)
-})
-
-test('finds shorthand timing functions', () => {
-	const fixture = `
-    durations {
-      animation: 1s ANIMATION_NAME linear;
-      animation: 1s ANIMATION_NAME LINEAR;
-      animation: 2s ANIMATION_NAME cubic-bezier(0,1,0,1);
-
-      transition: all 3s;
-      transition: all 4s cubic-bezier(0,1,0,1);
-      transition: all 5s linear 5000ms;
-
-      transition: all 6s Cubic-Bezier(0,1,0,1);
-
-      --my-animation: invalid;
-      --my-transition: invalid;
-    }
-  `
-	const actual = analyze(fixture).values.animations.timingFunctions
-	const expected = {
-		total: 6,
-		totalUnique: 2,
-		unique: {
-			linear: 3,
-			'cubic-bezier(0,1,0,1)': 3,
-		},
-		uniquenessRatio: 2 / 6,
-	}
-	expect(actual).toEqual(expected)
-})
-
-test('analyzes animations/transitions with value lists', () => {
-	const fixture = `
-    multi-value {
-      animation: 1s ANIMATION_NAME linear, 2s ANIMATION_NAME linear;
-      animation: 3s ANIMATION_NAME ease 3ms, 4s ANIMATION_NAME ease-in-out 4ms;
-      transition: all 5s, color 6s;
-      transition: all 7s ease, all 8s linear;
-      transition: all 9s steps(4, step-end) 9ms, all 10s steps(2) 10ms;
-      transition: all 11s, font-size 12s 12ms, line-height 13ms, border 0.0014s;
-    }
-  `
-	const actual = analyze(fixture).values.animations
-	const expected = {
-		durations: {
-			total: 14,
-			totalUnique: 14,
-			unique: {
-				'1s': 1,
-				'2s': 1,
-				'3s': 1,
-				'4s': 1,
-				'5s': 1,
-				'6s': 1,
-				'7s': 1,
-				'8s': 1,
-				'9s': 1,
-				'10s': 1,
-				'11s': 1,
-				'12s': 1,
-				'13ms': 1,
-				'0.0014s': 1,
-			},
-			uniquenessRatio: 14 / 14,
-		},
-		timingFunctions: {
-			total: 8,
-			totalUnique: 5,
-			unique: {
-				linear: 3,
-				ease: 2,
-				'ease-in-out': 1,
-				'steps(4, step-end)': 1,
-				'steps(2)': 1,
-			},
-			uniquenessRatio: 5 / 8,
-		},
-		names: {
-			total: 4,
-			totalUnique: 1,
-			unique: {
-				ANIMATION_NAME: 4,
-			},
-			uniquenessRatio: 1 / 4,
-		},
-	}
-	expect(actual).toEqual(expected)
-})
+function names_of(value: string): string[] {
+	return analyze_animation(parse_value(value)).names.map((match) => match.value)
+}
 
 test('emits name for custom animation name identifier', () => {
-	const names: string[] = []
-	analyzeAnimation(parse_value('slide-in 300ms ease-out forwards'), (item) => {
-		if (item.type === 'name') {
-			names.push(item.value.text)
-		}
-	})
+	const names = names_of('slide-in 300ms ease-out forwards')
 	expect(names).toEqual(['slide-in'])
 })
 
 test('emits name for each animation in a value list', () => {
-	const names: string[] = []
-	analyzeAnimation(parse_value('slide-in 1s, fade-out 2s'), (item) => {
-		if (item.type === 'name') {
-			names.push(item.value.text)
-		}
-	})
+	const names = names_of('slide-in 1s, fade-out 2s')
 	expect(names).toEqual(['slide-in', 'fade-out'])
 })
 
 test('does not emit name for animation direction keywords', () => {
 	const names: string[] = []
 	for (const kw of ['normal', 'reverse', 'alternate', 'alternate-reverse']) {
-		analyzeAnimation(parse_value(`my-anim 1s ${kw}`), (item) => {
-			if (item.type === 'name') {
-				names.push(item.value.text)
-			}
-		})
+		names.push(...names_of(`my-anim 1s ${kw}`))
 	}
 	expect(names).toEqual(['my-anim', 'my-anim', 'my-anim', 'my-anim'])
 })
@@ -273,11 +37,7 @@ test('does not emit name for animation direction keywords', () => {
 test('does not emit name for animation fill-mode keywords', () => {
 	const names: string[] = []
 	for (const kw of ['forwards', 'backwards', 'both']) {
-		analyzeAnimation(parse_value(`my-anim 1s ${kw}`), (item) => {
-			if (item.type === 'name') {
-				names.push(item.value.text)
-			}
-		})
+		names.push(...names_of(`my-anim 1s ${kw}`))
 	}
 	expect(names).toEqual(['my-anim', 'my-anim', 'my-anim'])
 })
@@ -285,22 +45,13 @@ test('does not emit name for animation fill-mode keywords', () => {
 test('does not emit name for animation play-state keywords', () => {
 	const names: string[] = []
 	for (const kw of ['running', 'paused']) {
-		analyzeAnimation(parse_value(`my-anim 1s ${kw}`), (item) => {
-			if (item.type === 'name') {
-				names.push(item.value.text)
-			}
-		})
+		names.push(...names_of(`my-anim 1s ${kw}`))
 	}
 	expect(names).toEqual(['my-anim', 'my-anim'])
 })
 
 test('does not emit name for infinite iteration-count', () => {
-	const names: string[] = []
-	analyzeAnimation(parse_value('my-anim 1s infinite'), (item) => {
-		if (item.type === 'name') {
-			names.push(item.value.text)
-		}
-	})
+	const names = names_of('my-anim 1s infinite')
 	expect(names).toEqual(['my-anim'])
 })
 
@@ -315,11 +66,7 @@ test('does not emit name for timing-function keywords', () => {
 		'step-start',
 		'step-end',
 	]) {
-		analyzeAnimation(parse_value(`my-anim 1s ${kw}`), (item) => {
-			if (item.type === 'name') {
-				names.push(item.value.text)
-			}
-		})
+		names.push(...names_of(`my-anim 1s ${kw}`))
 	}
 	expect(names).toEqual([
 		'my-anim',
@@ -333,42 +80,22 @@ test('does not emit name for timing-function keywords', () => {
 })
 
 test('does not emit name for none keyword', () => {
-	const names: string[] = []
-	analyzeAnimation(parse_value('none'), (item) => {
-		if (item.type === 'name') {
-			names.push(item.value.text)
-		}
-	})
+	const names = names_of('none')
 	expect(names).toEqual([])
 })
 
 test('emits name for dashed-ident animation names', () => {
-	const names: string[] = []
-	analyzeAnimation(parse_value('--my-name 1s ease-in'), (item) => {
-		if (item.type === 'name') {
-			names.push(item.value.text)
-		}
-	})
+	const names = names_of('--my-name 1s ease-in')
 	expect(names).toEqual(['--my-name'])
 })
 
 test('emits name for quoted (string) animation names', () => {
-	const names: string[] = []
-	analyzeAnimation(parse_value('"slide in" 300ms ease-out'), (item) => {
-		if (item.type === 'name') {
-			names.push(item.value.text)
-		}
-	})
+	const names = names_of('"slide in" 300ms ease-out')
 	expect(names).toEqual(['"slide in"'])
 })
 
 test('emits name for each quoted animation in a value list', () => {
-	const names: string[] = []
-	analyzeAnimation(parse_value('"slide in" 1s, "fade out" 2s'), (item) => {
-		if (item.type === 'name') {
-			names.push(item.value.text)
-		}
-	})
+	const names = names_of('"slide in" 1s, "fade out" 2s')
 	expect(names).toEqual(['"slide in"', '"fade out"'])
 })
 
@@ -376,11 +103,95 @@ test('emits name for a quoted keyword used as animation name', () => {
 	// Unlike the bare `none` keyword, a quoted "none" is a valid animation name
 	const names: string[] = []
 	for (const kw of ['none', 'infinite', 'paused', 'alternate', 'linear']) {
-		analyzeAnimation(parse_value(`"${kw}" 1s ease-in`), (item) => {
-			if (item.type === 'name') {
-				names.push(item.value.text)
-			}
-		})
+		names.push(...names_of(`"${kw}" 1s ease-in`))
 	}
 	expect(names).toEqual(['"none"', '"infinite"', '"paused"', '"alternate"', '"linear"'])
+})
+
+test('splits a shorthand into plain-data parts', () => {
+	expect(
+		texts(analyze_animation(parse_value('slide-in 300ms ease-out, none 1s infinite'))),
+	).toEqual({
+		durations: ['300ms', '1s'],
+		delays: [],
+		timing_functions: ['ease-out'],
+		names: ['slide-in'],
+		keywords: ['none'],
+	})
+})
+
+test('splits the delay from the duration, per layer', () => {
+	expect(texts(analyze_animation(parse_value('spin 2s linear 100ms, fade 1s'))).delays).toEqual([
+		'100ms',
+	])
+	expect(texts(analyze_animation(parse_value('spin 2s linear 100ms, fade 1s 3s')))).toMatchObject({
+		durations: ['2s', '1s'],
+		delays: ['100ms', '3s'],
+	})
+})
+
+test('analyze_transition splits a transition into plain-data parts', () => {
+	expect(
+		texts(analyze_transition(parse_value('opacity 200ms ease-in-out 0s, transform 300ms linear'))),
+	).toEqual({
+		properties: ['opacity', 'transform'],
+		durations: ['200ms', '300ms'],
+		delays: ['0s'],
+		timing_functions: ['ease-in-out', 'linear'],
+		keywords: [],
+	})
+})
+
+test.each([
+	['all 1s', ['all']],
+	['--brand-color 1s, margin-left 2s', ['--brand-color', 'margin-left']],
+	['none', []],
+	['inherit', []],
+])('analyze_transition("%s") finds the properties %j', (value, properties) => {
+	expect(texts(analyze_transition(parse_value(value))).properties).toEqual(properties)
+})
+
+test('analyze_transition finds timing functions, global keywords and accepts a parsed node', () => {
+	expect(
+		texts(analyze_transition(parse_value('color 1s cubic-bezier(0, 0, 1, 1), width 2s steps(4)'))),
+	).toMatchObject({
+		timing_functions: ['cubic-bezier(0, 0, 1, 1)', 'steps(4)'],
+	})
+	expect(texts(analyze_transition(parse_value('inherit'))).keywords).toEqual(['inherit'])
+})
+
+test.each([
+	['slide-in', ['slide-in']],
+	['slide-in, "fade-out", none', ['slide-in', 'fade-out']],
+	['"slide in", --my-name', ['slide in', '--my-name']],
+	['none', []],
+	['initial', []],
+])('get_animation_names("%s") is %j', (value, expected) => {
+	expect(get_animation_names(parse_value(value)).map((match) => match.name)).toEqual(expected)
+})
+
+test('locates every part, as written', () => {
+	const value = 'slide-in 300ms ease-out 1s, "my name" 2s'
+	const parts = analyze_animation(parse_value(value))
+	for (const match of Object.values(parts).flat()) {
+		expect(value.slice(match.start_offset, match.end_offset)).toBe(match.value)
+	}
+	expect(parts.delays[0]).toMatchObject({
+		value: '1s',
+		line: 1,
+		column: 25,
+		start_offset: 24,
+		end_offset: 26,
+	})
+})
+
+test('get_animation_names locates the quoted name, and names it without quotes', () => {
+	expect(get_animation_names(parse_value('a, "b c"'))[1]).toEqual({
+		value: '"b c"',
+		name: 'b c',
+		line: 1,
+		column: 4,
+		start_offset: 3,
+		end_offset: 8,
+	})
 })
