@@ -19,7 +19,6 @@ import {
 	is_selector,
 	is_combinator,
 } from '@projectwallace/css-parser'
-import { as_selectors } from '../utils/input.ts'
 
 export type Specificity = [number, number, number]
 
@@ -109,7 +108,7 @@ function parts_specificity(first: SelectorNode | null, until_combinator = false)
 							const child_selector_list = current.first_child
 							if (child_selector_list && is_selector_list(child_selector_list)) {
 								// Calculate Specificity for all selectors in the list and get max
-								const max1 = max_specificity(get_specificity(child_selector_list))
+								const max1 = list_specificity(child_selector_list)
 
 								add(max1)
 							}
@@ -127,7 +126,7 @@ function parts_specificity(first: SelectorNode | null, until_combinator = false)
 						const nth_of = current.first_child
 						if (nth_of && is_nth_of_selector(nth_of) && nth_of.selector) {
 							// Use the convenience property to access the selector list directly
-							const max2 = max_specificity(get_specificity(nth_of.selector))
+							const max2 = list_specificity(nth_of.selector)
 
 							add(max2)
 						}
@@ -231,11 +230,15 @@ function parts_specificity(first: SelectorNode | null, until_combinator = false)
 	return [a, b, c]
 }
 
-export function get_specificity(input: Selector | SelectorList): Specificity[] {
-	// Quit while you're ahead
-	if (!input) {
-		return []
-	}
+export function get_specificity(selector: Selector): Specificity {
+	return parts_specificity(selector.first_child)
+}
 
-	return as_selectors(input).map((selector) => parts_specificity(selector.first_child))
+// The most specific selector of a list, like the argument of `:is()`
+function list_specificity(list: SelectorList): Specificity {
+	const specificities: Specificity[] = []
+	list.for_each(function (selector) {
+		specificities.push(get_specificity(selector))
+	})
+	return max_specificity(specificities)
 }

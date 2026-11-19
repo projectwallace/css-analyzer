@@ -86,14 +86,14 @@ Rules of thumb:
 
 ## Utilities
 
-All pure utilities now take a parsed node (`Value`, `Selector`/`SelectorList` or an at-rule `AtrulePrelude`) and return plain data. Parse the CSS yourself with `@projectwallace/css-parser`: `parse_value()`, `parse_selector_list()`, or `parse()` for an at-rule prelude. No callbacks, no parser nodes in results, `snake_case` names:
+All pure utilities now take a parsed node (`Value`, one `Selector` or an at-rule `AtrulePrelude`) and return plain data. Parse the CSS yourself with `@projectwallace/css-parser`: `parse_value()`, `parse_selector()` (`parse_selector_list()` and `for_each` for a list), or `parse()` for an at-rule prelude. No callbacks, no parser nodes in results, `snake_case` names:
 
 | 9.x                                                              | 10                                                                                                                   |
 | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `calculateSpecificity(sel)`, `getSpecificity`                    | `get_specificity(sel)` → `Specificity[]`                                                                             |
-| `getSpecificityForAST(node)`                                     | `get_specificity(node)[0]`                                                                                           |
+| `calculateSpecificity(sel)`, `getSpecificity`                    | `get_specificity(sel)` → `Specificity` (one selector)                                                                |
+| `getSpecificityForAST(node)`                                     | `get_specificity(node)`                                                                                              |
 | `compareSpecificity`                                             | `compare_specificity` (ascending, as in `/selectors`)                                                                |
-| `selectorComplexity(node)`                                       | `get_complexity(sel)` → `Match<number>[]`                                                                            |
+| `selectorComplexity(node)`                                       | `get_complexity(sel)` → `Match<number>` (one selector)                                                               |
 | `isSelectorPrefixed(node, cb)`                                   | `get_vendor_prefixes(sel)` → `Match[]`                                                                               |
 | `isAccessibilitySelector(node, cb)`                              | `get_accessibility_selectors(sel)` → `Match[]`                                                                       |
 | `getCombinators(node, cb)`                                       | `get_combinators(sel)` → `Match[]` (`value` is the combinator)                                                       |

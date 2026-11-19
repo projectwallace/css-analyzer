@@ -24,7 +24,7 @@ export function specificity(options: CountOptions = {}): CollectorDef<Specificit
 		const counter = create_counter(options)
 		return {
 			selector(node) {
-				counter.add(get_specificity(node)[0]!.join(','), node)
+				counter.add(get_specificity(node).join(','), node)
 			},
 			// The brand is type-only: the runtime value is a plain count result
 			result: () => counter.result() as SpecificityResult,

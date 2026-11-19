@@ -178,14 +178,14 @@ A collector subscribes to what it needs: `stylesheet`, `rule`, `atrule`, `select
 
 ### Utilities
 
-Small functions that work on their own: they take a parsed node and return plain data. Parsing the CSS is up to you, with `@projectwallace/css-parser`: `parse_value()` for a value, `parse_selector_list()` for a selector, and the `prelude` of an at-rule from `parse()` for an at-rule prelude. Only names (a property, a function name) are text.
+Small functions that work on their own: they take a parsed node and return plain data. Parsing the CSS is up to you, with `@projectwallace/css-parser`: `parse_value()` for a value, `parse_selector()` for a selector (`parse_selector_list()` for a list, which you walk with `for_each`), and the `prelude` of an at-rule from `parse()` for an at-rule prelude. Only names (a property, a function name) are text.
 
 ```js
-import { parse_selector_list, parse_value } from '@projectwallace/css-parser'
+import { parse_selector, parse_value } from '@projectwallace/css-parser'
 import { get_specificity, compare_specificity } from '@projectwallace/css-analyzer/selectors'
 import { is_value_reset, get_value_browserhacks } from '@projectwallace/css-analyzer/values'
 
-get_specificity(parse_selector_list('a.b > #c')) // [[1, 1, 1]]
+get_specificity(parse_selector('a.b > #c')) // [1, 1, 1]
 is_value_reset(parse_value('0 0px')) // true
 
 // compare_specificity sorts ascending: lowest specificity first

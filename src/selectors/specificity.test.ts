@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest'
-import { parse_selector_list } from '@projectwallace/css-parser/parse-selector'
+import { parse_selector } from '@projectwallace/css-parser/parse-selector'
 import {
 	get_specificity,
 	compare_specificity,
@@ -7,24 +7,9 @@ import {
 	type Specificity,
 } from './specificity.ts'
 
-test('get_specificity returns one tuple per selector in the list', () => {
-	expect(get_specificity(parse_selector_list('a, .b, #c'))).toEqual([
-		[0, 0, 1],
-		[0, 1, 0],
-		[1, 0, 0],
-	])
-	expect(get_specificity(parse_selector_list(''))).toEqual([])
-})
-
-test('get_specificity accepts a single parsed Selector node', () => {
-	const [first] = parse_selector_list('a.b, #c')
-	expect(get_specificity(first!)).toEqual([[0, 1, 1]])
-})
-
-test('get_specificity throws a TypeError for input that is not a selector', () => {
-	expect(() =>
-		get_specificity(parse_selector_list('a').first_child!.first_child! as never),
-	).toThrow(TypeError)
+test('get_specificity returns the specificity of one selector', () => {
+	expect(get_specificity(parse_selector('a.b'))).toEqual([0, 1, 1])
+	expect(get_specificity(parse_selector('#c'))).toEqual([1, 0, 0])
 })
 
 test('compare_specificity sorts ascending', () => {
@@ -79,7 +64,7 @@ test.each<[string, [number, number, number]]>([
 	['ns|a', [0, 0, 1]],
 	['*|a', [0, 0, 1]],
 ])('specificity of "%s"', (selector, expected) => {
-	expect(get_specificity(parse_selector_list(selector))).toEqual([expected])
+	expect(get_specificity(parse_selector(selector))).toEqual(expected)
 })
 
 describe('max_specificity', () => {

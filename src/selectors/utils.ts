@@ -15,10 +15,8 @@ import {
 	is_combinator,
 	type AttributeSelector,
 	type Selector,
-	type SelectorList,
 } from '@projectwallace/css-parser'
 import { unquote } from '../utils/string-utils.ts'
-import { as_selectors } from '../utils/input.ts'
 import { type Match, to_location, to_match } from '../utils/location.ts'
 
 const pseudo_functions = new KeywordSet([
@@ -33,27 +31,25 @@ const pseudo_functions = new KeywordSet([
 	'-moz-any',
 ])
 
-export function get_vendor_prefixes(input: Selector | SelectorList): Match[] {
+export function get_vendor_prefixes(selector: Selector): Match[] {
 	const found: Match[] = []
-	for (const selector of as_selectors(input)) {
-		walk(selector, function (node) {
-			if (
-				is_pseudo_element_selector(node) ||
-				is_pseudo_class_selector(node) ||
-				is_type_selector(node)
-			) {
-				if (node.is_vendor_prefixed) {
-					let prefix = ''
-					if (is_pseudo_class_selector(node)) {
-						prefix = ':'
-					} else if (is_pseudo_element_selector(node)) {
-						prefix = '::'
-					}
-					found.push(to_match(node, prefix + node.name))
+	walk(selector, function (node) {
+		if (
+			is_pseudo_element_selector(node) ||
+			is_pseudo_class_selector(node) ||
+			is_type_selector(node)
+		) {
+			if (node.is_vendor_prefixed) {
+				let prefix = ''
+				if (is_pseudo_class_selector(node)) {
+					prefix = ':'
+				} else if (is_pseudo_element_selector(node)) {
+					prefix = '::'
 				}
+				found.push(to_match(node, prefix + node.name))
 			}
-		})
-	}
+		}
+	})
 	return found
 }
 
@@ -67,26 +63,22 @@ function normalize_accessibility_selector(node: AttributeSelector) {
 	return `[${name}]`
 }
 
-export function get_accessibility_selectors(input: Selector | SelectorList): Match[] {
+export function get_accessibility_selectors(selector: Selector): Match[] {
 	const found: Match[] = []
 
-	for (const selector of as_selectors(input)) {
-		walk(selector, function (node) {
-			if (is_attribute_selector(node)) {
-				const name = node.name || ''
-				if (str_equals('role', name) || str_starts_with('aria-', name)) {
-					found.push(to_match(node, normalize_accessibility_selector(node)))
-				}
+	walk(selector, function (node) {
+		if (is_attribute_selector(node)) {
+			const name = node.name || ''
+			if (str_equals('role', name) || str_starts_with('aria-', name)) {
+				found.push(to_match(node, normalize_accessibility_selector(node)))
 			}
-		})
-	}
+		}
+	})
 	return found
 }
 
-export function get_complexity(input: Selector | SelectorList): SelectorComplexity[] {
-	return as_selectors(input).map((selector) =>
-		Object.assign(to_location(selector), { value: selector_complexity(selector) }),
-	)
+export function get_complexity(selector: Selector): SelectorComplexity {
+	return Object.assign(to_location(selector), { value: selector_complexity(selector) })
 }
 
 function selector_complexity(selector: CSSNode): number {
@@ -186,14 +178,12 @@ export function combinator_name(node: Combinator): string {
 export type SelectorComplexity = Match<number>
 
 /** Find all combinators; `value` is `' '` for the descendant combinator */
-export function get_combinators(input: Selector | SelectorList): Match[] {
+export function get_combinators(selector: Selector): Match[] {
 	const found: Match[] = []
-	for (const selector of as_selectors(input)) {
-		walk(selector, function (node) {
-			if (is_combinator(node)) {
-				found.push(to_match(node, combinator_name(node), 1))
-			}
-		})
-	}
+	walk(selector, function (node) {
+		if (is_combinator(node)) {
+			found.push(to_match(node, combinator_name(node), 1))
+		}
+	})
 	return found
 }
