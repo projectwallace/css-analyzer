@@ -28,7 +28,7 @@ export function color_format(node: CSSNode, property: string): string | undefine
 	if (is_hash(node)) {
 		const text = node.text
 		// Only the color is counted: without any IE hack (\9, \7)
-		return text.startsWith('#') ? 'hex' + (strip_value_hack(text).length - 1) : undefined
+		return 'hex' + (strip_value_hack(text).length - 1)
 	}
 	if (is_identifier(node)) {
 		// Font names like "Black" are not colors

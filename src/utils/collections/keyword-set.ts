@@ -1,6 +1,6 @@
 /** A Set-like construct to search CSS keywords in a case-insensitive way */
 export class KeywordSet {
-	set: Set<string>
+	readonly set: Set<string>
 
 	constructor(items: Lowercase<string>[]) {
 		/** @type {ReadonlySet} */

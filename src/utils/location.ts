@@ -1,5 +1,7 @@
 import type { CSSNode } from '@projectwallace/css-parser'
 
+const NEWLINE = 10
+
 export type Location = {
 	line: number
 	column: number
@@ -42,7 +44,7 @@ export function to_match_in(node: CSSNode, index: number, length: number, value:
 	let column = node.column
 	// The part can be on a later line than the start of the node
 	for (let i = 0; i < index; i++) {
-		if (source.charCodeAt(i) === 10) {
+		if (source.charCodeAt(i) === NEWLINE) {
 			line++
 			column = 1
 		} else {
@@ -62,7 +64,7 @@ export function to_match_in_source(
 	let line = 1
 	let column = 1
 	for (let i = 0; i < index; i++) {
-		if (source.charCodeAt(i) === 10) {
+		if (source.charCodeAt(i) === NEWLINE) {
 			line++
 			column = 1
 		} else {

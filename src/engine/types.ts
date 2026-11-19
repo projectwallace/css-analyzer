@@ -14,6 +14,7 @@ export type { CSSNode }
 
 export type { Location, Match }
 
+/** Which sub-parsers should be enabled */
 export type ParseOptions = {
 	selectors: boolean
 	values: boolean
