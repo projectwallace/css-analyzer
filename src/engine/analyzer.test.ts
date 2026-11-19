@@ -215,7 +215,7 @@ test('locations are opt-in per collector', () => {
 	})
 
 	expect(result.with.unique.get('color')?.locations).toEqual([
-		{ line: 1, column: 5, start_offset: 4, end_offset: 14, length: 10 },
+		{ line: 1, column: 5, start_offset: 4, end_offset: 14 },
 	])
 	expect(result.without.unique.get('color')).toEqual({ count: 1 })
 })
@@ -248,7 +248,7 @@ test('comment and stylesheet subscriptions', () => {
 	const input = '/* hi */ a { color: red }'
 	const result = analyze(input, { meta })
 	expect(result.meta).toBe(1)
-	expect(comments).toEqual([{ line: 1, column: 1, start_offset: 0, end_offset: 8, length: 8 }])
+	expect(comments).toEqual([{ line: 1, column: 1, start_offset: 0, end_offset: 8 }])
 	expect(css).toBe(input)
 })
 
@@ -306,15 +306,14 @@ test('font_shorthand is split once and is null for everything else', () => {
 	analyze('a { font: 12px/1.5 Arial; color: red; font: caption }', { shorthand })
 	expect(seen[0]).toBe(seen[1])
 	expect(seen[0]).toEqual({
-		font_size: { value: '12px', line: 1, column: 11, start_offset: 10, end_offset: 14, length: 4 },
-		line_height: { value: '1.5', line: 1, column: 16, start_offset: 15, end_offset: 18, length: 3 },
+		font_size: { value: '12px', line: 1, column: 11, start_offset: 10, end_offset: 14 },
+		line_height: { value: '1.5', line: 1, column: 16, start_offset: 15, end_offset: 18 },
 		font_family: {
 			value: 'Arial',
 			line: 1,
 			column: 20,
 			start_offset: 19,
 			end_offset: 24,
-			length: 5,
 		},
 		keywords: [],
 	})

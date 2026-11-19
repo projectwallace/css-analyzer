@@ -55,6 +55,6 @@ test('accept a parsed value, and point at the whole value', () => {
 		extract_z_indexes('z-index', '10'),
 	)
 	expect(extract_box_shadows('box-shadow', '0 0 red')).toEqual([
-		{ value: '0 0 red', line: 1, column: 1, start_offset: 0, end_offset: 7, length: 7 },
+		{ value: '0 0 red', line: 1, column: 1, start_offset: 0, end_offset: 7 },
 	])
 })

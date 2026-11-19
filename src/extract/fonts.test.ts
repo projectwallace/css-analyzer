@@ -81,7 +81,7 @@ test('a font shorthand points at the part, other properties at the whole value',
 		'"My Font", serif',
 	])
 	expect(extract_font_sizes('font-size', '1rem')).toEqual([
-		{ value: '1rem', line: 1, column: 1, start_offset: 0, end_offset: 4, length: 4 },
+		{ value: '1rem', line: 1, column: 1, start_offset: 0, end_offset: 4 },
 	])
 })
 

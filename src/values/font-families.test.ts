@@ -48,7 +48,6 @@ test('points at every family, quotes included', () => {
 		column: 8,
 		start_offset: 7,
 		end_offset: 18,
-		length: 11,
 	})
 })
 

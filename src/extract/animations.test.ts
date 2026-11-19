@@ -59,7 +59,6 @@ test('point at every item', () => {
 		column: 27,
 		start_offset: 26,
 		end_offset: 28,
-		length: 2,
 	})
 })
 

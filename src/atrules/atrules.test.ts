@@ -74,6 +74,5 @@ test('get_container_query_name locates the name', () => {
 		column: 1,
 		start_offset: 0,
 		end_offset: 7,
-		length: 7,
 	})
 })

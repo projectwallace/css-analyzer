@@ -47,7 +47,6 @@ test('locates the name of the prefixed value', () => {
 		column: 5,
 		start_offset: 4,
 		end_offset: 16,
-		length: 12,
 	})
 	expect(value.slice(match!.start_offset, match!.end_offset)).toBe(match!.value)
 })

@@ -189,7 +189,6 @@ test('locates every part, as written', () => {
 		column: 25,
 		start_offset: 24,
 		end_offset: 26,
-		length: 2,
 	})
 })
 
@@ -200,6 +199,5 @@ test('get_animation_names locates the quoted name, without quotes in the text', 
 		column: 4,
 		start_offset: 3,
 		end_offset: 8,
-		length: 5,
 	})
 })

@@ -100,7 +100,7 @@ export function stylesheet(options: StylesheetOptions = {}): CollectorDef<Styles
 			comment(loc) {
 				comments++
 				// includes /* and */ in the size calculation
-				comments_size += loc.length
+				comments_size += loc.end_offset - loc.start_offset
 			},
 			value: {
 				types: [URL],

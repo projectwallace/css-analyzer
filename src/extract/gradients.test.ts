@@ -39,6 +39,6 @@ test('accepts a parsed value as well as text', () => {
 test('points at the gradient', () => {
 	const value = 'url(a.png), linear-gradient(red, blue)'
 	const [match] = extract_gradients('background', value)
-	expect(match).toMatchObject({ line: 1, column: 13, start_offset: 12, end_offset: 38, length: 26 })
+	expect(match).toMatchObject({ line: 1, column: 13, start_offset: 12, end_offset: 38 })
 	expect(value.slice(match!.start_offset, match!.end_offset)).toBe(match!.value)
 })

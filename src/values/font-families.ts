@@ -46,7 +46,6 @@ export function get_font_families(
 				column: first.column,
 				start_offset: first.start,
 				end_offset: first.start + length,
-				length,
 			})
 		}
 		first = undefined

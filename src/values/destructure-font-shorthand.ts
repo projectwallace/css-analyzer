@@ -196,7 +196,6 @@ export function destructure_font_shorthand(input: ValueInput): FontShorthand | n
 				column: first.column,
 				start_offset: first.start,
 				end_offset: last.end,
-				length: last.end - first.start,
 			}
 		}
 	}

@@ -48,6 +48,5 @@ test('locates a hack on a later line', () => {
 		column: 3,
 		start_offset: 6,
 		end_offset: 13,
-		length: 7,
 	})
 })

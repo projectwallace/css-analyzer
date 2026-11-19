@@ -31,7 +31,6 @@ export function get_layer_names(input: PreludeInput): Match[] {
 					column: name.line === 1 ? node.column + name.column - 1 : name.column,
 					start_offset: node.start + name.start_offset,
 					end_offset: node.start + name.end_offset,
-					length: name.length,
 				})
 			}
 		} else if (is_atrule_prelude(node)) {

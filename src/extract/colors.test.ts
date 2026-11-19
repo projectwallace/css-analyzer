@@ -61,6 +61,5 @@ test('points at every color', () => {
 		column: 20,
 		start_offset: 19,
 		end_offset: 23,
-		length: 4,
 	})
 })
