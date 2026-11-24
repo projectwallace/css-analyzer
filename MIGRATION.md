@@ -9,7 +9,7 @@
 - **Selectors inside at-rule preludes are no longer in the data**: `@scope (.card) to (.content)` and `@supports selector(:has(a))`. 9.x counted them; now `selectors()`, `specificity()` and `stylesheet()` all leave them out, so `selectors().total`, the specificity results and `stylesheet().source_lines_of_code` / `complexity` can be lower than in 9.x for CSS that uses these at-rules (all other CSS gives the same numbers). Selectors of style rules inside these at-rules are still counted.
 - `DefinedUsed` takes an optional payload per name (`define(name, payload)`, `use(name, payload)`, read back with `payloads()`); results of `analyze()` are unchanged.
 - `DefinedUsed` and `KeywordSet` moved from the package root to `@projectwallace/css-analyzer/utils/collections`.
-- Need the 9.x report shape in one call? `analyze_compat` is tracked in [#649](https://github.com/projectwallace/css-analyzer/pull/649); `analyze_all()` returns the same data under new keys (see the table below).
+- `/properties` exports predicates instead of sets: `shorthand_properties`, `spacing_reset_properties` and `border_radius_properties` are now `is_shorthand_property()`, `is_spacing_reset_property()` and `is_border_radius_property()`; they ignore case, vendor prefixes and hacks. `basename` is `property_basename` from `@projectwallace/css-parser`.
 
 ## From `analyze()` to collectors
 
@@ -88,24 +88,26 @@ Rules of thumb:
 
 All pure utilities now take a parsed node (`Value`, one `Selector` or an at-rule `AtrulePrelude`) and return plain data. Parse the CSS yourself with `@projectwallace/css-parser`: `parse_value()`, `parse_selector()` (`parse_selector_list()` and `for_each` for a list), or `parse()` for an at-rule prelude. No callbacks, no parser nodes in results, `snake_case` names:
 
-| 9.x                                                              | 10                                                                                                                   |
-| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `calculateSpecificity(sel)`, `getSpecificity`                    | `get_specificity(sel)` → `Specificity` (one selector)                                                                |
-| `getSpecificityForAST(node)`                                     | `get_specificity(node)`                                                                                              |
-| `compareSpecificity`                                             | `compare_specificity` (ascending, as in `/selectors`)                                                                |
-| `selectorComplexity(node)`                                       | `get_complexity(sel)` → `number` (one selector)                                                                      |
-| `isSelectorPrefixed(node, cb)`                                   | `get_vendor_prefixes(sel)` → `Match[]`                                                                               |
-| `isAccessibilitySelector(node, cb)`                              | `get_accessibility_selectors(sel)` → `Match[]`                                                                       |
-| `getCombinators(node, cb)`                                       | `get_combinators(sel)` → `Match[]` (`value` is the source, `name` the combinator)                                    |
-| `isValueBrowserhack(value, cb)`                                  | `get_value_browserhacks(value)` → `Match[]`                                                                          |
-| `isValuePrefixed(value, cb)`                                     | `get_prefixed_values(value)` → `Match[]`                                                                             |
-| `isValueReset(value)`                                            | `is_value_reset(value)`                                                                                              |
-| `analyzeAnimation(value, cb)`                                    | `analyze_animation(value)` → `{ durations, delays, timing_functions, names, keywords }`, all `Match[]`               |
-| `destructureFontShorthand(value, cb)`                            | `destructure_font_shorthand(value)` → `{ font_size, line_height, font_family, keywords } \| null`, parts are `Match` |
-| `isMediaBrowserhack(node, cb)`                                   | `get_media_browserhacks(prelude)` → `Match[]`                                                                        |
-| `isSupportsBrowserhack(node, cb)`                                | `get_supports_browserhacks(prelude)` → `Match[]`                                                                     |
-| `namedColors`, `systemColors`, `colorFunctions`, `colorKeywords` | `named_colors`, `system_colors`, `color_functions`, `color_keywords`                                                 |
-| `isPropertyHack`                                                 | `is_property_hack`                                                                                                   |
+| 9.x                                                                            | 10                                                                                                                   |
+| ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `calculateSpecificity(sel)`, `getSpecificity`                                  | `get_specificity(sel)` → `Specificity` (one selector)                                                                |
+| `getSpecificityForAST(node)`                                                   | `get_specificity(node)`                                                                                              |
+| `compareSpecificity`                                                           | `compare_specificity` (ascending, as in `/selectors`)                                                                |
+| `selectorComplexity(node)`                                                     | `get_complexity(sel)` → `number` (one selector)                                                                      |
+| `isSelectorPrefixed(node, cb)`                                                 | `get_vendor_prefixes(sel)` → `Match[]`                                                                               |
+| `isAccessibilitySelector(node, cb)`                                            | `get_accessibility_selectors(sel)` → `Match[]`                                                                       |
+| `getCombinators(node, cb)`                                                     | `get_combinators(sel)` → `Match[]` (`value` is the source, `name` the combinator)                                    |
+| `isValueBrowserhack(value, cb)`                                                | `get_value_browserhacks(value)` → `Match[]`                                                                          |
+| `isValuePrefixed(value, cb)`                                                   | `get_prefixed_values(value)` → `Match[]`                                                                             |
+| `isValueReset(value)`                                                          | `is_value_reset(value)`                                                                                              |
+| `analyzeAnimation(value, cb)`                                                  | `analyze_animation(value)` → `{ durations, delays, timing_functions, names, keywords }`, all `Match[]`               |
+| `destructureFontShorthand(value, cb)`                                          | `destructure_font_shorthand(value)` → `{ font_size, line_height, font_family, keywords } \| null`, parts are `Match` |
+| `isMediaBrowserhack(node, cb)`                                                 | `get_media_browserhacks(prelude)` → `Match[]`                                                                        |
+| `isSupportsBrowserhack(node, cb)`                                              | `get_supports_browserhacks(prelude)` → `Match[]`                                                                     |
+| `namedColors`, `systemColors`, `colorFunctions`, `colorKeywords`               | `named_colors`, `system_colors`, `color_functions`, `color_keywords`                                                 |
+| `isPropertyHack`                                                               | `is_property_hack`                                                                                                   |
+| `shorthand_properties`, `spacing_reset_properties`, `border_radius_properties` | `is_shorthand_property`, `is_spacing_reset_property`, `is_border_radius_property`                                    |
+| `basename`                                                                     | `property_basename` from `@projectwallace/css-parser`                                                                |
 
 Removed: `isIe9Hack` (use `get_value_browserhacks`), `hasVendorPrefix`, `cssKeywords` (use `keywords` from `/values`), the `Collection`, `ContextCollection` and `AggregateCollection` classes, and the `Location` / `UniqueWithLocations` types of the old result (`Location` is still exported).
 
