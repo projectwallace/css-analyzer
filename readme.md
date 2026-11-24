@@ -5,12 +5,6 @@
 </div>
 
 <div align="center">
-  <a href="https://npmjs.org/package/@projectwallace/css-analyzer"><img src="https://badgen.net/npm/v/@projectwallace/css-analyzer" alt="version" /></a>
-  <a href="https://npmjs.org/package/@projectwallace/css-analyzer"><img src="https://badgen.now.sh/npm/dm/@projectwallace/css-analyzer" alt="downloads" /></a>
-  <a href="https://packagephobia.com/result?p=%40projectwallace%2Fcss-analyzer"><img src="https://packagephobia.com/badge?p=%40projectwallace%2Fcss-analyzer" alt="install size" /></a>
-</div>
-
-<div align="center">
 Turn your CSS into <b>actionable stats</b> — specificity, complexity, design tokens, and 200+ more metrics.
 </div>
 
