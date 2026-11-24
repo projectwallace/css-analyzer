@@ -1,6 +1,6 @@
 export { extract_colors, type ColorMatch } from './colors.ts'
 export { extract_gradients } from './gradients.ts'
-export { extract_units } from './units.ts'
+export { extract_units, type UnitMatch } from './units.ts'
 export {
 	extract_font_sizes,
 	extract_line_heights,
