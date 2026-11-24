@@ -69,7 +69,9 @@ summarize_specificity(s) // { total, min, max, sum, mean, mode }
 Locations are opt-in per collector:
 
 ```js
-const { colors: result } = analyze(css, { colors: colors({ locations: true }) })
+const { colors: result } = analyze(css, {
+	colors: colors({ locations: true }),
+})
 result.unique.get('red').locations // [{ line: 3, column: 14, start_offset: 26, end_offset: 29 }, ...]
 ```
 
@@ -98,15 +100,13 @@ analyze_design_tokens(css, { locations: true }) // locations for every collector
 Each preset also exists as a function that returns a collector map (`design_tokens_collectors(options)`, `all_collectors(options)`), which you can spread, narrow or extend. The keys are the collector names.
 `analyze(css, { ...design_tokens_collectors({ locations: true }), z_indexes: z_indexes() })`.
 
-#### Design tokens
-
-`analyze_design_tokens` has 11 collectors: `colors`, `font_sizes`, `font_families`, `line_heights`, `gradients`, `box_shadows`, `border_radiuses`, `durations`, `timing_functions`, `text_shadows` and `units`. The result is keyed by collector name, like every other result: `result.colors`, `result.units`, ...
-`colors`, `border_radiuses` and `units` also have `by_context` (counts per property). It deliberately leaves out `z_indexes`, `displays`, `keywords` and everything about selectors, rules and at-rules.
-
 The preset takes the global `locations` option only. To give one collector other options, spread the preset and replace that collector:
 
 ```js
-analyze(css, { ...design_tokens_collectors(), colors: colors({ normalize: 'none' }) })
+analyze(css, {
+	...design_tokens_collectors(),
+	colors: colors({ normalize: 'none' }),
+})
 ```
 
 ### Typing a collector map
@@ -154,7 +154,9 @@ function important_declarations() {
 		return {
 			declaration: {
 				enter(node, ctx) {
-					if (ctx.is_important) counter.add(ctx.property, node)
+					if (ctx.is_important) {
+						counter.add(ctx.property, node)
+					}
 				},
 			},
 			result() {
@@ -167,80 +169,56 @@ function important_declarations() {
 analyze(css, { important: important_declarations() })
 ```
 
-A collector subscribes to what it needs: `stylesheet`, `rule`, `atrule`, `selector`, `declaration` (`{ properties?, enter }`), `value` (`{ types, properties?, enter }`) and `comment`. The engine walks the CSS once and only dispatches to subscribers. `selector` handlers get the selectors of style rules (not keyframe selectors, nor selectors in at-rule preludes) and no `ctx`: use `rule` when you need `depth` or `atrule_stack`. Collectors must not keep nodes or the `ctx` object after the handler returns.
-`ctx` offers lazy, shared facts: `property`, `raw_property`, `is_important`, `is_custom`, `is_browserhack`, `is_vendor_prefixed`, `value`, `value_text`, `clean_value_text`, `font_shorthand`, `depth`, `atrule_stack` and (in `stylesheet`) `css`. Counters take the node that was found (`counter.add(item, node)`): that is where `locations` come from.
+- Hooks: `stylesheet`, `rule`, `atrule`, `selector`, `declaration` (`{ properties?, enter }`), `value` (`{ types, properties?, enter }`), `comment`. Types in [src/engine/types.ts](./src/engine/types.ts).
+- `selector` gets style rule selectors only, without `ctx` (use `rule` for `depth`/`atrule_stack`).
+- `ctx` holds lazy, shared facts about the current node: see [src/engine/context.ts](./src/engine/context.ts).
+- `counter.add(item, node)`: the node is where `locations` come from.
+- Don't keep nodes or `ctx` after a handler returns.
 
 ### Utilities
 
-Small functions that work on their own: they take a parsed node and return plain data. Parsing the CSS is up to you, with `@projectwallace/css-parser`: `parse_value()` for a value, `parse_selector()` for a selector (`parse_selector_list()` for a list, which you walk with `for_each`), and the `prelude` of an at-rule from `parse()` for an at-rule prelude. Only names (a property, a function name) are text.
+Functions that take a node parsed with `@projectwallace/css-parser` (`parse_value()`, `parse_selector()`, or an at-rule `prelude` from `parse()`) and return plain data.
 
 ```js
 import { parse_selector, parse_value } from '@projectwallace/css-parser'
-import { get_specificity, compare_specificity } from '@projectwallace/css-analyzer/selectors'
-import { is_value_reset, get_value_browserhacks } from '@projectwallace/css-analyzer/values'
-
-get_specificity(parse_selector('a.b > #c')) // [1, 1, 1]
-is_value_reset(parse_value('0 0px')) // true
-
-// compare_specificity sorts ascending: lowest specificity first
-;[
-	[0, 1, 1],
-	[2, 0, 0],
-	[0, 0, 1],
-].sort(compare_specificity) // [[0, 0, 1], [0, 1, 1], [2, 0, 0]]
-compare_specificity([0, 1, 0], [0, 1, 0]) // 0
-```
-
-Utilities that find things return `Match`es: `{ value, line, column, start_offset, end_offset }`, so a tool (a linter, an editor) can point at what was found. `value` is always the source text at that location. What a util derives from it comes in a field with its own name: `hack` (browserhack utils), `name` (`get_vendor_prefixes`, `get_combinators`, and the unquoted names of `get_font_families`, `get_animation_names` and `get_keyframes_name`), `selector` (`get_accessibility_selectors`, normalized), `feature` (`get_static_features`), `unit` (`extract_units`) and `text` (the `extract_*` utils: the counted text, without a browserhack). Offsets (`start_offset`, and `end_offset` which is exclusive) are relative to the source the node came from: for `parse_value('a b')` that is `'a b'`, for an at-rule prelude it is the whole stylesheet that was parsed.
-
-```js
-import { parse_value } from '@projectwallace/css-parser'
+import { get_specificity } from '@projectwallace/css-analyzer/selectors'
 import { get_declared_container_names } from '@projectwallace/css-analyzer/values'
 
+get_specificity(parse_selector('a.b > #c')) // [1, 1, 1]
 get_declared_container_names(parse_value('sidebar card / size'))
-// [{ value: 'sidebar', line: 1, column: 1, start_offset: 0, end_offset: 7 }, { value: 'card', line: 1, column: 9, start_offset: 8, end_offset: 12 }]
+// [{ value: 'sidebar', line: 1, column: 1, start_offset: 0, end_offset: 7 }, ...]
 ```
 
-Also: `get_complexity`, `get_vendor_prefixes`, `get_accessibility_selectors`, `get_combinators` (`/selectors`); `destructure_font_shorthand`, `analyze_animation`, `analyze_transition`, `get_animation_names`, `get_declared_container_names`, `get_font_families`, `get_anchor_names`, `is_gradient_function`, `get_prefixed_values`, `named_colors`, `system_colors`, `color_functions`, `keywords` (`/values`); `get_media_browserhacks`, `get_supports_browserhacks`, `get_container_query_name`, `get_keyframes_name`, `get_layer_names`, `get_static_features`, `get_query_bounds`, `find_contradiction`, `validate_property_registration` (`/atrules`); `is_shorthand_property`, `is_spacing_reset_property`, `is_border_radius_property`, `is_property_hack` (`/properties`); `get_embed_type` (`/stylesheet`).
+| Entry point          | Source                                                                                  |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| `/selectors`         | [src/selectors](./src/selectors/index.ts)                                               |
+| `/values`            | [src/values](./src/values/index.ts)                                                     |
+| `/atrules`           | [src/atrules](./src/atrules/index.ts)                                                   |
+| `/properties`        | [src/properties](./src/properties/index.ts)                                             |
+| `/stylesheet`        | [src/stylesheet](./src/stylesheet/index.ts)                                             |
+| `/extract`           | [src/extract](./src/extract/index.ts)                                                   |
+| `/utils/collections` | [src/utils/collections](./src/utils/collections/index.ts) (`DefinedUsed`, `KeywordSet`) |
 
-`DefinedUsed` (track what is defined and what is used, for names like custom properties or keyframes) and `KeywordSet` (a case-insensitive set of keywords) are the building blocks the built-in collectors use. They are exported from `@projectwallace/css-analyzer/utils/collections`.
+**`Match`** ([src/utils/location.ts](./src/utils/location.ts)): `{ value, line, column, start_offset, end_offset }`
 
-`DefinedUsed` can keep something with every name, so you can point at it later: a node, or a `Match` from the name utilities (`get_keyframes_name`, `get_layer_names`, `get_font_families`, `get_anchor_names`, `get_declared_container_names`, `get_animation_names`).
-
-```js
-import { parse, parse_value } from '@projectwallace/css-parser'
-import { DefinedUsed } from '@projectwallace/css-analyzer/utils/collections'
-import { get_animation_names } from '@projectwallace/css-analyzer/values'
-import { get_keyframes_name } from '@projectwallace/css-analyzer/atrules'
-
-const keyframes = new DefinedUsed()
-const sheet = parse('@keyframes spin {} a { animation: fade 1s, spin 2s }')
-const spin = get_keyframes_name(sheet.first_child.prelude)!
-keyframes.define(spin.value, spin)
-for (const name of get_animation_names(parse_value('fade 1s, spin 2s'))) {
-	keyframes.use(name.value, name)
-}
-const { unknown } = keyframes.analyze() // ['fade']
-const { usages } = keyframes.payloads() // usages.get('fade') is the Match of `fade`
-```
+- `value` is always the source text; derived data gets its own field (`name`, `hack`, `text`, `unit`, ...).
+- Offsets are relative to the parsed source; `end_offset` is exclusive.
 
 ### Extractors
 
-For tools that already have the CSS in hand, like a linter or an editor: the logic of the collectors, per declaration. Pass the property and the parsed value and get the matches, with where they are. Collectors use the same code, so a tool and the analyzer never disagree about what a color or a font size is.
+The per-declaration logic of the collectors, for linters and editors: `extract_*(property, value): Match[]`.
 
 ```js
 import { parse_value } from '@projectwallace/css-parser'
-import { extract_colors, extract_font_sizes } from '@projectwallace/css-analyzer/extract'
+import { extract_colors } from '@projectwallace/css-analyzer/extract'
 
 extract_colors('border', parse_value('1px solid RED'))
 // [{ value: 'RED', text: 'RED', format: 'named', line: 1, column: 11, start_offset: 10, end_offset: 13 }]
-extract_font_sizes('font', parse_value('bold 12px/1.5 serif')) // [{ value: '12px', text: '12px', ... }]
-extract_font_sizes('color', parse_value('red')) // []
 ```
 
-`extract_colors`, `extract_gradients`, `extract_units`, `extract_font_sizes`, `extract_line_heights`, `extract_font_families` (the whole list as one match, which is what is counted; `get_font_families()` has one match per family, which is what is defined and used), `extract_z_indexes`, `extract_box_shadows`, `extract_text_shadows`, `extract_border_radiuses`, `extract_durations` and `extract_timing_functions` all return `Match[]`. The property decides how a value is read (the `font` shorthand, a `transition` against `transition-duration`), not whether: the extractors for one fixed property (`extract_z_indexes`, `extract_box_shadows`, `extract_text_shadows`, `extract_border_radiuses`) only take the value, and you choose the declarations with the property sets below. Extractors that look at a fixed set of properties export that set as a `KeywordSet` (`font_size_properties`, `z_index_properties`, ...), so you can skip declarations early. Values are as written (a hex color loses its browserhack); normalizing (lowercasing, `skip_var`) is up to you or the collector options.
-
-`get_feature_bounds()` (`/atrules`) lists the numeric bounds of the parsed prelude of a `@media` or `@container` at-rule: `(min-width: 400px)`, `(width >= 400px)` and `(50px <= width <= 100px)` become `{ feature, direction, value, unit, inclusive, query }` plus a location. `or` and `not` are not interpreted, and `query` tells the comma separated queries apart. `get_query_bounds()` gives the bounds per query with `complex: true` for a query that has `not` or `or`, and `get_static_features()` marks the features in such a query the same way: you decide what to do with them.
+- Single-property extractors (`extract_z_indexes`, `extract_box_shadows`, ...) take only the value.
+- Property sets are exported as `KeywordSet`s (`font_size_properties`, ...) to skip declarations early.
+- Values are returned as written; normalizing is up to you.
 
 ## Upgrading from 9.x
 
@@ -256,8 +234,6 @@ Browser hack patterns for value detection were sourced from:
 ## Related projects
 
 - [CSS Design Tokens](https://github.com/projectwallace/css-design-tokens) - Get DTCG tokens from CSS (uses this css-analyzer)
-- [Wallace CLI](https://github.com/projectwallace/wallace-cli) - CLI tool for
-  @projectwallace/css-analyzer
-- [Color Sorter](https://github.com/projectwallace/color-sorter) - Sort CSS colors
-  by hue, saturation, lightness and opacity
-- [Project Wallace Stylelint plugin pack](https://github.com/projectwallace/stylelint-plugin) - Lint your CSS based on the metrics in this CSS analyzer
+- [Project Wallace Stylelint plugin](https://github.com/projectwallace/stylelint-plugin) - Lint your CSS based on the metrics in this CSS analyzer
+- [Wallace CLI](https://github.com/projectwallace/wallace-cli) - CLI tool for @projectwallace/css-analyzer
+- [Color Sorter](https://github.com/projectwallace/color-sorter) - Sort CSS colors by hue, saturation, lightness and opacity
