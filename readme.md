@@ -10,14 +10,10 @@ Turn your CSS into <b>actionable stats</b> — specificity, complexity, design t
 
 ## Features
 
-- Extremely **detailed** (200+ metrics)
-- **Pick what you need**: metrics are opt-in collectors, so you only pay (runtime and bundle size) for what you use
-- **Tree-shakable** ES modules and **TypeScript** types, with the result type inferred from the collectors you pass
-- Write your **own collectors** with the same API the built-ins use
-- **Design system** audit ready: a design-tokens preset (colors, font sizes, shadows, ...) and uniqueness ratios via `summarize()`
-- Runs anywhere — **NodeJS and browsers**
-- Tiny footprint, only one dependency
-- Battle-tested — powers [Project Wallace](https://www.projectwallace.com)
+- **200+ metrics**: specificity, complexity, design tokens and more
+- **Opt-in collectors**: you only pay (runtime and bundle size) for what you use; result types are inferred
+- Runs in **NodeJS and browsers**, one dependency
+- Powers [Project Wallace](https://www.projectwallace.com)
 
 ## Install
 
@@ -62,52 +58,36 @@ const { s } = analyze(css, { s: specificity() })
 summarize_specificity(s) // { total, min, max, sum, mean, mode }
 ```
 
-`summarize_specificity` only accepts the result of `specificity()` (type `SpecificityResult`); passing the result of another collector is a type error.
+### Options
 
-### Locations
+All optional, passed per collector: `colors({ locations: true })`.
 
-Locations are opt-in per collector:
-
-```js
-const { colors: result } = analyze(css, {
-	colors: colors({ locations: true }),
-})
-result.unique.get('red').locations // [{ line: 3, column: 14, start_offset: 26, end_offset: 29 }, ...]
-```
-
-### Ordered numbers (for charts)
-
-Numeric series (nesting, sizes, complexity, specificity) are counted as values. Pass `sequence: true` to also get them in source order:
-
-```js
-import { rules } from '@projectwallace/css-analyzer/collectors'
-const { r } = analyze(css, { r: rules({ sequence: true }) })
-r.sizes.sequence // [2, 3, 1]
-```
-
-Use `summarize_numbers(result.sizes)` for min, max, mean, mode, median, range and sum.
+- `locations`: add `locations: [{ line, column, start_offset, end_offset }]` to every unique item
+- `sequence`: numeric series (nesting, sizes, complexity, specificity) also in source order, e.g. `rules({ sequence: true }).sizes.sequence // [2, 3, 1]`; `summarize_numbers()` gives min, max, mean, mode, median, range and sum
+- `contexts`: per-property counts in `by_context` (`colors`, `units`, `border_radiuses`)
+- `normalize: 'none'`: keep the authored case
+- `skip_var`: skip `var()` values (font sizes, families, line heights)
 
 ### Presets
 
 ```js
-import { analyze_design_tokens, analyze_all } from '@projectwallace/css-analyzer/presets'
+import {
+	analyze_design_tokens,
+	analyze_all,
+	design_tokens_collectors,
+} from '@projectwallace/css-analyzer/presets'
 
-analyze_design_tokens(css) // colors, font_sizes, font_families, line_heights, gradients, box_shadows, border_radiuses, durations, timing_functions, text_shadows, units
-analyze_all(css) // every collector, flat: result.colors, result.atrules, result.selectors, ...
-analyze_design_tokens(css, { locations: true }) // locations for every collector
-```
+analyze_design_tokens(css, { locations: true })
+analyze_all(css)
 
-Each preset also exists as a function that returns a collector map (`design_tokens_collectors(options)`, `all_collectors(options)`), which you can spread, narrow or extend. The keys are the collector names.
-`analyze(css, { ...design_tokens_collectors({ locations: true }), z_indexes: z_indexes() })`.
-
-The preset takes the global `locations` option only. To give one collector other options, spread the preset and replace that collector:
-
-```js
+// Or spread the collector map to narrow, extend or override it
 analyze(css, {
 	...design_tokens_collectors(),
 	colors: colors({ normalize: 'none' }),
 })
 ```
+
+Which collectors each preset includes: [src/presets](./src/presets/).
 
 ### Typing a collector map
 
@@ -124,7 +104,7 @@ export const collectors: {
 export type Report = ResultOf<typeof collectors>
 ```
 
-`CollectorDef`, `CountResult`, `ContextCountResult`, `Location` and `ResultOf` can be imported from `@projectwallace/css-analyzer/collectors` too.
+More types are exported from [src/collectors/index.ts](./src/collectors/index.ts).
 
 ### Collectors
 
@@ -141,7 +121,7 @@ export type Report = ResultOf<typeof collectors>
 | `units`, `z_indexes`, `displays`, `keywords`, `resets`     | other values                                                                                                                                 |
 | `value_prefixes`, `value_browserhacks`, `value_complexity` | vendor prefixes, hacks, complexity of values                                                                                                 |
 
-Options (all optional): `locations`, `sequence` (numeric series), `contexts` (`colors`, `units`, `border_radiuses`: count per property in `by_context`, which only exists with `contexts: true`), `normalize: 'none'` (keep the authored case), `skip_var` (font sizes, families, line heights).
+All collectors: [src/collectors](./src/collectors/index.ts).
 
 ### Write your own collector
 
