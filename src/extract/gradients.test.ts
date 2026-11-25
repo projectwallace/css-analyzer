@@ -5,8 +5,14 @@ import { extract_gradients } from './index.ts'
 test.each([
 	['linear-gradient(red, blue)', ['linear-gradient(red, blue)']],
 	['-webkit-linear-gradient(red, blue)', ['-webkit-linear-gradient(red, blue)']],
-	['-webkit-gradient(linear, 0 0, 0 100%, from(red))', ['-webkit-gradient(linear, 0 0, 0 100%, from(red))']],
-	['url(a.png), radial-gradient(red, blue), conic-gradient(red, blue)', ['radial-gradient(red, blue)', 'conic-gradient(red, blue)']],
+	[
+		'-webkit-gradient(linear, 0 0, 0 100%, from(red))',
+		['-webkit-gradient(linear, 0 0, 0 100%, from(red))'],
+	],
+	[
+		'url(a.png), radial-gradient(red, blue), conic-gradient(red, blue)',
+		['radial-gradient(red, blue)', 'conic-gradient(red, blue)'],
+	],
 	['var(--x, linear-gradient(red, blue))', ['linear-gradient(red, blue)']],
 	['repeating-linear-gradient(red, blue 10%)', ['repeating-linear-gradient(red, blue 10%)']],
 	['image-set(linear-gradient(red, blue) 1x)', ['linear-gradient(red, blue)']],

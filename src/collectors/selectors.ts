@@ -15,9 +15,9 @@ import type { CollectorDef, CountOptions, CountResult } from '../engine/types.ts
 import {
 	get_accessibility_selectors,
 	combinator_name,
-	get_complexity,
 	get_vendor_prefixes,
 } from '../selectors/utils.ts'
+import { get_complexity } from '../selectors/complexity.ts'
 import { get_specificity } from '../selectors/specificity.ts'
 
 export type SelectorsResult = CountResult & {

@@ -12,7 +12,7 @@ import type { CollectorDef, CountResult } from '../engine/types.ts'
 import { unquote } from '../utils/string-utils.ts'
 import { get_embed_type } from '../stylesheet/stylesheet.ts'
 import { get_media_browserhacks, get_supports_browserhacks } from '../atrules/atrules.ts'
-import { get_complexity } from '../selectors/utils.ts'
+import { get_complexity } from '../selectors/complexity.ts'
 import {
 	get_atrule_weight,
 	get_declaration_weight,
