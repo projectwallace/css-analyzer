@@ -48,17 +48,13 @@ test('get_first_identifier gives the name inside a function, or undefined', () =
 })
 
 // Why these four: their values are names, timing and numbers, so words in them (`red` in `font-family: Red`,
-// `1s` in `transition`) are not colors, units or gradients.
+// `1s` in `transition`) are not colors or units. Gradients are looked for everywhere: their function names
+// can't be mistaken for anything else.
 const skipped_properties = ['font-family', 'transition', 'animation', 'z-index'] as const
 const sample_value = 'foo red 1px, calc(2em + var(--x, blue)) linear-gradient(red, blue) bar'
 
-test.each(skipped_properties)('colors and gradients do not look inside %s', (property) => {
-	const result = analyze(`a { ${property}: ${sample_value} }`, {
-		colors: colors(),
-		gradients: gradients(),
-	})
-	expect(result.colors.total).toBe(0)
-	expect(result.gradients.total).toBe(0)
+test.each(skipped_properties)('colors do not look inside %s', (property) => {
+	expect(analyze(`a { ${property}: ${sample_value} }`, { colors: colors() }).colors.total).toBe(0)
 })
 
 test.each(['font-family', 'z-index'])('units do not look inside %s', (property) => {

@@ -7,7 +7,7 @@ import {
 } from '@projectwallace/css-parser'
 import { keywords } from '../values/values.ts'
 
-// Properties whose values are not searched for colors, gradients and keywords: their words are
+// Properties whose values are not searched for colors and keywords: their words are
 // names, timings or numbers (`font-family: Black` is a font, `animation: red 1s` a name).
 // Colors also skip `animation-name`; units only skip `font-family` and `z-index`.
 export const no_value_walk: ReadonlySet<string> = new Set([

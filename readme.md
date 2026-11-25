@@ -196,7 +196,7 @@ extract_colors('border', parse_value('1px solid RED'))
 // [{ value: 'RED', text: 'RED', format: 'named', line: 1, column: 11, start_offset: 10, end_offset: 13 }]
 ```
 
-- Single-property extractors (`extract_z_indexes`, `extract_box_shadows`, ...) take only the value.
+- Single-property extractors (`extract_z_indexes`, `extract_box_shadows`, ...) and `extract_gradients` take only the value.
 - Property sets are exported as `KeywordSet`s (`font_size_properties`, ...) to skip declarations early.
 - Values are returned as written; normalizing is up to you.
 

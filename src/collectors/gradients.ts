@@ -9,7 +9,7 @@ export function gradients(options: CountOptions = {}): CollectorDef<CountResult>
 			value: {
 				types: [FUNCTION],
 				enter(node, ctx) {
-					if (is_gradient(node, ctx.property)) {
+					if (is_gradient(node)) {
 						counter.add(node.text, node)
 					}
 				},
