@@ -33,7 +33,16 @@ function add_to<T extends CountItem>(
 		}
 		return
 	}
-	map.set(item, locations ? { count: 1, locations: [to_location(node, options)] } : { count: 1 })
+	if (locations) {
+		map.set(item, {
+			count:1,
+			locations: [to_location(node, options)]
+		})
+	} else {
+		map.set(item, {
+			count:1,
+		})
+	}
 }
 
 function to_result<T extends CountItem>(map: CountMap<T>, total: number): CountResult<T> {

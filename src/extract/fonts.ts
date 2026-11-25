@@ -1,12 +1,12 @@
 import { type Value, property_basename } from '@projectwallace/css-parser'
 import { KeywordSet } from '../utils/collections/keyword-set.ts'
-import { type TextMatch, to_match } from '../utils/location.ts'
+import { type TextMatch, to_location } from '../utils/location.ts'
 import {
 	type FontShorthand,
 	destructure_font_shorthand,
 	system_fonts,
 } from '../values/destructure-font-shorthand.ts'
-import { get_clean_value_text } from './shared.ts'
+import { clean_value_text, get_clean_value_text } from './shared.ts'
 
 export const font_size_properties: KeywordSet = new KeywordSet(['font-size', 'font'])
 export const line_height_properties: KeywordSet = new KeywordSet(['line-height', 'font'])
@@ -37,11 +37,12 @@ function font_part(
 	if (property !== own_property) {
 		return undefined
 	}
-	const text = get_clean_value_text(value, false)
+	const source = value.text
+	const text = clean_value_text(source, false)
 	if (text === undefined || (part !== 'line_height' && system_fonts.has(text))) {
 		return undefined
 	}
-	return { ...to_match(value), text }
+	return { value: source, ...to_location(value), text }
 }
 
 export function font_size(

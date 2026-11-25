@@ -2,10 +2,10 @@
 export { analyze } from './engine/analyzer.ts'
 export { define_collector } from './engine/define-collector.ts'
 export { create_counter, create_context_counter, summarize } from './engine/counter.ts'
+export type { Counter, ContextCounter } from './engine/counter.ts'
 export { to_location } from './utils/location.ts'
 export type { NamedMatch, TextMatch, HackMatch, LocationOptions } from './utils/location.ts'
 export { summarize_frequencies, summarize_numbers, type NumberSummary } from './engine/summary.ts'
-export type { Counter, ContextCounter } from './engine/counter.ts'
 export type {
 	CSSNode,
 	CollectorDef,

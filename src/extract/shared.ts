@@ -1,7 +1,7 @@
 import {
 	type CSSNode,
 	type Value,
-	is_operator,
+	OPERATOR,
 	str_index_of,
 	strip_value_hack,
 } from '@projectwallace/css-parser'
@@ -29,7 +29,7 @@ export function lowercase_unless_var(text: string): string {
 export function get_list_items(value: Value): CSSNode[] {
 	const items: CSSNode[] = []
 	value.for_each(function (child) {
-		if (!is_operator(child)) {
+		if (child.type !== OPERATOR) {
 			items.push(child)
 		}
 	})
@@ -43,12 +43,12 @@ export function get_clean_value_text(
 	value: Value | undefined,
 	is_custom: boolean,
 ): string | undefined {
-	if (!value) {
-		return undefined
-	}
-	const text = value.text
-	if (keywords.has(text)) {
-		return undefined
-	}
-	return is_custom ? text : strip_value_hack(text)
+	return value ? clean_value_text(value.text, is_custom) : undefined
+}
+
+/** `get_clean_value_text` for a value's text that is already read: saves reading `value.text` twice */
+export function clean_value_text(text: string, is_custom: boolean): string | undefined {
+	// Strip the hack first: `inherit\9` is still a global keyword
+	const clean = is_custom ? text : strip_value_hack(text)
+	return keywords.has(clean) ? undefined : clean
 }

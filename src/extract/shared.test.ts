@@ -9,6 +9,9 @@ test.each([
 	['inherit', false, undefined],
 	['none', false, undefined],
 	['auto', false, undefined],
+	['inherit\\9', false, undefined],
+	['none\\9', false, undefined],
+	['auto\\0', false, undefined],
 ])('get_clean_value_text("%s", custom: %s) is %j', (value, is_custom, expected) => {
 	expect(get_clean_value_text(parse_value(value), is_custom)).toBe(expected)
 })
