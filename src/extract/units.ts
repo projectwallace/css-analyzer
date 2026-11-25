@@ -8,8 +8,7 @@ import {
 import { type Match, to_match } from '../utils/location.ts'
 import { strip_unit_hack } from '../values/units.ts'
 
-// These are units, not lengths: `s` and `ms` in `transition` and `animation` count too. Only the values
-// that are names and numbers are left out (a font name, a z-index), as 9.x did.
+// Properties whose units are not counted.
 const skipped_properties = new Set(['font-family', 'z-index'])
 
 // The unit of a dimension node, as written and without a browserhack (`10px\9` is `px`), or '' when the

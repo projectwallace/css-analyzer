@@ -35,12 +35,12 @@ function add_to<T extends CountItem>(
 	}
 	if (locations) {
 		map.set(item, {
-			count:1,
+			count: 1,
 			locations: [to_location(node, options)]
 		})
 	} else {
 		map.set(item, {
-			count:1,
+			count: 1,
 		})
 	}
 }

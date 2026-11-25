@@ -7,12 +7,9 @@ import {
 } from '@projectwallace/css-parser'
 import { keywords } from '../values/values.ts'
 
-// Properties whose values are never searched for colors, gradients and keywords inside the value,
-// because their words are names, timings or plain numbers, not what the extractors look for:
-// `font-family: Black` (a font, not a color), `animation: red 1s` (an animation name, not a color),
-// `transition` and `animation` (names and timings; their durations and timing functions have their
-// own extractors) and `z-index` (a number). Colors also skip `animation-name`.
-// Units are not in this list: `1s` and `200ms` are units too, so they only skip `font-family` and `z-index`.
+// Properties whose values are not searched for colors, gradients and keywords: their words are
+// names, timings or numbers (`font-family: Black` is a font, `animation: red 1s` a name).
+// Colors also skip `animation-name`; units only skip `font-family` and `z-index`.
 export const no_value_walk: ReadonlySet<string> = new Set([
 	'font-family',
 	'transition',
