@@ -1,6 +1,8 @@
+export { get_specificity, compare_specificity, type Specificity } from './specificity.ts'
+export { get_complexity } from './complexity.ts'
 export {
-	calculate as getSpecificity,
-	calculateForAST as getSpecificityForAST,
-	compare as compareSpecificity,
-} from './specificity.ts'
-export { getComplexity, isPrefixed, isAccessibility, getCombinators } from './utils.ts'
+	get_vendor_prefixes,
+	get_accessibility_selectors,
+	get_combinators,
+	type AccessibilityMatch,
+} from './utils.ts'

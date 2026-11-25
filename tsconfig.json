@@ -27,8 +27,8 @@
 		"isolatedDeclarations": true,
 
 		// Code runs in the DOM
-		"lib": ["ES2022", "DOM", "DOM.Iterable"]
+		"lib": ["ES2022", "ES2025.Collection", "DOM", "DOM.Iterable"]
 	},
-	"include": ["src/**/*.ts"],
+	"include": ["src/**/*.ts", "test/**/*.ts"],
 	"exclude": ["node_modules"]
 }

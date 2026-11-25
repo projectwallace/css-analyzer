@@ -1,6 +1,6 @@
 {
 	"name": "@projectwallace/css-analyzer",
-	"version": "9.9.9",
+	"version": "10.0.0-alpha.0",
 	"description": "The best CSS analyzer out there. Check design tokens, complexity, specificity, performance and more.",
 	"keywords": [
 		"analytics",
@@ -39,6 +39,18 @@
 			"types": "./dist/index.d.ts",
 			"default": "./dist/index.js"
 		},
+		"./collectors": {
+			"types": "./dist/collectors/index.d.ts",
+			"default": "./dist/collectors/index.js"
+		},
+		"./presets": {
+			"types": "./dist/presets/index.d.ts",
+			"default": "./dist/presets/index.js"
+		},
+		"./utils/collections": {
+			"types": "./dist/utils/collections/index.d.ts",
+			"default": "./dist/utils/collections/index.js"
+		},
 		"./selectors": {
 			"types": "./dist/selectors/index.d.ts",
 			"default": "./dist/selectors/index.js"
@@ -47,9 +59,17 @@
 			"types": "./dist/atrules/index.d.ts",
 			"default": "./dist/atrules/index.js"
 		},
+		"./stylesheet": {
+			"types": "./dist/stylesheet/index.d.ts",
+			"default": "./dist/stylesheet/index.js"
+		},
 		"./values": {
 			"types": "./dist/values/index.d.ts",
 			"default": "./dist/values/index.js"
+		},
+		"./extract": {
+			"types": "./dist/extract/index.d.ts",
+			"default": "./dist/extract/index.js"
 		},
 		"./properties": {
 			"types": "./dist/properties/index.d.ts",
@@ -66,26 +86,26 @@
 		"check": "tsc --noEmit",
 		"build": "tsdown",
 		"knip": "knip",
-		"precommit": "pnpm run test --run && pnpm run check && pnpm run lint && pnpm run knip"
+		"precommit": "pnpm run test --run && pnpm run check && pnpm run lint && pnpm run knip && pnpm build"
 	},
 	"dependencies": {
 		"@projectwallace/css-parser": "~0.20.0"
 	},
 	"devDependencies": {
 		"@projectwallace/preset-oxlint": "^0.0.13",
-		"@vitest/coverage-v8": "^5.1.0",
+		"@vitest/coverage-v8": "^5.1.1",
 		"knip": "^6.45.1",
 		"oxfmt": "^0.78.0",
-		"oxlint": "^1.93.0",
+		"oxlint": "^1.94.0",
 		"pkg-pr-new": "^0.0.93",
 		"publint": "^0.3.25",
 		"tsdown": "^0.23.7",
 		"typescript": "^7.0.2",
 		"vite": "^8.3.8",
-		"vitest": "^5.1.0"
+		"vitest": "^5.1.1"
 	},
 	"engines": {
-		"node": ">=18.0.0",
+		"node": ">=22.18.0",
 		"pnpm": ">=11.0.0"
 	},
 	"packageManager": "pnpm@11.16.0"

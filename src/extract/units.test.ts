@@ -1,0 +1,30 @@
+import { test, expect } from 'vitest'
+import { parse_value } from '@projectwallace/css-parser/parse-value'
+import { extract_units } from './index.ts'
+
+test.each([
+	['width', '10px', ['px']],
+	['margin', '1px 2EM 3rem', ['px', 'EM', 'rem']],
+	['transition', 'opacity 200ms ease 1s', ['ms', 's']],
+	['animation', 'spin 2s', ['s']],
+	['width', 'calc(100% - 2px)', ['%', 'px']],
+	['rotate', '45deg', ['deg']],
+	['--gap', '4px', ['px']],
+	['WIDTH', '10px', ['px']],
+	['width', '10px\\9', ['px']],
+	['width', '0\\9', []],
+	['width', '12', []],
+	['font-family', 'Arial 10px', []],
+	['z-index', '10px', []],
+])('extract_units("%s", "%s") is %j', (property, value, expected) => {
+	expect(extract_units(property, parse_value(value)).map((match) => match.unit)).toEqual(expected)
+})
+
+test('points at the dimension', () => {
+	const value = '1px 22em'
+	const found = extract_units('margin', parse_value(value))
+	expect(found).toMatchObject([
+		{ value: '1px', unit: 'px', line: 1, column: 1, start_offset: 0, end_offset: 3 },
+		{ value: '22em', unit: 'em', line: 1, column: 5, start_offset: 4, end_offset: 8 },
+	])
+})

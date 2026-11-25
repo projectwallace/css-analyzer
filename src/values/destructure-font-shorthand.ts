@@ -1,15 +1,16 @@
+import type { Value } from '@projectwallace/css-parser'
 import {
 	is_dimension,
 	is_function,
 	is_identifier,
 	is_operator,
 	is_string,
-	type Value,
 } from '@projectwallace/css-parser'
-import { KeywordSet } from '../keyword-set.ts'
+import { KeywordSet } from '../utils/collections/keyword-set.ts'
+import { type Match, to_match } from '../utils/location.ts'
 import { keywords } from './values.ts'
 
-export const SYSTEM_FONTS: KeywordSet = new KeywordSet([
+export const system_fonts: KeywordSet = new KeywordSet([
 	'caption',
 	'icon',
 	'menu',
@@ -18,8 +19,8 @@ export const SYSTEM_FONTS: KeywordSet = new KeywordSet([
 	'status-bar',
 ])
 
-/** Keyword values for <absolute-size> and <relative-size> */
-const SIZE_KEYWORDS = new KeywordSet([
+//  Keyword values for <absolute-size> and <relative-size>
+const size_keywords = new KeywordSet([
 	'xx-small',
 	'x-small',
 	'small',
@@ -32,11 +33,9 @@ const SIZE_KEYWORDS = new KeywordSet([
 	'larger',
 ])
 
-/**
- * Identifier keywords that appear before font-size in the font shorthand:
- * font-style, font-variant, font-weight (keyword form), font-stretch, and "normal"
- */
-const PRE_SIZE_KEYWORDS = new KeywordSet([
+// Identifier keywords that appear before font-size in the font shorthand:
+// font-style, font-variant, font-weight (keyword form), font-stretch, and "normal"
+const pre_size_keywords = new KeywordSet([
 	// font-style
 	'italic',
 	'oblique',
@@ -59,27 +58,24 @@ const PRE_SIZE_KEYWORDS = new KeywordSet([
 	'normal',
 ])
 
-const SLASH = 47 // '/'.charCodeAt(0)
+const slash = 47 // '/'.charCodeAt(0)
 
-/**
- * Parse the CSS `font` shorthand value and extract its structural components.
- *
- * Grammar:
- *   font: [<font-style> || <font-variant> || <font-weight> || <font-stretch>]?
- *         <font-size>[/<line-height>]? <font-family>
- *
- * Does NOT handle system fonts (caption, icon, menu, …) — the caller should
- * check SYSTEM_FONTS before calling this function.
- *
- * Returns null when the value is a single var() and can't be decomposed.
- *
- * @param value - The VALUE CSSNode for a `font` declaration
- * @param cb    - Called for every global CSS keyword found in the value (e.g. inherit)
- */
-export function destructure(
-	value: Value,
-	cb: (keyword: string) => void,
-): { font_size?: string; line_height?: string; font_family?: string | null } | null {
+export type FontShorthand = {
+	font_size?: Match
+	line_height?: Match
+	font_family?: Match | null
+	keywords: Match[]
+}
+
+// Grammar:
+//   font: [<font-style> || <font-variant> || <font-weight> || <font-stretch>]?
+//         <font-size>[/<line-height>]? <font-family>
+//
+// System fonts (caption, icon, menu, ...) are not handled: check system_fonts first.
+/** Split a `font` shorthand into size, line height, family and keywords */
+export function destructure_font_shorthand(input: Value): FontShorthand | null {
+	const value = input
+	const found_keywords: Match[] = []
 	if (!value.has_children) {
 		return null
 	}
@@ -92,13 +88,13 @@ export function destructure(
 	// Report global keywords (inherit, initial, …) that appear anywhere in the value.
 	value.for_each((child) => {
 		if (is_identifier(child) && keywords.has(child.name)) {
-			cb(child.name!)
+			found_keywords.push(to_match(child))
 		}
 	})
 
 	const children = value.children
-	let font_size: string | undefined
-	let line_height: string | undefined
+	let font_size: Match | undefined
+	let line_height: Match | undefined
 	// Index of the first child node that belongs to font-family (-1 = none found)
 	let font_family_start = -1
 
@@ -108,7 +104,7 @@ export function destructure(
 	let slash_index = -1
 	for (let i = 0; i < value.child_count; i++) {
 		const child = children[i]
-		if (child && is_operator(child) && child.text.charCodeAt(0) === SLASH) {
+		if (child && is_operator(child) && child.text.charCodeAt(0) === slash) {
 			slash_index = i
 			break
 		}
@@ -119,13 +115,13 @@ export function destructure(
 		// Step 2: no slash — scan left-to-right to locate font-size.
 		//
 		// Pre-font-size tokens to skip:
-		//   • IDENTIFIER matching PRE_SIZE_KEYWORDS (bold, italic, condensed, …)
+		//   • IDENTIFIER matching pre_size_keywords (bold, italic, condensed, …)
 		//   • IDENTIFIER matching global keywords (inherit, initial, …)
 		//   • NUMBER (font-weight like 400, 700)
 		//
 		// Font-size tokens that end the pre-font-size section:
 		//   • DIMENSION  (e.g. 16px, 1.2em)
-		//   • IDENTIFIER in SIZE_KEYWORDS (small, large, medium, …)
+		//   • IDENTIFIER in size_keywords (small, large, medium, …)
 		//   • FUNCTION   (calc(), var(), …)
 		//
 		// Anything else signals we've reached font-family without a
@@ -138,25 +134,25 @@ export function destructure(
 			}
 
 			if (is_dimension(child)) {
-				font_size = child.text
+				font_size = to_match(child)
 				font_family_start = i + 1
 				break
 			}
 
 			if (is_function(child)) {
-				font_size = child.text
+				font_size = to_match(child)
 				font_family_start = i + 1
 				break
 			}
 
 			if (is_identifier(child)) {
 				const name = child.name
-				if (SIZE_KEYWORDS.has(name)) {
-					font_size = child.text
+				if (size_keywords.has(name)) {
+					font_size = to_match(child)
 					font_family_start = i + 1
 					break
 				}
-				if (PRE_SIZE_KEYWORDS.has(name) || keywords.has(name)) {
+				if (pre_size_keywords.has(name) || keywords.has(name)) {
 					continue
 				}
 				// Unrecognised identifier: treat as start of font-family.
@@ -177,11 +173,11 @@ export function destructure(
 		// The node immediately after "/" is line-height.
 		// Everything after line-height is font-family.
 		if (slash_index > 0) {
-			font_size = children[slash_index - 1]!.text
+			font_size = to_match(children[slash_index - 1]!)
 		}
 		const after_slash = slash_index + 1
 		if (after_slash < children.length) {
-			line_height = children[after_slash]!.text
+			line_height = to_match(children[after_slash]!)
 			font_family_start = after_slash + 1
 		}
 	}
@@ -189,14 +185,20 @@ export function destructure(
 	// -----------------------------------------------------------------
 	// Step 3: extract font-family as a raw substring of the value text.
 	// -----------------------------------------------------------------
-	let font_family: string | null = null
+	let font_family: Match | null = null
 	if (font_family_start >= 0 && font_family_start < children.length) {
 		const first = children[font_family_start]
 		const last = children.at(-1)
 		if (first && last) {
-			font_family = value.text.substring(first.start - value.start, last.end - value.start)
+			font_family = {
+				value: value.text.substring(first.start - value.start, last.end - value.start),
+				line: first.line,
+				column: first.column,
+				start_offset: first.start,
+				end_offset: last.end,
+			}
 		}
 	}
 
-	return { font_size, line_height, font_family }
+	return { font_size, line_height, font_family, keywords: found_keywords }
 }
