@@ -1,6 +1,6 @@
 // One test per behaviour change that MIGRATION.md announces ("Behaviour changes" and the per-property rule).
 import { test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.ts'
+import { analyze } from '../../src/engine/analyzer.ts'
 import {
 	atrules,
 	border_radiuses,
@@ -11,7 +11,7 @@ import {
 	stylesheet,
 	timing_functions,
 	units,
-} from '../collectors/index.ts'
+} from '../../src/collectors/index.ts'
 
 test.each([
 	['font-family', 'font-family: var(--a)'],

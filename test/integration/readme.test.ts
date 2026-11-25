@@ -1,6 +1,6 @@
 // The code in the README, as tests. If a snippet changes in the README, change it here too.
 import { test, expect, expectTypeOf } from 'vitest'
-import { analyze, create_counter, define_collector, summarize } from '../index.ts'
+import { analyze, create_counter, define_collector, summarize } from '../../src/index.ts'
 import {
 	colors,
 	font_sizes,
@@ -9,8 +9,8 @@ import {
 	summarize_specificity,
 	z_indexes,
 	type ResultOf,
-} from '../collectors/index.ts'
-import { design_tokens_collectors } from '../presets/index.ts'
+} from '../../src/collectors/index.ts'
+import { design_tokens_collectors } from '../../src/presets/index.ts'
 
 const css = `
 	a { color: red; font-size: 16px; z-index: 1 }

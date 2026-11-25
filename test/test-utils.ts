@@ -1,6 +1,6 @@
 import { type Atrule, type AtrulePrelude, parse } from '@projectwallace/css-parser'
-import { summarize_numbers } from '../engine/summary.ts'
-import type { CountItem, CountResult } from '../engine/types.ts'
+import { summarize_numbers } from '../src/engine/summary.ts'
+import type { CountItem, CountResult } from '../src/engine/types.ts'
 
 export type PlainCount = {
 	total: number

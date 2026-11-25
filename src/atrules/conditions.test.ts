@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest'
 import { find_contradiction, get_query_bounds, get_static_features } from './conditions.ts'
 import { get_feature_bounds } from './feature-bounds.ts'
-import { parse_prelude } from '../test/test-utils.ts'
+import { parse_prelude } from '../../test/test-utils.ts'
 
 test.each([
 	['(width: 300px)', 'media', ['width']],

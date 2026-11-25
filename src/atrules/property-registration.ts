@@ -38,16 +38,21 @@ function is_length(node: CSSNode): boolean {
 	return is_dimension_of(node, length_units) || is_zero(node)
 }
 
+// An <integer> is written without a decimal point or exponent: `2.0` and `1e3` are numbers, not integers
+function is_integer(node: CSSNode): boolean {
+	return (
+		is_number(node) &&
+		Number.isInteger(node.value) &&
+		str_index_of('.', node.text) === -1 &&
+		str_index_of('e', node.text) === -1
+	)
+}
+
 type Matcher = (node: CSSNode) => boolean
 
 const matchers: Record<string, Matcher> = {
 	'<number>': (node) => is_number(node),
-	// An <integer> has no decimal point or exponent
-	'<integer>': (node) =>
-		is_number(node) &&
-		Number.isInteger(node.value) &&
-		str_index_of('.', node.text) === -1 &&
-		str_index_of('e', node.text) === -1,
+	'<integer>': is_integer,
 	'<percentage>': is_percentage,
 	'<length>': is_length,
 	'<length-percentage>': (node) => is_length(node) || is_percentage(node),

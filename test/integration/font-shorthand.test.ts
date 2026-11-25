@@ -1,9 +1,9 @@
 import { describe, test, expect } from 'vitest'
-import { analyze } from '../engine/analyzer.ts'
-import { plain } from '../test/test-utils.ts'
-import { font_families } from '../collectors/font-families.ts'
-import { font_sizes } from '../collectors/font-sizes.ts'
-import { line_heights } from '../collectors/line-heights.ts'
+import { analyze } from '../../src/engine/analyzer.ts'
+import { plain } from '../test-utils.ts'
+import { font_families } from '../../src/collectors/font-families.ts'
+import { font_sizes } from '../../src/collectors/font-sizes.ts'
+import { line_heights } from '../../src/collectors/line-heights.ts'
 
 /** The `font` shorthand feeds three collectors from one split of the value */
 function run(css: string) {

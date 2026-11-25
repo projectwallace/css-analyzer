@@ -4,7 +4,7 @@ import {
 	get_media_browserhacks,
 	get_supports_browserhacks,
 } from './index.ts'
-import { parse_prelude } from '../test/test-utils.ts'
+import { parse_prelude } from '../../test/test-utils.ts'
 
 function hacks(matches: { hack: string }[]): string[] {
 	return matches.map((match) => match.hack)

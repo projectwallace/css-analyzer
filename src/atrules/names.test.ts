@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
 import { get_keyframes_name, get_layer_names } from './index.ts'
-import { parse_prelude } from '../test/test-utils.ts'
+import { parse_prelude } from '../../test/test-utils.ts'
 
 test.each([
 	['fade', 'fade'],

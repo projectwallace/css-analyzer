@@ -1,6 +1,6 @@
 import { test, expect, expectTypeOf } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
-import { plain } from '../test/test-utils.ts'
+import { plain } from '../../test/test-utils.ts'
 import { colors } from './colors.ts'
 import { specificity, summarize_specificity, type SpecificityResult } from './specificity.ts'
 

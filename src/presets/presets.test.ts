@@ -1,7 +1,7 @@
 import { test, expect, expectTypeOf, describe } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
 import type { CollectorDef, CountResult } from '../engine/types.ts'
-import { plain } from '../test/test-utils.ts'
+import { plain } from '../../test/test-utils.ts'
 import {
 	all_collectors,
 	analyze_all,

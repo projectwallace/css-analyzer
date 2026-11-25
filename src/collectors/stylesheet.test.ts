@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
 import { analyze } from '../engine/analyzer.ts'
-import { plain } from '../test/test-utils.ts'
+import { plain } from '../../test/test-utils.ts'
 import type { CountResult } from '../engine/types.ts'
 import { atrules } from './atrules.ts'
 import { declarations } from './declarations.ts'

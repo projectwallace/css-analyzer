@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
 import { get_feature_bounds } from './index.ts'
-import { parse_prelude } from '../test/test-utils.ts'
+import { parse_prelude } from '../../test/test-utils.ts'
 
 type Short = [feature: string, direction: string, value: number, unit: string, inclusive: boolean]
 
@@ -18,6 +18,9 @@ function short(name: 'media' | 'container', css: string) {
 test.each<[string, Short[]]>([
 	['(min-width: 400px)', [['width', 'min', 400, 'px', true]]],
 	['(MAX-WIDTH:50em)', [['width', 'max', 50, 'em', true]]],
+	['(Min-Width: 400px)', [['width', 'min', 400, 'px', true]]],
+	['(-WEBKIT-MIN-DEVICE-PIXEL-RATIO: 2)', [['-webkit-device-pixel-ratio', 'min', 2, '', true]]],
+	['(WIDTH >= 400px)', [['width', 'min', 400, 'px', true]]],
 	['(width: 600px)', [['width', 'equal', 600, 'px', true]]],
 	['(min-width: 0)', [['width', 'min', 0, '', true]]],
 	['(min-resolution: 2dppx)', [['resolution', 'min', 2, 'dppx', true]]],
