@@ -86,7 +86,7 @@
 		"check": "tsc --noEmit",
 		"build": "tsdown",
 		"knip": "knip",
-		"precommit": "pnpm run test --run && pnpm run check && pnpm run lint && pnpm run knip"
+		"precommit": "pnpm run test --run && pnpm run check && pnpm run lint && pnpm run knip && pnpm build"
 	},
 	"dependencies": {
 		"@projectwallace/css-parser": "~0.20.0"

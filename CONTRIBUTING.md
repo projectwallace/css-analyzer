@@ -9,6 +9,7 @@ pnpm check       # types
 pnpm lint        # oxlint + oxfmt
 pnpm knip        # unused code
 pnpm build       # build + publint
+pnpm precommit  # all of the above
 ```
 
 ## Code style
