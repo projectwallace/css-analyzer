@@ -18,6 +18,12 @@ export const length_units: KeywordSet = new KeywordSet([
 	'vh',
 	'vmin',
 	'vmax',
+	'svmin',
+	'svmax',
+	'lvmin',
+	'lvmax',
+	'dvmin',
+	'dvmax',
 	'vi',
 	'vb',
 	'svw',
@@ -47,6 +53,9 @@ export const length_units: KeywordSet = new KeywordSet([
 ])
 export const angle_units: KeywordSet = new KeywordSet(['deg', 'grad', 'rad', 'turn'])
 export const time_units: KeywordSet = new KeywordSet(['s', 'ms'])
+export const frequency_units: KeywordSet = new KeywordSet(['hz', 'khz'])
+export const decibel_units: KeywordSet = new KeywordSet(['db'])
+export const semitone_units: KeywordSet = new KeywordSet(['st'])
 export const flex_units: KeywordSet = new KeywordSet(['fr'])
 export const resolution_units: KeywordSet = new KeywordSet(['dpi', 'dpcm', 'dppx', 'x'])
 
