@@ -3,6 +3,8 @@ import type { CollectorDef, ContextCountResult, CountOptions, ResultOf } from '.
 import type { ColorsResult } from '../collectors/colors.ts'
 import {
 	animation_names,
+	mixins,
+	functions,
 	atrules,
 	border_radiuses,
 	box_shadows,
@@ -51,6 +53,8 @@ export type AllCollectors = {
 	z_indexes: ReturnType<typeof z_indexes>
 	displays: ReturnType<typeof displays>
 	animation_names: ReturnType<typeof animation_names>
+	mixins: ReturnType<typeof mixins>
+	functions: ReturnType<typeof functions>
 	value_prefixes: ReturnType<typeof value_prefixes>
 	value_browserhacks: ReturnType<typeof value_browserhacks>
 	units: CollectorDef<ContextCountResult>
@@ -85,6 +89,8 @@ export function all_collectors(options: AllOptions = {}): AllCollectors {
 		z_indexes: z_indexes({ locations }),
 		displays: displays({ locations }),
 		animation_names: animation_names({ locations }),
+		mixins: mixins({ locations }),
+		functions: functions({ locations }),
 		value_prefixes: value_prefixes({ locations }),
 		value_browserhacks: value_browserhacks({ locations }),
 		units: units({ contexts: true, locations }),

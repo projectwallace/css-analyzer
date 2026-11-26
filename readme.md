@@ -118,7 +118,7 @@ More types are exported from [src/collectors/index.ts](./src/collectors/index.ts
 | `font_sizes`, `font_families`, `line_heights`              | font values (also from the `font` shorthand)                                                                                                 |
 | `box_shadows`, `text_shadows`, `border_radiuses`           | shadows and radii                                                                                                                            |
 | `durations`, `timing_functions`, `animation_names`         | transitions and animations                                                                                                                   |
-| `units`, `z_indexes`, `displays`, `keywords`, `resets`     | other values                                                                                                                                 |
+| `mixins`, `functions`                                      | `@mixin` and `@function` definitions, used by `@apply` and `--name()`                                                                        |
 | `value_prefixes`, `value_browserhacks`, `value_complexity` | vendor prefixes, hacks, complexity of values                                                                                                 |
 
 All collectors: [src/collectors](./src/collectors/index.ts).
@@ -197,6 +197,7 @@ extract_colors('border', parse_value('1px solid RED'))
 ```
 
 - Single-property extractors (`extract_z_indexes`, `extract_box_shadows`, ...) and `extract_gradients` take only the value.
+- `extract_mixins` takes an at-rule (`@mixin`, `@apply`); `extract_functions` an at-rule (`@function`) or a value (`--name()`).
 - Property sets are exported as `KeywordSet`s (`font_size_properties`, ...) to skip declarations early.
 - Values are returned as written; normalizing is up to you.
 

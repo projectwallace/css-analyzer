@@ -25,3 +25,5 @@ export {
 	duration_properties,
 	timing_function_properties,
 } from './animations.ts'
+export { extract_mixins, type CustomMatch } from './mixins.ts'
+export { extract_functions } from './functions.ts'
